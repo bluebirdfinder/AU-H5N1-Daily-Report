@@ -1,1 +1,51 @@
+# This workflow runs the Python scraper twice a day to check for new H5N1 cases in Australia,
+# updates the cases database, recompiles the HTML report, and deploys it.
+name: H5N1 Report Auto Update
 
+on:
+  schedule:
+    # 每天定時執行兩次：
+    # 1. 國際標準時間 02:00 (台灣時間 10:00 AM / 澳洲 AEST 12:00 PM)
+    # 2. 國際標準時間 10:00 (台灣時間 06:00 PM / 澳洲 AEST 08:00 PM)
+    - cron: '0 2 * * *'
+    - cron: '0 10 * * *'
+  workflow_dispatch: # 允許您在 GitHub 介面上手動點擊「Run workflow」隨時觸發更新
+
+permissions:
+  contents: write # 賦予 Actions 權限可以將編譯完的 index.html 推送回儲存庫
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. 檢出儲存庫代碼 (Checkout Repository)
+        uses: actions/checkout@v4
+
+      - name: 2. 部署 Python 環境 (Set up Python)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 3. 安裝網路爬蟲依賴 (Install Python Dependencies)
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4
+
+      - name: 4. 執行爬蟲與自動更新 (Run Scraper and Compile HTML)
+        run: python h5n1.py
+
+      - name: 5. 偵測變動並推送到 GitHub (Commit and Push Changes)
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # 將生成的 index.html 加入暫存區
+          git add index.html
+          
+          # 只有在 index.html 內容真正有變更時才執行 commit，避免無意義提交導致 workflow 失敗
+          if git diff-index --quiet HEAD --; then
+            echo "沒有偵測到 H5N1 最新病例變動，跳過部署。"
+          else
+            git commit -m "自動更新：同步最新澳洲 H5N1 疫情數據 (系統時間: $(date +'%Y-%m-%d %H:%M:%S'))"
+            git push origin main
+          fi
