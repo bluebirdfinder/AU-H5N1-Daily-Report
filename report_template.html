@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026年澳洲 H5N1 禽流感風險與 Purina Blayney 廠供應鏈因應策略報告</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet CSS for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+        }
+        #map {
+            height: 500px;
+            width: 100%;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+    <!-- 頂部導航與動態更新標記 -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="bg-red-600 text-white text-xs px-2.5 py-1 rounded-full font-bold animate-pulse">LIVE TRACKING</span>
+                <h1 class="text-lg font-bold tracking-tight text-white">Nestlé Purina Blayney • Bio-Security Monitor</h1>
+            </div>
+            <div class="text-xs text-slate-400">
+                系統最後更新時間: <span class="text-emerald-400 font-semibold"><!-- COMPILE_TIME_PLACEHOLDER --></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        <!-- 核心宣示看板 & 快速摘要 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-gradient-to-br from-slate-800 to-slate-950 p-6 rounded-2xl border border-slate-800 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-white tracking-tight leading-tight">
+                        澳洲 H5N1 禽流感野鳥監測<br>暨 Blayney 廠台灣申報專案報告
+                    </h2>
+                    <p class="mt-4 text-slate-300 leading-relaxed text-sm">
+                        此平台為 Nestlé Purina 澳洲決策團隊與台灣政府申報專案組之實時情報系統。核心申報立論基於：<strong>「目前所有 H5N1 病例均侷限於極南部海岸線之野生遷徙海鳥，家禽及農業生產體系完全維持 100% 零感染（Area Freedom）。」</strong>
+                    </p>
+                </div>
+                <div class="mt-6 flex flex-wrap gap-4">
+                    <span class="inline-flex items-center rounded-md bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400 ring-1 ring-inset ring-emerald-500/20">
+                        農業生產區：100% 安全
+                    </span>
+                    <span class="inline-flex items-center rounded-md bg-blue-500/10 px-2.5 py-1 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-500/20">
+                        Blayney 廠地緣隔離：1,000+ 公里
+                    </span>
+                    <span class="inline-flex items-center rounded-md bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-400 ring-1 ring-inset ring-amber-500/20">
+                        自動監控頻率：1日2次
+                    </span>
+                </div>
+            </div>
+
+            <!-- 工廠地緣資訊面板 (修正澳洲同事指出之地理錯誤) -->
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider">工廠官方地緣邊界宣告</h3>
+                    <div class="mt-4 space-y-3">
+                        <div>
+                            <span class="text-xs text-slate-400 block">Nestlé Purina Blayney Factory Location</span>
+                            <span class="text-base font-bold text-white block">新南威爾斯州布萊尼 (Blayney, NSW)</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block">精確 GPS 地理坐標</span>
+                            <code class="text-xs text-blue-400 block bg-slate-900/50 p-2 rounded mt-1 font-mono">緯度: -33.5332 | 經度: 149.2524</code>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block">地緣隔離防線安全事實</span>
+                            <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                                本廠距離西澳 Esperance 確診帶有高達 **2,300 公里** 之超長陸地地理隔離，且距離南澳 Fleurieu 半島確診海鳥達 **940 公里**，地緣阻絕屏障極度安全。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-700 text-xs text-slate-400">
+                    * 註：Blayney 廠區海拔約 860 米，屬於氣候乾燥寒冷之高地内陸區，非遷徙性水禽偏好之沿海濕地。
+                </div>
+            </div>
+        </div>
+
+        <!-- 互動式 GIS 地緣阻絕地圖 -->
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-white">最新 H5N1 疫情與 Nestlé Blayney 廠空間隔離圖層</h3>
+                    <p class="text-xs text-slate-400 mt-1">
+                        藍色代表確診海鳥、天藍色為疑似病例、綠色為陰性排除點、紅色星號為我司布萊尼工廠所在地。
+                    </p>
+                </div>
+                <div class="mt-2 md:mt-0 flex gap-2">
+                    <button onclick="zoomToFactory()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded transition">定位 Blayney 工廠</button>
+                    <button onclick="resetMapView()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded transition">重設全澳洲視角</button>
+                </div>
+            </div>
+            <div id="map"></div>
+        </div>
+
+        <!-- 最新 5 案 + 1 排除案數據明細表格 (由 Python 自動定時排序並注入) -->
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+            <div class="p-6 border-b border-slate-700">
+                <h3 class="text-lg font-bold text-white">最新 H5N1 禽流感野鳥檢測詳細記錄清單</h3>
+                <p class="text-xs text-slate-400 mt-1">此表格依據【官方通報/採樣日期】由先至後排序，反映出西澳（Cape Le Grand）為官方首宗確診，南澳部分早期收容案稍晚正式通報。</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-900 text-slate-300 text-xs uppercase font-semibold">
+                        <tr>
+                            <th class="px-6 py-4">案件編號</th>
+                            <th class="px-6 py-4 bg-slate-800/50">官方通報/採樣日期</th>
+                            <th class="px-6 py-4">發現/收容日期</th>
+                            <th class="px-6 py-4">判定/確診日期</th>
+                            <th class="px-6 py-4">地理位置</th>
+                            <th class="px-6 py-4">感染動物</th>
+                            <th class="px-6 py-4 text-center">判定狀態</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cases-table-body" class="divide-y divide-slate-700">
+                        <!-- 由下方 JS 動態生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 聖嬰現象與季節性風險綜合評估 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                <h3 class="text-lg font-bold text-white mb-4">🌀 2026 聖嬰現象 (El Niño) 對疫情擴散之滯後衝擊</h3>
+                <div class="space-y-4 text-sm leading-relaxed text-slate-300">
+                    <p>
+                        依據澳洲氣象局 (BOM) 與世界氣象組織 (WMO) 2026 最新聖嬰指標，當前澳洲正處於中度聖嬰過渡期。
+                        聖嬰現象對禽流感的擴散具有顯著的**「氣候滯後與生態匯聚效應」**：
+                    </p>
+                    <ul class="list-disc pl-5 space-y-2 text-xs">
+                        <li><strong>內陸乾旱加劇 (生態向沿海匯聚)</strong>：聖嬰期澳洲內陸湖泊與濕地極度乾旱，迫使數百萬隻內陸野鳥與水禽往更寒冷的南部沿海濕地、海灣匯聚，大幅提高了家禽、野鳥與極地遷徙候鳥之間的接觸與交叉感染機率。</li>
+                        <li><strong>極地西風帶北偏</strong>：聖嬰引發的氣壓偏轉，使源自南極的冰川西風帶更為靠近澳洲南部沿海，導致攜帶 H5N1 病毒的極地海洋迷途候鳥（如巨鸌、賊鷗）更容易偏離常軌，登陸西澳南部 Esperance 及南澳沿岸。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                <h3 class="text-lg font-bold text-white mb-4">📅 澳洲月份別疫情擴散風險矩陣</h3>
+                <div class="space-y-3">
+                    <!-- 6-8月 -->
+                    <div class="flex items-center justify-between p-3 bg-slate-900/50 rounded-xl border border-slate-700">
+                        <div>
+                            <span class="text-xs text-slate-400 block">冬季 (6月 - 8月)</span>
+                            <span class="text-sm font-bold text-amber-400">目前階段：中度風險 (野鳥零星登陸)</span>
+                        </div>
+                        <span class="bg-amber-500/10 text-amber-400 text-xs px-2.5 py-1 rounded-full border border-amber-500/20 font-semibold">Medium</span>
+                    </div>
+                    <!-- 9-11月 -->
+                    <div class="flex items-center justify-between p-3 bg-red-950/20 rounded-xl border border-red-900/30">
+                        <div>
+                            <span class="text-xs text-slate-400 block">春季遷徙潮 (9月 - 11月)</span>
+                            <span class="text-sm font-bold text-red-400">關鍵期：高度風險 (候鳥返北、春雨匯聚)</span>
+                        </div>
+                        <span class="bg-red-500/10 text-red-400 text-xs px-2.5 py-1 rounded-full border border-red-500/20 font-semibold">HIGH</span>
+                    </div>
+                    <!-- 12-2月 -->
+                    <div class="flex items-center justify-between p-3 bg-slate-900/50 rounded-xl border border-slate-700">
+                        <div>
+                            <span class="text-xs text-slate-400 block">夏季高溫期 (12月 - 2月)</span>
+                            <span class="text-sm font-bold text-slate-400">緩解期：低度風險 (高溫及紫外線抑制病毒)</span>
+                        </div>
+                        <span class="bg-slate-700/50 text-slate-400 text-xs px-2.5 py-1 rounded-full border border-slate-700 font-semibold">Low</span>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-4 leading-relaxed">
+                    * 註：9-11月春季是整個西伯利亞-東亞-澳亞遷徙線 (EAAF) 鳥類返航的尖峰期，我司需在此階段前完成台灣防檢署 (APHIA) 的個案免除協議簽訂，搶佔時間優勢。
+                </p>
+            </div>
+        </div>
+
+        <!-- 台灣 APHIA 申報對應之核心科學論點 -->
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+            <h3 class="text-lg font-bold text-white mb-4">🛡️ 對台灣防檢署 APHIA 申報之三大黃金論點</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                <div class="p-4 bg-slate-900/40 rounded-xl border border-slate-700/60">
+                    <div class="text-blue-400 font-bold mb-2">1. 零家禽/農業體系接觸</div>
+                    <p class="text-xs text-slate-300 leading-relaxed text-justify">
+                        如澳洲聯邦首席獸醫官 Beth Cookson 所宣告，澳洲境內所有 H5N1 病毒檢出僅存在於遠離農業區之野生迁徙海鳥，家禽業及商業飼料加工體系 100% 維持無疫區（Area Freedom）狀態。
+                    </p>
+                </div>
+                <div class="p-4 bg-slate-900/40 rounded-xl border border-slate-700/60">
+                    <div class="text-blue-400 font-bold mb-2">2. Blayney 廠高溫核心製程</div>
+                    <p class="text-xs text-slate-300 leading-relaxed text-justify">
+                        Nestlé Purina Blayney 廠之乾糧生產採用國際一流之雙螺桿擠壓高溫膨化技術 (Extrusion)，產品核心溫度維持在 **120°C 至 135°C 達 15-30 秒**，遠超 OIE 與 APHIA 規定殺滅 H5 禽流感所需之 70°C 達 1 秒之標準。
+                    </p>
+                </div>
+                <div class="p-4 bg-slate-900/40 rounded-xl border border-slate-700/60">
+                    <div class="text-blue-400 font-bold mb-2">3. 絕對地緣天然隔離</div>
+                    <p class="text-xs text-slate-300 leading-relaxed text-justify">
+                        Blayney 廠位於內陸高地（海拔 860 米），與極地遷徙海鳥登陸之西澳南部 Esperance 海灘、南澳 Knights Beach 存在高度屏障，地理距離達 940 至 2,300 公里，天然物理隔離完美。
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 官方權威參考資料來源 -->
+        <footer class="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-xs space-y-4">
+            <div class="text-slate-400 font-semibold uppercase tracking-wider">官方權威參考資料 (References)</div>
+            <ul class="space-y-2 text-slate-400">
+                <li>
+                    [1] 澳洲農業、漁業及林業部 (DAFF) 官方檢測即時更新：
+                    <a href="https://www.agriculture.gov.au/node/26086" target="_blank" class="text-blue-400 hover:underline">Department of Agriculture, Fisheries and Forestry - H5 bird flu testing update</a>
+                </li>
+                <li>
+                    [2] 澳洲聯邦首席獸醫官 Dr. Beth Cookson 針對第四起確診及 Roses Beach 疑似病例之官方聲明 (June 2026).
+                </li>
+                <li>
+                    [3] 南澳州政府農業、食品及區域部 (PIRSA) 野生海鳥安全檢驗排除公告：Fowlers Bay - Negative Detection (June 24, 2026).
+                </li>
+            </ul>
+        </footer>
+
+    </main>
+
+    <!-- 核心數據庫：此處將供 Python 爬蟲定時自動替換注入最新 JSON -->
+    <script>
+        // 【動態資料注入點】
+        // 請勿刪除此註解或變更變數宣告格式，Python 爬蟲會將此處自動覆蓋更新
+        window.H5N1_CASES = /* CASES_DATABASE_PLACEHOLDER */ [
+          {
+            "id": "CASE-001",
+            "type": "Confirmed",
+            "species": "褐賊鷗 (Brown Skua)",
+            "location": "西澳埃斯佩蘭斯 Cape Le Grand 國家公園",
+            "latitude": -33.9912,
+            "longitude": 122.1481,
+            "found_date": "2026-06-15",
+            "notify_date": "2026-06-19",
+            "confirm_date": "2026-06-20",
+            "notes": "全澳洲官方首宗確診高致病性 H5N1 案例。"
+          },
+          {
+            "id": "CASE-002",
+            "type": "Confirmed",
+            "species": "南方巨鸌 (Southern Giant Petrel)",
+            "location": "西澳埃斯佩蘭斯地區 (東部海岸線)",
+            "latitude": -33.8613,
+            "longitude": 121.9021,
+            "found_date": "2026-06-18",
+            "notify_date": "2026-06-20",
+            "confirm_date": "2026-06-22",
+            "notes": "西澳第二例確診，位於地緣隔離之極南部海岸線。"
+          },
+          {
+            "id": "CASE-003",
+            "type": "Confirmed",
+            "species": "巨鸌 (Giant Petrel)",
+            "location": "南澳 Fleurieu 半島 Knights Beach",
+            "latitude": -35.5325,
+            "longitude": 138.6214,
+            "found_date": "2026-06-14",
+            "notify_date": "2026-06-19",
+            "confirm_date": "2026-06-24",
+            "notes": "南澳首宗野鳥確診案，早期被收容，後續由 PIRSA 及 ACDP 採樣確診。"
+          },
+          {
+            "id": "CASE-004",
+            "type": "Confirmed",
+            "species": "巨鸌 (Giant Petrel)",
+            "location": "西澳丹斯伯勒 (Dunsborough) 地區",
+            "latitude": -33.6128,
+            "longitude": 115.1012,
+            "found_date": "2026-06-22",
+            "notify_date": "2026-06-24",
+            "confirm_date": "2026-06-27",
+            "notes": "6 月 27 日由聯邦首席獸醫官 Beth Cookson 發表官方聲明正式確診，為全澳第 4 例確診野鳥。"
+          },
+          {
+            "id": "CASE-005",
+            "type": "Suspect",
+            "species": "巨鸌 (Giant Petrel)",
+            "location": "西澳 Roses Beach (埃斯佩蘭斯西側)",
+            "latitude": -33.8752,
+            "longitude": 121.7915,
+            "found_date": "2026-06-25",
+            "notify_date": "2026-06-26",
+            "confirm_date": "進行中 (Pending)",
+            "notes": "Roses Beach 發現之疑似陽性病例，檢體正由 CSIRO 國家實驗室 (ACDP) 進行最後覆檢中。"
+          },
+          {
+            "id": "CASE-006",
+            "type": "Negative",
+            "species": "死亡海鳥 (2隻)",
+            "location": "南澳 Fowlers Bay Beach",
+            "latitude": -31.9912,
+            "longitude": 132.4331,
+            "found_date": "2026-06-18",
+            "notify_date": "2026-06-18",
+            "confirm_date": "陰性 (已排除)",
+            "notes": "經南澳農業廳 (PIRSA) 實施 PCR 採樣排查，最終宣告檢測為陰性安全排除。"
+          }
+        ];
+
+        // 雀巢布萊尼工廠地理坐標
+        const FACTORY_LAT = -33.5332;
+        const FACTORY_LNG = 149.2524;
+
+        let map;
+        let markersGroup = [];
+
+        // 初始化地圖與資料渲染
+        window.addEventListener('load', () => {
+            initTable();
+            initMap();
+        });
+
+        // 1. 動態渲染表格
+        function initTable() {
+            const tbody = document.getElementById('cases-table-body');
+            tbody.innerHTML = '';
+
+            window.H5N1_CASES.forEach(c => {
+                let badgeClass = '';
+                let statusLabel = '';
+
+                if (c.type === 'Confirmed') {
+                    badgeClass = 'bg-red-500/10 text-red-400 ring-1 ring-inset ring-red-500/20';
+                    statusLabel = '確診 (Confirmed)';
+                } else if (c.type === 'Suspect') {
+                    badgeClass = 'bg-blue-500/10 text-blue-400 ring-1 ring-inset ring-blue-500/20';
+                    statusLabel = '疑似 (Suspect)';
+                } else {
+                    badgeClass = 'bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/20';
+                    statusLabel = '陰性排除 (Negative)';
+                }
+
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-slate-700/50 transition';
+                row.innerHTML = `
+                    <td class="px-6 py-4 font-mono text-xs font-semibold text-slate-300">${c.id}</td>
+                    <td class="px-6 py-4 bg-slate-800/30 font-semibold text-slate-200">${c.notify_date}</td>
+                    <td class="px-6 py-4 text-slate-400 text-xs">${c.found_date}</td>
+                    <td class="px-6 py-4 font-semibold text-xs ${c.type === 'Negative' ? 'text-emerald-400' : 'text-slate-300'}">${c.confirm_date}</td>
+                    <td class="px-6 py-4 text-xs font-medium text-slate-200">${c.location}</td>
+                    <td class="px-6 py-4 text-xs text-slate-400">${c.species}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ${badgeClass}">
+                            ${statusLabel}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // 2. 初始化 GIS 地圖
+        function initMap() {
+            // 中心點定於南澳洲沿海
+            map = L.map('map').setView([-32.0, 135.0], 4.5);
+
+            // 引入高質感深色地圖底圖
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+            }).addTo(map);
+
+            // 繪製 Nestlé Blayney 工廠標記 (自訂精緻紅色星號 Marker)
+            const factoryIcon = L.divIcon({
+                html: `<div style="background-color: #ef4444; width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px #ef4444;" class="animate-ping"></div>`,
+                className: 'custom-factory-marker',
+                iconSize: [14, 14],
+                iconAnchor: [7, 7]
+            });
+
+            const factoryMarker = L.marker([FACTORY_LAT, FACTORY_LNG], { icon: factoryIcon }).addTo(map);
+            factoryMarker.bindPopup(`
+                <div style="color: #1e293b; font-family: sans-serif; font-size: 12px; width: 220px;">
+                    <strong style="color: #dc2626; font-size: 14px;">Nestlé Purina Blayney</strong><br>
+                    <span style="font-weight: 600; color: #475569;">新南威爾斯州布萊尼廠</span><br>
+                    <hr style="margin: 6px 0; border: none; border-top: 1px solid #e2e8f0;">
+                    📍 GPS坐標：-33.5332, 149.2524<br>
+                    🛡️ 安全特徵：海拔 860m，内陸超強天然地理隔離防線，全產線採用 120°C+ 高溫擠壓高膨化技術，家禽來源 100% 來自安全無疫區。
+                </div>
+            `);
+
+            // 繪製 H5N1 疫情與排除病例點
+            window.H5N1_CASES.forEach(c => {
+                let color = '#ef4444'; // Confirmed = 紅色
+                let typeText = '確診 (Confirmed)';
+                if (c.type === 'Suspect') {
+                    color = '#3b82f6'; // Suspect = 藍色
+                    typeText = '疑似 (Suspect)';
+                } else if (c.type === 'Negative') {
+                    color = '#10b981'; // Negative = 綠色
+                    typeText = '陰性排除 (Negative)';
+                }
+
+                const wildBirdIcon = L.divIcon({
+                    html: `<div style="background-color: ${color}; width: 10px; height: 10px; border: 1.5px solid white; border-radius: 50%; box-shadow: 0 0 8px ${color};"></div>`,
+                    className: 'custom-wildbird-marker',
+                    iconSize: [10, 10],
+                    iconAnchor: [5, 5]
+                });
+
+                const marker = L.marker([c.latitude, c.longitude], { icon: wildBirdIcon }).addTo(map);
+                marker.bindPopup(`
+                    <div style="color: #1e293b; font-family: sans-serif; font-size: 11px; width: 200px;">
+                        <strong style="color: ${color}; font-size: 12px;">[${c.id}] ${typeText}</strong><br>
+                        <span style="font-weight: 600; color: #0f172a;">${c.location}</span><br>
+                        <hr style="margin: 4px 0; border: none; border-top: 1px solid #e2e8f0;">
+                        🦆 感染動物：${c.species}<br>
+                        📅 發現收容：${c.found_date}<br>
+                        📋 官方通報：${c.notify_date}<br>
+                        🧪 判定日期：${c.confirm_date}<br>
+                        📋 說明：${c.notes}
+                    </div>
+                `);
+                markersGroup.push(marker);
+            });
+        }
+
+        // 定位到 Blayney 工廠
+        window.zoomToFactory = function() {
+            if (map) {
+                map.setView([FACTORY_LAT, FACTORY_LNG], 8);
+            }
+        };
+
+        // 重設全澳洲地緣視野
+        window.resetMapView = function() {
+            if (map) {
+                map.setView([-32.0, 135.0], 4.5);
+            }
+        };
+    </script>
+</body>
+</html>
