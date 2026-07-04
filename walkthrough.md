@@ -4,6 +4,14 @@
 
 ---
 
+## 📅 2026-07-04 18:05：西澳 DPIRD 官方連結更新與說明文檔刷新
+
+- 修正了 `h5n1.py` 內建的西澳 DPIRD 參考資料網址，改為最新的正確連結：
+  `https://www.wa.gov.au/organisation/department-of-primary-industries-and-regional-development/avian-influenza`
+- 一併刷新了所有 6 個檔案的本機修改日期，保持檔案日期百分之百同步。
+
+---
+
 ## 📅 2026-07-04 17:45：最短地緣距離動態計算與自適應參考文獻升級
 
 為了解決手動修改網頁距離文案容易造成前後矛盾，以及參考資料需要隨著新病例省份動態擴展的問題，我們進一步完成了以下進階功能：
@@ -19,7 +27,7 @@
      - ③ 最下方 APHIA 申報黃金論點第 3 點：`最近地理距離僅 289 公里`。
 2. **自適應動態參考文獻庫 (References)**：
    - 將 HTML 底部的參考資料列表改為完全動態生成。
-   - 會自動依據當前資料庫中病例分布的省份，自適應追加該省政府農業廳 the 官方監控網址（例如當前檢出西澳病例，列表自動動態多出第 `[5]` 條西澳農業廳 DPIRD WA 官網連結）。
+   - 會自動依據當前資料庫中病例分布的省份，自適應追加該省政府農業廳的官方監控網址（例如當前檢出西澳病例，列表自動動態多出第 `[5]` 條西澳農業廳 DPIRD WA 官網連結）。
 
 ### 🧪 本地測試與驗證結果
 * 執行指令：`python h5n1.py`
@@ -67,7 +75,7 @@
    - 將下載的模板 `h5n1 (1).html` 更名為 `report_template.html` 放入專案根目錄，使 Python 腳本能順利讀取到模板並進行注入。
 3. **HTML 注入語法 Bug 修正**：
    - 原模板中的 JavaScript 預設寫了 `window.H5N1_CASES = /* CASES_DATABASE_PLACEHOLDER */ [ ... ];`，而 Python 直接進行字串取代，會導致生成的 `index.html` 產生 `] [` 的 JavaScript 語法錯誤。
-   - 我們在 `h5n1.py` 中將取代邏輯升級為正規表示式（`re.sub`），執行時會自動清除模板中多餘的預設 JavaScript 陣列，只保留動態注入的最新數據，徹底解決了網頁在地圖渲染時的潛在 JavaScript crash。
+   - We 在 `h5n1.py` 中將取代邏輯升級為正規表示式（`re.sub`），執行時會自動清除模板中多餘的預設 JavaScript 陣列，只保留動態注入的最新數據，徹底解決了網頁在地圖渲染時的潛在 JavaScript crash。
 4. **控制台 CP950 編碼問題修復 (Windows 執行 crash 修正)**：
    - Windows 本地控制台（繁體中文語系預設 CP950 編碼）在印出帶有 Emoji（如 🎉）的字串時會拋出 `UnicodeEncodeError`。
    - 我們在 `h5n1.py` 頂部引入了 `sys.stdout.reconfigure(encoding='utf-8')`，並優化了輸出文字，使其無論在本地 Windows 還是 GitHub 雲端 Linux 下執行都 100% 綠燈成功。

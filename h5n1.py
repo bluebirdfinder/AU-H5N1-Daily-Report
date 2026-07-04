@@ -419,7 +419,7 @@ def generate_dynamic_references(cases_data):
             has_vic = True
             
     if has_wa:
-        refs.append('西澳州政府一次產業及區域發展部 (DPIRD WA) 禽流感防線動態更新：<a href="https://www.agric.wa.gov.au/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 hover:underline">DPIRD WA - Avian influenza response</a>')
+        refs.append('西澳州政府一次產業及區域發展部 (DPIRD WA) 禽流感防線動態更新：<a href="https://www.wa.gov.au/organisation/department-of-primary-industries-and-regional-development/avian-influenza" target="_blank" class="text-blue-400 hover:underline">DPIRD WA - Avian influenza updates</a>')
     if has_vic:
         refs.append('維多利亞州政府農業廳 (Agriculture Victoria) 禽流感疫情公告：<a href="https://agriculture.vic.gov.au/biosecurity/animal-diseases/poultry-diseases/avian-influenza" target="_blank" class="text-blue-400 hover:underline">Agriculture Victoria - Bird flu update</a>')
         
