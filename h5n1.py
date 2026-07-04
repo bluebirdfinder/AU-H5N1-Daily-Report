@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-H5N1 澳洲疫情自動追蹤與報告編譯引擎
-功能：自動爬取澳洲農業部 (DAFF) 最新公告，更新病例資料庫，並動態寫入 HTML 報告範本中。
+H5N1 澳洲疫情自動追蹤與報告編譯引擎 (全自動地理定位升級版)
+功能：自動爬取澳洲農業部 (DAFF) 及 NSW DPIRD 官網最新公告，更新病例資料庫，
+      並自動透過 OpenStreetMap Nominatim API 對新地點進行地理定位，動態寫入 HTML 地圖。
 """
 
 import os
@@ -16,7 +17,7 @@ from datetime import datetime, timedelta, timezone
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
 
-# ==================== 1. 基礎病例資料庫 (包含 2026 年 6 月最新 6 例) ====================
+# ==================== 1. 基礎病例資料庫 (包含 2026 年 6-7 月最新 7 例) ====================
 # 當爬蟲執行時，會以這個結構為基礎，並嘗試與官網最新發布的文字進行比對與動態修正。
 DEFAULT_CASES = [
     {
@@ -90,66 +91,229 @@ DEFAULT_CASES = [
         "notify_date": "2026-06-18",
         "confirm_date": "陰性 (已排除)",
         "notes": "南澳 Fowlers Bay 發現之海鳥屍體，經南澳農業廳 (PIRSA) PCR 檢測證實為陰性，成功排除禽流感嫌疑。"
+    },
+    {
+        "id": "CASE-007",
+        "type": "Suspect",  # 7月3日初步檢出
+        "species": "巨鸌 (Giant Petrel)",
+        "location": "新南威爾斯州 Hawks Nest (Newcastle 以北)",
+        "latitude": -32.6658,
+        "longitude": 152.1793,
+        "found_date": "2026-07-02",
+        "notify_date": "2026-07-03",
+        "confirm_date": "進行中 (Pending)",
+        "notes": "新南威爾斯州 (NSW) 首宗野鳥疑似病例。於 Hawks Nest 發現之巨鸌初步檢出呈 H5 陽性，檢體已送往 ACDP 國家實驗室進行 H5N1 確診覆核中。"
     }
 ]
 
+def get_coordinates_from_api(location_name):
+    """
+    透過 OpenStreetMap Nominatim 免費地理編碼 API，將地名轉換為精確 GPS 經緯度
+    """
+    query = f"{location_name}, Australia"
+    url = "https://nominatim.openstreetmap.org/search"
+    params = {
+        "q": query,
+        "format": "json",
+        "limit": 1
+    }
+    # 依據 Nominatim 使用政策，必須聲明一個有意義且獨特之 User-Agent，避免被封鎖
+    headers = {
+        "User-Agent": "Purina-Blayney-H5N1-Monitor/1.0 (contact: bluebirdfinder@example.com)"
+    }
+    try:
+        response = requests.get(url, params=params, headers=headers, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if data:
+                lat = float(data[0]["lat"])
+                lon = float(data[0]["lon"])
+                display_name = data[0]["display_name"]
+                print(f"[地理編碼成功] 地名: {location_name} -> 坐標: ({lat}, {lon})")
+                return lat, lon
+    except Exception as e:
+        print(f"[地理編碼失敗] 無法解析地名 '{location_name}': {str(e)}")
+    return None, None
+
+def discover_new_cases(soup, existing_cases):
+    """
+    動態分析網頁 HTML，尋找潛在的全新疫情地點，並自動進行地理定位
+    """
+    if not soup:
+        return []
+        
+    # 提取所有包含關鍵字之段落文字
+    relevant_texts = []
+    for elem in soup.find_all(["p", "li"]):
+        txt = elem.text.strip()
+        if any(kw in txt.lower() for kw in ["wild bird", "petrel", "skua", "seabird", "influenza", "h5n1", "h5", "detection"]):
+            relevant_texts.append(txt)
+            
+    # 用正則表達式匹配地點特徵，例如 "near X"、"at X"、"in X"、"from X"
+    # X 通常為 1-3 個大寫字母開頭之英文單字（如 Knights Beach, Hawks Nest）
+    candidates = []
+    for txt in relevant_texts:
+        matches = re.findall(r"\b(near|at|in|from)\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+){0,2})", txt)
+        for prep, m in matches:
+            m_clean = m.strip(",.() ")
+            # 排除一些非地點之常見英文名詞與字詞
+            if m_clean.lower() in ["australia", "western australia", "south australia", "new south wales", "victoria", 
+                                  "queensland", "tasmania", "june", "july", "august", "september", "acdp", "csiro", 
+                                  "emergency", "avian", "influenza", "h5n1", "h5", "the", "department", "giant", "southern"]:
+                continue
+            candidates.append((m_clean, txt))
+            
+    # 移除重複的候選地點
+    unique_candidates = {}
+    for loc, source_text in candidates:
+        if loc not in unique_candidates:
+            unique_candidates[loc] = source_text
+            
+    new_discovered = []
+    case_idx = len(existing_cases) + 1
+    
+    for loc, src_txt in unique_candidates.items():
+        # 1. 檢查是否已經存在於現有病例列表中 (用名字相似度或包含關係)
+        is_existing = False
+        for ec in existing_cases:
+            if loc.lower() in ec["location"].lower() or ec["location"].lower() in loc.lower():
+                is_existing = True
+                break
+        if is_existing:
+            continue
+            
+        # 2. 呼叫地理編碼 API 獲取坐標
+        print(f"[動態偵測] 發現全新潛在疫情地點關鍵字: '{loc}'，正在進行地理定位...")
+        lat, lon = get_coordinates_from_api(loc)
+        if lat is None or lon is None:
+            continue  # 定位失敗，跳過
+            
+        # 3. 再次藉由坐標檢查是否為已知點的重複定位 (防止名字不同但經緯度極近，如 10 公里內)
+        is_close = False
+        for ec in existing_cases:
+            dist = abs(ec["latitude"] - lat) + abs(ec["longitude"] - lon)
+            if dist < 0.1:  # 約小於 10 公里
+                is_close = True
+                break
+        if is_close:
+            continue
+            
+        # 4. 判斷確診狀態
+        type_status = "Suspect"
+        confirm_date = "進行中 (Pending)"
+        notes_prefix = "動態偵測疑似病例。"
+        if any(kw in src_txt.lower() for kw in ["confirmed", "has confirmed", "tests confirmed"]):
+            type_status = "Confirmed"
+            now_taipei = datetime.now(timezone.utc) + timedelta(hours=8)
+            confirm_date = now_taipei.strftime("%Y-%m-%d")
+            notes_prefix = "官方已確診病例。"
+            
+        # 5. 建立新病例項目
+        new_case = {
+            "id": f"CASE-{case_idx:03d}",
+            "type": type_status,
+            "species": "野生候鳥 (野鳥監測)",
+            "location": f"新偵測：{loc}",
+            "latitude": lat,
+            "longitude": lon,
+            "found_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+            "notify_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+            "confirm_date": confirm_date,
+            "notes": f"【動態爬蟲自動生成】{notes_prefix}來源文字段落：\"{src_txt}\""
+        }
+        print(f"[動態新增成功] 成功將新地點 '{loc}' 寫入病例資料庫 (ID: {new_case['id']}, 坐標: {lat}, {lon})")
+        new_discovered.append(new_case)
+        case_idx += 1
+        
+    return new_discovered
+
 def fetch_daff_updates():
     """
-    從澳洲農業部官網 (DAFF) 爬取最新資訊，並嘗試對現存案例進行狀態升級。
+    從澳洲農業部官網 (DAFF) 及 NSW DPIRD 官網爬取最新資訊，並對病例進行動態狀態比對與升級。
     """
-    url = "https://www.agriculture.gov.au/node/26086"
+    daff_url = "https://www.agriculture.gov.au/node/26086"
+    nsw_url = "https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza"
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Connection": "keep-alive"
     }
     
-    print(f"正在連線澳洲農業部官網: {url} ...")
+    daff_soup = None
+    nsw_soup = None
+    
+    # 1. 爬取聯邦 DAFF 官網
+    print(f"正在連線澳洲農業部官網: {daff_url} ...")
     try:
-        response = requests.get(url, headers=headers, timeout=20)
-        if response.status_code != 200:
-            print(f"警告: 官網連線失敗 (HTTP status {response.status_code})。將採用基礎資料庫編譯。")
-            return DEFAULT_CASES
-        
-        soup = BeautifulSoup(response.text, "html.parser")
-        page_text = soup.get_text()
-        
-        # 建立深層複製，避免影響預設資料
-        cases = json.loads(json.dumps(DEFAULT_CASES))
-        
-        # 爬蟲自動化比對規則 (1)：比對 Roses Beach 案例是否已經確診
-        # 如果網頁文字中包含 "confirm"、"Roses Beach" 且不再是單純的 "suspect"，則代表狀態更新了
-        if "Roses Beach" in page_text:
-            # 尋找是否在 Roses Beach 案例的段落裡有 confirmed 關鍵字
-            roses_paragraphs = [p.text for p in soup.find_all(["p", "li"]) if "Roses Beach" in p.text]
-            for p in roses_paragraphs:
-                if any(kw in p.lower() for kw in ["confirmed", "has confirmed", "tests confirmed"]):
-                    for case in cases:
-                        if case["id"] == "CASE-005":
-                            if case["type"] != "Confirmed":
-                                case["type"] = "Confirmed"
-                                # 取得台北時間
-                                now_taipei = datetime.now(timezone.utc) + timedelta(hours=8)
-                                case["confirm_date"] = now_taipei.strftime("%Y-%m-%d")
-                                case["notes"] = "原西澳 Roses Beach 疑似病例，經 ACDP 國家實驗室進一步檢測，官方已正式升級為確診病例。"
-                                print("[動態更新] 偵測到 Roses Beach 疑似病例 (CASE-005) 已轉為『確診』狀態！")
-                                
-        # 爬蟲自動化比對規則 (2)：偵測是否有新的數字案例 (例如 "fifth confirmed case", "sixth confirmed case")
-        # 藉此提醒管理團隊有突破性新病例爆發
-        case_mentions = re.findall(r"(\w+)\s+(?:confirmed|H5N1)\s+case", page_text, re.IGNORECASE)
-        if case_mentions:
-            print(f"偵測到網頁提及病例數量關鍵字: {set(case_mentions)}")
-            
-        return cases
-
+        response = requests.get(daff_url, headers=headers, timeout=20)
+        if response.status_code == 200:
+            daff_soup = BeautifulSoup(response.text, "html.parser")
+        else:
+            print(f"警告: 聯邦 DAFF 連線失敗，HTTP 狀態碼: {response.status_code}")
     except Exception as e:
-        print(f"網路爬蟲發生例外錯誤: {str(e)}。將安全回退使用內置最安全資料庫編譯。")
-        return DEFAULT_CASES
+        print(f"警告: 聯邦 DAFF 連線錯誤: {str(e)}")
+        
+    # 2. 爬取新南威爾斯州 DPIRD 官網
+    print(f"正在連線新南威爾斯州 DPIRD 官網: {nsw_url} ...")
+    try:
+        response = requests.get(nsw_url, headers=headers, timeout=20)
+        if response.status_code == 200:
+            nsw_soup = BeautifulSoup(response.text, "html.parser")
+        else:
+            print(f"警告: NSW DPIRD 連線失敗，HTTP 狀態碼: {response.status_code}")
+    except Exception as e:
+        print(f"警告: NSW DPIRD 連線錯誤: {str(e)}")
+        
+    # 建立深層複製，避免影響預設資料
+    cases = json.loads(json.dumps(DEFAULT_CASES))
+    
+    # 輔助比對函數：尋找特定地點名稱之段落是否包含「確診 (confirmed)」關鍵字
+    def check_confirmed_in_soup(soup, location_keyword):
+        if not soup:
+            return False
+        paragraphs = [p.text for p in soup.find_all(["p", "li"]) if location_keyword in p.text]
+        for p in paragraphs:
+            if any(kw in p.lower() for kw in ["confirmed", "has confirmed", "tests confirmed", "confirmed as"]):
+                return True
+        return False
+
+    # 比對與升級規則 (1)：比對 Roses Beach 案例是否已經確診
+    if check_confirmed_in_soup(daff_soup, "Roses Beach") or check_confirmed_in_soup(nsw_soup, "Roses Beach"):
+        for case in cases:
+            if case["id"] == "CASE-005":
+                if case["type"] != "Confirmed":
+                    case["type"] = "Confirmed"
+                    now_taipei = datetime.now(timezone.utc) + timedelta(hours=8)
+                    case["confirm_date"] = now_taipei.strftime("%Y-%m-%d")
+                    case["notes"] = "原西澳 Roses Beach 疑似病例，經 ACDP 國家實驗室進一步檢測，官方已正式升級為確診病例。"
+                    print("[動態更新] 偵測到 Roses Beach 疑似病例 (CASE-005) 已轉為『確診』狀態！")
+                                
+    # 比對與升級規則 (2)：比對 Hawks Nest 案例是否已經確診
+    if check_confirmed_in_soup(daff_soup, "Hawks Nest") or check_confirmed_in_soup(nsw_soup, "Hawks Nest"):
+        for case in cases:
+            if case["id"] == "CASE-007":
+                if case["type"] != "Confirmed":
+                    case["type"] = "Confirmed"
+                    now_taipei = datetime.now(timezone.utc) + timedelta(hours=8)
+                    case["confirm_date"] = now_taipei.strftime("%Y-%m-%d")
+                    case["notes"] = "新南威爾斯州 (NSW) 首宗確診病例。原 Hawks Nest 疑似病例，經 ACDP 國家實驗室檢測，官方已正式升級為確診病例。"
+                    print("[動態更新] 偵測到 Hawks Nest 疑似病例 (CASE-007) 已轉為『確診』狀態！")
+            
+    # 3. 動態發現全新疫情地點並加入病例庫 (AI 智慧定位模組)
+    discovered_cases = discover_new_cases(daff_soup, cases) + discover_new_cases(nsw_soup, cases)
+    for nc in discovered_cases:
+        # 坐標防重覆寫入 (10公里範圍內不重覆)
+        if not any(abs(c["latitude"] - nc["latitude"]) + abs(c["longitude"] - nc["longitude"]) < 0.1 for c in cases):
+            cases.append(nc)
+
+    return cases
 
 def main():
     # 1. 抓取最新病例數據
     cases_data = fetch_daff_updates()
     
     # 2. 依照「官方通報/採樣日期」由先至後進行排序 (Ascending Chronological Order)
-    # 這樣能完美還原官方介入的疫情發展史
     cases_data.sort(key=lambda x: x["notify_date"])
     
     # 3. 讀取網頁模板檔案 (report_template.html)
