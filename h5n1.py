@@ -10,6 +10,7 @@ import os
 import sys
 import re
 import json
+import math
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta, timezone
@@ -106,6 +107,22 @@ DEFAULT_CASES = [
         "notes": "新南威爾斯州 (NSW) 首宗野鳥疑似病例。於 Hawks Nest 發現之巨鸌初步檢出呈 H5 陽性，檢體已送往 ACDP 國家實驗室進行 H5N1 確診覆核中。"
     }
 ]
+
+def calculate_distance(lat1, lon1, lat2, lon2):
+    """
+    使用 Haversine 公式計算地球上兩點之間的直線距離 (公里)
+    """
+    R = 6371.0  # 地球平均半徑 (公里)
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    delta_phi = math.radians(lat2 - lat1)
+    delta_lambda = math.radians(lon2 - lon1)
+    
+    a = math.sin(delta_phi / 2.0) ** 2 + \
+        math.cos(phi1) * math.cos(phi2) * \
+        math.sin(delta_lambda / 2.0) ** 2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return R * c
 
 def get_coordinates_from_api(location_name):
     """
@@ -380,6 +397,39 @@ def generate_dynamic_summary(cases_data):
         
     return official_text, media_text
 
+def generate_dynamic_references(cases_data):
+    """
+    動態生成網頁底部的官方權威參考資料 (References) 列表。
+    """
+    refs = [
+        '澳洲農業、漁業及林業部 (DAFF) 官方檢測即時更新：<a href="https://www.agriculture.gov.au/node/26086" target="_blank" class="text-blue-400 hover:underline">Department of Agriculture, Fisheries and Forestry - H5 bird flu testing update</a>',
+        '新南威爾斯州政府一次產業及區域發展廳 (NSW DPIRD) 禽流感專區即時更新：<a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 hover:underline">NSW DPIRD - Avian influenza updates</a>',
+        '澳洲聯邦首席獸醫官 Dr. Beth Cookson 針對高致病性 H5N1 野鳥病例及 Roses Beach 疑似病例之官方安全聲明 (2026).',
+        '南澳州政府農業、食品及區域部 (PIRSA) 野生海鳥安全檢驗排除公告：Fowlers Bay - Negative Detection (2026).'
+    ]
+    
+    # 根據資料庫中的病例省份，自動追加該省政府的一次產業廳官網參考連結
+    has_wa = False
+    has_vic = False
+    for case in cases_data:
+        loc = case["location"]
+        if any(kw in loc for kw in ["西澳", "WA", "Esperance", "Roses", "Dunsborough"]):
+            has_wa = True
+        if any(kw in loc for kw in ["維多利亞", "VIC"]):
+            has_vic = True
+            
+    if has_wa:
+        refs.append('西澳州政府一次產業及區域發展部 (DPIRD WA) 禽流感防線動態更新：<a href="https://www.agric.wa.gov.au/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 hover:underline">DPIRD WA - Avian influenza response</a>')
+    if has_vic:
+        refs.append('維多利亞州政府農業廳 (Agriculture Victoria) 禽流感疫情公告：<a href="https://agriculture.vic.gov.au/biosecurity/animal-diseases/poultry-diseases/avian-influenza" target="_blank" class="text-blue-400 hover:underline">Agriculture Victoria - Bird flu update</a>')
+        
+    # 格式化為 HTML <li> 列表
+    html_lines = []
+    for idx, ref in enumerate(refs, 1):
+        html_lines.append(f'                <li>\n                    [{idx}] {ref}\n                </li>')
+        
+    return "\n".join(html_lines)
+
 def main():
     # 1. 抓取最新病例數據
     cases_data = fetch_daff_updates()
@@ -402,6 +452,25 @@ def main():
     official_html, media_html = generate_dynamic_summary(cases_data)
     updated_html = html_template.replace("<!-- DYNAMIC_OFFICIAL_SUMMARY_PLACEHOLDER -->", official_html)
     updated_html = updated_html.replace("<!-- DYNAMIC_MEDIA_SUMMARY_PLACEHOLDER -->", media_html)
+    
+    # 4.1 動態產生底部參考文獻列表並替換
+    refs_html = generate_dynamic_references(cases_data)
+    updated_html = updated_html.replace("<!-- DYNAMIC_REFERENCES_PLACEHOLDER -->", refs_html)
+    
+    # 4.5 計算所有非排除案例到工廠的最短地緣距離並動態注入 HTML 中
+    factory_lat, factory_lon = -33.5332, 149.2524
+    min_dist = float('inf')
+    for case in cases_data:
+        if case["type"] != "Negative":
+            dist = calculate_distance(case["latitude"], case["longitude"], factory_lat, factory_lon)
+            if dist < min_dist:
+                min_dist = dist
+                
+    min_dist_str = "290"  # 預設安全回退值
+    if min_dist != float('inf'):
+        min_dist_str = str(int(round(min_dist)))
+    
+    updated_html = updated_html.replace("<!-- MIN_DISTANCE_PLACEHOLDER -->", min_dist_str)
     
     # 5. 將最新的病例數據 JSON 注入模板預留的佔位符中，並將模板中原有的預設 JavaScript 陣列完全替換
     cases_json_str = json.dumps(cases_data, ensure_ascii=False, indent=2)
