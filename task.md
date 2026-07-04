@@ -14,4 +14,6 @@
   - `[x]` 整合 `https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza`
   - `[x]` 導入 OpenStreetMap Nominatim 地理編碼 API
   - `[x]` 實作動態地點提取與防重覆演算法
+  - `[x]` 新增最短地緣距離動態計算 (Haversine 公式)
+  - `[x]` 新增自適應動態參考文獻庫 (References)
   - `[x]` 更新 `README.md` 及專案開發日誌 `walkthrough.md`
