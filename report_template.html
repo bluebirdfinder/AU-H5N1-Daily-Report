@@ -343,6 +343,17 @@
 
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-slate-700/50 transition';
+                
+                let mediaBadgeHtml = '';
+                if (c.source_status === 'media_announced') {
+                    mediaBadgeHtml = `
+                    <div class="mt-1">
+                        <span class="inline-flex items-center rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-400 ring-1 ring-inset ring-amber-500/20 cursor-help" title="本確診資訊源自 ABC News 引用官方記者會宣告。聯邦 DAFF 官網數據庫尚在行政同步中。">
+                            ⚠️ 媒體先行 (官網同步中)
+                        </span>
+                    </div>`;
+                }
+
                 row.innerHTML = `
                     <td class="px-6 py-4 font-mono text-xs font-semibold text-slate-300">${c.id}</td>
                     <td class="px-6 py-4 bg-slate-800/30 font-semibold text-slate-200">${c.notify_date}</td>
@@ -354,6 +365,7 @@
                         <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ${badgeClass}">
                             ${statusLabel}
                         </span>
+                        ${mediaBadgeHtml}
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -408,10 +420,15 @@
                     iconAnchor: [5, 5]
                 });
 
+                let mediaTag = '';
+                if (c.source_status === 'media_announced') {
+                    mediaTag = ` <span style="background-color: rgba(245, 158, 11, 0.1); color: #d97706; padding: 2px 4px; border-radius: 4px; font-size: 9px; border: 0.5px solid rgba(245, 158, 11, 0.2); font-weight: bold; margin-left: 4px;" title="本確診資訊源自 ABC News 引用官方記者會宣告。聯邦 DAFF 官網數據庫尚在行政同步中。">⚠️ 媒體先行</span>`;
+                }
+
                 const marker = L.marker([c.latitude, c.longitude], { icon: wildBirdIcon }).addTo(map);
                 marker.bindPopup(`
                     <div style="color: #1e293b; font-family: sans-serif; font-size: 11px; width: 200px;">
-                        <strong style="color: ${color}; font-size: 12px;">[${c.id}] ${typeText}</strong><br>
+                        <strong style="color: ${color}; font-size: 12px;">[${c.id}] ${typeText}${mediaTag}</strong><br>
                         <span style="font-weight: 600; color: #0f172a;">${c.location}</span><br>
                         <hr style="margin: 4px 0; border: none; border-top: 1px solid #e2e8f0;">
                         🦆 感染動物：${c.species}<br>
