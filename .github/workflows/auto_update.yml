@@ -49,3 +49,4 @@ jobs:
             git commit -m "自動更新：同步最新澳洲 H5N1 疫情數據 (系統時間: $(date +'%Y-%m-%d %H:%M:%S'))"
             git push origin main
           fi
+# Config Refreshed: 2026-07-06 15:35
