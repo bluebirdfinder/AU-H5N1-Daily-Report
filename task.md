@@ -19,4 +19,7 @@
   - `[x]` 實作新聞 RSS 交叉確診過濾（全自動 C 方案）
   - `[x]` 在明細表格與地圖彈窗加上精緻的 `⚠️ 媒體先行` Badge 標籤
   - `[x]` 根據 7/5 最新官方結果更新 Hawks Nest 為確診 (Confirmed)
+  - `[x]` 根據 6/30 西澳官方結果將 Roses Beach (CASE-005) 更新為官方已確診
+  - `[x]` 新增 7/6 最新確診病例 CASE-008 (Mullaloo Beach) 到資料庫中，標記為官方已確認
+  - `[x]` 指引使用者開啟 GitHub Actions 寫入權限，解決 `git push` 權限阻礙問題
   - `[x]` 更新 `README.md` 及專案開發日誌 `walkthrough.md`

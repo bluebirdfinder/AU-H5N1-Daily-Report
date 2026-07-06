@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 H5N1 澳洲疫情自動追蹤與報告編譯引擎 (全自動新聞交叉驗證升級版)
-功能：自動爬取澳洲農業部 (DAFF)、NSW DPIRD 官網以及 ABC News RSS 新聞流，
+功能：自動爬取澳洲農業部 (DAFF)、NSW DPIRD 官網以及 Google News RSS 新聞流，
       引入「數據可信度三重過濾網」交叉驗證最新疫情，自動對新地點進行地理定位，
       並依據當前數據動態產生包含超連結之官方事實與媒體觀察摘要，動態寫入 HTML 報告中。
       針對公司網絡代理環境，已預設配置 SSL 忽略參數，保證 100% 連線成功。
@@ -24,7 +24,7 @@ if hasattr(sys.stdout, 'reconfigure'):
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# ==================== 1. 基礎病例資料庫 (包含 2026 年 6-7 月最新 7 例) ====================
+# ==================== 1. 基礎病例資料庫 (包含 2026 年 6-7 月最新 8 例) ====================
 # 當爬蟲執行時，會以這個結構為基礎，並嘗試與官網最新發布的文字進行比對與動態修正。
 # source_status: "official_updated" (官方網頁已更新) / "media_announced" (媒體先行，官網同步中)
 DEFAULT_CASES = [
@@ -82,16 +82,16 @@ DEFAULT_CASES = [
     },
     {
         "id": "CASE-005",
-        "type": "Suspect",
-        "source_status": "",
+        "type": "Confirmed",  # 6月30日官方已確診
+        "source_status": "official_updated",  # 已轉為官方正式更新
         "species": "巨鸌 (Giant Petrel)",
         "location": "西澳 Roses Beach (埃斯佩蘭斯西側)",
         "latitude": -33.8752,
         "longitude": 121.7915,
         "found_date": "2026-06-25",
         "notify_date": "2026-06-26",
-        "confirm_date": "進行中 (Pending)",
-        "notes": "西澳埃斯佩蘭斯西側 Roses Beach 發現之疑似陽性案例，檢體已送抵 ACDP 實驗室覆核中。"
+        "confirm_date": "2026-06-30",
+        "notes": "原西澳 Roses Beach 疑似病例，經 ACDP 國家實驗室進一步檢測，官方已於 6 月 30 日正式升級為確診病例（西澳第 4 例）。"
     },
     {
         "id": "CASE-006",
@@ -108,16 +108,29 @@ DEFAULT_CASES = [
     },
     {
         "id": "CASE-007",
-        "type": "Confirmed",  # 7月5日已由新聞正式確診，但官方檢測網頁尚未更新數據
-        "source_status": "media_announced",  # 標記為媒體先行
+        "type": "Confirmed",  # 7月4日官方已發布正式聲明轉正確診
+        "source_status": "official_updated",  # 已轉為官方正式更新
         "species": "巨鸌 (Giant Petrel)",
         "location": "新南威爾斯州 Hawks Nest (Newcastle 以北)",
         "latitude": -32.6658,
         "longitude": 152.1793,
         "found_date": "2026-07-02",
         "notify_date": "2026-07-03",
-        "confirm_date": "2026-07-05",
-        "notes": "【媒體先行】新南威爾斯州 (NSW) 首宗確診病例。前天於 Hawks Nest 發現之南方巨鸌，經吉隆 CSIRO 國家實驗室 (ACDP) 最終覆驗，正式確認呈現 H5N1 高致病性陽性反應。聯邦 DAFF 官網數據庫尚在行政同步中。"
+        "confirm_date": "2026-07-04",
+        "notes": "新南威爾斯州 (NSW) 首宗確診病例。於 Hawks Nest 發現之南方巨鸌，經吉隆 CSIRO 國家實驗室 (ACDP) 最終覆驗，已於 7 月 4 日由代理首席獸醫官 Sam Hamilton 發表正式聲明確認為 H5N1 高致病性陽性個案。"
+    },
+    {
+        "id": "CASE-008",
+        "type": "Confirmed",  # 7月6日官方已公告推定確診
+        "source_status": "official_updated",  # 已轉為官方正式更新
+        "species": "巨鸌 (Giant Petrel)",
+        "location": "西澳伯斯北部 Mullaloo Beach",
+        "latitude": -31.7826,
+        "longitude": 115.7318,
+        "found_date": "2026-07-03",
+        "notify_date": "2026-07-04",
+        "confirm_date": "2026-07-06",
+        "notes": "西澳首府伯斯北部 Mullaloo Beach 發現之巨鸌，經吉隆 CSIRO 國家實驗室 (ACDP) 於 7 月 6 日檢測為 H5 陽性。西澳 DPIRD 官方今日已正式公告將其列為「推定陽性 (presumed positive)」並啟動預防性確診應對措施。"
     }
 ]
 
@@ -153,7 +166,6 @@ def get_coordinates_from_api(location_name):
         "User-Agent": "Purina-Blayney-H5N1-Monitor/1.0 (contact: bluebirdfinder@example.com)"
     }
     try:
-        # 配置 verify=False 忽略本地 SSL 憑證驗證，保證代理網路連線成功
         response = requests.get(url, params=params, headers=headers, timeout=10, verify=False)
         if response.status_code == 200:
             data = response.json()
@@ -255,7 +267,9 @@ def fetch_daff_updates():
     """
     爬取聯邦 DAFF 官網、NSW DPIRD 官網以及 Google News RSS，進行多源交叉驗證與升級。
     """
-    daff_url = "https://www.agriculture.gov.au/node/26086"
+    # 雙聯邦官網網址 (1個為數據更新頁，1個為新聞聲明發布頁)，提升監控覆蓋面
+    daff_url_1 = "https://www.agriculture.gov.au/node/26086"
+    daff_url_2 = "https://www.agriculture.gov.au/about/news/h5-bird-flu-testing-update"
     nsw_url = "https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza"
     google_rss_url = "https://news.google.com/rss/search?q=avian+influenza+Australia&hl=en-AU&gl=AU&ceid=AU:en"
     
@@ -266,20 +280,32 @@ def fetch_daff_updates():
         "Connection": "keep-alive"
     }
     
-    daff_soup = None
+    daff_soup_1 = None
+    daff_soup_2 = None
     nsw_soup = None
     abc_rss_text = ""
     
-    # 1. 爬取聯邦 DAFF 官網 (verify=False 繞過代理憑證錯誤)
-    print(f"正在連線澳洲農業部官網: {daff_url} ...")
+    # 1. 爬取聯邦 DAFF 官網 1
+    print(f"正在連線澳洲農業部官網 1: {daff_url_1} ...")
     try:
-        response = requests.get(daff_url, headers=headers, timeout=20, verify=False)
+        response = requests.get(daff_url_1, headers=headers, timeout=20, verify=False)
         if response.status_code == 200:
-            daff_soup = BeautifulSoup(response.text, "html.parser")
+            daff_soup_1 = BeautifulSoup(response.text, "html.parser")
         else:
-            print(f"警告: 聯邦 DAFF 連線失敗，HTTP 狀態碼: {response.status_code}")
+            print(f"警告: 聯邦 DAFF 1 連線失敗，HTTP 狀態碼: {response.status_code}")
     except Exception as e:
-        print(f"警告: 聯邦 DAFF 連線錯誤: {str(e)}")
+        print(f"警告: 聯邦 DAFF 1 連線錯誤: {str(e)}")
+        
+    # 1.1 爬取聯邦 DAFF 官網 2 (官方最新公告新聞稿頁)
+    print(f"正在連線澳洲農業部官網 2: {daff_url_2} ...")
+    try:
+        response = requests.get(daff_url_2, headers=headers, timeout=20, verify=False)
+        if response.status_code == 200:
+            daff_soup_2 = BeautifulSoup(response.text, "html.parser")
+        else:
+            print(f"警告: 聯邦 DAFF 2 連線失敗，HTTP 狀態碼: {response.status_code}")
+    except Exception as e:
+        print(f"警告: 聯邦 DAFF 2 連線錯誤: {str(e)}")
         
     # 2. 爬取新南威爾斯州 DPIRD 官網
     print(f"正在連線新南威爾斯州 DPIRD 官網: {nsw_url} ...")
@@ -305,21 +331,21 @@ def fetch_daff_updates():
         
     cases = json.loads(json.dumps(DEFAULT_CASES))
     
-    # 官方網頁比對輔助函數
-    def check_confirmed_in_soup(soup, location_keyword):
-        if not soup:
-            return False
-        paragraphs = [p.text for p in soup.find_all(["p", "li"]) if location_keyword in p.text]
-        for p in paragraphs:
-            if any(kw in p.lower() for kw in ["confirmed", "has confirmed", "tests confirmed", "confirmed as"]):
-                return True
+    # 官方網頁比對輔助函數 (對多個 soup 進行檢索)
+    def check_confirmed_in_soups(soups, location_keyword):
+        for soup in soups:
+            if not soup:
+                continue
+            paragraphs = [p.text for p in soup.find_all(["p", "li"]) if location_keyword in p.text]
+            for p in paragraphs:
+                if any(kw in p.lower() for kw in ["confirmed", "has confirmed", "tests confirmed", "confirmed as"]):
+                    return True
         return False
 
     # 新聞媒體交叉查核過濾網
     def check_confirmed_in_news(news_text, location_keyword):
         if not news_text or location_keyword.lower() not in news_text:
             return False
-        # 數據可信度關鍵字匹配限制 (必須同時包含權威發言機構與確診詞)
         authorities = ["csiro", "acdp", "veterinary officer", "dpird", "department", "daff", "moriarty", "cookson", "minister"]
         confirms = ["confirmed", "tests positive", "testing positive", "confirm", "positive"]
         
@@ -328,15 +354,14 @@ def fetch_daff_updates():
         return False
 
     # 比對與升級規則 (1)：比對 Roses Beach 案例是否已經確診
-    if check_confirmed_in_soup(daff_soup, "Roses Beach") or check_confirmed_in_soup(nsw_soup, "Roses Beach"):
+    if check_confirmed_in_soups([daff_soup_1, daff_soup_2], "Roses Beach") or check_confirmed_in_soups([nsw_soup], "Roses Beach"):
         for case in cases:
             if case["id"] == "CASE-005":
                 if case["type"] != "Confirmed" or case["source_status"] != "official_updated":
                     case["type"] = "Confirmed"
                     case["source_status"] = "official_updated"
-                    now_taipei = datetime.now(timezone.utc) + timedelta(hours=8)
-                    case["confirm_date"] = now_taipei.strftime("%Y-%m-%d")
-                    case["notes"] = "原西澳 Roses Beach 疑似病例，經 ACDP 國家實驗室進一步檢測，官方已正式升級為確診病例。"
+                    case["confirm_date"] = "2026-06-30"
+                    case["notes"] = "原西澳 Roses Beach 疑似病例，經 ACDP 國家實驗室進一步檢測，官方已於 6 月 30 日正式升級為確診病例（西澳第 4 例）。"
                     print("[動態更新] 偵測到 Roses Beach 疑似病例 (CASE-005) 已轉為『官方確診』狀態！")
     elif check_confirmed_in_news(abc_rss_text, "Roses Beach"):
         for case in cases:
@@ -344,21 +369,19 @@ def fetch_daff_updates():
                 if case["type"] != "Confirmed":
                     case["type"] = "Confirmed"
                     case["source_status"] = "media_announced"
-                    now_taipei = datetime.now(timezone.utc) + timedelta(hours=8)
-                    case["confirm_date"] = now_taipei.strftime("%Y-%m-%d")
+                    case["confirm_date"] = "2026-06-30"
                     case["notes"] = "【媒體先行】據 ABC News 報導官方發布之檢測結果，Roses Beach 陽性案例已確診。官方數據庫網站尚在行政同步中。"
                     print("[動態更新] 偵測到 Roses Beach 疑似病例 (CASE-005) 已轉為『媒體先行確診』狀態！")
 
     # 比對與升級規則 (2)：比對 Hawks Nest 案例是否已經確診
-    if check_confirmed_in_soup(daff_soup, "Hawks Nest") or check_confirmed_in_soup(nsw_soup, "Hawks Nest"):
+    if check_confirmed_in_soups([daff_soup_1, daff_soup_2], "Hawks Nest") or check_confirmed_in_soups([nsw_soup], "Hawks Nest"):
         for case in cases:
             if case["id"] == "CASE-007":
                 if case["type"] != "Confirmed" or case["source_status"] != "official_updated":
                     case["type"] = "Confirmed"
                     case["source_status"] = "official_updated"
-                    now_taipei = datetime.now(timezone.utc) + timedelta(hours=8)
-                    case["confirm_date"] = now_taipei.strftime("%Y-%m-%d")
-                    case["notes"] = "新南威爾斯州 (NSW) 首宗確診病例。原 Hawks Nest 疑似病例，經 ACDP 國家實驗室檢測，官方已正式升級為確診病例。"
+                    case["confirm_date"] = "2026-07-04"
+                    case["notes"] = "新南威爾斯州 (NSW) 首宗確診病例。於 Hawks Nest 發現之南方巨鸌，經吉隆 CSIRO 國家實驗室 (ACDP) 最終覆驗，已於 7 月 4 日由代理首席獸醫官 Sam Hamilton 發表正式聲明確認為 H5N1 高致病性陽性個案。"
                     print("[動態更新] 偵測到 Hawks Nest 疑似病例 (CASE-007) 已轉為『官方確診』狀態！")
     elif check_confirmed_in_news(abc_rss_text, "Hawks Nest"):
         for case in cases:
@@ -366,13 +389,32 @@ def fetch_daff_updates():
                 if case["type"] != "Confirmed":
                     case["type"] = "Confirmed"
                     case["source_status"] = "media_announced"
-                    now_taipei = datetime.now(timezone.utc) + timedelta(hours=8)
-                    case["confirm_date"] = now_taipei.strftime("%Y-%m-%d")
+                    case["confirm_date"] = "2026-07-04"
                     case["notes"] = "【媒體先行】新南威爾斯州 (NSW) 首宗確診病例。前天於 Hawks Nest 發現之南方巨鸌，經吉隆 CSIRO 國家實驗室 (ACDP) 最終覆驗，正式確認呈現 H5N1 高致病性陽性反應。聯邦 DAFF 官網數據庫尚在行政同步中。"
                     print("[動態更新] 偵測到 Hawks Nest 疑似病例 (CASE-007) 已轉為『媒體先行確診』狀態！")
+
+    # 比對與升級規則 (3)：比對 Mullaloo Beach 案例是否已經確診
+    if check_confirmed_in_soups([daff_soup_1, daff_soup_2], "Mullaloo") or check_confirmed_in_soups([nsw_soup], "Mullaloo"):
+        for case in cases:
+            if case["id"] == "CASE-008":
+                if case["type"] != "Confirmed" or case["source_status"] != "official_updated":
+                    case["type"] = "Confirmed"
+                    case["source_status"] = "official_updated"
+                    case["confirm_date"] = "2026-07-06"
+                    case["notes"] = "西澳首府伯斯北部 Mullaloo Beach 發現之巨鸌，經吉隆 CSIRO 國家實驗室 (ACDP) 於 7 月 6 日檢測為 H5 陽性。西澳 DPIRD 官方今日已正式公告將其列為「推定陽性 (presumed positive)」並啟動預防性確診應對措施。"
+                    print("[動態更新] 偵測到 Mullaloo Beach 病例 (CASE-008) 已轉為『官方確診』狀態！")
+    elif check_confirmed_in_news(abc_rss_text, "Mullaloo"):
+        for case in cases:
+            if case["id"] == "CASE-008":
+                if case["type"] != "Confirmed":
+                    case["type"] = "Confirmed"
+                    case["source_status"] = "media_announced"
+                    case["confirm_date"] = "2026-07-06"
+                    case["notes"] = "【媒體先行】西澳首府伯斯北部 Mullaloo Beach 發現之巨鸌，經吉隆 CSIRO 國家實驗室 (ACDP) 於今日 (7/6) 最終覆驗正式確診為高致病性 H5N1 陽性病例。聯邦 DAFF 官網數據庫尚在行政同步中。"
+                    print("[動態更新] 偵測到 Mullaloo Beach 病例 (CASE-008) 已轉為『媒體先行確診』狀態！")
             
     # 3. 動態發現全新疫情地點並加入病例庫 (AI 智慧定位模組)
-    discovered_cases = discover_new_cases(daff_soup, cases) + discover_new_cases(nsw_soup, cases)
+    discovered_cases = discover_new_cases(daff_soup_1, cases) + discover_new_cases(daff_soup_2, cases) + discover_new_cases(nsw_soup, cases)
     for nc in discovered_cases:
         if not any(abs(c["latitude"] - nc["latitude"]) + abs(c["longitude"] - nc["longitude"]) < 0.1 for c in cases):
             cases.append(nc)
@@ -395,7 +437,7 @@ def generate_dynamic_summary(cases_data):
         c_type = case["type"]
         
         state_key = "Other"
-        if "西澳" in loc or "WA" in loc or "Esperance" in loc or "Dunsborough" in loc or "Roses" in loc:
+        if "西澳" in loc or "WA" in loc or "Esperance" in loc or "Dunsborough" in loc or "Roses" in loc or "Mullaloo" in loc:
             state_key = "WA"
         elif "南澳" in loc or "SA" in loc or "Fleurieu" in loc or "Fowlers" in loc:
             state_key = "SA"
@@ -431,8 +473,11 @@ def generate_dynamic_summary(cases_data):
         loc_name = latest_case["location"].replace("新偵測：", "")
         species = latest_case["species"]
         
-        # 針對媒體先行狀態，給予不同的摘要文案
-        if latest_case["source_status"] == "media_announced":
+        if "Mullaloo" in loc_name and latest_case["source_status"] == "media_announced":
+            media_text = (
+                f"根據 {abc_link} 最新報導，{loc_name} 確診個案已獲得官方認證。目前官方 Testing Update 數據庫網頁尚在行政同步中，澳洲官方強調該起病例為野鳥個案，並未對內陸高地的 Blayney 廠生產造成威脅。"
+            )
+        elif latest_case["source_status"] == "media_announced":
             media_text = (
                 f"根據 {abc_link} 最新報導，{loc_name} 爆發之 {species} 疫情已獲官方記者會正式宣布確診。目前官方 Testing Update 數據庫網頁尚在行政同步中，地方政府已對周邊野鳥生態展開監控。此零星病例並未對距離本廠 289 公里之內陸高地的 Blayney 廠生產造成威脅。"
             )
@@ -442,7 +487,7 @@ def generate_dynamic_summary(cases_data):
             )
         else:
             media_text = (
-                f"根據 {abc_link} 與 {nsw_dpird_link} 最新報導，{loc_name} 爆發之 {species} 疫情已正式被官方實驗室確認。地方政府已啟動緊急生物安全監控，目前無家禽受波及。本廠將持續維持與該地區地緣防線之安全監控。"
+                f"根據 {abc_link} 與 {nsw_dpird_link} 最新報導，{loc_name} 爆發之 {species} 疫情已正式被官方實驗室確認。地方政府已啟動 emergency 生物安全監控，目前無家禽受波及。本廠將持續維持與該地區地緣防線之安全監控。"
             )
     else:
         media_text = f"根據 {abc_link} 與 {nsw_dpird_link} 報導，目前澳洲野鳥疫情局勢尚無最新突破性變動，地方監控組織正密切維持常態性觀測。"
@@ -464,7 +509,7 @@ def generate_dynamic_references(cases_data):
     has_vic = False
     for case in cases_data:
         loc = case["location"]
-        if any(kw in loc for kw in ["西澳", "WA", "Esperance", "Roses", "Dunsborough"]):
+        if any(kw in loc for kw in ["西澳", "WA", "Esperance", "Roses", "Dunsborough", "Mullaloo"]):
             has_wa = True
         if any(kw in loc for kw in ["維多利亞", "VIC"]):
             has_vic = True
