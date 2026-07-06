@@ -24,7 +24,7 @@ if hasattr(sys.stdout, 'reconfigure'):
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# ==================== 1. 基礎病例資料庫 (包含 2026 年 6-7 月最新 8 例) ====================
+# ==================== 1. 基礎病例資料庫 (包含 2026 年 6-7 月最新 9 例) ====================
 # 當爬蟲執行時，會以這個結構為基礎，並嘗試與官網最新發布的文字進行比對與動態修正。
 # source_status: "official_updated" (官方網頁已更新) / "media_announced" (媒體先行，官網同步中)
 DEFAULT_CASES = [
@@ -72,7 +72,7 @@ DEFAULT_CASES = [
         "type": "Confirmed",
         "source_status": "official_updated",
         "species": "巨鸌 (Giant Petrel)",
-        "location": "西澳丹斯伯勒 (Dunsborough) 地區",
+        "location": "西澳丹斯伯勒 Dunsborough (Quindalup) 地區",
         "latitude": -33.6128,
         "longitude": 115.1012,
         "found_date": "2026-06-22",
@@ -82,8 +82,8 @@ DEFAULT_CASES = [
     },
     {
         "id": "CASE-005",
-        "type": "Confirmed",  # 6月30日官方已確診
-        "source_status": "official_updated",  # 已轉為官方正式更新
+        "type": "Confirmed",
+        "source_status": "official_updated",
         "species": "巨鸌 (Giant Petrel)",
         "location": "西澳 Roses Beach (埃斯佩蘭斯西側)",
         "latitude": -33.8752,
@@ -108,8 +108,8 @@ DEFAULT_CASES = [
     },
     {
         "id": "CASE-007",
-        "type": "Confirmed",  # 7月4日官方已發布正式聲明轉正確診
-        "source_status": "official_updated",  # 已轉為官方正式更新
+        "type": "Confirmed",
+        "source_status": "official_updated",
         "species": "巨鸌 (Giant Petrel)",
         "location": "新南威爾斯州 Hawks Nest (Newcastle 以北)",
         "latitude": -32.6658,
@@ -121,8 +121,8 @@ DEFAULT_CASES = [
     },
     {
         "id": "CASE-008",
-        "type": "Confirmed",  # 7月6日官方已公告推定確診
-        "source_status": "official_updated",  # 已轉為官方正式更新
+        "type": "Confirmed",
+        "source_status": "official_updated",
         "species": "巨鸌 (Giant Petrel)",
         "location": "西澳伯斯北部 Mullaloo Beach",
         "latitude": -31.7826,
@@ -131,6 +131,19 @@ DEFAULT_CASES = [
         "notify_date": "2026-07-04",
         "confirm_date": "2026-07-06",
         "notes": "西澳首府伯斯北部 Mullaloo Beach 發現之巨鸌，經吉隆 CSIRO 國家實驗室 (ACDP) 於 7 月 6 日檢測為 H5 陽性。西澳 DPIRD 官方今日已正式公告將其列為「推定陽性 (presumed positive)」並啟動預防性確診應對措施。"
+    },
+    {
+        "id": "CASE-009",
+        "type": "Negative",
+        "source_status": "official_updated",
+        "species": "野生海鳥 (1隻)",
+        "location": "維多利亞州西部沿海地區 (Portland)",
+        "latitude": -38.3608,
+        "longitude": 141.6022,
+        "found_date": "2026-06-28",
+        "notify_date": "2026-07-01",
+        "confirm_date": "2026-07-03",
+        "notes": "維多利亞州一次產業廳送檢之異常死亡野鳥屍體，經吉隆 CSIRO 國家實驗室 (ACDP) 最終檢測為陰性，正式排除禽流感感染。"
     }
 ]
 
@@ -429,6 +442,7 @@ def generate_dynamic_summary(cases_data):
         "WA": {"Confirmed": 0, "Suspect": 0, "Negative": 0, "total": 0},
         "SA": {"Confirmed": 0, "Suspect": 0, "Negative": 0, "total": 0},
         "NSW": {"Confirmed": 0, "Suspect": 0, "Negative": 0, "total": 0},
+        "VIC": {"Confirmed": 0, "Suspect": 0, "Negative": 0, "total": 0},
         "Other": {"Confirmed": 0, "Suspect": 0, "Negative": 0, "total": 0}
     }
     
@@ -443,6 +457,8 @@ def generate_dynamic_summary(cases_data):
             state_key = "SA"
         elif "新南威爾斯" in loc or "NSW" in loc or "Hawks Nest" in loc:
             state_key = "NSW"
+        elif "維多利亞" in loc or "VIC" in loc or "Victoria" in loc:
+            state_key = "VIC"
             
         states_stats[state_key][c_type] += 1
         states_stats[state_key]["total"] += 1
@@ -459,8 +475,10 @@ def generate_dynamic_summary(cases_data):
         nsw_detail += f"{states_stats['NSW']['Suspect']}例疑似"
     nsw_detail += ")"
     
+    vic_detail = f"維多利亞州 (VIC) {states_stats['VIC']['total']} 例（{states_stats['VIC']['Negative']}例已排除)"
+    
     official_text = (
-        f"依據 {daff_link} 及各州政府最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙海鳥。當前最新疫情病例分布統計：{wa_detail}、{sa_detail}、以及{nsw_detail}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
+        f"依據 {daff_link} 及各州政府最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙海鳥。當前最新疫情病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
     )
 
     latest_case = cases_data[-1] if cases_data else None

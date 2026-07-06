@@ -22,4 +22,6 @@
   - `[x]` 根據 6/30 西澳官方結果將 Roses Beach (CASE-005) 更新為官方已確診
   - `[x]` 新增 7/6 最新確診病例 CASE-008 (Mullaloo Beach) 到資料庫中，標記為官方已確認
   - `[x]` 指引使用者開啟 GitHub Actions 寫入權限，解決 `git push` 權限阻礙問題
+  - `[x]` 修改 CASE-004 地名為 Dunsborough (Quindalup)，解決與 Gemini 表格的地名落差
+  - `[x]` 新增 CASE-009 (Negative) 維多利亞州沿海地區排除案，補齊東海岸安全排除點
   - `[x]` 更新 `README.md` 及專案開發日誌 `walkthrough.md`
