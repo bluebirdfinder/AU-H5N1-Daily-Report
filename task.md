@@ -24,4 +24,8 @@
   - `[x]` 指引使用者開啟 GitHub Actions 寫入權限，解決 `git push` 權限阻礙問題
   - `[x]` 修改 CASE-004 地名為 Dunsborough (Quindalup)，解決與 Gemini 表格的地名落差
   - `[x]` 新增 CASE-009 (Negative) 維多利亞州沿海地區排除案，補齊東海岸安全排除點
+  - `[x]` 新增雪梨敘利濱海灘（Narrabeen Beach）陰性排除個案 (CASE-010)
+  - `[x]` 升級 `h5n1.py` 自動化爬蟲防線以支援陰性個案判定與通用更新
+  - `[x]` 本地編譯並驗證最新 `index.html` 網頁數據與統計
   - `[x]` 更新 `README.md` 及專案開發日誌 `walkthrough.md`
+

@@ -144,6 +144,19 @@ DEFAULT_CASES = [
         "notify_date": "2026-07-01",
         "confirm_date": "2026-07-03",
         "notes": "維多利亞州一次產業廳送檢之異常死亡野鳥屍體，經吉隆 CSIRO 國家實驗室 (ACDP) 最終檢測為陰性，正式排除禽流感感染。"
+    },
+    {
+        "id": "CASE-010",
+        "type": "Negative",
+        "source_status": "official_updated",
+        "species": "野生鸕鶿 (Cormorant)",
+        "location": "新南威爾斯州雪梨 Narrabeen Beach",
+        "latitude": -33.7220,
+        "longitude": 151.2985,
+        "found_date": "2026-07-05",
+        "notify_date": "2026-07-06",
+        "confirm_date": "2026-07-07",
+        "notes": "雪梨北部敘利濱海灘 (Narrabeen Beach) 發現之死亡鸕鶿，經新南威爾斯州一次產業部 (DPI) 進行化驗，於 7 月 7 日深夜證實為陰性，正式排除 H5N1 禽流感感染。"
     }
 ]
 
@@ -256,6 +269,11 @@ def discover_new_cases(soup, existing_cases):
             confirm_date = now_taipei.strftime("%Y-%m-%d")
             notes_prefix = "官方已確診病例。"
             source_stat = "official_updated"
+        elif any(kw in src_txt.lower() for kw in ["negative", "excluded", "ruled out", "clear of", "tested negative", "not infected"]):
+            type_status = "Negative"
+            confirm_date = "陰性 (已排除)"
+            notes_prefix = "官方已排除病例。"
+            source_stat = "official_updated"
             
         new_case = {
             "id": f"CASE-{case_idx:03d}",
@@ -349,82 +367,99 @@ def fetch_daff_updates():
         for soup in soups:
             if not soup:
                 continue
-            paragraphs = [p.text for p in soup.find_all(["p", "li"]) if location_keyword in p.text]
+            paragraphs = [p.text for p in soup.find_all(["p", "li"]) if location_keyword.lower() in p.text.lower()]
             for p in paragraphs:
                 if any(kw in p.lower() for kw in ["confirmed", "has confirmed", "tests confirmed", "confirmed as"]):
                     return True
         return False
 
+    def check_negative_in_soups(soups, location_keyword):
+        for soup in soups:
+            if not soup:
+                continue
+            paragraphs = [p.text for p in soup.find_all(["p", "li"]) if location_keyword.lower() in p.text.lower()]
+            for p in paragraphs:
+                if any(kw in p.lower() for kw in ["negative", "excluded", "ruled out", "clear of", "tested negative", "not infected"]):
+                    return True
+        return False
+
     # 新聞媒體交叉查核過濾網
     def check_confirmed_in_news(news_text, location_keyword):
-        if not news_text or location_keyword.lower() not in news_text:
+        if not news_text or location_keyword.lower() not in news_text.lower():
             return False
         authorities = ["csiro", "acdp", "veterinary officer", "dpird", "department", "daff", "moriarty", "cookson", "minister"]
         confirms = ["confirmed", "tests positive", "testing positive", "confirm", "positive"]
         
-        if any(a in news_text for a in authorities) and any(c in news_text for c in confirms):
+        if any(a in news_text.lower() for a in authorities) and any(c in news_text.lower() for c in confirms):
             return True
         return False
 
-    # 比對與升級規則 (1)：比對 Roses Beach 案例是否已經確診
-    if check_confirmed_in_soups([daff_soup_1, daff_soup_2], "Roses Beach") or check_confirmed_in_soups([nsw_soup], "Roses Beach"):
-        for case in cases:
-            if case["id"] == "CASE-005":
-                if case["type"] != "Confirmed" or case["source_status"] != "official_updated":
-                    case["type"] = "Confirmed"
-                    case["source_status"] = "official_updated"
-                    case["confirm_date"] = "2026-06-30"
-                    case["notes"] = "原西澳 Roses Beach 疑似病例，經 ACDP 國家實驗室進一步檢測，官方已於 6 月 30 日正式升級為確診病例（西澳第 4 例）。"
-                    print("[動態更新] 偵測到 Roses Beach 疑似病例 (CASE-005) 已轉為『官方確診』狀態！")
-    elif check_confirmed_in_news(abc_rss_text, "Roses Beach"):
-        for case in cases:
-            if case["id"] == "CASE-005":
-                if case["type"] != "Confirmed":
-                    case["type"] = "Confirmed"
-                    case["source_status"] = "media_announced"
-                    case["confirm_date"] = "2026-06-30"
-                    case["notes"] = "【媒體先行】據 ABC News 報導官方發布之檢測結果，Roses Beach 陽性案例已確診。官方數據庫網站尚在行政同步中。"
-                    print("[動態更新] 偵測到 Roses Beach 疑似病例 (CASE-005) 已轉為『媒體先行確診』狀態！")
+    def check_negative_in_news(news_text, location_keyword):
+        if not news_text or location_keyword.lower() not in news_text.lower():
+            return False
+        negatives = ["negative", "excluded", "ruled out", "clear", "not infected", "free from"]
+        authorities = ["csiro", "acdp", "veterinary officer", "dpird", "department", "daff", "moriarty", "cookson", "minister"]
+        
+        if any(a in news_text.lower() for a in authorities) and any(n in news_text.lower() for n in negatives):
+            return True
+        return False
 
-    # 比對與升級規則 (2)：比對 Hawks Nest 案例是否已經確診
-    if check_confirmed_in_soups([daff_soup_1, daff_soup_2], "Hawks Nest") or check_confirmed_in_soups([nsw_soup], "Hawks Nest"):
-        for case in cases:
-            if case["id"] == "CASE-007":
+    # 通用動態更新機制：自動更新資料庫中非最終狀態 (Confirmed/Negative) 的個案
+    for case in cases:
+        if case["type"] not in ["Confirmed", "Negative"]:
+            # 從地點名稱中提取關鍵字，剔除州名與修飾詞
+            loc_clean = re.sub(r"(西澳|南澳|新南威爾斯|維多利亞州?|州|新偵測：)", "", case["location"]).strip()
+            words = [w for w in re.split(r"[\s,()（）]+", loc_clean) if w]
+            if words:
+                loc_keyword = words[0]
+                for w in words:
+                    if w.replace("Beach", "").strip() and len(w) > 3:
+                        loc_keyword = w.replace("Beach", "").strip()
+                        break
+            else:
+                loc_keyword = case["location"]
+            
+            print(f"[動態追蹤] 正在檢查 '{case['location']}' (關鍵字: {loc_keyword}) 的最新狀態...")
+            
+            # 1. 檢查官方網站是否更新
+            is_confirmed_official = check_confirmed_in_soups([daff_soup_1, daff_soup_2, nsw_soup], loc_keyword)
+            is_negative_official = check_negative_in_soups([daff_soup_1, daff_soup_2, nsw_soup], loc_keyword)
+            
+            if is_confirmed_official:
                 if case["type"] != "Confirmed" or case["source_status"] != "official_updated":
                     case["type"] = "Confirmed"
                     case["source_status"] = "official_updated"
-                    case["confirm_date"] = "2026-07-04"
-                    case["notes"] = "新南威爾斯州 (NSW) 首宗確診病例。於 Hawks Nest 發現之南方巨鸌，經吉隆 CSIRO 國家實驗室 (ACDP) 最終覆驗，已於 7 月 4 日由代理首席獸醫官 Sam Hamilton 發表正式聲明確認為 H5N1 高致病性陽性個案。"
-                    print("[動態更新] 偵測到 Hawks Nest 疑似病例 (CASE-007) 已轉為『官方確診』狀態！")
-    elif check_confirmed_in_news(abc_rss_text, "Hawks Nest"):
-        for case in cases:
-            if case["id"] == "CASE-007":
-                if case["type"] != "Confirmed":
-                    case["type"] = "Confirmed"
-                    case["source_status"] = "media_announced"
-                    case["confirm_date"] = "2026-07-04"
-                    case["notes"] = "【媒體先行】新南威爾斯州 (NSW) 首宗確診病例。前天於 Hawks Nest 發現之南方巨鸌，經吉隆 CSIRO 國家實驗室 (ACDP) 最終覆驗，正式確認呈現 H5N1 高致病性陽性反應。聯邦 DAFF 官網數據庫尚在行政同步中。"
-                    print("[動態更新] 偵測到 Hawks Nest 疑似病例 (CASE-007) 已轉為『媒體先行確診』狀態！")
-
-    # 比對與升級規則 (3)：比對 Mullaloo Beach 案例是否已經確診
-    if check_confirmed_in_soups([daff_soup_1, daff_soup_2], "Mullaloo") or check_confirmed_in_soups([nsw_soup], "Mullaloo"):
-        for case in cases:
-            if case["id"] == "CASE-008":
-                if case["type"] != "Confirmed" or case["source_status"] != "official_updated":
-                    case["type"] = "Confirmed"
+                    now_taipei = (datetime.now(timezone.utc) + timedelta(hours=8)).strftime("%Y-%m-%d")
+                    case["confirm_date"] = now_taipei
+                    case["notes"] = f"原疑似病例，經官方檢測確認為 H5N1 高致病性陽性個案。地點：{case['location']}"
+                    print(f"[動態更新] 偵測到 {case['id']} ({case['location']}) 已轉為『官方確診』狀態！")
+            elif is_negative_official:
+                if case["type"] != "Negative" or case["source_status"] != "official_updated":
+                    case["type"] = "Negative"
                     case["source_status"] = "official_updated"
-                    case["confirm_date"] = "2026-07-06"
-                    case["notes"] = "西澳首府伯斯北部 Mullaloo Beach 發現之巨鸌，經吉隆 CSIRO 國家實驗室 (ACDP) 於 7 月 6 日檢測為 H5 陽性。西澳 DPIRD 官方今日已正式公告將其列為「推定陽性 (presumed positive)」並啟動預防性確診應對措施。"
-                    print("[動態更新] 偵測到 Mullaloo Beach 病例 (CASE-008) 已轉為『官方確診』狀態！")
-    elif check_confirmed_in_news(abc_rss_text, "Mullaloo"):
-        for case in cases:
-            if case["id"] == "CASE-008":
-                if case["type"] != "Confirmed":
-                    case["type"] = "Confirmed"
-                    case["source_status"] = "media_announced"
-                    case["confirm_date"] = "2026-07-06"
-                    case["notes"] = "【媒體先行】西澳首府伯斯北部 Mullaloo Beach 發現之巨鸌，經吉隆 CSIRO 國家實驗室 (ACDP) 於今日 (7/6) 最終覆驗正式確診為高致病性 H5N1 陽性病例。聯邦 DAFF 官網數據庫尚在行政同步中。"
-                    print("[動態更新] 偵測到 Mullaloo Beach 病例 (CASE-008) 已轉為『媒體先行確診』狀態！")
+                    case["confirm_date"] = "陰性 (已排除)"
+                    case["notes"] = f"經官方實驗室檢測，結果呈陰性，正式排除禽流感感染。地點：{case['location']}"
+                    print(f"[動態更新] 偵測到 {case['id']} ({case['location']}) 已轉為『官方陰性排除』狀態！")
+            else:
+                # 2. 檢查新聞媒體是否有報導 (媒體先行)
+                is_confirmed_media = check_confirmed_in_news(abc_rss_text, loc_keyword)
+                is_negative_media = check_negative_in_news(abc_rss_text, loc_keyword)
+                
+                if is_confirmed_media:
+                    if case["type"] != "Confirmed":
+                        case["type"] = "Confirmed"
+                        case["source_status"] = "media_announced"
+                        now_taipei = (datetime.now(timezone.utc) + timedelta(hours=8)).strftime("%Y-%m-%d")
+                        case["confirm_date"] = now_taipei
+                        case["notes"] = f"【媒體先行】據報導該案檢測呈現陽性。聯邦官方數據庫網站尚在行政同步中。地點：{case['location']}"
+                        print(f"[動態更新] 偵測到 {case['id']} ({case['location']}) 已轉為『媒體先行確診』狀態！")
+                elif is_negative_media:
+                    if case["type"] != "Negative":
+                        case["type"] = "Negative"
+                        case["source_status"] = "media_announced"
+                        case["confirm_date"] = "陰性 (已排除)"
+                        case["notes"] = f"【媒體先行】據報導該案檢測呈陰性已排除。聯邦官方數據庫網站尚在行政同步中。地點：{case['location']}"
+                        print(f"[動態更新] 偵測到 {case['id']} ({case['location']}) 已轉為『媒體先行陰性排除』狀態！")
             
     # 3. 動態發現全新疫情地點並加入病例庫 (AI 智慧定位模組)
     discovered_cases = discover_new_cases(daff_soup_1, cases) + discover_new_cases(daff_soup_2, cases) + discover_new_cases(nsw_soup, cases)
@@ -465,15 +500,32 @@ def generate_dynamic_summary(cases_data):
 
     daff_link = '<a href="https://www.agriculture.gov.au/node/26086" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲聯邦農業部 (DAFF)</a>'
     
-    wa_detail = f"西澳 {states_stats['WA']['total']} 例（{states_stats['WA']['Confirmed']}例確診" + (f"/{states_stats['WA']['Suspect']}例疑似" if states_stats['WA']['Suspect'] else "") + ")"
-    sa_detail = f"南澳 {states_stats['SA']['total']} 例（{states_stats['SA']['Confirmed']}例確診" + (f"/{states_stats['SA']['Negative']}例已排除" if states_stats['SA']['Negative'] else "") + ")"
+    wa_parts = []
+    if states_stats['WA']['Confirmed'] > 0:
+        wa_parts.append(f"{states_stats['WA']['Confirmed']}例確診")
+    if states_stats['WA']['Suspect'] > 0:
+        wa_parts.append(f"{states_stats['WA']['Suspect']}例疑似")
+    if states_stats['WA']['Negative'] > 0:
+        wa_parts.append(f"{states_stats['WA']['Negative']}例已排除")
+    wa_detail = f"西澳 {states_stats['WA']['total']} 例（" + "/".join(wa_parts) + ")"
+
+    sa_parts = []
+    if states_stats['SA']['Confirmed'] > 0:
+        sa_parts.append(f"{states_stats['SA']['Confirmed']}例確診")
+    if states_stats['SA']['Suspect'] > 0:
+        sa_parts.append(f"{states_stats['SA']['Suspect']}例疑似")
+    if states_stats['SA']['Negative'] > 0:
+        sa_parts.append(f"{states_stats['SA']['Negative']}例已排除")
+    sa_detail = f"南澳 {states_stats['SA']['total']} 例（" + "/".join(sa_parts) + ")"
     
-    nsw_detail = f"新南威爾斯州 (NSW) {states_stats['NSW']['total']} 例（"
+    nsw_parts = []
     if states_stats['NSW']['Confirmed'] > 0:
-        nsw_detail += f"{states_stats['NSW']['Confirmed']}例確診"
-    else:
-        nsw_detail += f"{states_stats['NSW']['Suspect']}例疑似"
-    nsw_detail += ")"
+        nsw_parts.append(f"{states_stats['NSW']['Confirmed']}例確診")
+    if states_stats['NSW']['Suspect'] > 0:
+        nsw_parts.append(f"{states_stats['NSW']['Suspect']}例疑似")
+    if states_stats['NSW']['Negative'] > 0:
+        nsw_parts.append(f"{states_stats['NSW']['Negative']}例已排除")
+    nsw_detail = f"新南威爾斯州 (NSW) {states_stats['NSW']['total']} 例（" + "/".join(nsw_parts) + ")"
     
     vic_detail = f"維多利亞州 (VIC) {states_stats['VIC']['total']} 例（{states_stats['VIC']['Negative']}例已排除)"
     
