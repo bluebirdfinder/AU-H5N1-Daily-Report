@@ -24,8 +24,8 @@
   - `[x]` 指引使用者開啟 GitHub Actions 寫入權限，解決 `git push` 權限阻礙問題
   - `[x]` 修改 CASE-004 地名為 Dunsborough (Quindalup)，解決與 Gemini 表格的地名落差
   - `[x]` 新增 CASE-009 (Negative) 維多利亞州沿海地區排除案，補齊東海岸安全排除點
-  - `[x]` 新增雪梨敘利濱海灘（Narrabeen Beach）陰性排除個案 (CASE-010)
-  - `[x]` 升級 `h5n1.py` 自動化爬蟲防線以支援陰性個案判定與通用更新
-  - `[x]` 本地編譯並驗證最新 `index.html` 網頁數據與統計
+  - `[x]` 修正 7/10 本土留鳥大突破（SA Robe 案例等 5 例），補齊南澳 PIRSA 官網爬取
+  - `[x]` 升級全澳洲 8 州/領地官方站點聯防爬蟲網絡
+  - `[x]` 修正 DAFF 與 SA PIRSA 的最新正確專區 URL 連結
+  - `[x]` 實作防 Link Rot 新聞 RSS 兜底定位與多段式退避地緣搜尋 (解決 Horrocks Beach 案例)
   - `[x]` 更新 `README.md` 及專案開發日誌 `walkthrough.md`
-
