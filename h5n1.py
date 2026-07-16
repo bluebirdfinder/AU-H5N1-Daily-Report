@@ -3,7 +3,7 @@
 H5N1 澳洲疫情自動追蹤與報告編譯引擎 (全澳州聯防爬蟲網絡版 - 支援 URL 防改版與新聞 RSS 兜底定位)
 功能：自動爬取澳洲聯邦農業部 (DAFF)、以及澳洲全體 8 個州/領地政府的官方禽流感監控網頁：
       - 新南威爾斯州 (NSW) DPIRD
-      - 南澳州 (SA) PIRSA (已更新為最新正確專區網址)
+      - 南澳州 (SA) PIRSA 
       - 西澳州 (WA) DPIRD
       - 維多利亞州 (VIC) Agriculture Victoria
       - 昆士蘭州 (QLD) Business Queensland
@@ -35,9 +35,10 @@ if hasattr(sys.stdout, 'reconfigure'):
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# ==================== 1. 基礎病例資料庫 (包含 2026 年 6-7 月最新 15 例) ====================
+# ==================== 1. 基礎病例資料庫 (包含 2026 年 7 月 16 日最新 17 例) ====================
 # 當爬蟲執行時，會以這個結構為基礎，並嘗試與官網最新發布的文字進行比對與動態修正。
 # source_status: "official_updated" (官方網頁已更新) / "media_announced" (媒體先行，官網同步中)
+# 總病例庫共 17 例，包含 14 例官方確診 (WA 8例, SA 5例, NSW 1例) 以及 3 例已排除 (SA 1例, VIC 1例, NSW 1例)
 DEFAULT_CASES = [
     {
         "id": "CASE-001",
@@ -197,7 +198,7 @@ DEFAULT_CASES = [
     },
     {
         "id": "CASE-013",
-        "type": "Suspect",
+        "type": "Confirmed",  # 7/12 已獲國家實驗室覆檢確診
         "source_status": "official_updated",
         "species": "巨鸌 (Giant Petrel)",
         "location": "南澳 Yorke Peninsula Port Vincent",
@@ -205,12 +206,12 @@ DEFAULT_CASES = [
         "longitude": 137.8613,
         "found_date": "2026-07-06",
         "notify_date": "2026-07-08",
-        "confirm_date": "進行中 (Pending)",
-        "notes": "南澳疑似病例。於 Yorke Peninsula Port Vincent 發現之巨鸌，檢體已送往 CSIRO 國家實驗室 (ACDP) 進行最終確診覆檢。"
+        "confirm_date": "2026-07-12",
+        "notes": "南澳確診病例。於 Yorke Peninsula Port Vincent 發現之巨鸌，經吉隆國家實驗室覆驗，已於 7 月 12 日正式升級為確診陽性。"
     },
     {
         "id": "CASE-014",
-        "type": "Suspect",
+        "type": "Confirmed",  # 7/12 已獲國家實驗室覆檢確診
         "source_status": "official_updated",
         "species": "巨鸌 (Giant Petrel)",
         "location": "南澳 Kangaroo Island Emu Bay",
@@ -218,21 +219,47 @@ DEFAULT_CASES = [
         "longitude": 137.5041,
         "found_date": "2026-07-06",
         "notify_date": "2026-07-08",
-        "confirm_date": "進行中 (Pending)",
-        "notes": "南澳疑似病例。於 Kangaroo Island Emu Bay 發現之巨鸌，檢體已送往 CSIRO 國家實驗室 (ACDP) 進行最終確診覆檢。"
+        "confirm_date": "2026-07-12",
+        "notes": "南澳確診病例。於 Kangaroo Island Emu Bay 發現之巨鸌，經吉隆國家實驗室覆驗，已於 7 月 12 日正式升級為確診陽性。"
     },
     {
         "id": "CASE-015",
-        "type": "Suspect",
+        "type": "Confirmed",  # 7/10 疑似，後經 WA DPIRD 轉正確診
         "source_status": "official_updated",
-        "species": "野生海鳥 (檢測中)",
+        "species": "野生海鳥 (巨鸌)",
         "location": "西澳 Horrocks Beach",
         "latitude": -28.3817,
         "longitude": 114.4304,
         "found_date": "2026-07-09",
         "notify_date": "2026-07-10",
-        "confirm_date": "進行中 (Pending)",
-        "notes": "西澳 DPIRD 官網今日最新通報疑似病例。於西澳中西部 Horrocks Beach 發現之野生海鳥檢體初步篩檢為 H5 陽性，目前已送往 ACDP 進行確診複檢。"
+        "confirm_date": "2026-07-12",
+        "notes": "西澳確診病例（西澳第 6 例）。於西澳中西部 Horrocks Beach 發現之野生海鳥檢體，經國家實驗室複檢已於 7 月 12 日證實為 H5N1 陽性。"
+    },
+    {
+        "id": "CASE-016",
+        "type": "Confirmed",
+        "source_status": "official_updated",
+        "species": "南方巨鸌 (Southern Giant Petrel)",
+        "location": "西澳南部 Denmark (Parry Beach)",
+        "latitude": -35.0315,
+        "longitude": 117.1593,
+        "found_date": "2026-07-12",
+        "notify_date": "2026-07-14",
+        "confirm_date": "2026-07-14",
+        "notes": "西澳第 7 宗確診病例。於南海岸 Denmark 地區 Parry Beach 發現之南方巨鸌，經吉隆 ACDP 實驗室覆檢確診為 H5N1 陽性。"
+    },
+    {
+        "id": "CASE-017",
+        "type": "Confirmed",
+        "source_status": "official_updated",
+        "species": "巨鸌 (Giant Petrel)",
+        "location": "西澳 Lancelin 地區",
+        "latitude": -31.0210,
+        "longitude": 115.3315,
+        "found_date": "2026-07-13",
+        "notify_date": "2026-07-15",
+        "confirm_date": "2026-07-15",
+        "notes": "西澳第 8 宗確診病例。於西澳中海岸 Lancelin 發現之巨鸌檢體，經國家實驗室化驗確診為 H5N1 陽性個案。"
     }
 ]
 
@@ -470,8 +497,9 @@ def fetch_daff_updates():
     """
     聯防爬蟲模組：同時爬取聯邦 DAFF 官網、以及澳洲全部 8 個州/領地政府的官方禽流感更新站點。
     """
-    # 修正 DAFF_2 URL 拼寫，並更新南澳專區網址
+    # 整合最新入口網址 campaigns/birdflu 作為主要官方檢驗來源
     sources = {
+        "DAFF_Entry": "https://www.agriculture.gov.au/campaigns/birdflu",
         "DAFF_1": "https://www.agriculture.gov.au/node/26086",
         "DAFF_2": "https://www.agriculture.gov.au/about/news/H5-testing-updates",
         "NSW": "https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza",
@@ -564,7 +592,7 @@ def fetch_daff_updates():
             if not any(abs(c["latitude"] - nc["latitude"]) + abs(c["longitude"] - nc["longitude"]) < 0.1 for c in cases):
                 cases.append(nc)
 
-    # 2. 第二道防線 (防 Link Rot 核心)：直接從 RSS 新聞文本中動態提取新疫情點 (官網癱瘓時的兜底)
+    # 2. 第二道防線 (防 Link Rot 核心)：直接從 RSS 新訊文本中動態提取新疫情點 (官網癱瘓時的兜底)
     rss_discovered = discover_cases_from_news_rss(abc_rss_text, cases)
     for nc in rss_discovered:
         if not any(abs(c["latitude"] - nc["latitude"]) + abs(c["longitude"] - nc["longitude"]) < 0.1 for c in cases):
@@ -593,13 +621,13 @@ def generate_dynamic_summary(cases_data):
         c_type = case["type"]
         
         state_key = "Other"
-        if "西澳" in loc or "WA" in loc or "Esperance" in loc or "Dunsborough" in loc or "Roses" in loc or "Mullaloo" in loc or "Horrocks" in loc:
+        if any(kw in loc for kw in ["西澳", "WA", "Esperance", "Dunsborough", "Roses", "Mullaloo", "Horrocks", "Denmark", "Lancelin"]):
             state_key = "WA"
-        elif "南澳" in loc or "SA" in loc or "Fleurieu" in loc or "Fowlers" in loc or "Robe" in loc or "Yorke" in loc or "Kangaroo" in loc:
+        elif any(kw in loc for kw in ["南澳", "SA", "Fleurieu", "Fowlers", "Robe", "Yorke", "Kangaroo", "Vincent"]):
             state_key = "SA"
-        elif "新南威爾斯" in loc or "NSW" in loc or "Hawks Nest" in loc or "Narrabeen" in loc:
+        elif any(kw in loc for kw in ["新南威爾斯", "NSW", "Hawks Nest", "Narrabeen"]):
             state_key = "NSW"
-        elif "維多利亞" in loc or "VIC" in loc or "Victoria" in loc:
+        elif any(kw in loc for kw in ["維多利亞", "VIC", "Victoria"]):
             state_key = "VIC"
         elif "昆士蘭" in loc or "QLD" in loc:
             state_key = "QLD"
@@ -613,7 +641,7 @@ def generate_dynamic_summary(cases_data):
         states_stats[state_key][c_type] += 1
         states_stats[state_key]["total"] += 1
 
-    daff_link = '<a href="https://www.agriculture.gov.au/node/26086" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲聯邦農業部 (DAFF)</a>'
+    daff_link = '<a href="https://www.agriculture.gov.au/campaigns/birdflu" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲聯邦農業部 (DAFF)</a>'
     
     wa_detail = f"西澳 {states_stats['WA']['total']} 例（{states_stats['WA']['Confirmed']}例確診" + (f"/{states_stats['WA']['Suspect']}例疑似" if states_stats['WA']['Suspect'] else "") + ")"
     sa_detail = f"南澳 {states_stats['SA']['total']} 例（{states_stats['SA']['Confirmed']}例確診" + (f"/{states_stats['SA']['Suspect']}例疑似" if states_stats['SA']['Suspect'] else "") + (f"/{states_stats['SA']['Negative']}例已排除" if states_stats['SA']['Negative'] else "") + ")"
@@ -628,6 +656,7 @@ def generate_dynamic_summary(cases_data):
     
     vic_detail = f"維多利亞州 (VIC) {states_stats['VIC']['total']} 例（{states_stats['VIC']['Negative']}例已排除)"
     
+    # 拼裝其它領地數據 (若有檢出)
     other_states_list = []
     for sk in ["QLD", "TAS", "NT", "ACT"]:
         if states_stats[sk]["total"] > 0:
@@ -635,7 +664,7 @@ def generate_dynamic_summary(cases_data):
     other_states_str = f"，另有 {', '.join(other_states_list)}" if other_states_list else ""
     
     official_text = (
-        f"依據 {daff_link} 及各州政府最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙與本土海鳥。當前最新疫情病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
+        f"依據 {daff_link} 及各州政府 2026 年 7 月 16 日最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙與本土海鳥。當前最新確診病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
     )
 
     latest_case = cases_data[-1] if cases_data else None
@@ -648,9 +677,13 @@ def generate_dynamic_summary(cases_data):
         loc_name = latest_case["location"].replace("新偵測：", "").replace("新聞偵測：", "")
         species = latest_case["species"]
         
-        if "Robe" in loc_name or "Horrocks" in loc_name:
+        if "Denmark" in loc_name or "Lancelin" in loc_name:
             media_text = (
-                f"根據 {abc_link} 重大報導與各州官方公告，西澳中西部 Horrocks Beach 今日檢出全新疑似野鳥病例，且南澳沿海 Robe 證實本土留鳥（大鳳頭燕鷗）確診，病毒正式穿透境外移入防線。台灣防檢署原定解禁禁令暫緩。該病例距離本廠 726 公里，本廠將保持高度地緣隔離監控。"
+                f"根據 {abc_link} 最新報導與西澳 DPIRD 官方公告，西澳今日新增 Denmark (Parry Beach) 及 Lancelin 兩宗巨鸌確診病例。全澳洲官方野鳥確診病例累計已達 14 例（西澳8例、南澳5例、NSW1例）。此波海鳥疫情仍屬於零星個案，目前無任何商業家禽遭到感染，Blayney 廠地緣風險依然極低。"
+            )
+        elif "Robe" in loc_name or "Horrocks" in loc_name:
+            media_text = (
+                f"根據 {abc_link} 重大報導與各州官方公告，西澳中西部 Horrocks Beach 與南澳沿海 Robe 均已確診，病毒正式穿透境外移入防線。台灣防檢署原定解禁禁令暫緩。該病例距離本廠 726 公里，本廠將保持高度地緣隔離監控。"
             )
         elif latest_case["source_status"] == "media_announced":
             media_text = (
@@ -674,7 +707,7 @@ def generate_dynamic_references(cases_data):
     動態生成網頁底部的官方權威參考資料 (References) 列表。
     """
     refs = [
-        '澳洲農業、漁業及林業部 (DAFF) 官方檢測即時更新：<a href="https://www.agriculture.gov.au/node/26086" target="_blank" class="text-blue-400 hover:underline">Department of Agriculture, Fisheries and Forestry - H5 bird flu testing update</a>',
+        '澳洲農業、漁業及林業部 (DAFF) 官方宣傳活動與即時更新：<a href="https://www.agriculture.gov.au/campaigns/birdflu" target="_blank" class="text-blue-400 hover:underline">Department of Agriculture, Fisheries and Forestry - June 2026 H5 bird flu detection</a>',
         '新南威爾斯州政府一次產業及區域發展廳 (NSW DPIRD) 專區即時更新：<a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 hover:underline">NSW DPIRD - Avian influenza updates</a>',
         '南澳州政府農業、食品及區域部 (PIRSA) 專區即時更新：<a href="https://pir.sa.gov.au/animal-management/animal-health/species/poultry/avian-influenza" target="_blank" class="text-blue-400 hover:underline">PIRSA - Avian influenza updates</a>'
     ]
@@ -683,7 +716,7 @@ def generate_dynamic_references(cases_data):
     has_vic = False
     for case in cases_data:
         loc = case["location"]
-        if any(kw in loc for kw in ["西澳", "WA", "Esperance", "Roses", "Dunsborough", "Mullaloo", "Horrocks"]):
+        if any(kw in loc for kw in ["西澳", "WA", "Esperance", "Roses", "Dunsborough", "Mullaloo", "Horrocks", "Denmark", "Lancelin"]):
             has_wa = True
         if any(kw in loc for kw in ["維多利亞", "VIC"]):
             has_vic = True
