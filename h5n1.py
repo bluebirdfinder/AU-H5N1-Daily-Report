@@ -35,10 +35,10 @@ if hasattr(sys.stdout, 'reconfigure'):
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# ==================== 1. 基礎病例資料庫 (包含 2026 年 7 月 16 日最新 17 例) ====================
+# ==================== 1. 基礎病例資料庫 (包含 2026 年 7 月 17 日最新 20 例) ====================
 # 當爬蟲執行時，會以這個結構為基礎，並嘗試與官網最新發布的文字進行比對與動態修正。
 # source_status: "official_updated" (官方網頁已更新) / "media_announced" (媒體先行，官網同步中)
-# 總病例庫共 17 例，包含 14 例官方確診 (WA 8例, SA 5例, NSW 1例) 以及 3 例已排除 (SA 1例, VIC 1例, NSW 1例)
+# 總病例庫共 20 例，包含 17 例官方確診 (WA 10例, SA 5例, NSW 2例) 以及 3 例已排除 (SA 1例, VIC 1例, NSW 1例)
 DEFAULT_CASES = [
     {
         "id": "CASE-001",
@@ -198,7 +198,7 @@ DEFAULT_CASES = [
     },
     {
         "id": "CASE-013",
-        "type": "Confirmed",  # 7/12 已獲國家實驗室覆檢確診
+        "type": "Confirmed",
         "source_status": "official_updated",
         "species": "巨鸌 (Giant Petrel)",
         "location": "南澳 Yorke Peninsula Port Vincent",
@@ -211,7 +211,7 @@ DEFAULT_CASES = [
     },
     {
         "id": "CASE-014",
-        "type": "Confirmed",  # 7/12 已獲國家實驗室覆檢確診
+        "type": "Confirmed",
         "source_status": "official_updated",
         "species": "巨鸌 (Giant Petrel)",
         "location": "南澳 Kangaroo Island Emu Bay",
@@ -224,7 +224,7 @@ DEFAULT_CASES = [
     },
     {
         "id": "CASE-015",
-        "type": "Confirmed",  # 7/10 疑似，後經 WA DPIRD 轉正確診
+        "type": "Confirmed",
         "source_status": "official_updated",
         "species": "野生海鳥 (巨鸌)",
         "location": "西澳 Horrocks Beach",
@@ -260,6 +260,45 @@ DEFAULT_CASES = [
         "notify_date": "2026-07-15",
         "confirm_date": "2026-07-15",
         "notes": "西澳第 8 宗確診病例。於西澳中海岸 Lancelin 發現之巨鸌檢體，經國家實驗室化驗確診為 H5N1 陽性個案。"
+    },
+    {
+        "id": "CASE-018",
+        "type": "Confirmed",
+        "source_status": "official_updated",
+        "species": "巨海燕 (Giant Petrel)",
+        "location": "新南威爾斯州中北岸 Hawks Nest (第二例)",
+        "latitude": -32.6658,
+        "longitude": 152.1793,
+        "found_date": "2026-07-16",
+        "notify_date": "2026-07-17",
+        "confirm_date": "2026-07-17",
+        "notes": "新南威爾斯州 (NSW) 第 2 宗確診病例。於中北岸 Hawks Nest 發現之另一隻巨海燕，經 ACDP 國家實驗室最終複檢，於 7 月 17 日確診為 H5N1 陽性。"
+    },
+    {
+        "id": "CASE-019",
+        "type": "Confirmed",
+        "source_status": "official_updated",
+        "species": "野生海鳥 (巨鸌)",
+        "location": "西澳 Gingin 郡 Seabird 海灘",
+        "latitude": -31.2789,
+        "longitude": 115.4414,
+        "found_date": "2026-07-15",
+        "notify_date": "2026-07-16",
+        "confirm_date": "2026-07-17",
+        "notes": "西澳第 9 宗確診病例。於西澳中海岸 Gingin 郡 Seabird 鎮海灘發現之野鳥檢體，經檢驗確診為 H5N1 高致病性陽性。"
+    },
+    {
+        "id": "CASE-020",
+        "type": "Confirmed",
+        "source_status": "official_updated",
+        "species": "野生海鳥 (巨鸌)",
+        "location": "西澳伯斯北部 Whitfords Beach",
+        "latitude": -31.7944,
+        "longitude": 115.7368,
+        "found_date": "2026-07-16",
+        "notify_date": "2026-07-17",
+        "confirm_date": "2026-07-17",
+        "notes": "西澳第 10 宗確診病例。於伯斯北部 Whitfords Beach（鄰近 Mullaloo Beach）發現之巨鸌，經實驗室化驗證實為 H5N1 陽性個案。"
     }
 ]
 
@@ -325,6 +364,7 @@ def get_coordinates_from_api(location_name):
 def discover_new_cases(soup, existing_cases):
     """
     動態分析網頁 HTML，尋找潛在的全新疫情地點，並自動進行地理定位
+    優化防重覆判斷：利用 GPS 座標直線距離與通報日期雙重判定，防堵熱點多案例被誤殺過濾。
     """
     if not soup:
         return []
@@ -355,26 +395,30 @@ def discover_new_cases(soup, existing_cases):
     case_idx = len(existing_cases) + 1
     
     for loc, src_txt in unique_candidates.items():
-        is_existing = False
+        # 改進的防重覆判斷 (避免同地熱點第二案例被跳過)
+        # 1. 檢查地點字串是否重合
+        is_existing_text = False
         for ec in existing_cases:
             if loc.lower() in ec["location"].lower() or ec["location"].lower() in loc.lower():
-                is_existing = True
+                is_existing_text = True
                 break
-        if is_existing:
-            continue
-            
-        print(f"[動態偵測] 發現全新疫情地點關鍵字: '{loc}'，正在進行地理定位...")
+        
+        # 2. 如果地名重合，但可能為不同日期之獨立個案，此時去查地理位置
         lat, lon = get_coordinates_from_api(loc)
         if lat is None or lon is None:
             continue
             
-        is_close = False
+        # 計算與現有病例的距離 (公里)
+        is_too_close = False
         for ec in existing_cases:
-            dist = abs(ec["latitude"] - lat) + abs(ec["longitude"] - lon)
-            if dist < 0.1:
-                is_close = True
+            dist = calculate_distance(lat, lon, ec["latitude"], ec["longitude"])
+            # 若與現有病例距離極近 (小於 2 公里)，且日期重疊，才判定為重複通報
+            if dist < 2.0 and ec["notify_date"] == datetime.now(timezone.utc).strftime("%Y-%m-%d"):
+                is_too_close = True
                 break
-        if is_close:
+                
+        # 只有在既不是文字重合，也沒有靠得太近的重複日期案件時，才新增
+        if is_existing_text and is_too_close:
             continue
             
         type_status = "Suspect"
@@ -441,26 +485,25 @@ def discover_cases_from_news_rss(rss_text, existing_cases):
     case_idx = len(existing_cases) + 1
     
     for loc, src_txt in unique_candidates.items():
-        is_existing = False
+        is_existing_text = False
         for ec in existing_cases:
             if loc.lower() in ec["location"].lower() or ec["location"].lower() in loc.lower():
-                is_existing = True
+                is_existing_text = True
                 break
-        if is_existing:
-            continue
-            
+                
         print(f"[RSS 新聞兜底偵測] 發現全新潛在疫情地點關鍵字: '{loc}'，正在進行地理定位...")
         lat, lon = get_coordinates_from_api(loc)
         if lat is None or lon is None:
             continue
             
-        is_close = False
+        is_too_close = False
         for ec in existing_cases:
-            dist = abs(ec["latitude"] - lat) + abs(ec["longitude"] - lon)
-            if dist < 0.1:
-                is_close = True
+            dist = calculate_distance(lat, lon, ec["latitude"], ec["longitude"])
+            if dist < 2.0 and ec["notify_date"] == datetime.now(timezone.utc).strftime("%Y-%m-%d"):
+                is_too_close = True
                 break
-        if is_close:
+                
+        if is_existing_text and is_too_close:
             continue
             
         type_status = "Suspect"
@@ -497,7 +540,6 @@ def fetch_daff_updates():
     """
     聯防爬蟲模組：同時爬取聯邦 DAFF 官網、以及澳洲全部 8 個州/領地政府的官方禽流感更新站點。
     """
-    # 整合最新入口網址 campaigns/birdflu 作為主要官方檢驗來源
     sources = {
         "DAFF_Entry": "https://www.agriculture.gov.au/campaigns/birdflu",
         "DAFF_1": "https://www.agriculture.gov.au/node/26086",
@@ -592,7 +634,7 @@ def fetch_daff_updates():
             if not any(abs(c["latitude"] - nc["latitude"]) + abs(c["longitude"] - nc["longitude"]) < 0.1 for c in cases):
                 cases.append(nc)
 
-    # 2. 第二道防線 (防 Link Rot 核心)：直接從 RSS 新訊文本中動態提取新疫情點 (官網癱瘓時的兜底)
+    # 2. 第二道防線 (防 Link Rot 核心)：直接從 RSS 新聞文本中動態提取新疫情點 (官網癱瘓時的兜底)
     rss_discovered = discover_cases_from_news_rss(abc_rss_text, cases)
     for nc in rss_discovered:
         if not any(abs(c["latitude"] - nc["latitude"]) + abs(c["longitude"] - nc["longitude"]) < 0.1 for c in cases):
@@ -621,7 +663,7 @@ def generate_dynamic_summary(cases_data):
         c_type = case["type"]
         
         state_key = "Other"
-        if any(kw in loc for kw in ["西澳", "WA", "Esperance", "Dunsborough", "Roses", "Mullaloo", "Horrocks", "Denmark", "Lancelin"]):
+        if any(kw in loc for kw in ["西澳", "WA", "Esperance", "Dunsborough", "Roses", "Mullaloo", "Horrocks", "Denmark", "Lancelin", "Seabird", "Whitfords"]):
             state_key = "WA"
         elif any(kw in loc for kw in ["南澳", "SA", "Fleurieu", "Fowlers", "Robe", "Yorke", "Kangaroo", "Vincent"]):
             state_key = "SA"
@@ -664,7 +706,7 @@ def generate_dynamic_summary(cases_data):
     other_states_str = f"，另有 {', '.join(other_states_list)}" if other_states_list else ""
     
     official_text = (
-        f"依據 {daff_link} 及各州政府 2026 年 7 月 16 日最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙與本土海鳥。當前最新確診病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
+        f"依據 {daff_link} 及各州政府 2026 年 7 月 17 日最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙與本土海鳥。當前最新確診病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
     )
 
     latest_case = cases_data[-1] if cases_data else None
@@ -677,9 +719,13 @@ def generate_dynamic_summary(cases_data):
         loc_name = latest_case["location"].replace("新偵測：", "").replace("新聞偵測：", "")
         species = latest_case["species"]
         
-        if "Denmark" in loc_name or "Lancelin" in loc_name:
+        if "Seabird" in loc_name or "Whitfords" in loc_name or "Hawks Nest (第二例)" in loc_name:
             media_text = (
-                f"根據 {abc_link} 最新報導與西澳 DPIRD 官方公告，西澳今日新增 Denmark (Parry Beach) 及 Lancelin 兩宗巨鸌確診病例。全澳洲官方野鳥確診病例累計已達 14 例（西澳8例、南澳5例、NSW1例）。此波海鳥疫情仍屬於零星個案，目前無任何商業家禽遭到感染，Blayney 廠地緣風險依然極低。"
+                f"根據 {abc_link} 最新報導與新州政府及西澳 DPIRD 官方公告，澳洲今日單日突增 3 宗確診病例！其中新州中北岸 Hawks Nest 檢出第 2 宗確診，西澳中海岸 Seabird 鎮及伯斯北部 Whitfords Beach 亦分別確診 1 例。全澳野生海鳥確診病例跳升至 17 例（西澳10例、南澳5例、NSW2例），疫情形勢呈現小幅擴散。目前家禽防線安全，本廠將保持嚴密地緣隔離監控。"
+            )
+        elif "Denmark" in loc_name or "Lancelin" in loc_name:
+            media_text = (
+                f"根據 {abc_link} 最新報導與西澳 DPIRD 官方公告，西澳新增 Denmark (Parry Beach) 及 Lancelin 兩宗巨鸌確診病例。全澳洲官方野鳥確診病例累計已達 14 例（西澳8例、南澳5例、NSW1例）。此波海鳥疫情仍屬於零星個案，目前無任何商業家禽遭到感染，Blayney 廠地緣風險依然極低。"
             )
         elif "Robe" in loc_name or "Horrocks" in loc_name:
             media_text = (
@@ -716,7 +762,7 @@ def generate_dynamic_references(cases_data):
     has_vic = False
     for case in cases_data:
         loc = case["location"]
-        if any(kw in loc for kw in ["西澳", "WA", "Esperance", "Roses", "Dunsborough", "Mullaloo", "Horrocks", "Denmark", "Lancelin"]):
+        if any(kw in loc for kw in ["西澳", "WA", "Esperance", "Roses", "Dunsborough", "Mullaloo", "Horrocks", "Denmark", "Lancelin", "Seabird", "Whitfords"]):
             has_wa = True
         if any(kw in loc for kw in ["維多利亞", "VIC"]):
             has_vic = True

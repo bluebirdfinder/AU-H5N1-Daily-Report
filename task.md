@@ -29,7 +29,7 @@
   - `[x]` 修正 DAFF 與 SA PIRSA 的最新正確專區 URL 連結
   - `[x]` 實作防 Link Rot 新聞 RSS 兜底定位與多段式退避地緣搜尋 (解決 Horrocks Beach 案例)
   - `[x]` 對齊官方 7/16 最新數據（全澳累計 14 例確診：WA 8例, SA 5例, NSW 1例）
-  - `[x]` 在爬蟲來源中整合官方最新 H5N1 專題入口網頁 campaigns/birdflu 
-  - `[x]` 新增西澳 Denmark (Parry Beach) 確診與 Lancelin 確診病例至資料庫中
-  - `[x]` 將西澳 Horrocks Beach 與南澳 Port Vincent, Kangaroo Island 案例升級為官方確診
-  - `[x]` 更新 `README.md` 及專案開發日誌 `walkthrough.md`
+  - `[x]` 對齊官方 7/17 最新數據（全澳累計 17 例確診：WA 10例, SA 5例, NSW 2例）
+  - `[x]` 修正 `discover_new_cases` 的同地熱點第二案例誤殺過濾 Bug
+  - `[x]` 新增新州第二例 Hawks Nest 確診、西澳 Seabird 及 Whitfords Beach 確診病例至資料庫中
+  - `[x]` 同步更新 `README.md`、`report_template.html`、`.github/workflows/auto_update.yml`、`walkthrough.md`、`task.md` 的修改時間與說明
