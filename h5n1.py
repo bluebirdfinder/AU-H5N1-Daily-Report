@@ -299,6 +299,19 @@ DEFAULT_CASES = [
         "notify_date": "2026-07-17",
         "confirm_date": "2026-07-17",
         "notes": "西澳第 10 宗確診病例。於伯斯北部 Whitfords Beach（鄰近 Mullaloo Beach）發現之巨鸌，經實驗室化驗證實為 H5N1 陽性個案。"
+    },
+    {
+        "id": "CASE-021",
+        "type": "Negative",
+        "source_status": "official_updated",
+        "species": "北方巨海燕 (Northern Giant Petrel)",
+        "location": "昆士蘭州 Noosa Main Beach",
+        "latitude": -26.3847,
+        "longitude": 153.0886,
+        "found_date": "2026-07-11",
+        "notify_date": "2026-07-12",
+        "confirm_date": "陰性 (已排除)",
+        "notes": "昆士蘭首宗通報之野鳥疑似病例。於 Noosa 海灘尋獲之北方巨海燕，經昆士蘭農業部 (Biosecurity Queensland) 化驗，已於 7 月 14 日證實為陰性，正式排除 H5N1 禽流感，目前昆士蘭維持無病例安全狀態。"
     }
 ]
 
@@ -702,11 +715,20 @@ def generate_dynamic_summary(cases_data):
     other_states_list = []
     for sk in ["QLD", "TAS", "NT", "ACT"]:
         if states_stats[sk]["total"] > 0:
-            other_states_list.append(f"{sk} {states_stats[sk]['total']} 例")
+            confirmed = states_stats[sk]["Confirmed"]
+            suspect = states_stats[sk]["Suspect"]
+            negative = states_stats[sk]["Negative"]
+            detail = f"{sk} {states_stats[sk]['total']} 例（"
+            parts = []
+            if confirmed: parts.append(f"{confirmed}例確診")
+            if suspect: parts.append(f"{suspect}例疑似")
+            if negative: parts.append(f"{negative}例已排除")
+            detail += "/".join(parts) + ")"
+            other_states_list.append(detail)
     other_states_str = f"，另有 {', '.join(other_states_list)}" if other_states_list else ""
     
     official_text = (
-        f"依據 {daff_link} 及各州政府 2026 年 7 月 17 日最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙與本土海鳥。當前最新確診病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
+        f"依據 {daff_link} 及各州政府 2026 年 7 月 22 日最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙與本土海鳥。當前最新確診病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
     )
 
     latest_case = cases_data[-1] if cases_data else None
@@ -715,7 +737,14 @@ def generate_dynamic_summary(cases_data):
     abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a>'
     
     media_text = ""
-    if latest_case:
+    # 檢查是否有 QLD 且為 Negative 的 Noosa 案例 (優先說明此最新疑似排除案件)
+    has_noosa_negative = any("Noosa" in c["location"] and c["type"] == "Negative" for c in cases_data)
+    
+    if has_noosa_negative:
+        media_text = (
+            f"根據 {abc_link} 與各州官方公告，近期昆士蘭州 Noosa Main Beach 通報之首宗野生海鳥疑似病例已於 7 月 14 日經檢驗證實為 H5N1 陰性並正式排除，昆士蘭州維持零確診紀錄。西澳自 7 月 17 日起亦無新增確診個案，全澳確診總數維持 17 例（西澳10例、南澳5例、NSW2例）。所有病例均侷限於沿海野生海鳥，目前商業家禽生產區維持 100% 安全，對 Blayney 廠無威脅。"
+        )
+    elif latest_case:
         loc_name = latest_case["location"].replace("新偵測：", "").replace("新聞偵測：", "")
         species = latest_case["species"]
         
@@ -760,17 +789,22 @@ def generate_dynamic_references(cases_data):
     
     has_wa = False
     has_vic = False
+    has_qld = False
     for case in cases_data:
         loc = case["location"]
         if any(kw in loc for kw in ["西澳", "WA", "Esperance", "Roses", "Dunsborough", "Mullaloo", "Horrocks", "Denmark", "Lancelin", "Seabird", "Whitfords"]):
             has_wa = True
         if any(kw in loc for kw in ["維多利亞", "VIC"]):
             has_vic = True
+        if any(kw in loc for kw in ["昆士蘭", "QLD", "Noosa"]):
+            has_qld = True
             
     if has_wa:
         refs.append('西澳州政府一次產業及區域發展部 (DPIRD WA) 專區即時更新：<a href="https://www.wa.gov.au/organisation/department-of-primary-industries-and-regional-development/avian-influenza" target="_blank" class="text-blue-400 hover:underline">DPIRD WA - Avian influenza updates</a>')
     if has_vic:
         refs.append('維多利亞州政府農業廳 (Agriculture Victoria) 疫情公告：<a href="https://agriculture.vic.gov.au/biosecurity/animal-diseases/poultry-diseases/avian-influenza" target="_blank" class="text-blue-400 hover:underline">Agriculture Victoria - Bird flu update</a>')
+    if has_qld:
+        refs.append('昆士蘭州政府一次產業及農業發展專區 (Biosecurity Queensland)：<a href="https://www.business.qld.gov.au/industries/farms-fishing-forestry/agriculture/animal/health-diseases/disorders/avian-influenza" target="_blank" class="text-blue-400 hover:underline">Biosecurity Queensland - Avian influenza updates</a>')
         
     html_lines = []
     for idx, ref in enumerate(refs, 1):

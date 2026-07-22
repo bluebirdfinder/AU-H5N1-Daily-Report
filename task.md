@@ -31,5 +31,8 @@
   - `[x]` 對齊官方 7/16 最新數據（全澳累計 14 例確診：WA 8例, SA 5例, NSW 1例）
   - `[x]` 對齊官方 7/17 最新數據（全澳累計 17 例確診：WA 10例, SA 5例, NSW 2例）
   - `[x]` 修正 `discover_new_cases` 的同地熱點第二案例誤殺過濾 Bug
-  - `[x]` 新增新州第二例 Hawks Nest 確診、西澳 Seabird 及 Whitfords Beach 確診病例至資料庫中
   - `[x]` 同步更新 `README.md`、`report_template.html`、`.github/workflows/auto_update.yml`、`walkthrough.md`、`task.md` 的修改時間與說明
+  - `[x]` 對齊官方 7/22 最新數據（全澳累計 17 例確診：WA 10例, SA 5例, NSW 2例）
+  - `[x]` 新增昆士蘭 Noosa Main Beach (CASE-021, Negative) 疑似排除個案
+  - `[x]` 升級動態參考資料庫以支援 QLD 官網動態追加
+
