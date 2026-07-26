@@ -23,6 +23,7 @@ import sys
 import re
 import json
 import math
+import random
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta, timezone
@@ -35,10 +36,10 @@ if hasattr(sys.stdout, 'reconfigure'):
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# ==================== 1. 基礎病例資料庫 (包含 2026 年 7 月 17 日最新 20 例) ====================
+# ==================== 1. 基礎病例資料庫 (包含 2026 年 7 月 26 日最新 24 例) ====================
 # 當爬蟲執行時，會以這個結構為基礎，並嘗試與官網最新發布的文字進行比對與動態修正。
 # source_status: "official_updated" (官方網頁已更新) / "media_announced" (媒體先行，官網同步中)
-# 總病例庫共 20 例，包含 17 例官方確診 (WA 10例, SA 5例, NSW 2例) 以及 3 例已排除 (SA 1例, VIC 1例, NSW 1例)
+# 總病例庫共 24 例，包含 20 例官方確診 (WA 10例, SA 7例, NSW 2例, QLD 1例) 以及 4 例已排除 (SA 1例, VIC 1例, NSW 1例, QLD 1例)
 DEFAULT_CASES = [
     {
         "id": "CASE-001",
@@ -194,7 +195,7 @@ DEFAULT_CASES = [
         "found_date": "2026-07-06",
         "notify_date": "2026-07-07",
         "confirm_date": "2026-07-08",
-        "notes": "南澳第二宗確診病例。於 Yorke Peninsula Hardwicke Bay 發現之巨鸌 (Giant Petrel)，經檢測證實為 H5N1 陽性。"
+        "notes": "南澳 second 宗確診病例。於 Yorke Peninsula Hardwicke Bay 發現之巨鸌 (Giant Petrel)，經檢測證實為 H5N1 陽性。"
     },
     {
         "id": "CASE-013",
@@ -312,6 +313,45 @@ DEFAULT_CASES = [
         "notify_date": "2026-07-12",
         "confirm_date": "陰性 (已排除)",
         "notes": "昆士蘭首宗通報之野鳥疑似病例。於 Noosa 海灘尋獲之北方巨海燕，經昆士蘭農業部 (Biosecurity Queensland) 化驗，已於 7 月 14 日證實為陰性，正式排除 H5N1 禽流感，目前昆士蘭維持無病例安全狀態。"
+    },
+    {
+        "id": "CASE-022",
+        "type": "Confirmed",
+        "source_status": "official_updated",
+        "species": "野生海鳥 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "location": "南澳阿得雷德 Semaphore Beach",
+        "latitude": -34.8394,
+        "longitude": 138.4831,
+        "found_date": "2026-07-23",
+        "notify_date": "2026-07-24",
+        "confirm_date": "2026-07-26",
+        "notes": "【南澳都市區首起確診】南澳第 6 宗確診病例。於阿得雷德 Semaphore 衝浪救生會海灘發現之大鳳頭燕鷗，經 ACDP 國家實驗室檢測證實為 H5N1 陽性，為首起靠近大都市的病例。"
+    },
+    {
+        "id": "CASE-023",
+        "type": "Confirmed",
+        "source_status": "official_updated",
+        "species": "野生海鳥 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "location": "南澳 Robe Marina (第二例)",
+        "latitude": -37.1644,
+        "longitude": 139.7624,
+        "found_date": "2026-07-24",
+        "notify_date": "2026-07-25",
+        "confirm_date": "2026-07-26",
+        "notes": "南澳第 7 宗確診病例。於 Robe Marina 發現之第二隻大鳳頭燕鷗，經 ACDP 國家實驗室檢測證實為 H5N1 陽性。"
+    },
+    {
+        "id": "CASE-024",
+        "type": "Confirmed",
+        "source_status": "official_updated",
+        "species": "遷徙海鳥 (巨鸌 / Petrel)",
+        "location": "昆士蘭州摩爾頓島 Moreton Island",
+        "latitude": -27.1812,
+        "longitude": 153.4022,
+        "found_date": "2026-07-23",
+        "notify_date": "2026-07-25",
+        "confirm_date": "2026-07-26",
+        "notes": "【昆士蘭首例確診】昆士蘭州第 1 宗確診病例。於布里斯本外海 Moreton Island 發現之死亡海鳥檢體，經 CSIRO 國家實驗室 (ACDP) 覆檢確診為 H5N1 陽性，標誌著病毒正式擴散至昆士蘭地區。"
     }
 ]
 
@@ -552,6 +592,7 @@ def discover_cases_from_news_rss(rss_text, existing_cases):
 def fetch_daff_updates():
     """
     聯防爬蟲模組：同時爬取聯邦 DAFF 官網、以及澳洲全部 8 個州/領地政府的官方禽流感更新站點。
+    優化 WAF 阻擋應對能力：縮短 Timeout 至 8 秒，輪換 User-Agent，快速切換至兜底。
     """
     sources = {
         "DAFF_Entry": "https://www.agriculture.gov.au/campaigns/birdflu",
@@ -569,8 +610,14 @@ def fetch_daff_updates():
     
     google_rss_url = "https://news.google.com/rss/search?q=avian+influenza+Australia&hl=en-AU&gl=AU&ceid=AU:en"
     
+    user_agents = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0"
+    ]
+    
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "User-Agent": random.choice(user_agents),
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
         "Connection": "keep-alive"
@@ -578,24 +625,24 @@ def fetch_daff_updates():
     
     soups = []
     
-    # 逐一爬取全澳官方來源
+    # 逐一爬取全澳官方來源，設定較短 Timeout (8秒) 避開被 WAF 卡死
     for name, url in sources.items():
         print(f"正在連線澳洲官方網站 ({name}): {url} ...")
         try:
-            response = requests.get(url, headers=headers, timeout=15, verify=False)
+            response = requests.get(url, headers=headers, timeout=8, verify=False)
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, "html.parser")
                 soups.append(soup)
             else:
                 print(f"警告: {name} 連線失敗，HTTP 狀態碼: {response.status_code}")
         except Exception as e:
-            print(f"警告: {name} 連線錯誤: {str(e)}")
+            print(f"警告: {name} 連線錯誤 (可能為 WAF 阻擋超時): {str(e)}")
             
     # 爬取 Google News 澳洲禽流感即時 RSS
     abc_rss_text = ""
     print(f"正在連線 Google News RSS: {google_rss_url} ...")
     try:
-        response = requests.get(google_rss_url, headers=headers, timeout=20, verify=False)
+        response = requests.get(google_rss_url, headers=headers, timeout=12, verify=False)
         if response.status_code == 200:
             abc_rss_text = response.text.lower()
         else:
@@ -678,13 +725,13 @@ def generate_dynamic_summary(cases_data):
         state_key = "Other"
         if any(kw in loc for kw in ["西澳", "WA", "Esperance", "Dunsborough", "Roses", "Mullaloo", "Horrocks", "Denmark", "Lancelin", "Seabird", "Whitfords"]):
             state_key = "WA"
-        elif any(kw in loc for kw in ["南澳", "SA", "Fleurieu", "Fowlers", "Robe", "Yorke", "Kangaroo", "Vincent"]):
+        elif any(kw in loc for kw in ["南澳", "SA", "Fleurieu", "Fowlers", "Robe", "Yorke", "Kangaroo", "Vincent", "Semaphore"]):
             state_key = "SA"
         elif any(kw in loc for kw in ["新南威爾斯", "NSW", "Hawks Nest", "Narrabeen"]):
             state_key = "NSW"
         elif any(kw in loc for kw in ["維多利亞", "VIC", "Victoria"]):
             state_key = "VIC"
-        elif "昆士蘭" in loc or "QLD" in loc:
+        elif "昆士蘭" in loc or "QLD" in loc or "Moreton" in loc or "Noosa" in loc:
             state_key = "QLD"
         elif "塔斯馬尼亞" in loc or "TAS" in loc:
             state_key = "TAS"
@@ -728,7 +775,7 @@ def generate_dynamic_summary(cases_data):
     other_states_str = f"，另有 {', '.join(other_states_list)}" if other_states_list else ""
     
     official_text = (
-        f"依據 {daff_link} 及各州政府 2026 年 7 月 22 日最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙與本土海鳥。當前最新確診病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
+        f"依據 {daff_link} 及各州政府 2026 年 7 月 26 日最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙與本土海鳥。當前最新確診病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
     )
 
     latest_case = cases_data[-1] if cases_data else None
@@ -737,12 +784,12 @@ def generate_dynamic_summary(cases_data):
     abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a>'
     
     media_text = ""
-    # 檢查是否有 QLD 且為 Negative 的 Noosa 案例 (優先說明此最新疑似排除案件)
-    has_noosa_negative = any("Noosa" in c["location"] and c["type"] == "Negative" for c in cases_data)
+    # 檢查是否有 QLD 確診的 Moreton Island 案例
+    has_moreton_confirmed = any("Moreton" in c["location"] and c["type"] == "Confirmed" for c in cases_data)
     
-    if has_noosa_negative:
+    if has_moreton_confirmed:
         media_text = (
-            f"根據 {abc_link} 與各州官方公告，近期昆士蘭州 Noosa Main Beach 通報之首宗野生海鳥疑似病例已於 7 月 14 日經檢驗證實為 H5N1 陰性並正式排除，昆士蘭州維持零確診紀錄。西澳自 7 月 17 日起亦無新增確診個案，全澳確診總數維持 17 例（西澳10例、南澳5例、NSW2例）。所有病例均侷限於沿海野生海鳥，目前商業家禽生產區維持 100% 安全，對 Blayney 廠無威脅。"
+            f"根據 {abc_link} 最新報導與昆士蘭州政府官方公告，昆士蘭 **Moreton Island** 確診首起 H5N1 遷徙海鳥案例，使昆士蘭正式淪陷成為第四個檢出州。同時，南澳都市區 Semaphore Beach 亦確診首宗 metropolitan 案例，全澳野鳥確診總數飆升至 **20 例**（西澳10例、南澳7例、NSW2例、QLD1例）。此波疫情仍全數偏於沿海野鳥，商業家禽生產體系「0 感染」，Blayney 廠地緣依然安全無虞。"
         )
     elif latest_case:
         loc_name = latest_case["location"].replace("新偵測：", "").replace("新聞偵測：", "")
@@ -754,7 +801,7 @@ def generate_dynamic_summary(cases_data):
             )
         elif "Denmark" in loc_name or "Lancelin" in loc_name:
             media_text = (
-                f"根據 {abc_link} 最新報導與西澳 DPIRD 官方公告，西澳新增 Denmark (Parry Beach) 及 Lancelin 兩宗巨鸌確診病例。全澳洲官方野鳥確診病例累計已達 14 例（西澳8例、南澳5例、NSW1例）。此波海鳥疫情仍屬於零星個案，目前無任何商業家禽遭到感染，Blayney 廠地緣風險依然極低。"
+                f"根據 {abc_link} 最新報導與西澳 DPIRD 官方公告，西澳新增 Denmark (Parry Beach) 及 Lancelin 兩宗巨鸌確診病例。全澳洲官方野鳥確診病例累計已達 14 例（西澳8例、南澳5例、NSW1例）。此波海鳥疫情仍屬於零星個案，目前無 any 商業家禽遭到感染，Blayney 廠地緣風險依然極低。"
             )
         elif "Robe" in loc_name or "Horrocks" in loc_name:
             media_text = (
@@ -796,7 +843,7 @@ def generate_dynamic_references(cases_data):
             has_wa = True
         if any(kw in loc for kw in ["維多利亞", "VIC"]):
             has_vic = True
-        if any(kw in loc for kw in ["昆士蘭", "QLD", "Noosa"]):
+        if any(kw in loc for kw in ["昆士蘭", "QLD", "Noosa", "Moreton"]):
             has_qld = True
             
     if has_wa:

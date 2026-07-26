@@ -35,4 +35,7 @@
   - `[x]` 對齊官方 7/22 最新數據（全澳累計 17 例確診：WA 10例, SA 5例, NSW 2例）
   - `[x]` 新增昆士蘭 Noosa Main Beach (CASE-021, Negative) 疑似排除個案
   - `[x]` 升級動態參考資料庫以支援 QLD 官網動態追加
+  - `[x]` 對齊官方 7/26 最新數據（全澳累計 20 例確診：WA 10例, SA 7例, NSW 2例, QLD 1例）
+  - `[x]` 新增南澳 Semaphore Beach、Robe Marina (第二例) 及昆士蘭 Moreton Island 確診個案
+  - `[x]` 優化 `h5n1.py` 爬蟲模擬真實瀏覽器 (UA 輪換) 與 Timeout 加速防死鎖
 
