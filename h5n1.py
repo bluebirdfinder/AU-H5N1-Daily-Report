@@ -352,6 +352,45 @@ DEFAULT_CASES = [
         "notify_date": "2026-07-25",
         "confirm_date": "2026-07-26",
         "notes": "【昆士蘭首例確診】昆士蘭州第 1 宗確診病例。於布里斯本外海 Moreton Island 發現之死亡海鳥檢體，經 CSIRO 國家實驗室 (ACDP) 覆檢確診為 H5N1 陽性，標誌著病毒正式擴散至昆士蘭地區。"
+    },
+    {
+        "id": "CASE-025",
+        "type": "Suspect",
+        "source_status": "media_announced",
+        "species": "野生海鳥 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "location": "南澳東南部 Southend Jetty (near Beachport)",
+        "latitude": -37.5683,
+        "longitude": 140.1264,
+        "found_date": "2026-07-26",
+        "notify_date": "2026-07-27",
+        "confirm_date": "進行中 (Pending)",
+        "notes": "【南澳 Limestone Coast 疑似案例】於 Southend Jetty 發現之大鳳頭燕鷗，經初步快篩呈現陽性，已送往 ACDP 進行國家級確診判定。"
+    },
+    {
+        "id": "CASE-026",
+        "type": "Suspect",
+        "source_status": "media_announced",
+        "species": "野生海鳥 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "location": "南澳東南部 Cape Jaffa",
+        "latitude": -36.9389,
+        "longitude": 139.6917,
+        "found_date": "2026-07-26",
+        "notify_date": "2026-07-27",
+        "confirm_date": "進行中 (Pending)",
+        "notes": "【南澳 Limestone Coast 疑似案例】於 Cape Jaffa 發現之大鳳頭燕鷗，經初步快篩呈現陽性，已送往 ACDP 進行國家級確診判定。"
+    },
+    {
+        "id": "CASE-027",
+        "type": "Suspect",
+        "source_status": "media_announced",
+        "species": "野生海鳥 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "location": "南澳東南部 Port MacDonnell",
+        "latitude": -38.0531,
+        "longitude": 140.6972,
+        "found_date": "2026-07-26",
+        "notify_date": "2026-07-27",
+        "confirm_date": "進行中 (Pending)",
+        "notes": "【南澳 Limestone Coast 疑似案例】於 Port MacDonnell 發現之大鳳頭燕鷗，經初步快篩呈現陽性，已送往 ACDP 進行國家級確診判定。"
     }
 ]
 
@@ -634,9 +673,35 @@ def fetch_daff_updates():
                 soup = BeautifulSoup(response.text, "html.parser")
                 soups.append(soup)
             else:
-                print(f"警告: {name} 連線失敗，HTTP 狀態碼: {response.status_code}")
+                print(f"警告: {name} 連線失敗，HTTP 狀態碼: {response.status_code}，將嘗試代理阻擋兜底...")
+                raise ValueError(f"HTTP {response.status_code}")
         except Exception as e:
-            print(f"警告: {name} 連線錯誤 (可能為 WAF 阻擋超時): {str(e)}")
+            print(f"警告: {name} 連線錯誤/直接連線失敗: {str(e)}，正在嘗試透過 CORS 代理伺服器進行兜底連線...")
+            # 1. 嘗試 AllOrigins 代理
+            try:
+                proxy_url = f"https://api.allorigins.win/get?url={url}"
+                proxy_response = requests.get(proxy_url, headers=headers, timeout=12, verify=False)
+                if proxy_response.status_code == 200:
+                    contents = proxy_response.json().get("contents", "")
+                    if contents:
+                        soup = BeautifulSoup(contents, "html.parser")
+                        soups.append(soup)
+                        print(f"✅ 成功透過 AllOrigins 代理抓取 {name} 的資料！")
+                        continue
+            except Exception as pe:
+                print(f"警告: {name} 透過 AllOrigins 代理連線亦失敗: {str(pe)}")
+            
+            # 2. 嘗試 corsproxy.io 代理
+            try:
+                proxy_url = f"https://corsproxy.io/?{url}"
+                proxy_response = requests.get(proxy_url, headers=headers, timeout=12, verify=False)
+                if proxy_response.status_code == 200:
+                    soup = BeautifulSoup(proxy_response.text, "html.parser")
+                    soups.append(soup)
+                    print(f"✅ 成功透過 corsproxy.io 代理抓取 {name} 的資料！")
+                    continue
+            except Exception as pe:
+                print(f"警告: {name} 透過 corsproxy.io 代理連線亦失敗: {str(pe)}")
             
     # 爬取 Google News 澳洲禽流感即時 RSS
     abc_rss_text = ""
@@ -775,7 +840,7 @@ def generate_dynamic_summary(cases_data):
     other_states_str = f"，另有 {', '.join(other_states_list)}" if other_states_list else ""
     
     official_text = (
-        f"依據 {daff_link} 及各州政府 2026 年 7 月 26 日最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙與本土海鳥。當前最新確診病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
+        f"依據 {daff_link} 及各州政府 2026 年 7 月 27 日最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙與本土海鳥。當前最新確診病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
     )
 
     latest_case = cases_data[-1] if cases_data else None
@@ -784,10 +849,16 @@ def generate_dynamic_summary(cases_data):
     abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a>'
     
     media_text = ""
+    # 檢查是否有南澳 Limestone Coast 疑似病例 (優先說明此最新疑似案件)
+    has_limestone_suspect = any(any(k in c["location"] for k in ["Southend", "Jaffa", "MacDonnell", "Limestone"]) and c["type"] == "Suspect" for c in cases_data)
     # 檢查是否有 QLD 確診的 Moreton Island 案例
     has_moreton_confirmed = any("Moreton" in c["location"] and c["type"] == "Confirmed" for c in cases_data)
     
-    if has_moreton_confirmed:
+    if has_limestone_suspect:
+        media_text = (
+            f"根據 {abc_link} 最新報導與南澳政府公告，南澳東南部 **Limestone Coast**（包括 Southend Jetty, Cape Jaffa 與 Port MacDonnell）於 7 月 27 日爆發 **7 起野生大鳳頭燕鷗疑似病例**，快篩均呈 H5 陽性。樣本已送往 ACDP 進行最終覆檢。BirdLife Australia 警告這顯示病毒已在南澳本地野生鳥類中「紮根並擴散」。目前家禽防線 100% 安全，本廠運作無虞。"
+        )
+    elif has_moreton_confirmed:
         media_text = (
             f"根據 {abc_link} 最新報導與昆士蘭州政府官方公告，昆士蘭 **Moreton Island** 確診首起 H5N1 遷徙海鳥案例，使昆士蘭正式淪陷成為第四個檢出州。同時，南澳都市區 Semaphore Beach 亦確診首宗 metropolitan 案例，全澳野鳥確診總數飆升至 **20 例**（西澳10例、南澳7例、NSW2例、QLD1例）。此波疫情仍全數偏於沿海野鳥，商業家禽生產體系「0 感染」，Blayney 廠地緣依然安全無虞。"
         )

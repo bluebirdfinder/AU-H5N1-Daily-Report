@@ -20,7 +20,9 @@
 * **`report_template.html`**：網頁 GIS 報告模板（整合 Leaflet.js 地圖與 Tailwind CSS 樣式，供 `h5n1.py` 讀取）。
 * **`.github/workflows/auto_update.yml`**：GitHub Actions 定時自動化工作流設定檔（每天定時執行 2 次）。
 * **`index.html`**：編譯後生成的正式報告網頁。
-* **`更新說明`**：最後檔案同步日期更新於 2026-07-26 17:48。
+* **`walkthrough.md`**：專案開發與 Bug 修正軌跡日誌。
+* **`task.md`**：任務排程與完成度檢核表。
+* **`更新說明`**：最後檔案同步日期更新於 2026-07-27 15:40 (前後端雙重 CORS 代理 + USDA 風格看板大改版)。
 
 
 

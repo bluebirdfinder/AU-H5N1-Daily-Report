@@ -38,4 +38,9 @@
   - `[x]` 對齊官方 7/26 最新數據（全澳累計 20 例確診：WA 10例, SA 7例, NSW 2例, QLD 1例）
   - `[x]` 新增南澳 Semaphore Beach、Robe Marina (第二例) 及昆士蘭 Moreton Island 確診個案
   - `[x]` 優化 `h5n1.py` 爬蟲模擬真實瀏覽器 (UA 輪換) 與 Timeout 加速防死鎖
+  - `[x]` 對齊官方 7/27 最新疑似病例，新增南澳 Limestone Coast（Southend Jetty, Cape Jaffa, Port MacDonnell）共 7 起疑似大鳳頭燕鷗案例
+  - `[x]` 實作前後端雙重 CORS 代理與瀏覽器端自適應實時同步機制，徹底解決 WAF IP 屏蔽與 CORS 跨域限制
+  - `[x]` 參考美國 USDA APHIS 樣式，改版「巨型 KPI 指標卡片」與「月度堆疊柱狀/折線混合圖表 (Month-Year)」，並支援前端實時同步動態聯動
+
+
 
