@@ -357,40 +357,40 @@ DEFAULT_CASES = [
         "id": "CASE-025",
         "type": "Suspect",
         "source_status": "media_announced",
-        "species": "野生海鳥 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "species": "野生海鳥 5 隻 (大鳳頭燕鷗 / Greater Crested Tern)：4 隻病危、1 隻已死亡",
         "location": "南澳東南部 Southend Jetty (near Beachport)",
         "latitude": -37.5683,
         "longitude": 140.1264,
         "found_date": "2026-07-26",
         "notify_date": "2026-07-27",
         "confirm_date": "進行中 (Pending)",
-        "notes": "【南澳 Limestone Coast 疑似案例】於 Southend Jetty 發現之大鳳頭燕鷗，經初步快篩呈現陽性，已送往 ACDP 進行國家級確診判定。"
+        "notes": "【南澳 Limestone Coast 疑似案例 - 7 隻合計中的 5 隻】於 Southend Jetty 發現 5 隻大鳳頭燕鷗（4 隻病危、1 隻已死亡），經初步快篩呈現 H5 陽性，已送往 Geelong ACDP 國家實驗室進行最終確診判定。資料來源：InDaily SA / The Guardian 2026-07-27。"
     },
     {
         "id": "CASE-026",
         "type": "Suspect",
         "source_status": "media_announced",
-        "species": "野生海鳥 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "species": "野生海鳥 1 隻 (大鳳頭燕鷗 / Greater Crested Tern)：1 隻已死亡",
         "location": "南澳東南部 Cape Jaffa",
         "latitude": -36.9389,
         "longitude": 139.6917,
         "found_date": "2026-07-26",
         "notify_date": "2026-07-27",
         "confirm_date": "進行中 (Pending)",
-        "notes": "【南澳 Limestone Coast 疑似案例】於 Cape Jaffa 發現之大鳳頭燕鷗，經初步快篩呈現陽性，已送往 ACDP 進行國家級確診判定。"
+        "notes": "【南澳 Limestone Coast 疑似案例 - 7 隻合計中的 1 隻】於 Cape Jaffa 發現 1 隻已死亡大鳳頭燕鷗，經初步快篩呈現 H5 陽性，已送往 Geelong ACDP 國家實驗室進行最終確診判定。資料來源：InDaily SA / The Guardian 2026-07-27。"
     },
     {
         "id": "CASE-027",
         "type": "Suspect",
         "source_status": "media_announced",
-        "species": "野生海鳥 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "species": "野生海鳥 1 隻 (大鳳頭燕鷗 / Greater Crested Tern)：1 隻已死亡",
         "location": "南澳東南部 Port MacDonnell",
         "latitude": -38.0531,
         "longitude": 140.6972,
         "found_date": "2026-07-26",
         "notify_date": "2026-07-27",
         "confirm_date": "進行中 (Pending)",
-        "notes": "【南澳 Limestone Coast 疑似案例】於 Port MacDonnell 發現之大鳳頭燕鷗，經初步快篩呈現陽性，已送往 ACDP 進行國家級確診判定。"
+        "notes": "【南澳 Limestone Coast 疑似案例 - 7 隻合計中的 1 隻】於 Port MacDonnell 發現 1 隻已死亡大鳳頭燕鷗，經初步快篩呈現 H5 陽性，已送往 Geelong ACDP 國家實驗室進行最終確診判定。資料來源：InDaily SA / The Guardian 2026-07-27。"
     }
 ]
 

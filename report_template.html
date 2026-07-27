@@ -174,8 +174,8 @@
             <!-- 月度增長柱狀圖 (Detections by Month-Year) -->
             <div class="lg:col-span-2 bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between">
                 <div>
-                    <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">📊 疫情按月份增長趨勢 (Detections by Month-Year)</h3>
-                    <p class="text-[11px] text-slate-500 mb-4">柱狀圖反映出最近幾個月（6月、7月）官方確診 (Confirmed) 與疑似 (Suspect) 病例的月度新增分佈。</p>
+                    <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">📊 疫情週次增長趨勢 (Weekly Epi-Curve)</h3>
+                    <p class="text-[11px] text-slate-500 mb-4">以週為單位呈現官方確診 (Confirmed) 與疑似 (Suspect) 新增分佈，標籤同時標示所屬月份（例：7月W4）。</p>
                 </div>
                 <div class="h-[250px] w-full relative">
                     <canvas id="trendChart"></canvas>
@@ -523,35 +523,37 @@
             }
         };
 
-        // 3. 初始化疫情月份增長柱狀/折線混合圖表 (Chart.js - 參考 USDA 樣式)
+        // 3. 初始化疫情週次增長柱狀/折線混合圖表 (Chart.js - 週次分組 + 月份標示)
         let trendChart;
         function initChart() {
             const canvas = document.getElementById('trendChart');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             
-            // 篩選出確診 (Confirmed) 和疑似 (Suspect) 病例
             const activeCases = window.H5N1_CASES.filter(c => c.type !== 'Negative');
             
-            // 按月份統計 Confirmed 與 Suspect 新增
-            const monthMap = {}; // { '2026-06': { Confirmed: 0, Suspect: 0, total: 0 }, ... }
+            // 按「年-月-週次」分組，週次以每 7 天為一個單位 (1-7日=W1, 8-14日=W2, 15-21日=W3, 22-28日=W4, 29+日=W5)
+            const weekMap = {};
             
             activeCases.forEach(c => {
                 const date = new Date(c.notify_date);
-                const monthStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                if (!monthMap[monthStr]) {
-                    monthMap[monthStr] = { Confirmed: 0, Suspect: 0, total: 0 };
+                const year = date.getFullYear();
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                const weekOfMonth = Math.ceil(day / 7);
+                // 排序鍵 (確保按時間排序)
+                const weekKey = `${year}-${String(month).padStart(2,'0')}-W${weekOfMonth}`;
+                // 顯示標籤：如「6月W3」
+                const weekLabel = `${month}月W${weekOfMonth}`;
+                
+                if (!weekMap[weekKey]) {
+                    weekMap[weekKey] = { Confirmed: 0, Suspect: 0, label: weekLabel };
                 }
-                if (c.type === 'Confirmed') {
-                    monthMap[monthStr].Confirmed++;
-                } else if (c.type === 'Suspect') {
-                    monthMap[monthStr].Suspect++;
-                }
-                monthMap[monthStr].total++;
+                if (c.type === 'Confirmed') weekMap[weekKey].Confirmed++;
+                else if (c.type === 'Suspect') weekMap[weekKey].Suspect++;
             });
             
-            // 排序月份
-            const sortedMonths = Object.keys(monthMap).sort();
+            const sortedWeeks = Object.keys(weekMap).sort();
             
             const labels = [];
             const confirmedData = [];
@@ -559,14 +561,11 @@
             const cumulativeData = [];
             let cumulativeSum = 0;
             
-            sortedMonths.forEach(m => {
-                const parts = m.split('-');
-                labels.push(`${parts[0]}年${parseInt(parts[1])}月`);
-                
-                confirmedData.push(monthMap[m].Confirmed);
-                suspectData.push(monthMap[m].Suspect);
-                
-                cumulativeSum += monthMap[m].Confirmed + monthMap[m].Suspect;
+            sortedWeeks.forEach(k => {
+                labels.push(weekMap[k].label);
+                confirmedData.push(weekMap[k].Confirmed);
+                suspectData.push(weekMap[k].Suspect);
+                cumulativeSum += weekMap[k].Confirmed + weekMap[k].Suspect;
                 cumulativeData.push(cumulativeSum);
             });
             
@@ -574,18 +573,15 @@
             const confirmedCount = activeCases.filter(c => c.type === 'Confirmed').length;
             document.getElementById('confirmed-indicator').innerText = `${confirmedCount} 例確診`;
             
-            // 計算 7 日內新增 (以資料庫最新日期為基準)
-            const latestDate = activeCases.length > 0 ? new Date(activeCases[activeCases.length - 1].notify_date) : new Date();
+            const latestDate = activeCases.length > 0 ? new Date(activeCases.sort((a,b) => new Date(b.notify_date) - new Date(a.notify_date))[0].notify_date) : new Date();
             const sevenDaysAgo = new Date(latestDate);
             sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
             const recentNewCases = activeCases.filter(c => new Date(c.notify_date) >= sevenDaysAgo).length;
             
-            const speedIndicator = document.getElementById('speed-indicator');
-            speedIndicator.innerText = `${recentNewCases} 宗案例 (${recentNewCases > 5 ? '擴散加速中' : '零星緩慢期'})`;
+            document.getElementById('speed-indicator').innerText =
+                `+${recentNewCases} 宗 / 7日 (${recentNewCases > 5 ? '擴散加速中' : '緩慢觀察期'})`;
             
-            if (trendChart) {
-                trendChart.destroy();
-            }
+            if (trendChart) trendChart.destroy();
             
             trendChart = new Chart(ctx, {
                 type: 'bar',
@@ -593,31 +589,39 @@
                     labels: labels,
                     datasets: [
                         {
-                            label: '每月確診 (Confirmed)',
+                            label: '週確診 (Confirmed)',
                             data: confirmedData,
-                            backgroundColor: 'rgba(239, 68, 68, 0.7)', // 紅色柱子
-                            borderColor: 'rgba(239, 68, 68, 0.9)',
-                            borderWidth: 1,
-                            stack: 'Stack0',
+                            backgroundColor: 'rgba(239, 68, 68, 0.75)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 0,
+                            borderRadius: 4,
+                            borderSkipped: false,
+                            stack: 'stack',
                             yAxisID: 'y'
                         },
                         {
-                            label: '每月疑似 (Suspect)',
+                            label: '週疑似 (Suspect)',
                             data: suspectData,
-                            backgroundColor: 'rgba(59, 130, 246, 0.7)', // 藍色柱子
-                            borderColor: 'rgba(59, 130, 246, 0.9)',
-                            borderWidth: 1,
-                            stack: 'Stack0',
+                            backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                            borderColor: 'rgba(99, 102, 241, 1)',
+                            borderWidth: 0,
+                            borderRadius: 4,
+                            borderSkipped: false,
+                            stack: 'stack',
                             yAxisID: 'y'
                         },
                         {
                             label: '累計病例 (Cumulative)',
                             type: 'line',
                             data: cumulativeData,
-                            borderColor: 'rgba(16, 185, 129, 1)', // 綠色折線
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            fill: false,
-                            tension: 0.3,
+                            borderColor: 'rgba(52, 211, 153, 1)',
+                            backgroundColor: 'rgba(52, 211, 153, 0.08)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: 'rgba(52, 211, 153, 1)',
+                            borderWidth: 2,
                             yAxisID: 'y1'
                         }
                     ]
@@ -625,36 +629,57 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
                     plugins: {
                         legend: {
+                            position: 'top',
+                            align: 'end',
                             labels: {
                                 color: '#94a3b8',
-                                font: { size: 10 }
+                                font: { size: 10 },
+                                boxWidth: 12,
+                                padding: 12
                             }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            borderColor: 'rgba(51, 65, 85, 0.6)',
+                            borderWidth: 1,
+                            titleColor: '#e2e8f0',
+                            bodyColor: '#94a3b8',
+                            padding: 10
                         }
                     },
                     scales: {
                         x: {
                             stacked: true,
-                            grid: { color: 'rgba(51, 65, 85, 0.2)' },
-                            ticks: { color: '#94a3b8', font: { size: 10 } }
+                            grid: { color: 'rgba(51, 65, 85, 0.15)', drawBorder: false },
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { size: 10 },
+                                maxRotation: 45,
+                                minRotation: 0
+                            },
+                            border: { display: false }
                         },
                         y: {
                             stacked: true,
                             type: 'linear',
                             display: true,
                             position: 'left',
-                            title: { display: true, text: '月度新增病例數', color: '#94a3b8', font: { size: 10 } },
-                            grid: { color: 'rgba(51, 65, 85, 0.2)' },
-                            ticks: { color: '#94a3b8', stepSize: 2 }
+                            title: { display: true, text: '週新增 ▶', color: '#64748b', font: { size: 9 } },
+                            grid: { color: 'rgba(51, 65, 85, 0.15)', drawBorder: false },
+                            ticks: { color: '#94a3b8', font: { size: 9 }, stepSize: 2 },
+                            border: { display: false }
                         },
                         y1: {
                             type: 'linear',
                             display: true,
                             position: 'right',
-                            title: { display: true, text: '累計病例總數', color: '#94a3b8', font: { size: 10 } },
+                            title: { display: true, text: '◀ 累計', color: '#64748b', font: { size: 9 } },
                             grid: { drawOnChartArea: false },
-                            ticks: { color: '#94a3b8', stepSize: 5 }
+                            ticks: { color: '#94a3b8', font: { size: 9 }, stepSize: 5 },
+                            border: { display: false }
                         }
                     }
                 }
