@@ -4,6 +4,22 @@
 
 ---
 
+## 📅 2026-07-29 12:15：對齊官方 7/29 最新數據（全澳累計 27 例確診）與南澳在地傳播預警更新
+
+- **數據更新與計算方式澄清**：
+  - **DAFF 統計方式確認**：DAFF 以「個別鳥隻」為單位計算 detection 數量（非以地點事件計算）。因此 Limestone Coast 3 個地點（Southend Jetty 5 隻 + Cape Jaffa 1 隻 + Port MacDonnell 1 隻）= 共 7 個 detection，使 SA 合計達 14 例，全澳 **累計 27 例官方確診**（WA 10、SA 14、NSW 2、QLD 1）。
+  - **7/27 Limestone Coast 疑似今日確診**：昨日（7/27）通報之 Limestone Coast 7 起疑似案例（CASE-025~027），已於今日（7/29）經 CSIRO ACDP Geelong 實驗室基因定序正式確認為 H5N1 陽性，已更新 confirm_date。
+- **7/29 全新 11 起疑似案例通報（本地傳播警戒升級）**：
+  - **袋鼠島 Seal Bay 4 起（CASE-028）**：於 Kangaroo Island Seal Bay 發現 4 隻大鳳頭燕鷗疑似病例，送往 ACDP 確認中。當局已暫停 Seal Bay 海灘旅遊以保護瀕危澳洲海獅族群。
+  - **南澳東南部 7 起（CASE-029）**：於 Limestone Coast 沿岸一帶另發現 7 隻大鳳頭燕鷗疑似病例，送往 ACDP 確認中。
+  - **本地傳播重要里程碑**：南澳初級產業及地區發展部長 Clare Scriven 正式宣告，這批新案例「極有可能（extremely likely）」代表 H5N1 已在澳洲本地野鳥族群中建立持續性在地傳播（local transmission）。
+- **資料庫升級**：
+  - 新增 `CASE-029`（SE SA 東南部 7 起疑似）至病例庫。
+  - 更新資料庫說明文字，澄清 DAFF 計算方式（按鳥隻計 detection）。
+  - 病例庫總計：30 例（27 例確診 + 4 例排除 + 2 例疑似待確認 CASE-028、029）。
+
+---
+
 ## 📅 2026-07-27 15:40：參考美國 USDA HPAI 樣式，升級巨型 KPI 統計看板與月度堆疊柱狀圖 (Detections by Month-Year)
 
 - **視覺與分析大升級 (USDA 風格引入)**：

@@ -36,10 +36,13 @@ if hasattr(sys.stdout, 'reconfigure'):
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# ==================== 1. 基礎病例資料庫 (包含 2026 年 7 月 26 日最新 24 例) ====================
+# ==================== 1. 基礎病例資料庫 (更新至 2026 年 7 月 29 日，共 30 例) ====================
 # 當爬蟲執行時，會以這個結構為基礎，並嘗試與官網最新發布的文字進行比對與動態修正。
 # source_status: "official_updated" (官方網頁已更新) / "media_announced" (媒體先行，官網同步中)
-# 總病例庫共 24 例，包含 20 例官方確診 (WA 10例, SA 7例, NSW 2例, QLD 1例) 以及 4 例已排除 (SA 1例, VIC 1例, NSW 1例, QLD 1例)
+# 【DAFF 統計說明】DAFF 以「個別鳥隻」為單位計算 detection 數量，而非以「地點事件」計算。
+# 因此 CASE-025（5隻）+ CASE-026（1隻）+ CASE-027（1隻）= 7 個官方 detection，合計 SA 14 例。
+# 總病例庫共 30 例，包含 27 例官方確診 (WA 10例, SA 14例 [按鳥隻], NSW 2例, QLD 1例)
+# 以及 4 例已排除 (SA 1例, VIC 1例, NSW 1例, QLD 1例) 與 2 例疑似待確診 (SA 2例)
 DEFAULT_CASES = [
     {
         "id": "CASE-001",
@@ -355,42 +358,68 @@ DEFAULT_CASES = [
     },
     {
         "id": "CASE-025",
-        "type": "Suspect",
-        "source_status": "media_announced",
+        "type": "Confirmed",
+        "source_status": "official_confirmed",
         "species": "野生海鳥 5 隻 (大鳳頭燕鷗 / Greater Crested Tern)：4 隻病危、1 隻已死亡",
         "location": "南澳東南部 Southend Jetty (near Beachport)",
         "latitude": -37.5683,
         "longitude": 140.1264,
         "found_date": "2026-07-26",
         "notify_date": "2026-07-27",
-        "confirm_date": "進行中 (Pending)",
-        "notes": "【南澳 Limestone Coast 疑似案例 - 7 隻合計中的 5 隻】於 Southend Jetty 發現 5 隻大鳳頭燕鷗（4 隻病危、1 隻已死亡），經初步快篩呈現 H5 陽性，已送往 Geelong ACDP 國家實驗室進行最終確診判定。資料來源：InDaily SA / The Guardian 2026-07-27。"
+        "confirm_date": "2026-07-29",
+        "notes": "【南澳 Limestone Coast 確診案例 - 7 隻合計中的 5 隻】於 Southend Jetty 發現 5 隻大鳳頭燕鷗（4 隻病危、1 隻已死亡），經 Geelong ACDP 國家實驗室複檢，已於 7 月 29 日確診為 H5N1 陽性。南澳衛生部長指出，此事件極可能代表病毒已開始在本地野鳥族群中傳播。資料來源：DAFF / agriculture.gov.au 2026-07-29。"
     },
     {
         "id": "CASE-026",
-        "type": "Suspect",
-        "source_status": "media_announced",
+        "type": "Confirmed",
+        "source_status": "official_confirmed",
         "species": "野生海鳥 1 隻 (大鳳頭燕鷗 / Greater Crested Tern)：1 隻已死亡",
         "location": "南澳東南部 Cape Jaffa",
         "latitude": -36.9389,
         "longitude": 139.6917,
         "found_date": "2026-07-26",
         "notify_date": "2026-07-27",
-        "confirm_date": "進行中 (Pending)",
-        "notes": "【南澳 Limestone Coast 疑似案例 - 7 隻合計中的 1 隻】於 Cape Jaffa 發現 1 隻已死亡大鳳頭燕鷗，經初步快篩呈現 H5 陽性，已送往 Geelong ACDP 國家實驗室進行最終確診判定。資料來源：InDaily SA / The Guardian 2026-07-27。"
+        "confirm_date": "2026-07-29",
+        "notes": "【南澳 Limestone Coast 確診案例 - 7 隻合計中的 1 隻】於 Cape Jaffa 發現 1 隻已死亡大鳳頭燕鷗，經 Geelong ACDP 國家實驗室複檢，已於 7 月 29 日確診為 H5N1 陽性。資料來源：DAFF / agriculture.gov.au 2026-07-29。"
     },
     {
         "id": "CASE-027",
-        "type": "Suspect",
-        "source_status": "media_announced",
+        "type": "Confirmed",
+        "source_status": "official_confirmed",
         "species": "野生海鳥 1 隻 (大鳳頭燕鷗 / Greater Crested Tern)：1 隻已死亡",
         "location": "南澳東南部 Port MacDonnell",
         "latitude": -38.0531,
         "longitude": 140.6972,
         "found_date": "2026-07-26",
         "notify_date": "2026-07-27",
+        "confirm_date": "2026-07-29",
+        "notes": "【南澳 Limestone Coast 確診案例 - 7 隻合計中的 1 隻】於 Port MacDonnell 發現 1 隻已死亡大鳳頭燕鷗，經 Geelong ACDP 國家實驗室複檢，已於 7 月 29 日確診為 H5N1 陽性。資料來源：DAFF / agriculture.gov.au 2026-07-29。"
+    },
+    {
+        "id": "CASE-028",
+        "type": "Suspect",
+        "source_status": "official_announced",
+        "species": "野生海鳥 4 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "location": "南澳 袋鼠島 Seal Bay, Kangaroo Island",
+        "latitude": -35.9766,
+        "longitude": 137.3164,
+        "found_date": "2026-07-28",
+        "notify_date": "2026-07-29",
         "confirm_date": "進行中 (Pending)",
-        "notes": "【南澳 Limestone Coast 疑似案例 - 7 隻合計中的 1 隻】於 Port MacDonnell 發現 1 隻已死亡大鳳頭燕鷗，經初步快篩呈現 H5 陽性，已送往 Geelong ACDP 國家實驗室進行最終確診判定。資料來源：InDaily SA / The Guardian 2026-07-27。"
+        "notes": "【南澳 袋鼠島新增疑似案例 - 7/29 通報 11 起疑似之 4 起】於 Kangaroo Island Seal Bay 發現 4 隻大鳳頭燕鷗疑似病例，已送往 CSIRO ACDP 進行最終確診判定。Seal Bay 為瀕危澳洲海獅的重要繁殖棲息地，當局已暫停海灘旅遊活動以保護海獅族群，木棧道行程仍維持開放。南澳部長 Clare Scriven 表示，目前疫情「極有可能（extremely likely）」已在本地野鳥族群中出現在地傳播。資料來源：InDaily SA / Xinhua 2026-07-29。"
+    },
+    {
+        "id": "CASE-029",
+        "type": "Suspect",
+        "source_status": "official_announced",
+        "species": "野生海鳥 7 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "location": "南澳東南部 Limestone Coast 一帶 (Southeast SA)",
+        "latitude": -37.2500,
+        "longitude": 139.9500,
+        "found_date": "2026-07-28",
+        "notify_date": "2026-07-29",
+        "confirm_date": "進行中 (Pending)",
+        "notes": "【南澳東南部新增疑似案例 - 7/29 通報 11 起疑似之 7 起】於南澳東南部 Limestone Coast 沿岸一帶（具體地點待 ACDP 確認）發現 7 隻大鳳頭燕鷗疑似病例，已送往 CSIRO ACDP 進行 PCR 及基因定序最終確診判定。此批疑似與同日 Kangaroo Island 4 起合計構成今日通報之 11 起全新疑似案例。官方指出這些新案例極可能代表病毒已在澳洲本地野鳥族群中持續進行在地傳播（local transmission）。資料來源：Xinhua / china.org.cn / DAFF 2026-07-29。"
     }
 ]
 
