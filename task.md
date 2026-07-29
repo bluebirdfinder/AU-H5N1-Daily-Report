@@ -42,10 +42,8 @@
   - `[x]` 實作前後端雙重 CORS 代理與瀏覽器端自適應實時同步機制，徹底解決 WAF IP 屏蔽與 CORS 跨域限制
   - `[x]` 參考美國 USDA APHIS 樣式，改版「巨型 KPI 指標卡片」與「月度堆疊柱狀/折線混合圖表 (Month-Year)」，並支援前端實時同步動態聯動
   - `[x]` 對齊官方 7/29 最新數據（全澳累計 27 例確診：WA 10例, SA 14例 [按鳥隻], NSW 2例, QLD 1例）
-  - `[x]` 確認 DAFF 以個別鳥隻計算 detection，澄清 SA 14 例數字計算方式（CASE-025~027 共 7 隻 = 7 detections）
-  - `[x]` 確認 CASE-025~027（Limestone Coast 7 起）已於 7/29 基因定序確診，confirm_date 已正確記錄
-  - `[x]` 新增 CASE-029（南澳東南部 Limestone Coast 沿岸 7 起新疑似，7/29 通報，ACDP 確認中）
-  - `[x]` 更新 CASE-028（袋鼠島 Seal Bay 4 起）說明文字，標注為 7/29 通報 11 起疑似之一部分
-  - `[x]` 同步更新 README.md、walkthrough.md、task.md 的修改說明與時間戳記
+  - `[x]` 修復左側巨型 KPI 大卡片顯示 23 與各州加總 27 之不一致 Bug（前端/後端累計邏輯升級為按 detection_count 隻數加總）
+  - `[x]` 優化表格明細呈現：同地點多鳥病例保持單一行不拉長表格，並於狀態欄動態顯示隻數標籤（如 [5 隻鳥]）
+  - `[x]` 全面更新與校對所有專案檔案（h5n1.py, report_template.html, index.html, README.md, walkthrough.md, task.md）
 
 

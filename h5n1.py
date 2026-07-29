@@ -402,6 +402,7 @@ DEFAULT_CASES = [
         "id": "CASE-028",
         "type": "Suspect",
         "source_status": "official_announced",
+        "detection_count": 4,
         "species": "野生海鳥 4 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
         "location": "南澳 袋鼠島 Seal Bay, Kangaroo Island",
         "latitude": -35.9766,
@@ -415,6 +416,7 @@ DEFAULT_CASES = [
         "id": "CASE-029",
         "type": "Suspect",
         "source_status": "official_announced",
+        "detection_count": 7,
         "species": "野生海鳥 7 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
         "location": "南澳東南部 Limestone Coast 一帶 (Southeast SA)",
         "latitude": -37.2500,
@@ -838,8 +840,9 @@ def generate_dynamic_summary(cases_data):
         elif "首都領地" in loc or "ACT" in loc:
             state_key = "ACT"
             
-        states_stats[state_key][c_type] += 1
-        states_stats[state_key]["total"] += 1
+        count = case.get("detection_count", 1)
+        states_stats[state_key][c_type] += count
+        states_stats[state_key]["total"] += count
 
     daff_link = '<a href="https://www.agriculture.gov.au/campaigns/birdflu" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲聯邦農業部 (DAFF)</a>'
     
