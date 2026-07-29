@@ -360,6 +360,7 @@ DEFAULT_CASES = [
         "id": "CASE-025",
         "type": "Confirmed",
         "source_status": "official_confirmed",
+        "detection_count": 5,
         "species": "野生海鳥 5 隻 (大鳳頭燕鷗 / Greater Crested Tern)：4 隻病危、1 隻已死亡",
         "location": "南澳東南部 Southend Jetty (near Beachport)",
         "latitude": -37.5683,
@@ -367,12 +368,13 @@ DEFAULT_CASES = [
         "found_date": "2026-07-26",
         "notify_date": "2026-07-27",
         "confirm_date": "2026-07-29",
-        "notes": "【南澳 Limestone Coast 確診案例 - 7 隻合計中的 5 隻】於 Southend Jetty 發現 5 隻大鳳頭燕鷗（4 隻病危、1 隻已死亡），經 Geelong ACDP 國家實驗室複檢，已於 7 月 29 日確診為 H5N1 陽性。南澳衛生部長指出，此事件極可能代表病毒已開始在本地野鳥族群中傳播。資料來源：DAFF / agriculture.gov.au 2026-07-29。"
+        "notes": "【南澳 Limestone Coast 確診案例 - 7 隻合計中的 5 隻】於 Southend Jetty 發現 5 隻大鳳頭燕鷗（4 隻病危、1 隻已死亡），經 Geelong ACDP 國家實驗室複檢，已於 7 月 29 日確診為 H5N1 陽性。南澳衛生部長指出，此事件極可能代表病毒已開始在本地野鳥族群中傳播。【DAFF 統計：此 1 個 CASE 危 5 個 official detection】資料來源：DAFF / agriculture.gov.au 2026-07-29。"
     },
     {
         "id": "CASE-026",
         "type": "Confirmed",
         "source_status": "official_confirmed",
+        "detection_count": 1,
         "species": "野生海鳥 1 隻 (大鳳頭燕鷗 / Greater Crested Tern)：1 隻已死亡",
         "location": "南澳東南部 Cape Jaffa",
         "latitude": -36.9389,
@@ -386,6 +388,7 @@ DEFAULT_CASES = [
         "id": "CASE-027",
         "type": "Confirmed",
         "source_status": "official_confirmed",
+        "detection_count": 1,
         "species": "野生海鳥 1 隻 (大鳳頭燕鷗 / Greater Crested Tern)：1 隻已死亡",
         "location": "南澳東南部 Port MacDonnell",
         "latitude": -38.0531,
@@ -819,7 +822,8 @@ def generate_dynamic_summary(cases_data):
         state_key = "Other"
         if any(kw in loc for kw in ["西澳", "WA", "Esperance", "Dunsborough", "Roses", "Mullaloo", "Horrocks", "Denmark", "Lancelin", "Seabird", "Whitfords"]):
             state_key = "WA"
-        elif any(kw in loc for kw in ["南澳", "SA", "Fleurieu", "Fowlers", "Robe", "Yorke", "Kangaroo", "Vincent", "Semaphore"]):
+        elif any(kw in loc for kw in ["南澳", "SA", "Fleurieu", "Fowlers", "Robe", "Yorke", "Kangaroo", "Vincent", "Semaphore",
+                                         "Southend", "Jaffa", "MacDonnell", "Limestone", "Seal Bay", "Southeast SA", "Cape Jaffa", "Port MacDonnell"]):
             state_key = "SA"
         elif any(kw in loc for kw in ["新南威爾斯", "NSW", "Hawks Nest", "Narrabeen"]):
             state_key = "NSW"
@@ -869,7 +873,7 @@ def generate_dynamic_summary(cases_data):
     other_states_str = f"，另有 {', '.join(other_states_list)}" if other_states_list else ""
     
     official_text = (
-        f"依據 {daff_link} 及各州政府 2026 年 7 月 27 日最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙與本土海鳥。當前最新確診病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
+        f"依據 {daff_link} 及各州政府 2026 年 7 月 29 日最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙與本土海鳥。當前最新確診病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
     )
 
     latest_case = cases_data[-1] if cases_data else None
@@ -878,15 +882,22 @@ def generate_dynamic_summary(cases_data):
     abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a>'
     
     media_text = ""
-    # 檢查是否有南澳 Limestone Coast 疑似病例 (優先說明此最新疑似案件)
-    has_limestone_suspect = any(any(k in c["location"] for k in ["Southend", "Jaffa", "MacDonnell", "Limestone"]) and c["type"] == "Suspect" for c in cases_data)
+    # 檢查是否有南澳 Limestone Coast 已確診病例（7/29 確診，媒體報導更新）
+    has_limestone_confirmed = any(any(k in c["location"] for k in ["Southend", "Jaffa", "MacDonnell", "Limestone"]) and c["type"] == "Confirmed" for c in cases_data)
+    # 檢查是否有南澳 袋鼠島/SE SA 新疑似病例（7/29 通報）
+    has_kangaroo_or_se_suspect = any(any(k in c["location"] for k in ["Seal Bay", "Southeast SA", "袋鼠島"]) and c["type"] == "Suspect" for c in cases_data)
     # 檢查是否有 QLD 確診的 Moreton Island 案例
     has_moreton_confirmed = any("Moreton" in c["location"] and c["type"] == "Confirmed" for c in cases_data)
     
-    if has_limestone_suspect:
-        media_text = (
-            f"根據 {abc_link} 最新報導與南澳政府公告，南澳東南部 **Limestone Coast**（包括 Southend Jetty, Cape Jaffa 與 Port MacDonnell）於 7 月 27 日爆發 **7 起野生大鳳頭燕鷗疑似病例**，快篩均呈 H5 陽性。樣本已送往 ACDP 進行最終覆檢。BirdLife Australia 警告這顯示病毒已在南澳本地野生鳥類中「紮根並擴散」。目前家禽防線 100% 安全，本廠運作無虞。"
-        )
+    if has_limestone_confirmed:
+        if has_kangaroo_or_se_suspect:
+            media_text = (
+                f"根據 {abc_link} 最新報導與南澳政府 7 月 29 日公告，南澳東南部 **Limestone Coast**（Southend Jetty, Cape Jaffa, Port MacDonnell）於 7 月 27 日通報之 **7 起野生大鳳頭燕鷗疑似病例**，已於今日（7/29）經 CSIRO ACDP Geelong 實驗室基因定序 **正式確診為 H5N1 陽性**，使全澳累計確診達 **27 例**（按 DAFF 個別鳥隻統計：WA 10、SA 14、NSW 2、QLD 1）。同日另新增 11 起疑似案例（袋鼠島 Seal Bay 4 起 + SE SA 7 起），正送往 ACDP 確認。南澳部長 Clare Scriven 宣告 H5N1 病毒「極有可能（extremely likely）」已在澳洲本地野鳥族群中建立在地傳播。目前家禽防線 **100% 安全**，本廠運作無虞。"
+            )
+        else:
+            media_text = (
+                f"根據 {abc_link} 最新報導與南澳政府公告，南澳東南部 **Limestone Coast**（Southend Jetty, Cape Jaffa, Port MacDonnell）於 7 月 27 日通報之 **7 起野生大鳳頭燕鷗疑似病例**，已於今日（7/29）經 CSIRO ACDP Geelong 實驗室基因定序 **正式確診為 H5N1 陽性**，全澳累計確診達 **27 例**。目前家禽防線 **100% 安全**，本廠運作無虞。"
+            )
     elif has_moreton_confirmed:
         media_text = (
             f"根據 {abc_link} 最新報導與昆士蘭州政府官方公告，昆士蘭 **Moreton Island** 確診首起 H5N1 遷徙海鳥案例，使昆士蘭正式淪陷成為第四個檢出州。同時，南澳都市區 Semaphore Beach 亦確診首宗 metropolitan 案例，全澳野鳥確診總數飆升至 **20 例**（西澳10例、南澳7例、NSW2例、QLD1例）。此波疫情仍全數偏於沿海野鳥，商業家禽生產體系「0 感染」，Blayney 廠地緣依然安全無虞。"
