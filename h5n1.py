@@ -399,8 +399,8 @@ DEFAULT_CASES = [
     },
     {
         "id": "CASE-028",
-        "type": "Confirmed",
-        "source_status": "official_confirmed",
+        "type": "Suspect",
+        "source_status": "official_announced",
         "detection_count": 4,
         "species": "野生海鳥 4 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
         "location": "南澳 袋鼠島 Seal Bay, Kangaroo Island",
@@ -408,22 +408,8 @@ DEFAULT_CASES = [
         "longitude": 137.3164,
         "found_date": "2026-07-28",
         "notify_date": "2026-07-29",
-        "confirm_date": "2026-07-30",
-        "notes": "【南澳 袋鼠島確診案例 - 7/30 DAFF 正式判定 Presumed Positive】於 Kangaroo Island Seal Bay 發現之 4 隻大鳳頭燕鷗病例，已於 7 月 30 日由 DAFF 判定為推定陽性確診。Seal Bay 已暫停海灘旅遊以保護瀕危澳洲海獅。資料來源：DAFF / Agriculture SA 2026-07-30。"
-    },
-    {
-        "id": "CASE-029",
-        "type": "Confirmed",
-        "source_status": "official_confirmed",
-        "detection_count": 7,
-        "species": "野生海鳥 7 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
-        "location": "南澳東南部 Limestone Coast 一帶 (Southeast SA)",
-        "latitude": -37.2500,
-        "longitude": 139.9500,
-        "found_date": "2026-07-28",
-        "notify_date": "2026-07-29",
-        "confirm_date": "2026-07-30",
-        "notes": "【南澳東南部確診案例 - 7/30 DAFF 正式判定 Presumed Positive】於 Limestone Coast 沿岸一帶發現之 7 隻大鳳頭燕鷗，已於 7 月 30 日經 Geelong ACDP 覆驗全數判定為推定陽性確診。資料來源：DAFF 2026-07-30。"
+        "confirm_date": "進行中 (Pending)",
+        "notes": "【南澳 袋鼠島疑似案例 - 待覆核 24 例之一部分】於 Kangaroo Island Seal Bay 發現 4 隻大鳳頭燕鷗疑似病例，已送往 CSIRO ACDP 進行最終檢驗。Seal Bay 已暫停海灘旅遊活動以保護海獅族群。資料來源：InDaily SA / DAFF 2026-07-29。"
     },
     {
         "id": "CASE-030",

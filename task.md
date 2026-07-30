@@ -42,8 +42,8 @@
   - `[x]` 實作前後端雙重 CORS 代理與瀏覽器端自適應實時同步機制，徹底解決 WAF IP 屏蔽與 CORS 跨域限制
   - `[x]` 參考美國 USDA APHIS 樣式，改版「巨型 KPI 指標卡片」與「月度堆疊柱狀/折線混合圖表 (Month-Year)」，並支援前端實時同步動態聯動
   - `[x]` 對齊 DAFF 7/30 下午最新數據（全澳累計 28 例確診：SA 15例, WA 10例, NSW 2例, QLD 1例, VIC 1例）
-  - `[x]` 新增 CASE-032 (南澳艾爾半島 Port Lincoln 林肯港新增 1 隻巨鸌確診，南澳確診推升至 15 例)
-  - `[x]` 記錄南澳 PIRSA 今日追加通報 13 隻大鳳頭燕鷗新疑似案（南澳待覆核疑似個案達 24 例）
-  - `[x]` 全面更新與校對所有專案檔案（h5n1.py, index.html, README.md, walkthrough.md, task.md）的修改時間與最新疫情說明
+  - `[x]` 徹底排查並修復數據重複計算 (Double Counting) Bug（刪除重複 CASE-029，將 CASE-028 修正為 Suspect，使 Confirmed 加總精確對齊為 28 例）
+  - `[x]` 升級「各州分佈細分 (By State)」為動態 JavaScript 渲染，自動反應維州 (VIC 1例) 與南澳 (SA 15例) 的真實動態變化
+  - `[x]` 全面更新與校對所有專案檔案（h5n1.py, report_template.html, index.html, README.md, walkthrough.md, task.md）
 
 
