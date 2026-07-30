@@ -41,9 +41,9 @@
   - `[x]` 對齊官方 7/27 最新疑似病例，新增南澳 Limestone Coast（Southend Jetty, Cape Jaffa, Port MacDonnell）共 7 起疑似大鳳頭燕鷗案例
   - `[x]` 實作前後端雙重 CORS 代理與瀏覽器端自適應實時同步機制，徹底解決 WAF IP 屏蔽與 CORS 跨域限制
   - `[x]` 參考美國 USDA APHIS 樣式，改版「巨型 KPI 指標卡片」與「月度堆疊柱狀/折線混合圖表 (Month-Year)」，並支援前端實時同步動態聯動
-  - `[x]` 對齊官方 7/29 最新數據（全澳累計 27 例確診：WA 10例, SA 14例 [按鳥隻], NSW 2例, QLD 1例）
-  - `[x]` 修復左側巨型 KPI 大卡片顯示 23 與各州加總 27 之不一致 Bug（前端/後端累計邏輯升級為按 detection_count 隻數加總）
-  - `[x]` 優化表格明細呈現：同地點多鳥病例保持單一行不拉長表格，並於狀態欄動態顯示隻數標籤（如 [5 隻鳥]）
-  - `[x]` 全面更新與校對所有專案檔案（h5n1.py, report_template.html, index.html, README.md, walkthrough.md, task.md）
+  - `[x]` 對齊 DAFF 7/30 下午最新數據（全澳累計 28 例確診：SA 15例, WA 10例, NSW 2例, QLD 1例, VIC 1例）
+  - `[x]` 新增 CASE-032 (南澳艾爾半島 Port Lincoln 林肯港新增 1 隻巨鸌確診，南澳確診推升至 15 例)
+  - `[x]` 記錄南澳 PIRSA 今日追加通報 13 隻大鳳頭燕鷗新疑似案（南澳待覆核疑似個案達 24 例）
+  - `[x]` 全面更新與校對所有專案檔案（h5n1.py, index.html, README.md, walkthrough.md, task.md）的修改時間與最新疫情說明
 
 

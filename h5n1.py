@@ -36,13 +36,12 @@ if hasattr(sys.stdout, 'reconfigure'):
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# ==================== 1. 基礎病例資料庫 (更新至 2026 年 7 月 29 日，共 30 例) ====================
+# ==================== 1. 基礎病例資料庫 (更新至 2026 年 7 月 30 日下午，共 32 例) ====================
 # 當爬蟲執行時，會以這個結構為基礎，並嘗試與官網最新發布的文字進行比對與動態修正。
 # source_status: "official_updated" (官方網頁已更新) / "media_announced" (媒體先行，官網同步中)
-# 【DAFF 統計說明】DAFF 以「個別鳥隻」為單位計算 detection 數量，而非以「地點事件」計算。
-# 因此 CASE-025（5隻）+ CASE-026（1隻）+ CASE-027（1隻）= 7 個官方 detection，合計 SA 14 例。
-# 總病例庫共 30 例，包含 27 例官方確診 (WA 10例, SA 14例 [按鳥隻], NSW 2例, QLD 1例)
-# 以及 4 例已排除 (SA 1例, VIC 1例, NSW 1例, QLD 1例) 與 2 例疑似待確診 (SA 2例)
+# 【DAFF 統計說明】DAFF 以「個別鳥隻」為單位計算 detection 數量。
+# 總病例庫包含 28 例官方確診/推定陽性 (WA 10例, SA 15例, NSW 2例, QLD 1例, VIC 1例)
+# 4 例已排除 (SA 1例, VIC 1例, NSW 1例, QLD 1例) 與 7/30 南澳通報之 13 隻新疑似案。
 DEFAULT_CASES = [
     {
         "id": "CASE-001",
@@ -400,8 +399,8 @@ DEFAULT_CASES = [
     },
     {
         "id": "CASE-028",
-        "type": "Suspect",
-        "source_status": "official_announced",
+        "type": "Confirmed",
+        "source_status": "official_confirmed",
         "detection_count": 4,
         "species": "野生海鳥 4 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
         "location": "南澳 袋鼠島 Seal Bay, Kangaroo Island",
@@ -409,13 +408,13 @@ DEFAULT_CASES = [
         "longitude": 137.3164,
         "found_date": "2026-07-28",
         "notify_date": "2026-07-29",
-        "confirm_date": "進行中 (Pending)",
-        "notes": "【南澳 袋鼠島新增疑似案例 - 7/29 通報 11 起疑似之 4 起】於 Kangaroo Island Seal Bay 發現 4 隻大鳳頭燕鷗疑似病例，已送往 CSIRO ACDP 進行最終確診判定。Seal Bay 為瀕危澳洲海獅的重要繁殖棲息地，當局已暫停海灘旅遊活動以保護海獅族群，木棧道行程仍維持開放。南澳部長 Clare Scriven 表示，目前疫情「極有可能（extremely likely）」已在本地野鳥族群中出現在地傳播。資料來源：InDaily SA / Xinhua 2026-07-29。"
+        "confirm_date": "2026-07-30",
+        "notes": "【南澳 袋鼠島確診案例 - 7/30 DAFF 正式判定 Presumed Positive】於 Kangaroo Island Seal Bay 發現之 4 隻大鳳頭燕鷗病例，已於 7 月 30 日由 DAFF 判定為推定陽性確診。Seal Bay 已暫停海灘旅遊以保護瀕危澳洲海獅。資料來源：DAFF / Agriculture SA 2026-07-30。"
     },
     {
         "id": "CASE-029",
-        "type": "Suspect",
-        "source_status": "official_announced",
+        "type": "Confirmed",
+        "source_status": "official_confirmed",
         "detection_count": 7,
         "species": "野生海鳥 7 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
         "location": "南澳東南部 Limestone Coast 一帶 (Southeast SA)",
@@ -423,8 +422,50 @@ DEFAULT_CASES = [
         "longitude": 139.9500,
         "found_date": "2026-07-28",
         "notify_date": "2026-07-29",
+        "confirm_date": "2026-07-30",
+        "notes": "【南澳東南部確診案例 - 7/30 DAFF 正式判定 Presumed Positive】於 Limestone Coast 沿岸一帶發現之 7 隻大鳳頭燕鷗，已於 7 月 30 日經 Geelong ACDP 覆驗全數判定為推定陽性確診。資料來源：DAFF 2026-07-30。"
+    },
+    {
+        "id": "CASE-030",
+        "type": "Confirmed",
+        "source_status": "official_confirmed",
+        "detection_count": 1,
+        "species": "野生海鳥 1 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "location": "維多利亞州 Portland (south-west Victoria)",
+        "latitude": -38.3608,
+        "longitude": 141.6022,
+        "found_date": "2026-07-29",
+        "notify_date": "2026-07-30",
+        "confirm_date": "2026-07-30",
+        "notes": "【維多利亞州首例確診 - 7/30 今日最新】維多利亞州農業局 (Agriculture Victoria) 於 7 月 30 日正式宣布於 Portland 發現之大鳳頭燕鷗呈 H5 陽性。標誌著維州失守，全澳洲所有 5 個 mainland 州全數淪陷！維州已啟動緊急動物疾病應變計畫。資料來源：Agriculture Victoria 2026-07-30。"
+    },
+    {
+        "id": "CASE-031",
+        "type": "Suspect",
+        "source_status": "official_announced",
+        "detection_count": 13,
+        "species": "野生海鳥 13 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "location": "南澳沿海地區 (SA Coastal Regions)",
+        "latitude": -35.2000,
+        "longitude": 137.5000,
+        "found_date": "2026-07-30",
+        "notify_date": "2026-07-30",
         "confirm_date": "進行中 (Pending)",
-        "notes": "【南澳東南部新增疑似案例 - 7/29 通報 11 起疑似之 7 起】於南澳東南部 Limestone Coast 沿岸一帶（具體地點待 ACDP 確認）發現 7 隻大鳳頭燕鷗疑似病例，已送往 CSIRO ACDP 進行 PCR 及基因定序最終確診判定。此批疑似與同日 Kangaroo Island 4 起合計構成今日通報之 11 起全新疑似案例。官方指出這些新案例極可能代表病毒已在澳洲本地野鳥族群中持續進行在地傳播（local transmission）。資料來源：Xinhua / china.org.cn / DAFF 2026-07-29。"
+        "notes": "【南澳 7/30 今日暴增 13 隻全新疑似個案】南澳初級產業廳 (PIRSA) 7 月 30 日證實，沿海地區再度發現 13 隻大鳳頭燕鷗集體生病死亡疑似案例，檢體正送往 Geelong ACDP 國家實驗室進行最終檢驗，南澳待覆核個案總數達 24 例。聯邦 DAFF 強調所有商業家禽農場目前依然 100% 零感染。資料來源：PIRSA / DAFF 2026-07-30。"
+    },
+    {
+        "id": "CASE-032",
+        "type": "Confirmed",
+        "source_status": "official_confirmed",
+        "detection_count": 1,
+        "species": "野生巨鸌 1 隻 (Giant Petrel)",
+        "location": "南澳艾爾半島 Port Lincoln (Eyre Peninsula)",
+        "latitude": -34.7322,
+        "longitude": 135.8586,
+        "found_date": "2026-07-29",
+        "notify_date": "2026-07-30",
+        "confirm_date": "2026-07-30",
+        "notes": "【南澳艾爾半島新增確診 - 7/30 下午最新】南澳艾爾半島 (Eyre Peninsula) 林肯港 (Port Lincoln) 新增 1 隻野生巨鸌確診，使南澳確診數推升至 15 例，全澳累計確診達 28 例。資料來源：DAFF / PIRSA 2026-07-30。"
     }
 ]
 
@@ -885,14 +926,18 @@ def generate_dynamic_summary(cases_data):
     abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a>'
     
     media_text = ""
-    # 檢查是否有南澳 Limestone Coast 已確診病例（7/29 確診，媒體報導更新）
+    # 檢查是否有 VIC Portland 7/30 今日確診首例（優先報導此最新維州淪陷新聞）
+    has_vic_portland_confirmed = any("Portland" in c["location"] and c["type"] == "Confirmed" for c in cases_data)
+    # 檢查是否有南澳 Limestone Coast 已確診病例
     has_limestone_confirmed = any(any(k in c["location"] for k in ["Southend", "Jaffa", "MacDonnell", "Limestone"]) and c["type"] == "Confirmed" for c in cases_data)
-    # 檢查是否有南澳 袋鼠島/SE SA 新疑似病例（7/29 通報）
+    # 檢查是否有南澳 袋鼠島/SE SA 新疑似病例
     has_kangaroo_or_se_suspect = any(any(k in c["location"] for k in ["Seal Bay", "Southeast SA", "袋鼠島"]) and c["type"] == "Suspect" for c in cases_data)
-    # 檢查是否有 QLD 確診的 Moreton Island 案例
-    has_moreton_confirmed = any("Moreton" in c["location"] and c["type"] == "Confirmed" for c in cases_data)
     
-    if has_limestone_confirmed:
+    if has_vic_portland_confirmed:
+        media_text = (
+            f"根據 {abc_link} 最新報導與 DAFF / 維州農業局 **7 月 30 日下午最新公告**，全澳官方確診總數精確推升至 **28 例**！包含維州西南部 **波特蘭 (Portland)** 確診大鳳頭燕鷗首例（**維州正式成為全澳第 5 個淪陷州**），以及南澳艾爾半島 **林肯港 (Port Lincoln)** 新增 1 隻巨鸌確診（**南澳確診增至 15 例**）。全澳 28 例確診分布為：南澳 15 例、西澳 10 例、新州 2 例、昆士蘭 1 例、維州 1 例。南澳 PIRSA 今日亦追加通報 13 隻大鳳頭燕鷗新疑似案（南澳待覆核個案達 24 例）。聯邦 DAFF 強調：**澳洲與紐西蘭所有商業家禽農場目前依然 100% 零感染，未受波及**，本廠生產線安全無虞。"
+        )
+    elif has_limestone_confirmed:
         if has_kangaroo_or_se_suspect:
             media_text = (
                 f"根據 {abc_link} 最新報導與南澳政府 7 月 29 日公告，南澳東南部 **Limestone Coast**（Southend Jetty, Cape Jaffa, Port MacDonnell）於 7 月 27 日通報之 **7 起野生大鳳頭燕鷗疑似病例**，已於今日（7/29）經 CSIRO ACDP Geelong 實驗室基因定序 **正式確診為 H5N1 陽性**，使全澳累計確診達 **27 例**（按 DAFF 個別鳥隻統計：WA 10、SA 14、NSW 2、QLD 1）。同日另新增 11 起疑似案例（袋鼠島 Seal Bay 4 起 + SE SA 7 起），正送往 ACDP 確認。南澳部長 Clare Scriven 宣告 H5N1 病毒「極有可能（extremely likely）」已在澳洲本地野鳥族群中建立在地傳播。目前家禽防線 **100% 安全**，本廠運作無虞。"
