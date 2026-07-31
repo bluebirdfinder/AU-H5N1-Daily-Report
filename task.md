@@ -44,6 +44,7 @@
   - `[x]` 對齊 DAFF 7/30 下午最新數據（全澳累計 28 例確診：SA 15例, WA 10例, NSW 2例, QLD 1例, VIC 1例）
   - `[x]` 徹底排查並修復數據重複計算 (Double Counting) Bug（刪除重複 CASE-029，將 CASE-028 修正為 Suspect，使 Confirmed 加總精確對齊為 28 例）
   - `[x]` 升級「各州分佈細分 (By State)」為動態 JavaScript 渲染，自動反應維州 (VIC 1例) 與南澳 (SA 15例) 的真實動態變化
+  - `[x]` 對齊官方 7/31 最新數據（全澳累計 33 例確診：SA 19例, WA 10例, NSW 2例, QLD 1例, VIC 1例；新增袋鼠島與 SA 沿海確診 4 例，VIC Portland 通報第 2 例疑似個案；官方評估野鳥病毒確立本土傳播）
   - `[x]` 全面更新與校對所有專案檔案（h5n1.py, report_template.html, index.html, README.md, walkthrough.md, task.md）
 
 

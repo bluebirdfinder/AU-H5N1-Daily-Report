@@ -452,6 +452,34 @@ DEFAULT_CASES = [
         "notify_date": "2026-07-30",
         "confirm_date": "2026-07-30",
         "notes": "【南澳艾爾半島新增確診 - 7/30 下午最新】南澳艾爾半島 (Eyre Peninsula) 林肯港 (Port Lincoln) 新增 1 隻野生巨鸌確診，使南澳確診數推升至 15 例，全澳累計確診達 28 例。資料來源：DAFF / PIRSA 2026-07-30。"
+    },
+    {
+        "id": "CASE-033",
+        "type": "Confirmed",
+        "source_status": "official_confirmed",
+        "detection_count": 4,
+        "species": "野生海鳥 4 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "location": "南澳袋鼠島 Seal Bay 及沿海地區",
+        "latitude": -35.9766,
+        "longitude": 137.3164,
+        "found_date": "2026-07-28",
+        "notify_date": "2026-07-31",
+        "confirm_date": "2026-07-31",
+        "notes": "【南澳袋鼠島與沿海新增確診 - 7/31 最新】7 月 31 日 DAFF 官方最新數據，原送檢之袋鼠島 Seal Bay 4 隻大鳳頭燕鷗經 ACDP 覆驗確診為 H5N1 陽性，使南澳確診個案推升至 19 例，全澳累計確診達 33 例。資料來源：DAFF 2026-07-31。"
+    },
+    {
+        "id": "CASE-034",
+        "type": "Suspect",
+        "source_status": "official_announced",
+        "detection_count": 1,
+        "species": "野生海鳥 1 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "location": "維多利亞州 Portland (第 2 例疑似)",
+        "latitude": -38.3608,
+        "longitude": 141.6022,
+        "found_date": "2026-07-30",
+        "notify_date": "2026-07-31",
+        "confirm_date": "進行中 (Pending)",
+        "notes": "【維多利亞州第二例疑似 - 7/31 最新】維州農業局 7 月 31 日通報，於 Portland 發現第 2 隻大鳳頭燕鷗疑似病例，檢體已送往 ACDP 進行覆驗。資料來源：Agriculture Victoria 2026-07-31。"
     }
 ]
 
@@ -903,7 +931,7 @@ def generate_dynamic_summary(cases_data):
     other_states_str = f"，另有 {', '.join(other_states_list)}" if other_states_list else ""
     
     official_text = (
-        f"依據 {daff_link} 及各州政府 2026 年 7 月 29 日最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙與本土海鳥。當前最新確診病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
+        f"依據 {daff_link} 及各州政府 2026 年 7 月 31 日最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙與本土海鳥。當前最新確診病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
     )
 
     latest_case = cases_data[-1] if cases_data else None
@@ -912,16 +940,13 @@ def generate_dynamic_summary(cases_data):
     abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a>'
     
     media_text = ""
-    # 檢查是否有 VIC Portland 7/30 今日確診首例（優先報導此最新維州淪陷新聞）
+    # 檢查是否有 7/31 最新確診推升至 33 例
+    has_sa_33_confirmed = any("CASE-033" == c["id"] or ("Seal Bay" in c["location"] and c["type"] == "Confirmed") for c in cases_data)
     has_vic_portland_confirmed = any("Portland" in c["location"] and c["type"] == "Confirmed" for c in cases_data)
-    # 檢查是否有南澳 Limestone Coast 已確診病例
-    has_limestone_confirmed = any(any(k in c["location"] for k in ["Southend", "Jaffa", "MacDonnell", "Limestone"]) and c["type"] == "Confirmed" for c in cases_data)
-    # 檢查是否有南澳 袋鼠島/SE SA 新疑似病例
-    has_kangaroo_or_se_suspect = any(any(k in c["location"] for k in ["Seal Bay", "Southeast SA", "袋鼠島"]) and c["type"] == "Suspect" for c in cases_data)
     
-    if has_vic_portland_confirmed:
+    if has_sa_33_confirmed or has_vic_portland_confirmed:
         media_text = (
-            f"根據 {abc_link} 最新報導與 DAFF / 維州農業局 **7 月 30 日下午最新公告**，全澳官方確診總數精確推升至 **28 例**！包含維州西南部 **波特蘭 (Portland)** 確診大鳳頭燕鷗首例（**維州正式成為全澳第 5 個淪陷州**），以及南澳艾爾半島 **林肯港 (Port Lincoln)** 新增 1 隻巨鸌確診（**南澳確診增至 15 例**）。全澳 28 例確診分布為：南澳 15 例、西澳 10 例、新州 2 例、昆士蘭 1 例、維州 1 例。南澳 PIRSA 今日亦追加通報 13 隻大鳳頭燕鷗新疑似案（南澳待覆核個案達 24 例）。聯邦 DAFF 強調：**澳洲與紐西蘭所有商業家禽農場目前依然 100% 零感染，未受波及**，本廠生產線安全無虞。"
+            f"根據 {abc_link} 最新報導與 DAFF / PIRSA / 維州農業局 **7 月 31 日最新官方數據**，全澳高致病性 H5N1 野鳥確診總數累計達到 **33 例**！確診個案分布為：南澳 19 例、西澳 10 例、新州 2 例、昆士蘭 1 例、維州 1 例（包含維州西南部 **波特蘭 Portland** 確診首例，維州為全澳第 5 個檢出州）。新增疑似案例方面，維州 Portland 今日追加通報第 2 例大鳳頭燕鷗疑似個案，南澳沿海亦持續追蹤待覆核個案。官方已證實病毒在野生海鳥（大鳳頭燕鷗）族群中存在 **本土傳播 (local transmission)**，評估野鳥清零已不可行，國家策略轉為保護商業家禽生物安全。聯邦 DAFF 強調：**澳洲與紐西蘭所有商業家禽農場目前依然 100% 零感染，未受波及**，生產鏈與原料供應安全無虞。"
         )
     elif has_limestone_confirmed:
         if has_kangaroo_or_se_suspect:
