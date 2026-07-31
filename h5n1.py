@@ -717,10 +717,92 @@ def discover_cases_from_news_rss(rss_text, existing_cases):
         
     return new_discovered
 
+def smart_fetch_url(url, headers=None, timeout=10):
+    """
+    強化版跨障礙 HTTP 抓取器：
+    1. 優先試用用戶配置的 Cloudflare Worker 代理 (CF_WORKER_URL 變數)
+    2. 嘗試使用 curl_cffi 進行 Chrome 120 TLS 指紋偽裝抓取
+    3. 嘗試使用 Playwright 無頭真實瀏覽器渲染抓取
+    4. 兜底嘗試第三方 CORS Proxy (AllOrigins / corsproxy)
+    5. 最後回退至標準 requests.get
+    """
+    cf_worker_url = os.environ.get("CF_WORKER_URL", "").strip().rstrip("/")
+    if cf_worker_url:
+        try:
+            proxy_target = f"{cf_worker_url}/?url={url}"
+            print(f"  [Cloudflare Worker 代理通道] 正在透過 Cloudflare 轉接抓取 {url} ...")
+            resp = requests.get(proxy_target, timeout=timeout+5, verify=False)
+            if resp.status_code == 200 and resp.text and len(resp.text) > 200:
+                print(f"  ✅ [Cloudflare Worker 成功] 取得 {len(resp.text)} 位元組數據！")
+                return resp.text
+        except Exception as e:
+            print(f"  ⚠️ [Cloudflare Worker 失敗] {str(e)}")
+
+    # 嘗試策略 2: curl_cffi Chrome TLS 指紋偽裝
+    try:
+        from curl_cffi import requests as cffi_requests
+        print("  [curl_cffi 擬真通道] 正在模擬真實 Chrome TLS 指紋發送請求...")
+        resp = cffi_requests.get(url, impersonate="chrome120", timeout=timeout, verify=False)
+        if resp.status_code == 200 and resp.text and len(resp.text) > 200:
+            print(f"  ✅ [curl_cffi 成功] 取得 {len(resp.text)} 位元組數據！")
+            return resp.text
+    except Exception as e:
+        print(f"  ⚠️ [curl_cffi 失敗/未安裝] {str(e)}")
+
+    # 嘗試策略 3: Playwright 無頭瀏覽器
+    try:
+        from playwright.sync_api import sync_playwright
+        print("  [Playwright 瀏覽器通道] 正在啟動真實 Chromium 模擬人眼瀏覽...")
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                viewport={"width": 1280, "height": 800}
+            )
+            page = context.new_page()
+            page.goto(url, wait_until="domcontentloaded", timeout=timeout*1000)
+            content = page.content()
+            browser.close()
+            if content and len(content) > 200:
+                print(f"  ✅ [Playwright 成功] 取得 {len(content)} 位元組數據！")
+                return content
+    except Exception as e:
+        print(f"  ⚠️ [Playwright 失敗/未安裝] {str(e)}")
+
+    # 嘗試策略 4: CORS 代理 (AllOrigins / corsproxy)
+    for proxy_pattern in [
+        "https://api.allorigins.win/get?url={url}",
+        "https://corsproxy.io/?{url}"
+    ]:
+        try:
+            proxy_url = proxy_pattern.format(url=url)
+            print(f"  [第三方 CORS 代理通道] 正在嘗試 {proxy_pattern.split('/')[2]}...")
+            resp = requests.get(proxy_url, headers=headers, timeout=timeout+4, verify=False)
+            if resp.status_code == 200:
+                body = resp.text
+                if "allorigins" in proxy_pattern and "json" in resp.headers.get("Content-Type", ""):
+                    body = resp.json().get("contents", "")
+                if body and len(body) > 200:
+                    print(f"  ✅ [第三方代理成功] 取得數據！")
+                    return body
+        except Exception as e:
+            pass
+
+    # 嘗試策略 5: 標準 requests.get 兜底
+    try:
+        print("  [標準 HTTP 兜底通道] 發送一般 HTTP GET 請求...")
+        resp = requests.get(url, headers=headers, timeout=timeout, verify=False)
+        if resp.status_code == 200:
+            return resp.text
+    except Exception as e:
+        print(f"  ⚠️ [標準 HTTP 失敗] {str(e)}")
+
+    return None
+
 def fetch_daff_updates():
     """
     聯防爬蟲模組：同時爬取聯邦 DAFF 官網、以及澳洲全部 8 個州/領地政府的官方禽流感更新站點。
-    優化 WAF 阻擋應對能力：縮短 Timeout 至 8 秒，輪換 User-Agent，快速切換至兜底。
+    優化 WAF 阻擋應對能力：結合 Cloudflare Worker 代理、curl_cffi TLS 偽裝與 Playwright 真實瀏覽器。
     """
     sources = {
         "DAFF_Entry": "https://www.agriculture.gov.au/campaigns/birdflu",
@@ -753,56 +835,24 @@ def fetch_daff_updates():
     
     soups = []
     
-    # 逐一爬取全澳官方來源，設定較短 Timeout (8秒) 避開被 WAF 卡死
+    # 逐一爬取全澳官方來源，採用多重防阻擋通道
     for name, url in sources.items():
         print(f"正在連線澳洲官方網站 ({name}): {url} ...")
-        try:
-            response = requests.get(url, headers=headers, timeout=8, verify=False)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.text, "html.parser")
-                soups.append(soup)
-            else:
-                print(f"警告: {name} 連線失敗，HTTP 狀態碼: {response.status_code}，將嘗試代理阻擋兜底...")
-                raise ValueError(f"HTTP {response.status_code}")
-        except Exception as e:
-            print(f"警告: {name} 連線錯誤/直接連線失敗: {str(e)}，正在嘗試透過 CORS 代理伺服器進行兜底連線...")
-            # 1. 嘗試 AllOrigins 代理
-            try:
-                proxy_url = f"https://api.allorigins.win/get?url={url}"
-                proxy_response = requests.get(proxy_url, headers=headers, timeout=12, verify=False)
-                if proxy_response.status_code == 200:
-                    contents = proxy_response.json().get("contents", "")
-                    if contents:
-                        soup = BeautifulSoup(contents, "html.parser")
-                        soups.append(soup)
-                        print(f"✅ 成功透過 AllOrigins 代理抓取 {name} 的資料！")
-                        continue
-            except Exception as pe:
-                print(f"警告: {name} 透過 AllOrigins 代理連線亦失敗: {str(pe)}")
-            
-            # 2. 嘗試 corsproxy.io 代理
-            try:
-                proxy_url = f"https://corsproxy.io/?{url}"
-                proxy_response = requests.get(proxy_url, headers=headers, timeout=12, verify=False)
-                if proxy_response.status_code == 200:
-                    soup = BeautifulSoup(proxy_response.text, "html.parser")
-                    soups.append(soup)
-                    print(f"✅ 成功透過 corsproxy.io 代理抓取 {name} 的資料！")
-                    continue
-            except Exception as pe:
-                print(f"警告: {name} 透過 corsproxy.io 代理連線亦失敗: {str(pe)}")
+        html_content = smart_fetch_url(url, headers=headers, timeout=8)
+        if html_content:
+            soup = BeautifulSoup(html_content, "html.parser")
+            soups.append(soup)
+        else:
+            print(f"警告: {name} 所有防阻擋通道連線均告失敗，跳過此站點，維持既有病例數據。")
             
     # 爬取 Google News 澳洲禽流感即時 RSS
     abc_rss_text = ""
     print(f"正在連線 Google News RSS: {google_rss_url} ...")
-    try:
-        response = requests.get(google_rss_url, headers=headers, timeout=12, verify=False)
-        if response.status_code == 200:
-            abc_rss_text = response.text.lower()
-        else:
-            print(f"警告: Google News RSS 連線失敗，HTTP 狀態碼: {response.status_code}")
-    except Exception as e:
-        print(f"警告: Google News RSS 連線錯誤: {str(e)}")
+    rss_content = smart_fetch_url(google_rss_url, headers=headers, timeout=12)
+    if rss_content:
+        abc_rss_text = rss_content.lower()
+    else:
+        print(f"警告: Google News RSS 連線失敗。")
         
     cases = json.loads(json.dumps(DEFAULT_CASES))
     
