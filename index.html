@@ -46,7 +46,7 @@
                 <h1 class="text-lg font-bold tracking-tight text-white">Nestlé Purina Blayney • Bio-Security Monitor</h1>
             </div>
             <div class="text-xs text-slate-400">
-                系統最後更新時間: <span class="text-emerald-400 font-semibold">2026-08-02 00:23:21 (台北時間) / 2026-08-02 02:23:21 (澳洲 AEST)</span>
+                系統最後更新時間: <span class="text-emerald-400 font-semibold">2026-08-02 00:31:29 (台北時間) / 2026-08-02 02:31:29 (澳洲 AEST)</span>
             </div>
         </div>
     </header>
@@ -810,19 +810,6 @@
     "notify_date": "2026-08-01",
     "confirm_date": "進行中 (Pending)",
     "notes": "【南澳離島首起野生動物大規模死亡事件 - 8/1 最新】南澳環境部利用無人機巡查 Baudin Rocks 時發現 49 隻大鳳頭燕鷗死亡、35 隻生病之大規模群聚慘況，緊急採樣送驗中，極度擔憂為全澳首起野生動物集體大規模死亡事件。資料來源：PIRSA / SA DEW 2026-08-01。"
-  },
-  {
-    "id": "CASE-045",
-    "type": "Suspect",
-    "source_status": "",
-    "species": "野生候鳥 (野鳥監測)",
-    "location": "新偵測：Northampton",
-    "latitude": -28.3667,
-    "longitude": 114.6333,
-    "found_date": "2026-08-01",
-    "notify_date": "2026-08-01",
-    "confirm_date": "進行中 (Pending)",
-    "notes": "【動態爬蟲自動生成】動態偵測疑似病例。來源文字段落：\"Testing at CSIRO’s Australian Centre for Disease Preparedness (ACDP)has determined that there has been one additional detection of H5 high pathogenicity avian influenza (bird flu) in a petrel, found at Horrocks Beach near Northampton, Western Australia.\""
   }
 ];
 
@@ -904,27 +891,33 @@
                 attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
             }).addTo(map);
 
-            // 繪製 Nestlé Blayney 工廠標記 (自訂精緻紅色星號 Marker)
+            // 繪製 Nestlé Blayney 工廠標記 (金色星級工廠 🏭 + 旋轉防護金圈 + 常駐名稱標籤，完全區隔紅色疫區點)
             const factoryIcon = L.divIcon({
-                html: `<div style="background-color: #ef4444; width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px #ef4444;" class="animate-ping"></div>`,
+                html: `
+                    <div style="position: relative; display: flex; align-items: center; justify-content: center;">
+                        <div style="position: absolute; background-color: rgba(245, 158, 11, 0.25); width: 40px; height: 40px; border-radius: 50%; border: 1.5px dashed #f59e0b;" class="animate-spin"></div>
+                        <div style="background: linear-gradient(135deg, #fbbf24, #d97706); width: 28px; height: 28px; border: 2.5px solid white; border-radius: 50%; box-shadow: 0 0 16px #f59e0b; display: flex; align-items: center; justify-content: center; font-size: 14px; z-index: 10;">🏭</div>
+                        <div style="position: absolute; top: -24px; white-space: nowrap; background-color: #0f172a; color: #fbbf24; border: 1px solid #f59e0b; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.6); pointer-events: none; letter-spacing: 0.5px;">Nestlé Blayney 廠</div>
+                    </div>
+                `,
                 className: 'custom-factory-marker',
-                iconSize: [14, 14],
-                iconAnchor: [7, 7]
+                iconSize: [40, 40],
+                iconAnchor: [20, 20]
             });
 
             const factoryMarker = L.marker([FACTORY_LAT, FACTORY_LNG], { icon: factoryIcon }).addTo(map);
             factoryMarker.bindPopup(`
-                <div style="color: #1e293b; font-family: sans-serif; font-size: 12px; width: 220px;">
-                    <strong style="color: #dc2626; font-size: 14px;">Nestlé Purina Blayney</strong><br>
-                    <span style="font-weight: 600; color: #475569;">新南威爾斯州布萊尼廠</span><br>
+                <div style="color: #1e293b; font-family: sans-serif; font-size: 12px; width: 230px;">
+                    <strong style="color: #d97706; font-size: 14px;">🏭 Nestlé Purina Blayney</strong><br>
+                    <span style="font-weight: 600; color: #475569;">新南威爾斯州布萊尼廠 (安全核心)</span><br>
                     <hr style="margin: 6px 0; border: none; border-top: 1px solid #e2e8f0;">
                     📍 GPS坐標：-33.5332, 149.2524<br>
-                    🛡️ 安全特徵：海拔 860m，内陸超強天然地理隔離防線，全產線採用 120°C+ 高溫擠壓高膨化技術，家禽來源 100% 來自安全無疫區。
+                    🛡️ 安全特徵：海拔 860m 内陸地理屏障，全產線採用 120°C+ 高溫擠壓膨化技術，家禽原料 100% 來自無疫區 (Area Freedom)。
                 </div>
             `);
 
-            // 繪製 H5N1 疫情與排除病例點
-            window.H5N1_CASES.forEach(c => {
+            // 繪製 H5N1 疫情與排除病例點 (支援多鳥隻動態尺寸、數量 Badge、雷達水波光圈與微小黃金角度分散)
+            window.H5N1_CASES.forEach((c, idx) => {
                 let color = '#ef4444'; // Confirmed = 紅色
                 let typeText = '確診 (Confirmed)';
                 if (c.type === 'Suspect') {
@@ -935,11 +928,44 @@
                     typeText = '陰性排除 (Negative)';
                 }
 
+                // 鳥隻數量 (預設為 1)
+                const count = c.detection_count || 1;
+                
+                // 根據鳥隻密度動態計算標籤尺寸與波紋特效
+                let size = 12;
+                let fontSize = '9px';
+                let pulseEffect = '';
+                
+                if (count >= 50) {
+                    size = 36;
+                    fontSize = '12px';
+                    pulseEffect = 'animate-ping opacity-75';
+                } else if (count >= 10) {
+                    size = 26;
+                    fontSize = '11px';
+                    pulseEffect = 'animate-pulse';
+                } else if (count > 1) {
+                    size = 20;
+                    fontSize = '10px';
+                }
+
+                // 微小的座標分散 (Jittering) 防止完全重疊覆蓋
+                let lat = c.latitude;
+                let lng = c.longitude;
+                const angle = (idx * 137.5) * (Math.PI / 180);
+                const offset = 0.002 * Math.sqrt((idx % 4) + 1);
+                lat += offset * Math.sin(angle);
+                lng += offset * Math.cos(angle);
+
+                const badgeContent = count > 1 
+                    ? `<div style="background-color: ${color}; width: ${size}px; height: ${size}px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 14px ${color}; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: ${fontSize}; font-family: sans-serif; text-shadow: 0 1px 2px rgba(0,0,0,0.8);" class="${pulseEffect}">${count}</div>`
+                    : `<div style="background-color: ${color}; width: 12px; height: 12px; border: 1.5px solid white; border-radius: 50%; box-shadow: 0 0 8px ${color};"></div>`;
+
                 const wildBirdIcon = L.divIcon({
-                    html: `<div style="background-color: ${color}; width: 10px; height: 10px; border: 1.5px solid white; border-radius: 50%; box-shadow: 0 0 8px ${color};"></div>`,
+                    html: badgeContent,
                     className: 'custom-wildbird-marker',
-                    iconSize: [10, 10],
-                    iconAnchor: [5, 5]
+                    iconSize: [size, size],
+                    iconAnchor: [size / 2, size / 2]
                 });
 
                 let mediaTag = '';
@@ -947,13 +973,13 @@
                     mediaTag = ` <span style="background-color: rgba(245, 158, 11, 0.1); color: #d97706; padding: 2px 4px; border-radius: 4px; font-size: 9px; border: 0.5px solid rgba(245, 158, 11, 0.2); font-weight: bold; margin-left: 4px;" title="本確診資訊源自 ABC News 引用官方記者會宣告。聯邦 DAFF 官網數據庫尚在行政同步中。">⚠️ 媒體先行</span>`;
                 }
 
-                const marker = L.marker([c.latitude, c.longitude], { icon: wildBirdIcon }).addTo(map);
+                const marker = L.marker([lat, lng], { icon: wildBirdIcon }).addTo(map);
                 marker.bindPopup(`
-                    <div style="color: #1e293b; font-family: sans-serif; font-size: 11px; width: 200px;">
+                    <div style="color: #1e293b; font-family: sans-serif; font-size: 11px; width: 210px;">
                         <strong style="color: ${color}; font-size: 12px;">[${c.id}] ${typeText}${mediaTag}</strong><br>
                         <span style="font-weight: 600; color: #0f172a;">${c.location}</span><br>
                         <hr style="margin: 4px 0; border: none; border-top: 1px solid #e2e8f0;">
-                        🦆 感染動物：${c.species}<br>
+                        🦆 數量/物種：<span style="font-weight: bold; color: ${color};">${count} 隻</span> (${c.species})<br>
                         📅 發現收容：${c.found_date}<br>
                         📋 官方通報：${c.notify_date}<br>
                         🧪 判定日期：${c.confirm_date}<br>

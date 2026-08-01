@@ -49,4 +49,6 @@
   - `[x]` 新增 CASE-035 (SA 大鳳頭燕鷗 19 隻確診)、CASE-036 (全澳首例銀鷗/海鷗確診)、CASE-037 (維州西南海岸 6 例疑似)、CASE-038 (南澳 Baudin Rocks 84 隻大規模死亡/生病事件)
   - `[x]` 解決 GitHub Actions 對 Nominatim API 的 IP 封鎖與 403/429 限制（新增內建 LOCAL_GAZETTEER、Cloudflare 地理編碼代理轉接與州級預設坐標備用）
   - `[x]` 優化動態地點提取防雜訊過濾器（剔除 health, animal, australian 等非地名單字與換行符號）
+  - `[x]` 升級地圖「鳥類數量密度 Badge 圈圈 (12px ~ 36px) + 雷達水波擴散光圈」與「黃金角度螺旋分散」
+  - `[x]` 重構「 Nestlé Blayney 廠專屬金色 🏭 工廠地標與旋轉防護金圈」，徹底與紅色野鳥疫區劃清界線
 - `[x]` 全面更新與校對所有專案檔案（h5n1.py, report_template.html, index.html, README.md, walkthrough.md, task.md, .github/workflows/auto_update.yml）

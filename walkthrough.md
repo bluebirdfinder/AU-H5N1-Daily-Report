@@ -20,9 +20,14 @@
   - **升級方案 1 (LOCAL_GAZETTEER)**：在 `h5n1.py` 內建澳洲熱點與 coastal 城市經緯度字典，優先命中本地地名庫，完全繞過 CI 伺服器 IP 限制。
   - **升級方案 2 (Cloudflare Proxy for Nominatim)**：支援自動透過 `CF_WORKER_URL` 代理轉發 Nominatim 地理編碼請求，共享通用代理基礎設施。
   - **升級方案 3 (State Fallback & Stop Words)**：加入州別預設坐標備用機制，並嚴格過濾 `health`, `animal`, `australian`, `biosecurity` 等雜訊關鍵字，保證地理解析 100% 穩定且不丟案。
+- **GIS 地圖視覺化極致升級 (Bird Density & Safe Factory Marker)**：
+  - **鳥類數量密度動態 Badge 圈圈 (Proportional Count Badges)**：地圖 Marker 根據鳥隻數量 (1隻、19隻、84隻) 動態放縮為 12px ~ 36px，並在圈圈中央直接標示粗體數量數字，方便審查者一目了然感受疫情集群密度。
+  - **雷達水波光圈特效 (Pulsing Radar Wave)**：對於 >10 隻以上的感染點加入 `animate-pulse` 光感；對 Baudin Rocks 84 隻大爆發加入 `animate-ping` 高頻雷達水波光圈。
+  - **黃金角度螺旋分散 (Spiral Jittering)**：對同一地區多起案例自動進行微幅圓形散開，解決標記完全疊死問題。
+  - **獨立金色 🏭 Nestlé Blayney 廠地標**：工廠改用專屬琥珀金圖示 (Gold Factory Badge)、旋轉防護金圈與常駐標籤，徹底與紅色野鳥疫區劃清界線。
 - **全套專案檔案同步更新**：
   - 更新 `h5n1.py`（新增 CASE-035 至 CASE-038），修復 `generate_dynamic_summary` 文案與條件判斷。
-  - 更新 `report_template.html` 前端 JavaScript 關鍵字匹配。
+  - 更新 `report_template.html` 前端 JavaScript 關鍵字匹配、鳥類密度視覺化與工廠地標。
   - 重新執行 `h5n1.py` 編譯生成正式發布網頁 `index.html`。
   - 同步校對更新 `README.md`、`task.md` 與 `walkthrough.md`。
 
