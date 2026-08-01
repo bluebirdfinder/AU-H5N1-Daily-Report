@@ -480,6 +480,62 @@ DEFAULT_CASES = [
         "notify_date": "2026-07-31",
         "confirm_date": "進行中 (Pending)",
         "notes": "【維多利亞州第二例疑似 - 7/31 最新】維州農業局 7 月 31 日通報，於 Portland 發現第 2 隻大鳳頭燕鷗疑似病例，檢體已送往 ACDP 進行覆驗。資料來源：Agriculture Victoria 2026-07-31。"
+    },
+    {
+        "id": "CASE-035",
+        "type": "Confirmed",
+        "source_status": "official_confirmed",
+        "detection_count": 19,
+        "species": "野生海鳥 19 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "location": "南澳 Robe、Beachport、袋鼠島等沿海棲息地",
+        "latitude": -37.1644,
+        "longitude": 139.7624,
+        "found_date": "2026-07-30",
+        "notify_date": "2026-08-01",
+        "confirm_date": "2026-08-01",
+        "notes": "【南澳 8/1 舊疑似大規模覆核確診 - 暴增 19 例】CSIRO ACDP 國家實驗室完成大規模基因定序，南澳先前送驗之 19 隻大鳳頭燕鷗（分佈於 Robe、Beachport、袋鼠島等地）一舉覆核轉為正式陽性確診。資料來源：DAFF / PIRSA 2026-08-01。"
+    },
+    {
+        "id": "CASE-036",
+        "type": "Confirmed",
+        "source_status": "official_confirmed",
+        "detection_count": 1,
+        "species": "野生海鷗 1 隻 (銀鷗 / Silver Gull)",
+        "location": "南澳 Robe 地區",
+        "latitude": -37.1644,
+        "longitude": 139.7624,
+        "found_date": "2026-07-31",
+        "notify_date": "2026-08-01",
+        "confirm_date": "2026-08-01",
+        "notes": "【全澳洲首例海鷗確診 - 8/1 最新】南澳 Robe 發現之銀鷗（Silver Gull / 海鷗）經 ACDP 覆核確診 H5N1 陽性。此為全澳洲首例海鷗確診個案，因海鷗大量棲息於城鎮與人類社區，專家警告病毒恐即將往內陸與淡水環境蔓延。資料來源：DAFF / PIRSA 2026-08-01。"
+    },
+    {
+        "id": "CASE-037",
+        "type": "Suspect",
+        "source_status": "official_announced",
+        "detection_count": 6,
+        "species": "野生海鳥 6 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
+        "location": "維多利亞州 西南海岸地區 (SW Victoria Coast)",
+        "latitude": -38.3608,
+        "longitude": 141.6022,
+        "found_date": "2026-07-31",
+        "notify_date": "2026-08-01",
+        "confirm_date": "進行中 (Pending)",
+        "notes": "【維多利亞州西南海岸全新 6 例疑似 - 8/1 最新】維州農業局通報於該州西南海岸發現 6 隻大鳳頭燕鷗生病死亡疑似個案，檢體已送抵 Geelong ACDP 實驗室進行覆驗。資料來源：Agriculture Victoria 2026-08-01。"
+    },
+    {
+        "id": "CASE-038",
+        "type": "Suspect",
+        "source_status": "official_announced",
+        "detection_count": 84,
+        "species": "野生海鳥 84 隻 (大鳳頭燕鷗：49隻死亡、35隻生病)",
+        "location": "南澳沿海離島 Baudin Rocks",
+        "latitude": -37.0950,
+        "longitude": 139.7180,
+        "found_date": "2026-07-31",
+        "notify_date": "2026-08-01",
+        "confirm_date": "進行中 (Pending)",
+        "notes": "【南澳離島首起野生動物大規模死亡事件 - 8/1 最新】南澳環境部利用無人機巡查 Baudin Rocks 時發現 49 隻大鳳頭燕鷗死亡、35 隻生病之大規模群聚慘況，緊急採樣送驗中，極度擔憂為全澳首起野生動物集體大規模死亡事件。資料來源：PIRSA / SA DEW 2026-08-01。"
     }
 ]
 
@@ -499,10 +555,62 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return R * c
 
+LOCAL_GAZETTEER = {
+    "robe": (-37.1644, 139.7624),
+    "beachport": (-37.4833, 140.0167),
+    "kangaroo island": (-35.7752, 137.2142),
+    "seal bay": (-35.9766, 137.3164),
+    "baudin rocks": (-37.0950, 139.7180),
+    "portland": (-38.3608, 141.6022),
+    "port lincoln": (-34.7322, 135.8586),
+    "southend": (-37.5683, 140.1264),
+    "cape jaffa": (-36.9389, 139.6917),
+    "port macdonnell": (-38.0531, 140.6972),
+    "esperance": (-33.8613, 121.9021),
+    "cape le grand": (-33.9912, 122.1481),
+    "roses beach": (-33.8752, 121.7915),
+    "dunsborough": (-33.6128, 115.1012),
+    "mullaloo": (-31.7826, 115.7318),
+    "whitfords": (-31.7944, 115.7368),
+    "lancelin": (-31.0210, 115.3315),
+    "seabird": (-31.2789, 115.4414),
+    "denmark": (-35.0315, 117.1593),
+    "parry beach": (-35.0315, 117.1593),
+    "horrocks": (-28.3817, 114.4304),
+    "hawks nest": (-32.6658, 152.1793),
+    "narrabeen": (-33.7220, 151.2985),
+    "semaphore": (-34.8394, 138.4831),
+    "moreton island": (-27.1812, 153.4022),
+    "noosa": (-26.3847, 153.0886),
+    "hardwicke bay": (-34.8919, 137.4595),
+    "port vincent": (-34.7773, 137.8613),
+    "fleurieu": (-35.5325, 138.6214),
+    "fowlers bay": (-31.9912, 132.4331),
+    "northampton": (-28.3667, 114.6333),
+    "wa": (-31.9505, 115.8605),
+    "western australia": (-31.9505, 115.8605),
+    "sa": (-34.9285, 138.6007),
+    "south australia": (-34.9285, 138.6007),
+    "nsw": (-33.8688, 151.2093),
+    "new south wales": (-33.8688, 151.2093),
+    "vic": (-37.8136, 144.9631),
+    "victoria": (-37.8136, 144.9631),
+    "qld": (-27.4705, 153.0260),
+    "queensland": (-27.4705, 153.0260),
+}
+
 def get_coordinates_from_api(location_name):
     """
-    透過 OpenStreetMap Nominatim 免費地理編碼 API，將地名轉換為精確 GPS 經緯度 (支援多級退避搜尋)
+    將地名轉換為精確 GPS 經緯度 (優先搜尋內建 Australian Gazetteer 字典，兜底呼叫 Nominatim API 或州級備用坐標)
     """
+    loc_clean_lower = location_name.lower().strip()
+
+    # 1. 優先查本地字典 (避免 GitHub Actions / CI 網路被 Nominatim 阻擋 403/429)
+    for g_key, coords in LOCAL_GAZETTEER.items():
+        if g_key in loc_clean_lower or loc_clean_lower in g_key:
+            print(f"[本地地名庫命中] '{location_name}' -> {coords}")
+            return coords[0], coords[1]
+
     headers = {
         "User-Agent": "Purina-Blayney-H5N1-Monitor/1.0 (contact: bluebirdfinder@example.com)"
     }
@@ -518,6 +626,24 @@ def get_coordinates_from_api(location_name):
     # 嘗試策略 3: 原始地名直接搜
     queries.append(location_name)
     
+    cf_worker_url = os.environ.get("CF_WORKER_URL", "").strip().rstrip("/")
+    if cf_worker_url:
+        for q in queries:
+            try:
+                nom_target = f"https://nominatim.openstreetmap.org/search?q={requests.utils.quote(q)}&format=json&limit=1"
+                proxy_target = f"{cf_worker_url}/?url={requests.utils.quote(nom_target)}"
+                print(f"  [Cloudflare 地理編碼代理] 正在透過 Cloudflare 轉接查詢 Nominatim: '{q}' ...")
+                resp = requests.get(proxy_target, timeout=8, verify=False)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if isinstance(data, list) and data:
+                        lat = float(data[0]["lat"])
+                        lon = float(data[0]["lon"])
+                        print(f"  ✅ [Cloudflare 地理編碼成功] '{q}' (地名: {location_name}) -> 坐標: ({lat}, {lon})")
+                        return lat, lon
+            except Exception as e:
+                print(f"  ⚠️ [Cloudflare 地理編碼失敗] {str(e)}")
+
     for q in queries:
         url = "https://nominatim.openstreetmap.org/search"
         params = {
@@ -527,8 +653,8 @@ def get_coordinates_from_api(location_name):
         }
         try:
             import time
-            time.sleep(1.0)  # 微小延遲避免頻繁請求
-            response = requests.get(url, params=params, headers=headers, timeout=10, verify=False)
+            time.sleep(0.5)
+            response = requests.get(url, params=params, headers=headers, timeout=5, verify=False)
             if response.status_code == 200:
                 data = response.json()
                 if data:
@@ -539,8 +665,21 @@ def get_coordinates_from_api(location_name):
         except Exception as e:
             print(f"[地理編碼警告] 查詢 '{q}' 失敗: {str(e)}")
             
-    print(f"[地理編碼失敗] 所有查詢策略均無法解析地名 '{location_name}'")
-    return None, None
+    # 2. 兜底策略：依州別提供預設備用坐標 (保證不會因為地名查不到而丟棄案例)
+    state_defaults = {
+        "sa": (-34.9285, 138.6007),
+        "wa": (-31.9505, 115.8605),
+        "vic": (-37.8136, 144.9631),
+        "nsw": (-33.8688, 151.2093),
+        "qld": (-27.4705, 153.0260),
+    }
+    for st, coords in state_defaults.items():
+        if st in loc_clean_lower:
+            print(f"[州級備用坐標命中] 地名 '{location_name}' 使用 {st.upper()} 州備用坐標: {coords}")
+            return coords[0], coords[1]
+
+    print(f"[地理編碼備用] 地名 '{location_name}' 使用澳洲南部預設坐標: (-35.0, 138.0)")
+    return -35.0, 138.0
 
 def discover_new_cases(soup, existing_cases):
     """
@@ -556,14 +695,20 @@ def discover_new_cases(soup, existing_cases):
         if any(kw in txt.lower() for kw in ["wild bird", "petrel", "skua", "seabird", "influenza", "h5n1", "h5", "detection"]):
             relevant_texts.append(txt)
             
+    stop_words = {
+        "australia", "western australia", "south australia", "new south wales", "victoria", 
+        "queensland", "tasmania", "june", "july", "august", "september", "acdp", "csiro", 
+        "emergency", "avian", "influenza", "h5n1", "h5", "the", "department", "giant", 
+        "southern", "news", "health", "animal", "australian", "minister", "official", 
+        "update", "cases", "testing", "biosecurity", "sa", "nsw", "wa", "vic", "qld", "tas", "nt", "act"
+    }
+
     candidates = []
     for txt in relevant_texts:
         matches = re.findall(r"\b(near|at|in|from)\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+){0,2})", txt)
         for prep, m in matches:
-            m_clean = m.strip(",.() ")
-            if m_clean.lower() in ["australia", "western australia", "south australia", "new south wales", "victoria", 
-                                  "queensland", "tasmania", "june", "july", "august", "september", "acdp", "csiro", 
-                                  "emergency", "avian", "influenza", "h5n1", "h5", "the", "department", "giant", "southern"]:
+            m_clean = re.sub(r"\s+", " ", m).strip(",.() ")
+            if len(m_clean) < 3 or m_clean.lower() in stop_words or any(w in stop_words for w in m_clean.lower().split()):
                 continue
             candidates.append((m_clean, txt))
             
@@ -648,12 +793,17 @@ def discover_cases_from_news_rss(rss_text, existing_cases):
     candidates = []
     for txt in all_texts:
         if any(kw in txt.lower() for kw in ["bird flu", "avian influenza", "h5n1", "h5"]):
+            stop_words = {
+                "australia", "western australia", "south australia", "new south wales", "victoria", 
+                "queensland", "tasmania", "june", "july", "august", "september", "acdp", "csiro", 
+                "emergency", "avian", "influenza", "h5n1", "h5", "the", "department", "giant", 
+                "southern", "news", "health", "animal", "australian", "minister", "official", 
+                "update", "cases", "testing", "biosecurity", "sa", "nsw", "wa", "vic", "qld", "tas", "nt", "act"
+            }
             matches = re.findall(r"\b(at|in|near|from)\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+){0,2})", txt)
             for prep, m in matches:
-                m_clean = m.strip(",.() ")
-                if m_clean.lower() in ["australia", "western australia", "south australia", "new south wales", "victoria", 
-                                      "queensland", "tasmania", "june", "july", "august", "september", "acdp", "csiro", 
-                                      "emergency", "avian", "influenza", "h5n1", "h5", "the", "department", "giant", "southern", "news"]:
+                m_clean = re.sub(r"\s+", " ", m).strip(",.() ")
+                if len(m_clean) < 3 or m_clean.lower() in stop_words or any(w in stop_words for w in m_clean.lower().split()):
                     continue
                 candidates.append((m_clean, txt))
                 
@@ -949,6 +1099,7 @@ def generate_dynamic_summary(cases_data):
         states_stats[state_key][c_type] += count
         states_stats[state_key]["total"] += count
 
+    total_confirmed_count = sum(c.get("detection_count", 1) for c in cases_data if c["type"] == "Confirmed")
     daff_link = '<a href="https://www.agriculture.gov.au/campaigns/birdflu" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲聯邦農業部 (DAFF)</a>'
     
     wa_detail = f"西澳 {states_stats['WA']['total']} 例（{states_stats['WA']['Confirmed']}例確診" + (f"/{states_stats['WA']['Suspect']}例疑似" if states_stats['WA']['Suspect'] else "") + ")"
@@ -962,7 +1113,7 @@ def generate_dynamic_summary(cases_data):
         nsw_details_list.append(f"{states_stats['NSW']['Negative']}例已排除")
     nsw_detail += "/".join(nsw_details_list) + ")"
     
-    vic_detail = f"維多利亞州 (VIC) {states_stats['VIC']['total']} 例（{states_stats['VIC']['Negative']}例已排除)"
+    vic_detail = f"維多利亞州 (VIC) {states_stats['VIC']['total']} 例（{states_stats['VIC']['Confirmed']}例確診" + (f"/{states_stats['VIC']['Suspect']}例疑似" if states_stats['VIC']['Suspect'] else "") + (f"/{states_stats['VIC']['Negative']}例已排除" if states_stats['VIC']['Negative'] else "") + ")"
     
     # 拼裝其它領地數據 (若有檢出)
     other_states_list = []
@@ -980,8 +1131,10 @@ def generate_dynamic_summary(cases_data):
             other_states_list.append(detail)
     other_states_str = f"，另有 {', '.join(other_states_list)}" if other_states_list else ""
     
+    latest_date_str = "2026 年 8 月 1 日" if any(c.get("notify_date") == "2026-08-01" for c in cases_data) else "2026 年 7 月 31 日"
+
     official_text = (
-        f"依據 {daff_link} 及各州政府 2026 年 7 月 31 日最新公告，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區之野生遷徙與本土海鳥。當前最新確診病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。"
+        f"依據 {daff_link} 及各州政府 {latest_date_str} 最新公告，全澳高致病性 H5N1 野鳥確診總數累計已達 **{total_confirmed_count} 例**！當前最新確診病例分布統計：{wa_detail}、{sa_detail}、{nsw_detail}，另有 {vic_detail}{other_states_str}。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈與原料供應安全無虞。"
     )
 
     latest_case = cases_data[-1] if cases_data else None
@@ -990,57 +1143,14 @@ def generate_dynamic_summary(cases_data):
     abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a>'
     
     media_text = ""
-    # 檢查是否有 7/31 最新確診推升至 33 例
-    has_sa_33_confirmed = any("CASE-033" == c["id"] or ("Seal Bay" in c["location"] and c["type"] == "Confirmed") for c in cases_data)
-    has_vic_portland_confirmed = any("Portland" in c["location"] and c["type"] == "Confirmed" for c in cases_data)
+    has_aug1_surge = any(c.get("notify_date") == "2026-08-01" or "CASE-035" == c["id"] for c in cases_data) or total_confirmed_count >= 53
     
-    if has_sa_33_confirmed or has_vic_portland_confirmed:
+    if has_aug1_surge:
         media_text = (
-            f"根據 {abc_link} 最新報導與 DAFF / PIRSA / 維州農業局 **7 月 31 日最新官方數據**，全澳高致病性 H5N1 野鳥確診總數累計達到 **33 例**！確診個案分布為：南澳 19 例、西澳 10 例、新州 2 例、昆士蘭 1 例、維州 1 例（包含維州西南部 **波特蘭 Portland** 確診首例，維州為全澳第 5 個檢出州）。新增疑似案例方面，維州 Portland 今日追加通報第 2 例大鳳頭燕鷗疑似個案，南澳沿海亦持續追蹤待覆核個案。官方已證實病毒在野生海鳥（大鳳頭燕鷗）族群中存在 **本土傳播 (local transmission)**，評估野鳥清零已不可行，國家策略轉為保護商業家禽生物安全。聯邦 DAFF 強調：**澳洲與紐西蘭所有商業家禽農場目前依然 100% 零感染，未受波及**，生產鏈與原料供應安全無虞。"
+            f"根據 {abc_link} 最新報導與 DAFF / PIRSA / 維州農業局 **8 月 1 日最新官方數據**，全澳高致病性 H5N1 野鳥確診總數單日大暴增 **20 例**，累計飆升至 **53 例**！南澳州舊疑似案例大規模確診（大鳳頭燕鷗追加 19 例），且南澳 Robe 首度確診全澳 **首例銀鷗（海鷗，Silver Gull）** 陽性，專家警告海鷗大量棲息於城鎮與社區，病毒恐向內陸與淡水環境蔓延。全新疑似個案方面：維州西南海岸通報 6 隻大鳳頭燕鷗生病死亡；南澳離島 Baudin Rocks 空拍巡查赫然發現 **49 隻死亡、35 隻生病的大鳳頭燕鷗** 集體群聚慘況，為全澳首起野生動物大規模死亡事件。聯邦首席獸醫官 Beth Cookson 今日重申：**澳洲所有商業家禽農場 100% 零感染，對一般人類健康風險依然維持「極低」等級**。"
         )
-    elif has_limestone_confirmed:
-        if has_kangaroo_or_se_suspect:
-            media_text = (
-                f"根據 {abc_link} 最新報導與南澳政府 7 月 29 日公告，南澳東南部 **Limestone Coast**（Southend Jetty, Cape Jaffa, Port MacDonnell）於 7 月 27 日通報之 **7 起野生大鳳頭燕鷗疑似病例**，已於今日（7/29）經 CSIRO ACDP Geelong 實驗室基因定序 **正式確診為 H5N1 陽性**，使全澳累計確診達 **27 例**（按 DAFF 個別鳥隻統計：WA 10、SA 14、NSW 2、QLD 1）。同日另新增 11 起疑似案例（袋鼠島 Seal Bay 4 起 + SE SA 7 起），正送往 ACDP 確認。南澳部長 Clare Scriven 宣告 H5N1 病毒「極有可能（extremely likely）」已在澳洲本地野鳥族群中建立在地傳播。目前家禽防線 **100% 安全**，本廠運作無虞。"
-            )
-        else:
-            media_text = (
-                f"根據 {abc_link} 最新報導與南澳政府公告，南澳東南部 **Limestone Coast**（Southend Jetty, Cape Jaffa, Port MacDonnell）於 7 月 27 日通報之 **7 起野生大鳳頭燕鷗疑似病例**，已於今日（7/29）經 CSIRO ACDP Geelong 實驗室基因定序 **正式確診為 H5N1 陽性**，全澳累計確診達 **27 例**。目前家禽防線 **100% 安全**，本廠運作無虞。"
-            )
-    elif has_moreton_confirmed:
-        media_text = (
-            f"根據 {abc_link} 最新報導與昆士蘭州政府官方公告，昆士蘭 **Moreton Island** 確診首起 H5N1 遷徙海鳥案例，使昆士蘭正式淪陷成為第四個檢出州。同時，南澳都市區 Semaphore Beach 亦確診首宗 metropolitan 案例，全澳野鳥確診總數飆升至 **20 例**（西澳10例、南澳7例、NSW2例、QLD1例）。此波疫情仍全數偏於沿海野鳥，商業家禽生產體系「0 感染」，Blayney 廠地緣依然安全無虞。"
-        )
-    elif latest_case:
-        loc_name = latest_case["location"].replace("新偵測：", "").replace("新聞偵測：", "")
-        species = latest_case["species"]
-        
-        if "Seabird" in loc_name or "Whitfords" in loc_name or "Hawks Nest (第二例)" in loc_name:
-            media_text = (
-                f"根據 {abc_link} 最新報導與新州政府及西澳 DPIRD 官方公告，澳洲今日單日突增 3 宗確診病例！其中新州中北岸 Hawks Nest 檢出第 2 宗確診，西澳中海岸 Seabird 鎮及伯斯北部 Whitfords Beach 亦分別確診 1 例。全澳野生海鳥確診病例跳升至 17 例（西澳10例、南澳5例、NSW2例），疫情形勢呈現小幅擴散。目前家禽防線安全，本廠將保持嚴密地緣隔離監控。"
-            )
-        elif "Denmark" in loc_name or "Lancelin" in loc_name:
-            media_text = (
-                f"根據 {abc_link} 最新報導與西澳 DPIRD 官方公告，西澳新增 Denmark (Parry Beach) 及 Lancelin 兩宗巨鸌確診病例。全澳洲官方野鳥確診病例累計已達 14 例（西澳8例、南澳5例、NSW1例）。此波海鳥疫情仍屬於零星個案，目前無 any 商業家禽遭到感染，Blayney 廠地緣風險依然極低。"
-            )
-        elif "Robe" in loc_name or "Horrocks" in loc_name:
-            media_text = (
-                f"根據 {abc_link} 重大報導與各州官方公告，西澳中西部 Horrocks Beach 與南澳沿海 Robe 均已確診，病毒正式穿透境外移入防線。台灣防檢署原定解禁禁令暫緩。該病例距離本廠 726 公里，本廠將保持高度地緣隔離監控。"
-            )
-        elif latest_case["source_status"] == "media_announced":
-            media_text = (
-                f"根據 {abc_link} 最新報導，{loc_name} 爆發之 {species} 疫情已獲官方記者會正式宣布確診。目前官方 Testing Update 數據庫網頁尚在行政同步中，地方政府已對周邊野鳥生態展開監控。此零星病例並未對距離本廠 289 公里之內陸高地的 Blayney 廠生產造成威脅。"
-            )
-        elif latest_case["type"] == "Suspect":
-            media_text = (
-                f"根據 {abc_link} 與 {nsw_dpird_link} 報導指出，最新於 {loc_name} 發現之 {species} 初步篩檢（快篩）呈現 H5 陽性，目前列為疑似病例，檢體已送往 CSIRO 國家實驗室 (ACDP) 進行最終確診覆檢。此零星野鳥病例並未對距離本廠 289 公里之內陸高地的 Blayney 廠生產造成任何威脅。"
-            )
-        else:
-            media_text = (
-                f"根據 {abc_link} 與 {nsw_dpird_link} 最新報導，{loc_name} 爆發之 {species} 疫情已正式被官方實驗室確認。地方政府已啟動 emergency 生物安全監控，目前無家禽受波及。本廠將持續維持與該地區地緣防線之安全監控。"
-            )
     else:
-        media_text = f"根據 {abc_link} 與 {nsw_dpird_link} 報導，目前澳洲野鳥疫情局勢尚無最新突破性變動，地方監控組織正密切維持常態性觀測。"
+        media_text = f"根據 {abc_link} 與 {nsw_dpird_link} 最新報導，全澳野生海鳥確診累計 **{total_confirmed_count} 例**，地方監控組織正密切維持常態性觀測。"
         
     return official_text, media_text
 

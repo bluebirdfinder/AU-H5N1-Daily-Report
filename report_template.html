@@ -585,10 +585,10 @@
                 const loc = c.location;
                 const count = c.detection_count || 1;
                 if (loc.includes('西澳') || loc.includes('WA') || loc.includes('Esperance') || loc.includes('Dunsborough') || loc.includes('Roses') || loc.includes('Mullaloo') || loc.includes('Horrocks') || loc.includes('Denmark') || loc.includes('Lancelin') || loc.includes('Seabird') || loc.includes('Whitfords')) stateCounts.WA += count;
-                else if (loc.includes('南澳') || loc.includes('SA') || loc.includes('Fleurieu') || loc.includes('Fowlers') || loc.includes('Robe') || loc.includes('Yorke') || loc.includes('Kangaroo') || loc.includes('Vincent') || loc.includes('Semaphore') || loc.includes('Southend') || loc.includes('Jaffa') || loc.includes('MacDonnell') || loc.includes('Lincoln') || loc.includes('Limestone')) stateCounts.SA += count;
+                else if (loc.includes('南澳') || loc.includes('SA') || loc.includes('Fleurieu') || loc.includes('Fowlers') || loc.includes('Robe') || loc.includes('Yorke') || loc.includes('Kangaroo') || loc.includes('Vincent') || loc.includes('Semaphore') || loc.includes('Southend') || loc.includes('Jaffa') || loc.includes('MacDonnell') || loc.includes('Lincoln') || loc.includes('Limestone') || loc.includes('Beachport') || loc.includes('Baudin')) stateCounts.SA += count;
                 else if (loc.includes('新南威爾斯') || loc.includes('NSW') || loc.includes('Hawks Nest')) stateCounts.NSW += count;
                 else if (loc.includes('昆士蘭') || loc.includes('QLD') || loc.includes('Moreton') || loc.includes('Noosa')) stateCounts.QLD += count;
-                else if (loc.includes('維多利亞') || loc.includes('VIC') || loc.includes('Portland')) stateCounts.VIC += count;
+                else if (loc.includes('維多利亞') || loc.includes('VIC') || loc.includes('Portland') || loc.includes('Victoria')) stateCounts.VIC += count;
             });
 
             const gridEl = document.getElementById('by-state-grid');

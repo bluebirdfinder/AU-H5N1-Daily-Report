@@ -1,14 +1,52 @@
-# 任務追蹤：HPAI 疫情監控程式優化 (已完成)
+# 任務追蹤：澳洲 H5N1 疫情地圖自動更新系統 (已完成)
 
 ## 待辦事項
-- `[x]` 修改 `monitor.py` 的程式邏輯
-  - `[x]` 移除舊的輔助過濾函數 `is_new_nz_newsletter` 和 `is_new_wahis_report`
-  - `[x]` 優化 USDA 看板的日期判定，加入 7 天時間過濾限制
-  - `[x]` 重構紐西蘭 MPI 篩選與狀態一次性寫入邏輯
-  - `[x]` 重構澳洲新聞 RSS（擴充搜尋關鍵字、新增 `.gov.au` 與 WHA 優先排序，狀態一次性寫入）
-  - `[x]` 重構 WOAH WAHIS 篩選與狀態一次性寫入邏輯
-  - `[x]` 實作 `call_gemini_api` 的 429 重試（30秒退避）與成功後自動等待（15秒延遲）機制
-- `[x]` 執行測試驗證
-  - `[x]` 空狀態測試：刪除 `status.json` 後運行，確認只發送 2026 最新一筆，但將其餘舊資料全部寫入 `status.json` (驗證成功，見 task-561)
-  - `[x]` 重複執行測試：有狀態下再次運行，確認全部跳過，Telegram 不重複收到訊息 (驗證成功，見 task-573)
-- `[x]` 更新 `walkthrough.md` 說明完成的工作
+- `[x]` 建立新專案 `AU_H5N1_Daily_Update`
+  - `[x]` 建立專案資料夾與 workflows 目錄
+  - `[x]` 寫入 `h5n1.py`
+  - `[x]` 寫入 `report_template.html`
+  - `[x]` 寫入 `.github/workflows/auto_update.yml`
+  - `[x]` 建立 `README.md` 說明文件
+- `[x]` 執行本地編譯與驗證
+  - `[x]` 執行 `python h5n1.py` 生成 `index.html`
+  - `[x]` 驗證新專案 `index.html` 是否正常
+- `[x]` 升級全自動地理定位與 NSW DPIRD 官網監控
+  - `[x]` 整合 `https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza`
+  - `[x]` 導入 OpenStreetMap Nominatim 地理編碼 API
+  - `[x]` 實作動態地點提取與防重覆演算法
+  - `[x]` 新增最短地緣距離動態計算 (Haversine 公式)
+  - `[x]` 新增自適應動態參考文獻庫 (References)
+  - `[x]` 實作新聞 RSS 交叉確診過濾（全自動 C 方案）
+  - `[x]` 在明細表格與地圖彈窗加上精緻的 `⚠️ 媒體先行` Badge 標籤
+  - `[x]` 根據 7/5 最新官方結果更新 Hawks Nest 為確診 (Confirmed)
+  - `[x]` 根據 6/30 西澳官方結果將 Roses Beach (CASE-005) 更新為官方已確診
+  - `[x]` 新增 7/6 最新確診病例 CASE-008 (Mullaloo Beach) 到資料庫中，標記為官方已確認
+  - `[x]` 指引使用者開啟 GitHub Actions 寫入權限，解決 `git push` 權限阻礙問題
+  - `[x]` 修改 CASE-004 地名為 Dunsborough (Quindalup)，解決與 Gemini 表格的地名落差
+  - `[x]` 新增 CASE-009 (Negative) 維多利亞州沿海地區排除案，補齊東海岸安全排除點
+  - `[x]` 修正 7/10 本土留鳥大突破（SA Robe 案例等 5 例），補齊南澳 PIRSA 官網爬取
+  - `[x]` 升級全澳洲 8 州/領地官方站點聯防爬蟲網絡
+  - `[x]` 修正 DAFF 與 SA PIRSA 的最新正確專區 URL 連結
+  - `[x]` 實作防 Link Rot 新聞 RSS 兜底定位與多段式退避地緣搜尋 (解決 Horrocks Beach 案例)
+  - `[x]` 對齊官方 7/16 最新數據（全澳累計 14 例確診：WA 8例, SA 5例, NSW 1例）
+  - `[x]` 對齊官方 7/17 最新數據（全澳累計 17 例確診：WA 10例, SA 5例, NSW 2例）
+  - `[x]` 修正 `discover_new_cases` 的同地熱點第二案例誤殺過濾 Bug
+  - `[x]` 同步更新 `README.md`、`report_template.html`、`.github/workflows/auto_update.yml`、`walkthrough.md`、`task.md` 的修改時間與說明
+  - `[x]` 對齊官方 7/22 最新數據（全澳累計 17 例確診：WA 10例, SA 5例, NSW 2例）
+  - `[x]` 新增昆士蘭 Noosa Main Beach (CASE-021, Negative) 疑似排除個案
+  - `[x]` 升級動態參考資料庫以支援 QLD 官網動態追加
+  - `[x]` 對齊官方 7/26 最新數據（全澳累計 20 例確診：WA 10例, SA 7例, NSW 2例, QLD 1例）
+  - `[x]` 新增南澳 Semaphore Beach、Robe Marina (第二例) 及昆士蘭 Moreton Island 確診個案
+  - `[x]` 優化 `h5n1.py` 爬蟲模擬真實瀏覽器 (UA 輪換) 與 Timeout 加速防死鎖
+  - `[x]` 對齊官方 7/27 最新疑似病例，新增南澳 Limestone Coast（Southend Jetty, Cape Jaffa, Port MacDonnell）共 7 起疑似大鳳頭燕鷗案例
+  - `[x]` 實作前後端雙重 CORS 代理與瀏覽器端自適應實時同步機制，徹底解決 WAF IP 屏蔽與 CORS 跨域限制
+  - `[x]` 參考美國 USDA APHIS 樣式，改版「巨型 KPI 指標卡片」與「月度堆疊柱狀/折線混合圖表 (Month-Year)」，並支援前端實時同步動態聯動
+  - `[x]` 對齊 DAFF 7/30 下午最新數據（全澳累計 28 例確診：SA 15例, WA 10例, NSW 2例, QLD 1例, VIC 1例）
+  - `[x]` 徹底排查並修復數據重複計算 (Double Counting) Bug（刪除重複 CASE-029，將 CASE-028 修正為 Suspect，使 Confirmed 加總精確對齊為 28 例）
+  - `[x]` 升級「各州分佈細分 (By State)」為動態 JavaScript 渲染，自動反應維州 (VIC 1例) 與南澳 (SA 15例) 的真實動態變化
+  - `[x]` 全面升級爬蟲抗阻擋與雲端代理中繼架構 (整合 Cloudflare Worker 代理、curl_cffi TLS 指紋偽裝與 Playwright 真實無頭瀏覽器，徹底解決 GitHub Actions 機房 IP 封鎖)
+  - `[x]` 對齊 DAFF / PIRSA / 維州農業局 8/1 最新疫情大暴增（全澳累計 53 例確診：SA 39例, WA 10例, NSW 2例, QLD 1例, VIC 1例）
+  - `[x]` 新增 CASE-035 (SA 大鳳頭燕鷗 19 隻確診)、CASE-036 (全澳首例銀鷗/海鷗確診)、CASE-037 (維州西南海岸 6 例疑似)、CASE-038 (南澳 Baudin Rocks 84 隻大規模死亡/生病事件)
+  - `[x]` 解決 GitHub Actions 對 Nominatim API 的 IP 封鎖與 403/429 限制（新增內建 LOCAL_GAZETTEER、Cloudflare 地理編碼代理轉接與州級預設坐標備用）
+  - `[x]` 優化動態地點提取防雜訊過濾器（剔除 health, animal, australian 等非地名單字與換行符號）
+- `[x]` 全面更新與校對所有專案檔案（h5n1.py, report_template.html, index.html, README.md, walkthrough.md, task.md, .github/workflows/auto_update.yml）
