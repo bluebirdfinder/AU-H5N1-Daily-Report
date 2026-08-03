@@ -56,7 +56,8 @@
 
 ### 3. 地理座標 API 降級策略 (Geocoding Fallback Chain)
 - **Local Gazetteer（離線地名快取庫）**：優先比對常見重要城鎮，0 延遲且免去 API 限流風險。
-- **Nominatim API (OpenStreetMap)**：實作多段退避機制（自動剔除 "Beach", "Jetty", "Coast" 等邊緣字尾，提高匹配率）。
+- **Nominatim API (OpenStreetMap Rate Limit 防護)**：嚴格符合 OpenStreetMap Usage Policy 規範，每次 API 請求間加入 `time.sleep(1.0)` 延遲，防止多個新地點併發請求時觸發 HTTP 429 Rate Limit。
+- **多段退避**：自動剔除 "Beach", "Jetty", "Coast" 等邊緣字尾，提高匹配率。
 - **Geocoding Proxy**：將 Nominatim 請求同樣透過 Cloudflare Worker 轉接，避免 GitHub Actions 共享 IP 被 OpenStreetMap 封鎖。
 
 ### 4. 智慧自動對帳與盲區補齊機制 (Reconciliation Engine)

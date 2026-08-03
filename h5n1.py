@@ -644,6 +644,8 @@ def get_coordinates_from_api(location_name):
     if cf_worker_url:
         for q in queries:
             try:
+                import time
+                time.sleep(1.0)
                 nom_target = f"https://nominatim.openstreetmap.org/search?q={requests.utils.quote(q)}&format=json&limit=1"
                 proxy_target = f"{cf_worker_url}/?url={requests.utils.quote(nom_target)}"
                 print(f"  [Cloudflare 地理編碼代理] 正在透過 Cloudflare 轉接查詢 Nominatim: '{q}' ...")
@@ -667,7 +669,7 @@ def get_coordinates_from_api(location_name):
         }
         try:
             import time
-            time.sleep(0.5)
+            time.sleep(1.0)
             response = requests.get(url, params=params, headers=headers, timeout=5, verify=False)
             if response.status_code == 200:
                 data = response.json()
