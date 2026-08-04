@@ -1022,7 +1022,16 @@ def fetch_daff_updates():
     else:
         print(f"警告: Google News RSS 連線失敗。")
         
+    # 載入歷史病例庫 (避免排程重新執行時丟失舊動態個案)
+    existing_index_cases = load_existing_index_cases()
     cases = json.loads(json.dumps(DEFAULT_CASES))
+    
+    # 聯集歷史數據 (以 id 避重)
+    existing_ids = {c["id"] for c in cases}
+    for ec in existing_index_cases:
+        if ec["id"] not in existing_ids:
+            cases.append(ec)
+            existing_ids.add(ec["id"])
     
     # 官方比對輔助函數
     def check_confirmed_in_soups(target_soups, location_keyword):
@@ -1072,30 +1081,85 @@ def fetch_daff_updates():
         if not any(abs(c["latitude"] - nc["latitude"]) + abs(c["longitude"] - nc["longitude"]) < 0.1 for c in cases):
             cases.append(nc)
 
-    # 3. 第三道防線：智慧對帳與盲區自動補齊機制 (Reconciliation Engine)
-    # 解析官方各州已知底線目標 (若官網爬取解析出新目標會自動擴充，預設為最新官方對帳基準)
-    target_state_totals = {"WA": 10, "SA": 42, "NSW": 2, "QLD": 1, "VIC": 7}
-    
-    # 嘗試從所有抓取到的官方及新聞 HTML/Text 中動態動態提取官方數字
+    # 3. 第三道防線：超強廣義正則對帳引擎 (Reconciliation Engine)
     all_combined_text = " ".join([s.get_text() for s in soups if s]) + " " + abc_rss_text
-    for state_name_en, state_key in [("Western Australia", "WA"), ("South Australia", "SA"), 
-                                     ("New South Wales", "NSW"), ("Queensland", "QLD"), 
-                                     ("Victoria", "VIC")]:
-        match = re.search(fr"{state_name_en}(?:\s*\([A-Z]+\))?\s*[:-]\s*(\d+)", all_combined_text, re.IGNORECASE)
-        if match:
-            extracted_num = int(match.group(1))
-            if extracted_num > target_state_totals.get(state_key, 0):
-                target_state_totals[state_key] = extracted_num
+    target_state_totals, national_target = extract_official_totals(all_combined_text)
 
-    cases = reconcile_state_counts(cases, target_state_totals)
+    cases = reconcile_state_counts(cases, target_state_totals, national_target)
 
     return cases
 
-def reconcile_state_counts(cases, target_state_totals):
+def load_existing_index_cases():
     """
-    智慧對帳系統：比對現有病例點與官方各州控制目標 (target_state_totals)。
-    若官方數字 (如 SA: 42) > 目前已提取座標的病例總數，
-    則自動發起盲區補齊，生成『官方已確診，未公布具體地點』的盲區病例節點。
+    從現有的 index.html 中讀取歷史 window.H5N1_CASES 病例數據庫。
+    防止排程重複執行時因為舊新聞過期而丟失過往已抓取到的動態病例。
+    """
+    index_path = "index.html"
+    if not os.path.exists(index_path):
+        return []
+    try:
+        with open(index_path, "r", encoding="utf-8") as f:
+            html_content = f.read()
+        match = re.search(r'window\.H5N1_CASES\s*=\s*/\*\s*CASES_DATABASE_PLACEHOLDER\s*\*/\s*(\[.*?\])\s*;', html_content, re.DOTALL)
+        if match:
+            loaded = json.loads(match.group(1))
+            print(f"[歷史數據繼承] 成功從既有 index.html 讀取 {len(loaded)} 筆歷史病例資料！")
+            return loaded
+    except Exception as e:
+        print(f"[歷史數據繼承警告] 無法讀取 index.html: {str(e)}")
+    return []
+
+def extract_official_totals(all_text):
+    """
+    超強廣義正則對帳引擎：
+    多角度掃描澳洲聯邦與各州官方與新聞文字，提煉全澳總確診數與各州確診數。
+    """
+    target_state_totals = {"WA": 10, "SA": 42, "NSW": 2, "QLD": 1, "VIC": 7}
+    national_target = 62
+
+    # 1. 各州廣義對帳模式 (匹配如: SA: 45, South Australia 45, 45 in SA, SA (45 cases), South Australia reported 45)
+    state_patterns = [
+        ("WA", [r"Western Australia(?:\s*\([A-Z]+\))?\s*[:-]?\s*(\d+)", r"\bWA\s*[:-]?\s*(\d+)", r"(\d+)\s*(?:confirmed\s*)?(?:cases|detections)?\s*in\s*(?:Western Australia|WA)", r"(?:Western Australia|WA)\s*(?:has\s*)?(?:reported|confirmed|recorded)?\s*(\d+)"]),
+        ("SA", [r"South Australia(?:\s*\([A-Z]+\))?\s*[:-]?\s*(\d+)", r"\bSA\s*[:-]?\s*(\d+)", r"(\d+)\s*(?:confirmed\s*)?(?:cases|detections)?\s*in\s*(?:South Australia|SA)", r"(?:South Australia|SA)\s*(?:has\s*)?(?:reported|confirmed|recorded)?\s*(\d+)"]),
+        ("NSW", [r"New South Wales(?:\s*\([A-Z]+\))?\s*[:-]?\s*(\d+)", r"\bNSW\s*[:-]?\s*(\d+)", r"(\d+)\s*(?:confirmed\s*)?(?:cases|detections)?\s*in\s*(?:New South Wales|NSW)", r"(?:New South Wales|NSW)\s*(?:has\s*)?(?:reported|confirmed|recorded)?\s*(\d+)"]),
+        ("VIC", [r"Victoria(?:\s*\([A-Z]+\))?\s*[:-]?\s*(\d+)", r"\bVIC\s*[:-]?\s*(\d+)", r"(\d+)\s*(?:confirmed\s*)?(?:cases|detections)?\s*in\s*(?:Victoria|VIC)", r"(?:Victoria|VIC)\s*(?:has\s*)?(?:reported|confirmed|recorded)?\s*(\d+)"]),
+        ("QLD", [r"Queensland(?:\s*\([A-Z]+\))?\s*[:-]?\s*(\d+)", r"\bQLD\s*[:-]?\s*(\d+)", r"(\d+)\s*(?:confirmed\s*)?(?:cases|detections)?\s*in\s*(?:Queensland|QLD)", r"(?:Queensland|QLD)\s*(?:has\s*)?(?:reported|confirmed|recorded)?\s*(\d+)"]),
+    ]
+
+    for key, patterns in state_patterns:
+        for pat in patterns:
+            for m in re.finditer(pat, all_text, re.IGNORECASE):
+                try:
+                    num = int(m.group(1))
+                    if 1 <= num <= 500 and num > target_state_totals[key]:
+                        target_state_totals[key] = num
+                        print(f"[對帳引擎提取成功] 偵測到 {key} 最新對帳控制目標: {num} 例 (模式: {pat})")
+                except:
+                    pass
+
+    # 2. 全澳總數對帳模式 (匹配如: 65 confirmed detections in Australia, total of 65 cases)
+    national_patterns = [
+        r"(\d+)\s*(?:confirmed\s*)?(?:h5\s*)?(?:detections|cases)?\s*(?:in|across|throughout)\s*Australia",
+        r"Australia\s*(?:wide|total)?\s*[:-]?\s*(\d+)\s*(?:cases|detections)?",
+        r"total\s*of\s*(\d+)\s*(?:confirmed\s*)?(?:h5\s*)?(?:cases|detections)",
+        r"cumulative\s*total\s*(?:of\s*)?(\d+)"
+    ]
+    for pat in national_patterns:
+        for m in re.finditer(pat, all_text, re.IGNORECASE):
+            try:
+                num = int(m.group(1))
+                if 50 <= num <= 1000 and num > national_target:
+                    national_target = num
+                    print(f"[全澳總數對帳成功] 偵測到全澳洲最新總確診控制目標: {num} 例 (模式: {pat})")
+            except:
+                pass
+
+    return target_state_totals, national_target
+
+def reconcile_state_counts(cases, target_state_totals, national_target=62):
+    """
+    智慧對帳系統：比對現有病例點與官方各州控制目標 (target_state_totals) 及全澳總目標 (national_target)。
+    若官方數字 > 目前已提取座標的病例總數，則自動發起盲區補齊。
     """
     state_mapping = [
         ("西澳", "WA", -31.9505, 115.8605, "西澳沿海地區"),
@@ -1122,6 +1186,7 @@ def reconcile_state_counts(cases, target_state_totals):
                 pass
     case_idx = max_id + 1
 
+    # 1. 補齊各州落差
     for name_zh, key, default_lat, default_lon, default_loc in state_mapping:
         target = target_state_totals.get(key, 0)
         curr = current_counts.get(key, 0)
@@ -1143,7 +1208,29 @@ def reconcile_state_counts(cases, target_state_totals):
             }
             print(f"[智慧對帳補齊] {name_zh} 自動補齊 {gap} 例盲區確診 (ID: {new_blind_case['id']})")
             cases.append(new_blind_case)
+            current_counts[key] += gap
             case_idx += 1
+
+    # 2. 檢查全澳總數是否有剩餘對帳落差
+    total_confirmed = sum(current_counts.values())
+    national_gap = national_target - total_confirmed
+    if national_gap > 0:
+        new_national_case = {
+            "id": f"CASE-{case_idx:03d}",
+            "type": "Confirmed",
+            "source_status": "official_reconciled",
+            "detection_count": national_gap,
+            "species": f"野生海鳥 {national_gap} 隻 (全澳總數即時對帳)",
+            "location": "澳洲沿海地區 (全澳對帳/細分待公布)",
+            "latitude": -34.0,
+            "longitude": 138.0,
+            "found_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+            "notify_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+            "confirm_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+            "notes": f"【全澳總數自動對帳】聯邦 DAFF/媒體最新數據確認全澳累計確診達 {national_target} 例。其中 {national_gap} 例尚待各州發布細分，系統自動對齊全澳總數。"
+        }
+        print(f"[全澳總數對帳補齊] 自動補齊全澳剩餘落差 {national_gap} 例 (ID: {new_national_case['id']})")
+        cases.append(new_national_case)
 
     return cases
 
