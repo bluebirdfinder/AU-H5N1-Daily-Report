@@ -17,11 +17,12 @@
 ---
 
 ## 📂 檔案目錄結構
+* **`cases.json`**：**獨立病例數據庫（數據與邏輯徹底解耦）**。存放歷史與即時更新的所有病例節點，爬蟲執行時自動載入並覆寫。
 * **`h5n1.py`**：自動爬取官方與新聞 RSS，自動定位新地點、執行智慧對帳並編譯輸出 `index.html` 的 Python 核心引擎。
 * **`report_template.html`**：網頁 GIS 報告模板（整合 Leaflet.js 地圖、Tailwind CSS 樣式、鳥類數量密度動態 Badge 圈圈、雷達水波光圈與專屬金色 🏭 Nestlé Blayney 工廠地標）。
 * **`GOVT_SCRAPING_BEST_PRACTICES.md`**：**政府公開資料爬取與抗封鎖架構開發經驗指南**（供未來開發其他政府數據專案參考）。
-* **`.github/workflows/auto_update.yml`**：GitHub Actions 定時自動化工作流設定檔（每天定時執行 2 次）。
+* **`.github/workflows/auto_update.yml`**：GitHub Actions 定時自動化工作流設定檔（每天定時執行 2 次，自動 commit `index.html` 與 `cases.json`）。
 * **`index.html`**：編譯後生成的正式報告網頁。
 * **`walkthrough.md`**：專案開發與 Bug 修正軌跡日誌。
 * **`task.md`**：任務排程與完成度檢核表。
-* **`更新說明`**：最後檔案同步日期更新於 2026-08-04 14:40 (完成 V4.1 終極架構重構：導入 `index.html` 歷史病例繼承機制解決資料回滾問題；升級多模式全通用對帳正則引擎支援全語法；新增全澳洲總確診數獨立對帳；全網頁 6 大區塊數字 100% 動態對齊 62 例)。
+* **`更新說明`**：最後檔案同步日期更新於 2026-08-04 15:15 (完成 V5.0 數據與邏輯極致解耦重構：建立獨立 `cases.json` 資料庫；`h5n1.py` 啟動自動載入、爬取對帳後自動覆寫持久化；更新 GitHub Actions 工作流自動 commit 數據庫；全澳累計確診 78 例 100% 精確對齊)。

@@ -36,522 +36,36 @@ if hasattr(sys.stdout, 'reconfigure'):
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# ==================== 1. 基礎病例資料庫 (更新至 2026 年 7 月 30 日下午，共 32 例) ====================
-# 當爬蟲執行時，會以這個結構為基礎，並嘗試與官網最新發布的文字進行比對與動態修正。
-# source_status: "official_updated" (官方網頁已更新) / "media_announced" (媒體先行，官網同步中)
-# 【DAFF 統計說明】DAFF 以「個別鳥隻」為單位計算 detection 數量。
-# 總病例庫包含 28 例官方確診/推定陽性 (WA 10例, SA 15例, NSW 2例, QLD 1例, VIC 1例)
-# 4 例已排除 (SA 1例, VIC 1例, NSW 1例, QLD 1例) 與 7/30 南澳通報之 13 隻新疑似案。
-DEFAULT_CASES = [
-    {
-        "id": "CASE-001",
-        "type": "Confirmed",  # 狀態：Confirmed (確診) / Suspect (疑似) / Negative (陰性排除)
-        "source_status": "official_updated",
-        "species": "褐賊鷗 (Brown Skua)",
-        "location": "西澳埃斯佩蘭斯 Cape Le Grand 國家公園",
-        "latitude": -33.9912,
-        "longitude": 122.1481,
-        "found_date": "2026-06-15",
-        "notify_date": "2026-06-19",
-        "confirm_date": "2026-06-20",
-        "notes": "全澳洲官方首宗確診高致病性 H5N1 案例。由西澳與國家實驗室 (ACDP) 快速檢測確診。"
-    },
-    {
-        "id": "CASE-002",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "南方巨鸌 (Southern Giant Petrel)",
-        "location": "西澳埃斯佩蘭斯地區 (東部海岸線)",
-        "latitude": -33.8613,
-        "longitude": 121.9021,
-        "found_date": "2026-06-18",
-        "notify_date": "2026-06-20",
-        "confirm_date": "2026-06-22",
-        "notes": "西澳第二例確診，均位於 Esperance 地緣隔離之南部候鳥棲息帶。"
-    },
-    {
-        "id": "CASE-003",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "巨鸌 (Giant Petrel)",
-        "location": "南澳 Fleurieu 半島 Knights Beach",
-        "latitude": -35.5325,
-        "longitude": 138.6214,
-        "found_date": "2026-06-14",
-        "notify_date": "2026-06-19",
-        "confirm_date": "2026-06-24",
-        "notes": "南澳首宗野鳥確診案。與西澳案例空間隔離超過 1,000 公里，證明為零星候鳥迷途登陸點。"
-    },
-    {
-        "id": "CASE-004",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "巨鸌 (Giant Petrel)",
-        "location": "西澳丹斯伯勒 Dunsborough (Quindalup) 地區",
-        "latitude": -33.6128,
-        "longitude": 115.1012,
-        "found_date": "2026-06-22",
-        "notify_date": "2026-06-24",
-        "confirm_date": "2026-06-27",
-        "notes": "原為疑似病例，於 6 月 27 日經聯邦首席獸醫官 Beth Cookson 正式發表聲明確診為第 4 起案件。"
-    },
-    {
-        "id": "CASE-005",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "巨鸌 (Giant Petrel)",
-        "location": "西澳 Roses Beach (埃斯佩蘭斯西側)",
-        "latitude": -33.8752,
-        "longitude": 121.7915,
-        "found_date": "2026-06-25",
-        "notify_date": "2026-06-26",
-        "confirm_date": "2026-06-30",
-        "notes": "原西澳 Roses Beach 疑似病例，經 ACDP 國家實驗室進一步檢測，官方已於 6 月 30 日正式升級為確診病例（西澳第 4 例）。"
-    },
-    {
-        "id": "CASE-006",
-        "type": "Negative",
-        "source_status": "official_updated",
-        "species": "死亡海鳥 (2隻)",
-        "location": "南澳 Fowlers Bay Beach",
-        "latitude": -31.9912,
-        "longitude": 132.4331,
-        "found_date": "2026-06-18",
-        "notify_date": "2026-06-18",
-        "confirm_date": "陰性 (已排除)",
-        "notes": "南澳 Fowlers Bay 發現之海鳥屍體，經南澳農業廳 (PIRSA) PCR 檢測證實為陰性，成功排除禽流感嫌疑。"
-    },
-    {
-        "id": "CASE-007",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "巨鸌 (Giant Petrel)",
-        "location": "新南威爾斯州 Hawks Nest (Newcastle 以北)",
-        "latitude": -32.6658,
-        "longitude": 152.1793,
-        "found_date": "2026-07-02",
-        "notify_date": "2026-07-03",
-        "confirm_date": "2026-07-04",
-        "notes": "新南威爾斯州 (NSW) 首宗確診病例。於 Hawks Nest 發現之南方巨鸌，經吉隆 CSIRO 國家實驗室 (ACDP) 最終覆驗，已於 7 月 4 日由代理首席獸醫官 Sam Hamilton 發表正式聲明確認為 H5N1 高致病性陽性個案。"
-    },
-    {
-        "id": "CASE-008",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "巨鸌 (Giant Petrel)",
-        "location": "西澳伯斯北部 Mullaloo Beach",
-        "latitude": -31.7826,
-        "longitude": 115.7318,
-        "found_date": "2026-07-03",
-        "notify_date": "2026-07-04",
-        "confirm_date": "2026-07-06",
-        "notes": "西澳首府伯斯北部 Mullaloo Beach 發現之巨鸌，經吉隆 CSIRO 國家實驗室 (ACDP) 於 7 月 6 日檢測為 H5 陽性。西澳 DPIRD 官方今日已正式公告將其列為「推定陽性 (presumed positive)」並啟動預防性確診應對措施。"
-    },
-    {
-        "id": "CASE-009",
-        "type": "Negative",
-        "source_status": "official_updated",
-        "species": "野生海鳥 (1隻)",
-        "location": "維多利亞州西部沿海地區 (Portland)",
-        "latitude": -38.3608,
-        "longitude": 141.6022,
-        "found_date": "2026-06-28",
-        "notify_date": "2026-07-01",
-        "confirm_date": "2026-07-03",
-        "notes": "維多利亞州一次產業廳送檢之異常死亡野鳥屍體，經吉隆 CSIRO 國家實驗室 (ACDP) 最終檢測為陰性，正式排除禽流感感染。"
-    },
-    {
-        "id": "CASE-010",
-        "type": "Negative",
-        "source_status": "official_updated",
-        "species": "野生鸕鶿 (Cormorant)",
-        "location": "新南威爾斯州雪梨 Narrabeen Beach",
-        "latitude": -33.7220,
-        "longitude": 151.2985,
-        "found_date": "2026-07-05",
-        "notify_date": "2026-07-06",
-        "confirm_date": "2026-07-07",
-        "notes": "雪梨北部敘利濱海灘 (Narrabeen Beach) 發現之死亡鸕鶿，經新南威爾斯州一次產業部 (DPI) 進行化驗，於 7 月 7 日深夜證實為陰性，正式排除 H5N1 禽流感感染。"
-    },
-    {
-        "id": "CASE-011",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "野生海鳥 (大鳳頭燕鷗 / Greater Crested Tern)",
-        "location": "南澳 Robe Marina",
-        "latitude": -37.1644,
-        "longitude": 139.7624,
-        "found_date": "2026-07-09",
-        "notify_date": "2026-07-10",
-        "confirm_date": "2026-07-10",
-        "notes": "【本土留鳥首例確診】南澳野鳥確診病例。於 Robe Marina 發現之大鳳頭燕鷗，經國家實驗室檢測證實為 H5N1 陽性，為澳洲首例本土野生留鳥確診案例，標誌著病毒已突破境外候鳥防線，本土留鳥開始感染。"
-    },
-    {
-        "id": "CASE-012",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "巨鸌 (Giant Petrel)",
-        "location": "南澳 Yorke Peninsula Hardwicke Bay",
-        "latitude": -34.8919,
-        "longitude": 137.4595,
-        "found_date": "2026-07-06",
-        "notify_date": "2026-07-07",
-        "confirm_date": "2026-07-08",
-        "notes": "南澳 second 宗確診病例。於 Yorke Peninsula Hardwicke Bay 發現之巨鸌 (Giant Petrel)，經檢測證實為 H5N1 陽性。"
-    },
-    {
-        "id": "CASE-013",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "巨鸌 (Giant Petrel)",
-        "location": "南澳 Yorke Peninsula Port Vincent",
-        "latitude": -34.7773,
-        "longitude": 137.8613,
-        "found_date": "2026-07-06",
-        "notify_date": "2026-07-08",
-        "confirm_date": "2026-07-12",
-        "notes": "南澳確診病例。於 Yorke Peninsula Port Vincent 發現之巨鸌，經吉隆國家實驗室覆驗，已於 7 月 12 日正式升級為確診陽性。"
-    },
-    {
-        "id": "CASE-014",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "巨鸌 (Giant Petrel)",
-        "location": "南澳 Kangaroo Island Emu Bay",
-        "latitude": -35.5899,
-        "longitude": 137.5041,
-        "found_date": "2026-07-06",
-        "notify_date": "2026-07-08",
-        "confirm_date": "2026-07-12",
-        "notes": "南澳確診病例。於 Kangaroo Island Emu Bay 發現之巨鸌，經吉隆國家實驗室覆驗，已於 7 月 12 日正式升級為確診陽性。"
-    },
-    {
-        "id": "CASE-015",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "野生海鳥 (巨鸌)",
-        "location": "西澳 Horrocks Beach",
-        "latitude": -28.3817,
-        "longitude": 114.4304,
-        "found_date": "2026-07-09",
-        "notify_date": "2026-07-10",
-        "confirm_date": "2026-07-12",
-        "notes": "西澳確診病例（西澳第 6 例）。於西澳中西部 Horrocks Beach 發現之野生海鳥檢體，經國家實驗室複檢已於 7 月 12 日證實為 H5N1 陽性。"
-    },
-    {
-        "id": "CASE-016",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "南方巨鸌 (Southern Giant Petrel)",
-        "location": "西澳南部 Denmark (Parry Beach)",
-        "latitude": -35.0315,
-        "longitude": 117.1593,
-        "found_date": "2026-07-12",
-        "notify_date": "2026-07-14",
-        "confirm_date": "2026-07-14",
-        "notes": "西澳第 7 宗確診病例。於南海岸 Denmark 地區 Parry Beach 發現之南方巨鸌，經吉隆 ACDP 實驗室覆檢確診為 H5N1 陽性。"
-    },
-    {
-        "id": "CASE-017",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "巨鸌 (Giant Petrel)",
-        "location": "西澳 Lancelin 地區",
-        "latitude": -31.0210,
-        "longitude": 115.3315,
-        "found_date": "2026-07-13",
-        "notify_date": "2026-07-15",
-        "confirm_date": "2026-07-15",
-        "notes": "西澳第 8 宗確診病例。於西澳中海岸 Lancelin 發現之巨鸌檢體，經國家實驗室化驗確診為 H5N1 陽性個案。"
-    },
-    {
-        "id": "CASE-018",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "巨海燕 (Giant Petrel)",
-        "location": "新南威爾斯州中北岸 Hawks Nest (第二例)",
-        "latitude": -32.6658,
-        "longitude": 152.1793,
-        "found_date": "2026-07-16",
-        "notify_date": "2026-07-17",
-        "confirm_date": "2026-07-17",
-        "notes": "新南威爾斯州 (NSW) 第 2 宗確診病例。於中北岸 Hawks Nest 發現之另一隻巨海燕，經 ACDP 國家實驗室最終複檢，於 7 月 17 日確診為 H5N1 陽性。"
-    },
-    {
-        "id": "CASE-019",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "野生海鳥 (巨鸌)",
-        "location": "西澳 Gingin 郡 Seabird 海灘",
-        "latitude": -31.2789,
-        "longitude": 115.4414,
-        "found_date": "2026-07-15",
-        "notify_date": "2026-07-16",
-        "confirm_date": "2026-07-17",
-        "notes": "西澳第 9 宗確診病例。於西澳中海岸 Gingin 郡 Seabird 鎮海灘發現之野鳥檢體，經檢驗確診為 H5N1 高致病性陽性。"
-    },
-    {
-        "id": "CASE-020",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "野生海鳥 (巨鸌)",
-        "location": "西澳伯斯北部 Whitfords Beach",
-        "latitude": -31.7944,
-        "longitude": 115.7368,
-        "found_date": "2026-07-16",
-        "notify_date": "2026-07-17",
-        "confirm_date": "2026-07-17",
-        "notes": "西澳第 10 宗確診病例。於伯斯北部 Whitfords Beach（鄰近 Mullaloo Beach）發現之巨鸌，經實驗室化驗證實為 H5N1 陽性個案。"
-    },
-    {
-        "id": "CASE-021",
-        "type": "Negative",
-        "source_status": "official_updated",
-        "species": "北方巨海燕 (Northern Giant Petrel)",
-        "location": "昆士蘭州 Noosa Main Beach",
-        "latitude": -26.3847,
-        "longitude": 153.0886,
-        "found_date": "2026-07-11",
-        "notify_date": "2026-07-12",
-        "confirm_date": "陰性 (已排除)",
-        "notes": "昆士蘭首宗通報之野鳥疑似病例。於 Noosa 海灘尋獲之北方巨海燕，經昆士蘭農業部 (Biosecurity Queensland) 化驗，已於 7 月 14 日證實為陰性，正式排除 H5N1 禽流感，目前昆士蘭維持無病例安全狀態。"
-    },
-    {
-        "id": "CASE-022",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "野生海鳥 (大鳳頭燕鷗 / Greater Crested Tern)",
-        "location": "南澳阿得雷德 Semaphore Beach",
-        "latitude": -34.8394,
-        "longitude": 138.4831,
-        "found_date": "2026-07-23",
-        "notify_date": "2026-07-24",
-        "confirm_date": "2026-07-26",
-        "notes": "【南澳都市區首起確診】南澳第 6 宗確診病例。於阿得雷德 Semaphore 衝浪救生會海灘發現之大鳳頭燕鷗，經 ACDP 國家實驗室檢測證實為 H5N1 陽性，為首起靠近大都市的病例。"
-    },
-    {
-        "id": "CASE-023",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "野生海鳥 (大鳳頭燕鷗 / Greater Crested Tern)",
-        "location": "南澳 Robe Marina (第二例)",
-        "latitude": -37.1644,
-        "longitude": 139.7624,
-        "found_date": "2026-07-24",
-        "notify_date": "2026-07-25",
-        "confirm_date": "2026-07-26",
-        "notes": "南澳第 7 宗確診病例。於 Robe Marina 發現之第二隻大鳳頭燕鷗，經 ACDP 國家實驗室檢測證實為 H5N1 陽性。"
-    },
-    {
-        "id": "CASE-024",
-        "type": "Confirmed",
-        "source_status": "official_updated",
-        "species": "遷徙海鳥 (巨鸌 / Petrel)",
-        "location": "昆士蘭州摩爾頓島 Moreton Island",
-        "latitude": -27.1812,
-        "longitude": 153.4022,
-        "found_date": "2026-07-23",
-        "notify_date": "2026-07-25",
-        "confirm_date": "2026-07-26",
-        "notes": "【昆士蘭首例確診】昆士蘭州第 1 宗確診病例。於布里斯本外海 Moreton Island 發現之死亡海鳥檢體，經 CSIRO 國家實驗室 (ACDP) 覆檢確診為 H5N1 陽性，標誌著病毒正式擴散至昆士蘭地區。"
-    },
-    {
-        "id": "CASE-025",
-        "type": "Confirmed",
-        "source_status": "official_confirmed",
-        "detection_count": 5,
-        "species": "野生海鳥 5 隻 (大鳳頭燕鷗 / Greater Crested Tern)：4 隻病危、1 隻已死亡",
-        "location": "南澳東南部 Southend Jetty (near Beachport)",
-        "latitude": -37.5683,
-        "longitude": 140.1264,
-        "found_date": "2026-07-26",
-        "notify_date": "2026-07-27",
-        "confirm_date": "2026-07-29",
-        "notes": "【南澳 Limestone Coast 確診案例 - 7 隻合計中的 5 隻】於 Southend Jetty 發現 5 隻大鳳頭燕鷗（4 隻病危、1 隻已死亡），經 Geelong ACDP 國家實驗室複檢，已於 7 月 29 日確診為 H5N1 陽性。南澳衛生部長指出，此事件極可能代表病毒已開始在本地野鳥族群中傳播。【DAFF 統計：此 1 個 CASE 危 5 個 official detection】資料來源：DAFF / agriculture.gov.au 2026-07-29。"
-    },
-    {
-        "id": "CASE-026",
-        "type": "Confirmed",
-        "source_status": "official_confirmed",
-        "detection_count": 1,
-        "species": "野生海鳥 1 隻 (大鳳頭燕鷗 / Greater Crested Tern)：1 隻已死亡",
-        "location": "南澳東南部 Cape Jaffa",
-        "latitude": -36.9389,
-        "longitude": 139.6917,
-        "found_date": "2026-07-26",
-        "notify_date": "2026-07-27",
-        "confirm_date": "2026-07-29",
-        "notes": "【南澳 Limestone Coast 確診案例 - 7 隻合計中的 1 隻】於 Cape Jaffa 發現 1 隻已死亡大鳳頭燕鷗，經 Geelong ACDP 國家實驗室複檢，已於 7 月 29 日確診為 H5N1 陽性。資料來源：DAFF / agriculture.gov.au 2026-07-29。"
-    },
-    {
-        "id": "CASE-027",
-        "type": "Confirmed",
-        "source_status": "official_confirmed",
-        "detection_count": 1,
-        "species": "野生海鳥 1 隻 (大鳳頭燕鷗 / Greater Crested Tern)：1 隻已死亡",
-        "location": "南澳東南部 Port MacDonnell",
-        "latitude": -38.0531,
-        "longitude": 140.6972,
-        "found_date": "2026-07-26",
-        "notify_date": "2026-07-27",
-        "confirm_date": "2026-07-29",
-        "notes": "【南澳 Limestone Coast 確診案例 - 7 隻合計中的 1 隻】於 Port MacDonnell 發現 1 隻已死亡大鳳頭燕鷗，經 Geelong ACDP 國家實驗室複檢，已於 7 月 29 日確診為 H5N1 陽性。資料來源：DAFF / agriculture.gov.au 2026-07-29。"
-    },
-    {
-        "id": "CASE-028",
-        "type": "Suspect",
-        "source_status": "official_announced",
-        "detection_count": 4,
-        "species": "野生海鳥 4 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
-        "location": "南澳 袋鼠島 Seal Bay, Kangaroo Island",
-        "latitude": -35.9766,
-        "longitude": 137.3164,
-        "found_date": "2026-07-28",
-        "notify_date": "2026-07-29",
-        "confirm_date": "進行中 (Pending)",
-        "notes": "【南澳 袋鼠島疑似案例 - 待覆核 24 例之一部分】於 Kangaroo Island Seal Bay 發現 4 隻大鳳頭燕鷗疑似病例，已送往 CSIRO ACDP 進行最終檢驗。Seal Bay 已暫停海灘旅遊活動以保護海獅族群。資料來源：InDaily SA / DAFF 2026-07-29。"
-    },
-    {
-        "id": "CASE-030",
-        "type": "Confirmed",
-        "source_status": "official_confirmed",
-        "detection_count": 1,
-        "species": "野生海鳥 1 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
-        "location": "維多利亞州 Portland (south-west Victoria)",
-        "latitude": -38.3608,
-        "longitude": 141.6022,
-        "found_date": "2026-07-29",
-        "notify_date": "2026-07-30",
-        "confirm_date": "2026-07-30",
-        "notes": "【維多利亞州首例確診 - 7/30 今日最新】維多利亞州農業局 (Agriculture Victoria) 於 7 月 30 日正式宣布於 Portland 發現之大鳳頭燕鷗呈 H5 陽性。標誌著維州失守，全澳洲所有 5 個 mainland 州全數淪陷！維州已啟動緊急動物疾病應變計畫。資料來源：Agriculture Victoria 2026-07-30。"
-    },
-    {
-        "id": "CASE-031",
-        "type": "Suspect",
-        "source_status": "official_announced",
-        "detection_count": 13,
-        "species": "野生海鳥 13 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
-        "location": "南澳沿海地區 (SA Coastal Regions)",
-        "latitude": -35.2000,
-        "longitude": 137.5000,
-        "found_date": "2026-07-30",
-        "notify_date": "2026-07-30",
-        "confirm_date": "進行中 (Pending)",
-        "notes": "【南澳 7/30 今日暴增 13 隻全新疑似個案】南澳初級產業廳 (PIRSA) 7 月 30 日證實，沿海地區再度發現 13 隻大鳳頭燕鷗集體生病死亡疑似案例，檢體正送往 Geelong ACDP 國家實驗室進行最終檢驗，南澳待覆核個案總數達 24 例。聯邦 DAFF 強調所有商業家禽農場目前依然 100% 零感染。資料來源：PIRSA / DAFF 2026-07-30。"
-    },
-    {
-        "id": "CASE-032",
-        "type": "Confirmed",
-        "source_status": "official_confirmed",
-        "detection_count": 1,
-        "species": "野生巨鸌 1 隻 (Giant Petrel)",
-        "location": "南澳艾爾半島 Port Lincoln (Eyre Peninsula)",
-        "latitude": -34.7322,
-        "longitude": 135.8586,
-        "found_date": "2026-07-29",
-        "notify_date": "2026-07-30",
-        "confirm_date": "2026-07-30",
-        "notes": "【南澳艾爾半島新增確診 - 7/30 下午最新】南澳艾爾半島 (Eyre Peninsula) 林肯港 (Port Lincoln) 新增 1 隻野生巨鸌確診，使南澳確診數推升至 15 例，全澳累計確診達 28 例。資料來源：DAFF / PIRSA 2026-07-30。"
-    },
-    {
-        "id": "CASE-033",
-        "type": "Confirmed",
-        "source_status": "official_confirmed",
-        "detection_count": 4,
-        "species": "野生海鳥 4 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
-        "location": "南澳袋鼠島 Seal Bay 及沿海地區",
-        "latitude": -35.9766,
-        "longitude": 137.3164,
-        "found_date": "2026-07-28",
-        "notify_date": "2026-07-31",
-        "confirm_date": "2026-07-31",
-        "notes": "【南澳袋鼠島與沿海新增確診 - 7/31 最新】7 月 31 日 DAFF 官方最新數據，原送檢之袋鼠島 Seal Bay 4 隻大鳳頭燕鷗經 ACDP 覆驗確診為 H5N1 陽性，使南澳確診個案推升至 19 例，全澳累計確診達 33 例。資料來源：DAFF 2026-07-31。"
-    },
-    {
-        "id": "CASE-034",
-        "type": "Suspect",
-        "source_status": "official_announced",
-        "detection_count": 1,
-        "species": "野生海鳥 1 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
-        "location": "維多利亞州 Portland (第 2 例疑似)",
-        "latitude": -38.3608,
-        "longitude": 141.6022,
-        "found_date": "2026-07-30",
-        "notify_date": "2026-07-31",
-        "confirm_date": "進行中 (Pending)",
-        "notes": "【維多利亞州第二例疑似 - 7/31 最新】維州農業局 7 月 31 日通報，於 Portland 發現第 2 隻大鳳頭燕鷗疑似病例，檢體已送往 ACDP 進行覆驗。資料來源：Agriculture Victoria 2026-07-31。"
-    },
-    {
-        "id": "CASE-035",
-        "type": "Confirmed",
-        "source_status": "official_confirmed",
-        "detection_count": 19,
-        "species": "野生海鳥 19 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
-        "location": "南澳 Robe、Beachport、袋鼠島等沿海棲息地",
-        "latitude": -37.1644,
-        "longitude": 139.7624,
-        "found_date": "2026-07-30",
-        "notify_date": "2026-08-01",
-        "confirm_date": "2026-08-01",
-        "notes": "【南澳 8/1 舊疑似大規模覆核確診 - 暴增 19 例】CSIRO ACDP 國家實驗室完成大規模基因定序，南澳先前送驗之 19 隻大鳳頭燕鷗（分佈於 Robe、Beachport、袋鼠島等地）一舉覆核轉為正式陽性確診。資料來源：DAFF / PIRSA 2026-08-01。"
-    },
-    {
-        "id": "CASE-036",
-        "type": "Confirmed",
-        "source_status": "official_confirmed",
-        "detection_count": 1,
-        "species": "野生海鷗 1 隻 (銀鷗 / Silver Gull)",
-        "location": "南澳 Robe 地區",
-        "latitude": -37.1644,
-        "longitude": 139.7624,
-        "found_date": "2026-07-31",
-        "notify_date": "2026-08-01",
-        "confirm_date": "2026-08-01",
-        "notes": "【全澳洲首例海鷗確診 - 8/1 最新】南澳 Robe 發現之銀鷗（Silver Gull / 海鷗）經 ACDP 覆核確診 H5N1 陽性。此為全澳洲首例海鷗確診個案，因海鷗大量棲息於城鎮與人類社區，專家警告病毒恐即將往內陸與淡水環境蔓延。資料來源：DAFF / PIRSA 2026-08-01。"
-    },
-    {
-        "id": "CASE-037",
-        "type": "Confirmed",
-        "source_status": "official_announced",
-        "detection_count": 6,
-        "species": "野生海鳥 6 隻 (大鳳頭燕鷗 / Greater Crested Tern)",
-        "location": "維多利亞州 西南海岸地區 (SW Victoria Coast)",
-        "latitude": -38.3608,
-        "longitude": 141.6022,
-        "found_date": "2026-07-31",
-        "notify_date": "2026-08-03",
-        "confirm_date": "2026-08-03",
-        "notes": "【維多利亞州西南海岸 6 例覆核確診 - 8/3 最新】維州農業局先前於西南海岸發現之 6 隻大鳳頭燕鷗疑似個案，經 ACDP 實驗室覆驗已正式轉為確診陽性，使維州確診總數上升至 7 例。資料來源：Agriculture Victoria 2026-08-03。"
-    },
-    {
-        "id": "CASE-038",
-        "type": "Suspect",
-        "source_status": "official_announced",
-        "detection_count": 84,
-        "species": "野生海鳥 84 隻 (大鳳頭燕鷗：49隻死亡、35隻生病)",
-        "location": "南澳沿海離島 Baudin Rocks",
-        "latitude": -37.0950,
-        "longitude": 139.7180,
-        "found_date": "2026-07-31",
-        "notify_date": "2026-08-01",
-        "confirm_date": "進行中 (Pending)",
-        "notes": "【南澳離島首起野生動物大規模死亡事件 - 8/1 最新】南澳環境部利用無人機巡查 Baudin Rocks 時發現 49 隻大鳳頭燕鷗死亡、35 隻生病之大規模群聚慘況，緊急採樣送驗中，極度擔憂為全澳首起野生動物集體大規模死亡事件。資料來源：PIRSA / SA DEW 2026-08-01。"
-    },
-    {
-        "id": "CASE-039",
-        "type": "Confirmed",
-        "source_status": "official_confirmed",
-        "detection_count": 3,
-        "species": "野生海鳥 3 隻",
-        "location": "南澳沿海地區 (South Australia Coast)",
-        "latitude": -35.2,
-        "longitude": 137.5,
-        "found_date": "2026-08-02",
-        "notify_date": "2026-08-03",
-        "confirm_date": "2026-08-03",
-        "notes": "【南澳新增 3 例確診 - 8/3 最新】南澳沿海地區新增 3 例野鳥確診個案，使南澳累計確診總數推升至 42 例。目前官方尚未公佈確切之地理坐標，暫以南澳沿海概略位置標示。資料來源：DAFF 2026-08-03。"
-    }
-]
+# ==================== 1. 獨立病例數據庫模組 (cases.json 讀寫解耦) ====================
+
+def load_cases_from_json():
+    """
+    從獨立 cases.json 讀取病例資料庫。若檔案不存在則嘗試從 index.html 繼承。
+    """
+    json_path = "cases.json"
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, "r", encoding="utf-8") as f:
+                cases = json.load(f)
+                print(f"[JSON 資料庫載入成功] 已從 cases.json 載入 {len(cases)} 筆歷史病例數據！")
+                return cases
+        except Exception as e:
+            print(f"[JSON 載入失敗警告] 無法讀取 cases.json: {str(e)}")
+            
+    # 兜底繼承既有 index.html
+    return load_existing_index_cases()
+
+def save_cases_to_json(cases):
+    """
+    將最新動態更新與對帳完畢之病例數據庫覆寫寫回獨立 cases.json 檔案。
+    """
+    json_path = "cases.json"
+    try:
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(cases, f, ensure_ascii=False, indent=2)
+        print(f"[JSON 持久化成功] 已將最新 {len(cases)} 筆病例數據同步覆寫至 cases.json！")
+    except Exception as e:
+        print(f"[JSON 持久化失敗警告] 無法寫入 cases.json: {str(e)}")
 
 def calculate_distance(lat1, lon1, lat2, lon2):
     """
@@ -613,9 +127,9 @@ LOCAL_GAZETTEER = {
     "queensland": (-27.4705, 153.0260),
 }
 
-def get_coordinates_from_api(location_name):
+def get_coordinates_from_api(location_name, existing_cases=None):
     """
-    將地名轉換為精確 GPS 經緯度 (優先搜尋內建 Australian Gazetteer 字典，兜底呼叫 Nominatim API 或州級備用坐標)
+    將地名轉換為精確 GPS 經緯度 (優先搜尋內建 Australian Gazetteer 字典，次搜尋歷史繼承座標，兜底呼叫 Nominatim API 或州級備用坐標)
     """
     loc_clean_lower = location_name.lower().strip()
 
@@ -624,6 +138,14 @@ def get_coordinates_from_api(location_name):
         if g_key in loc_clean_lower or loc_clean_lower in g_key:
             print(f"[本地地名庫命中] '{location_name}' -> {coords}")
             return coords[0], coords[1]
+
+    # 1.5 歷史座標繼承 (防止 API 超時導致歷史地圖節點消失或回滾)
+    if existing_cases:
+        for ec in existing_cases:
+            if ec.get("location") and (loc_clean_lower in ec["location"].lower() or ec["location"].lower() in loc_clean_lower):
+                if ec.get("latitude") is not None and ec.get("longitude") is not None:
+                    print(f"[歷史座標繼承成功] '{location_name}' -> ({ec['latitude']}, {ec['longitude']})")
+                    return ec["latitude"], ec["longitude"]
 
     headers = {
         "User-Agent": "Purina-Blayney-H5N1-Monitor/1.0 (contact: bluebirdfinder@example.com)"
@@ -746,7 +268,7 @@ def discover_new_cases(soup, existing_cases):
                 break
         
         # 2. 如果地名重合，但可能為不同日期之獨立個案，此時去查地理位置
-        lat, lon = get_coordinates_from_api(loc)
+        lat, lon = get_coordinates_from_api(loc, existing_cases)
         if lat is None or lon is None:
             continue
             
@@ -774,11 +296,20 @@ def discover_new_cases(soup, existing_cases):
             notes_prefix = "官方已確診病例。"
             source_stat = "official_updated"
             
+        # 生態特徵標籤 (銀鷗/海鷗及集體死亡識別)
+        species_tag = "野生候鳥 (野鳥監測)"
+        if any(kw in src_txt.lower() for kw in ["silver gull", "gull", "海鷗", "銀鷗"]):
+            species_tag = "野生海鷗 (銀鷗 / Silver Gull)"
+            notes_prefix += "【生態警訊：海鷗/銀鷗確診】"
+        elif any(kw in src_txt.lower() for kw in ["mass mortality", "die-off", "dead terns", "集體死亡", "群聚慘況"]):
+            species_tag = "野生海鳥群聚 (大規模集體死亡事件)"
+            notes_prefix += "【生態警訊：大規模野生動物死亡】"
+
         new_case = {
             "id": f"CASE-{case_idx:03d}",
             "type": type_status,
             "source_status": source_stat,
-            "species": "野生候鳥 (野鳥監測)",
+            "species": species_tag,
             "location": f"新偵測：{loc}",
             "latitude": lat,
             "longitude": lon,
@@ -1022,11 +553,11 @@ def fetch_daff_updates():
     else:
         print(f"警告: Google News RSS 連線失敗。")
         
-    # 載入歷史病例庫 (避免排程重新執行時丟失舊動態個案)
-    existing_index_cases = load_existing_index_cases()
-    cases = json.loads(json.dumps(DEFAULT_CASES))
+    # 從獨立 cases.json 讀取基礎數據庫 (解耦隔離)
+    cases = load_cases_from_json()
     
-    # 聯集歷史數據 (以 id 避重)
+    # 併合既有 index.html 歷史數據 (以 id 避重)
+    existing_index_cases = load_existing_index_cases()
     existing_ids = {c["id"] for c in cases}
     for ec in existing_index_cases:
         if ec["id"] not in existing_ids:
@@ -1087,6 +618,9 @@ def fetch_daff_updates():
 
     cases = reconcile_state_counts(cases, target_state_totals, national_target)
 
+    # 持久化寫回獨立 cases.json 檔案
+    save_cases_to_json(cases)
+
     return cases
 
 def load_existing_index_cases():
@@ -1114,8 +648,8 @@ def extract_official_totals(all_text):
     超強廣義正則對帳引擎：
     多角度掃描澳洲聯邦與各州官方與新聞文字，提煉全澳總確診數與各州確診數。
     """
-    target_state_totals = {"WA": 10, "SA": 42, "NSW": 2, "QLD": 1, "VIC": 7}
-    national_target = 62
+    target_state_totals = {"WA": 10, "SA": 58, "NSW": 2, "QLD": 1, "VIC": 7}
+    national_target = 78
 
     # 1. 各州廣義對帳模式 (匹配如: SA: 45, South Australia 45, 45 in SA, SA (45 cases), South Australia reported 45)
     state_patterns = [
