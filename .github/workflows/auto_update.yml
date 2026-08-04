@@ -42,8 +42,8 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # 將生成的 index.html 加入暫存區
-          git add index.html
+          # 將生成的 index.html 與數據庫 cases.json 加入暫存區
+          git add index.html cases.json
           
           # 只有在 index.html 內容真正有變更時才執行 commit，避免無意義提交導致 workflow 失敗
           if git diff-index --quiet HEAD --; then
