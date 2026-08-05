@@ -387,7 +387,6 @@
             initTable();
             initMap();
             initChart();
-            syncLiveDAFFData();
         });
 
         // 動態計算全澳累計確診數與各州分佈細分
@@ -793,113 +792,6 @@
             });
         }
 
-        // 4. 實時同步聯邦官網 (DAFF) 數據 (Bypass WAF)
-        async function syncLiveDAFFData() {
-            const banner = document.getElementById('live-sync-banner');
-            const message = document.getElementById('live-sync-message');
-            
-            const proxies = [
-                url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-                url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
-            ];
-            
-            const daffUrl = 'https://www.agriculture.gov.au/campaigns/birdflu';
-            let htmlText = '';
-            
-            for (let getProxyUrl of proxies) {
-                try {
-                    const targetUrl = getProxyUrl(daffUrl);
-                    console.log(`[Live Sync] 正在透過代理請求: ${targetUrl}`);
-                    const res = await fetch(targetUrl);
-                    if (res.ok) {
-                        if (targetUrl.includes('allorigins')) {
-                            const data = await res.json();
-                            htmlText = data.contents;
-                        } else {
-                            htmlText = await res.text();
-                        }
-                        if (htmlText) {
-                            console.log(`[Live Sync] 成功透過代理獲取 DAFF 數據！`);
-                            break;
-                        }
-                    }
-                } catch (e) {
-                    console.warn(`[Live Sync] 代理請求失敗:`, e);
-                }
-            }
-            
-            if (!htmlText) {
-                console.warn('[Live Sync] 所有 CORS 代理均未能成功獲取 DAFF 數據。');
-                banner.className = 'bg-amber-600/90 text-white text-xs px-4 py-2.5 text-center font-medium sticky top-0 z-[100] transition-all duration-300 backdrop-blur border-b border-amber-500/20';
-                message.innerHTML = '⚠️ 聯邦官網反爬防禦較強，實時同步超時。已為您展示定時編譯版本。';
-                return;
-            }
-            
-            try {
-                let wa = 0, sa = 0, nsw = 0, qld = 0, vic = 0;
-                
-                const waMatch = htmlText.match(/(\d+)\s*(?:confirmed\s*)?in\s*Western\s*Australia/i);
-                const saMatch = htmlText.match(/(\d+)\s*(?:confirmed\s*)?in\s*South\s*Australia/i);
-                const nswMatch = htmlText.match(/(\d+)\s*(?:confirmed\s*)?in\s*New\s*South\s*Wales/i);
-                const qldMatch = htmlText.match(/(\d+)\s*(?:confirmed\s*)?in\s*Queensland/i);
-                const vicMatch = htmlText.match(/(\d+)\s*(?:confirmed\s*)?in\s*Victoria/i);
-                
-                if (waMatch) wa = parseInt(waMatch[1]);
-                if (saMatch) sa = parseInt(saMatch[1]);
-                if (nswMatch) nsw = parseInt(nswMatch[1]);
-                if (qldMatch) qld = parseInt(qldMatch[1]);
-                if (vicMatch) vic = parseInt(vicMatch[1]);
-                
-                const totalConfirmed = wa + sa + nsw + qld + vic;
-                console.log(`[Live Sync] 解析結果: WA=${wa}, SA=${sa}, NSW=${nsw}, QLD=${qld}, VIC=${vic}, 總確診=${totalConfirmed}`);
-                
-                const localConfirmed = window.H5N1_CASES.filter(c => c.type === 'Confirmed').reduce((sum, c) => sum + (c.detection_count || 1), 0);
-                
-                if (totalConfirmed > 0) {
-                    banner.className = 'bg-emerald-600/90 text-white text-xs px-4 py-2.5 text-center font-medium sticky top-0 z-[100] transition-all duration-300 backdrop-blur border-b border-emerald-500/20';
-                    
-                    if (totalConfirmed > localConfirmed) {
-                        message.innerHTML = `📢 實時同步成功！檢測到聯邦官網已有最新確診（全澳已達 ${totalConfirmed} 例：WA ${wa}, SA ${sa}, NSW ${nsw}, QLD ${qld}, VIC ${vic}）。網頁數據已動態對齊！`;
-                        
-                        // 動態往本地病例庫中追加虛擬確診病例，讓圖表自動向上增長！
-                        const diff = totalConfirmed - localConfirmed;
-                        const todayStr = new Date().toISOString().split('T')[0];
-                        for (let i = 0; i < diff; i++) {
-                            window.H5N1_CASES.push({
-                                id: `LIVE-CONF-${i+1}`,
-                                type: 'Confirmed',
-                                notify_date: todayStr,
-                                found_date: todayStr,
-                                confirm_date: '實時同步',
-                                location: '沿海未命名野鳥棲息地 (實時同步)',
-                                species: '野生海鳥',
-                                latitude: -30.0,
-                                longitude: 135.0,
-                                notes: '本病例由瀏覽器端實時同步模組檢測並載入，最新資料請以聯邦農業部官網為準。'
-                            });
-                        }
-                        
-                        // 動態修正計數事實描述
-                        const summaryElements = document.getElementsByTagName('p');
-                        for (let p of summaryElements) {
-                            if (p.innerHTML.includes('澳洲官方防線事實')) {
-                                p.innerHTML = `<span class="text-xs text-slate-400 font-bold block uppercase tracking-wider mb-1">📢 澳洲官方防線事實 (Official Status) [實時同步中]</span>
-                                依據澳洲聯邦農業部 (DAFF) 及各州政府最新即時同步，目前全澳所有高致病性 H5N1 檢出均侷限於沿海地區野生海鳥。當前最新確診病例分布：西澳 ${wa} 例、南澳 ${sa} 例、新南威爾斯州 ${nsw} 例、昆士蘭州 ${qld} 例、維多利亞州 ${vic} 例。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈安全無虞。`;
-                            }
-                        }
-                    } else {
-                        message.innerHTML = `✅ 實時同步成功！網頁計數與聯邦 DAFF 官網完全一致 (全澳確診共 ${totalConfirmed} 例)。`;
-                    }
-                    
-                    // 重新刷新圖表，展示最新曲線
-                    initChart();
-                }
-            } catch (err) {
-                console.error('[Live Sync] 解析官網 HTML 出錯:', err);
-                banner.className = 'bg-amber-600/90 text-white text-xs px-4 py-2.5 text-center font-medium sticky top-0 z-[100] transition-all duration-300 backdrop-blur border-b border-amber-500/20';
-                message.innerHTML = '⚠️ 實時同步資料解析失敗。已為您展示定時編譯版本。';
-            }
-        }
     </script>
 </body>
 </html>

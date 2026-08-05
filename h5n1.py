@@ -648,8 +648,8 @@ def extract_official_totals(all_text):
     超強廣義正則對帳引擎：
     多角度掃描澳洲聯邦與各州官方與新聞文字，提煉全澳總確診數與各州確診數。
     """
-    target_state_totals = {"WA": 10, "SA": 58, "NSW": 2, "QLD": 1, "VIC": 7}
-    national_target = 78
+    target_state_totals = {"WA": 10, "SA": 81, "NSW": 2, "QLD": 1, "VIC": 7}
+    national_target = 101
 
     # 1. 各州廣義對帳模式 (匹配如: SA: 45, South Australia 45, 45 in SA, SA (45 cases), South Australia reported 45)
     state_patterns = [
@@ -703,6 +703,9 @@ def reconcile_state_counts(cases, target_state_totals, national_target=62):
         ("昆士蘭", "QLD", -27.4705, 153.0260, "昆州沿海地區"),
     ]
     
+    # 先清理舊有的對帳盲區節點，防止重複執行時盲區點累加導致數字暴增
+    cases = [c for c in cases if c.get("source_status") != "official_reconciled"]
+
     current_counts = {k: 0 for _, k, _, _, _ in state_mapping}
     for c in cases:
         if c["type"] == "Confirmed":
