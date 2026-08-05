@@ -566,28 +566,42 @@
     "id": "CASE-055",
     "type": "Confirmed",
     "source_status": "official_reconciled",
-    "detection_count": 6,
-    "species": "野生海鳥 6 隻 (官方已確診，詳細地點待公布)",
+    "detection_count": 3,
+    "species": "野生海鳥 3 隻 (官方已確診，詳細地點待公布)",
+    "location": "維多利亞沿海地區 (官方確診/未公布細節)",
+    "latitude": -38.3608,
+    "longitude": 141.6022,
+    "found_date": "2026-08-05",
+    "notify_date": "2026-08-05",
+    "confirm_date": "2026-08-05",
+    "notes": "【智慧對帳自動補齊】官方 DAFF/州政府最新數據確認 維多利亞 累計確診達 10 例。其中 3 例官方尚未公布具體海岸/鎮名座標，系統自動錨定至 維多利亞 沿海監控區域以維持對帳 100% 精確。"
+  },
+  {
+    "id": "CASE-056",
+    "type": "Confirmed",
+    "source_status": "official_reconciled",
+    "detection_count": 21,
+    "species": "野生海鳥 21 隻 (官方已確診，詳細地點待公布)",
     "location": "昆士蘭沿海地區 (官方確診/未公布細節)",
     "latitude": -27.4705,
     "longitude": 153.026,
     "found_date": "2026-08-05",
     "notify_date": "2026-08-05",
     "confirm_date": "2026-08-05",
-    "notes": "【智慧對帳自動補齊】官方 DAFF/州政府最新數據確認 昆士蘭 累計確診達 7 例。其中 6 例官方尚未公布具體海岸/鎮名座標，系統自動錨定至 昆士蘭 沿海監控區域以維持對帳 100% 精確。"
+    "notes": "【智慧對帳自動補齊】官方 DAFF/州政府最新數據確認 昆士蘭 累計確診達 22 例。其中 21 例官方尚未公布具體海岸/鎮名座標，系統自動錨定至 昆士蘭 沿海監控區域以維持對帳 100% 精確。"
   },
   {
-    "id": "CASE-056",
+    "id": "CASE-057",
     "type": "Confirmed",
     "source_status": "official_reconciled",
-    "detection_count": 226,
-    "species": "野生海鳥 226 隻 (全澳總數即時對帳)",
+    "detection_count": 208,
+    "species": "野生海鳥 208 隻 (全澳總數即時對帳)",
     "location": "澳洲沿海地區 (全澳對帳/細分待公布)",
     "latitude": -34.0,
     "longitude": 138.0,
     "found_date": "2026-08-05",
     "notify_date": "2026-08-05",
     "confirm_date": "2026-08-05",
-    "notes": "【全澳總數自動對帳】聯邦 DAFF/媒體最新數據確認全澳累計確診達 404 例。其中 226 例尚待各州發布細分，系統自動對齊全澳總數。"
+    "notes": "【全澳總數自動對帳】聯邦 DAFF/媒體最新數據確認全澳累計確診達 404 例。其中 208 例尚待各州發布細分，系統自動對齊全澳總數。"
   }
 ]
