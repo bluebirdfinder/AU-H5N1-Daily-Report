@@ -523,15 +523,15 @@
   },
   {
     "id": "CASE-052",
-    "type": "Suspect",
-    "source_status": "",
+    "type": "Confirmed",
+    "source_status": "official_updated",
     "species": "野生候鳥 (野鳥監測)",
     "location": "新偵測：Northampton",
     "latitude": -28.3667,
     "longitude": 114.6333,
     "found_date": "2026-08-05",
     "notify_date": "2026-08-05",
-    "confirm_date": "進行中 (Pending)",
+    "confirm_date": "2026-08-05",
     "notes": "【動態爬蟲自動生成】動態偵測疑似病例。來源文字段落：\"Testing at CSIRO’s Australian Centre for Disease Preparedness (ACDP)has determined that there has been one additional detection of H5 high pathogenicity avian influenza (bird flu) in a petrel, found at Horrocks Beach near Northampton, Western Australia.\""
   },
   {
