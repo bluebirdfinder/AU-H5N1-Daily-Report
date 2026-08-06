@@ -139,7 +139,7 @@
                         <!-- 核心指標 1：全澳累計確診 -->
                         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/50">
                             <span class="text-slate-400 text-xs block mb-1">野生海鳥累計確診 (Confirmed Flocks)</span>
-                            <span id="confirmed-indicator" class="text-3xl font-black text-red-500 tracking-tight">62 例確診</span>
+                            <span id="confirmed-indicator" class="text-3xl font-black text-red-500 tracking-tight">123 隻確診 (42 起事件)</span>
                         </div>
 
                         <!-- 核心指標 2：受影響家禽 (Nestle 命脈數據) -->
@@ -153,11 +153,11 @@
                         <div class="bg-slate-900/30 p-3.5 rounded-xl border border-slate-700/40 text-xs space-y-2">
                             <span class="text-slate-400 block font-semibold mb-1">各州分佈細分 (By State)</span>
                             <div id="by-state-grid" class="grid grid-cols-2 gap-2 text-slate-300 font-mono">
-                                <div>西澳 (WA): <span class="text-white font-bold">10 例</span></div>
-                                <div>南澳 (SA): <span class="text-white font-bold">42 例</span></div>
-                                <div>新州 (NSW): <span class="text-white font-bold">2 例</span></div>
-                                <div>昆士蘭 (QLD): <span class="text-white font-bold">1 例</span></div>
-                                <div>維州 (VIC): <span class="text-white font-bold">7 例</span></div>
+                                <div>西澳 (WA): <span class="text-white font-bold">10 隻 (10事件)</span></div>
+                                <div>南澳 (SA): <span class="text-white font-bold">87 隻 (22事件)</span></div>
+                                <div>維州 (VIC): <span class="text-white font-bold">23 隻 (7事件)</span></div>
+                                <div>新州 (NSW): <span class="text-white font-bold">2 隻 (2事件)</span></div>
+                                <div>昆州 (QLD): <span class="text-white font-bold">1 隻 (1事件)</span></div>
                             </div>
                         </div>
 
@@ -389,40 +389,49 @@
             initChart();
         });
 
-        // 動態計算全澳累計確診數與各州分佈細分
+        // 動態計算全澳累計確診數與各州分佈細分 (明確區分隻數與事件數)
         function updateKPIs() {
-            let totalConfirmed = 0;
-            const stateCounts = { WA: 0, SA: 0, NSW: 0, VIC: 0, QLD: 0, TAS: 0, NT: 0, ACT: 0 };
+            let totalConfirmedDetections = 0;
+            let totalConfirmedEvents = 0;
+            const stateDetections = { WA: 0, SA: 0, NSW: 0, VIC: 0, QLD: 0, TAS: 0, NT: 0, ACT: 0 };
+            const stateEvents = { WA: 0, SA: 0, NSW: 0, VIC: 0, QLD: 0, TAS: 0, NT: 0, ACT: 0 };
 
             window.H5N1_CASES.forEach(c => {
                 if (c.type === 'Confirmed') {
                     const count = c.detection_count || 1;
-                    totalConfirmed += count;
+                    totalConfirmedDetections += count;
+                    totalConfirmedEvents += 1;
                     const loc = c.location;
-                    if (loc.includes('西澳') || loc.includes('WA')) stateCounts.WA += count;
-                    else if (loc.includes('南澳') || loc.includes('SA')) stateCounts.SA += count;
-                    else if (loc.includes('新南威爾斯') || loc.includes('NSW') || loc.includes('新州')) stateCounts.NSW += count;
-                    else if (loc.includes('維多利亞') || loc.includes('VIC') || loc.includes('維州')) stateCounts.VIC += count;
-                    else if (loc.includes('昆士蘭') || loc.includes('QLD') || loc.includes('昆州')) stateCounts.QLD += count;
-                    else if (loc.includes('塔斯馬尼亞') || loc.includes('TAS')) stateCounts.TAS += count;
-                    else if (loc.includes('北領地') || loc.includes('NT')) stateCounts.NT += count;
-                    else if (loc.includes('首都領地') || loc.includes('ACT')) stateCounts.ACT += count;
+                    let st = 'Other';
+                    if (loc.includes('西澳') || loc.includes('WA')) st = 'WA';
+                    else if (loc.includes('南澳') || loc.includes('SA')) st = 'SA';
+                    else if (loc.includes('新南威爾斯') || loc.includes('NSW') || loc.includes('新州')) st = 'NSW';
+                    else if (loc.includes('維多利亞') || loc.includes('VIC') || loc.includes('維州')) st = 'VIC';
+                    else if (loc.includes('昆士蘭') || loc.includes('QLD') || loc.includes('昆州')) st = 'QLD';
+                    else if (loc.includes('塔斯馬尼亞') || loc.includes('TAS')) st = 'TAS';
+                    else if (loc.includes('北領地') || loc.includes('NT')) st = 'NT';
+                    else if (loc.includes('首都領地') || loc.includes('ACT')) st = 'ACT';
+                    
+                    if (st !== 'Other') {
+                        stateDetections[st] += count;
+                        stateEvents[st] += 1;
+                    }
                 }
             });
 
             const confirmedEl = document.getElementById('confirmed-indicator');
             if (confirmedEl) {
-                confirmedEl.textContent = `${totalConfirmed} 例確診`;
+                confirmedEl.textContent = `${totalConfirmedDetections} 隻確診 (${totalConfirmedEvents} 起事件)`;
             }
 
             const byStateEl = document.getElementById('by-state-grid');
             if (byStateEl) {
                 byStateEl.innerHTML = `
-                    <div>西澳 (WA): <span class="text-white font-bold">${stateCounts.WA} 例</span></div>
-                    <div>南澳 (SA): <span class="text-white font-bold">${stateCounts.SA} 例</span></div>
-                    <div>新州 (NSW): <span class="text-white font-bold">${stateCounts.NSW} 例</span></div>
-                    <div>昆士蘭 (QLD): <span class="text-white font-bold">${stateCounts.QLD} 例</span></div>
-                    <div>維州 (VIC): <span class="text-white font-bold">${stateCounts.VIC} 例</span></div>
+                    <div>西澳 (WA): <span class="text-white font-bold">${stateDetections.WA} 隻 (${stateEvents.WA}事件)</span></div>
+                    <div>南澳 (SA): <span class="text-white font-bold">${stateDetections.SA} 隻 (${stateEvents.SA}事件)</span></div>
+                    <div>維州 (VIC): <span class="text-white font-bold">${stateDetections.VIC} 隻 (${stateEvents.VIC}事件)</span></div>
+                    <div>新州 (NSW): <span class="text-white font-bold">${stateDetections.NSW} 隻 (${stateEvents.NSW}事件)</span></div>
+                    <div>昆州 (QLD): <span class="text-white font-bold">${stateDetections.QLD} 隻 (${stateEvents.QLD}事件)</span></div>
                 `;
             }
         }
@@ -650,34 +659,8 @@
                 cumulativeData.push(cumulativeSum);
             });
             
-            // 更新指標面板 (按 DAFF 官方鳥隻 Detection 總數累加)
-            const confirmedCount = activeCases
-                .filter(c => c.type === 'Confirmed')
-                .reduce((sum, c) => sum + (c.detection_count || 1), 0);
-            document.getElementById('confirmed-indicator').innerText = `${confirmedCount} 例確診`;
-
-            // 動態更新各州分佈細分 (By State)
-            const stateCounts = { WA: 0, SA: 0, NSW: 0, QLD: 0, VIC: 0 };
-            activeCases.filter(c => c.type === 'Confirmed').forEach(c => {
-                const loc = c.location;
-                const count = c.detection_count || 1;
-                if (loc.includes('西澳') || loc.includes('WA') || loc.includes('Esperance') || loc.includes('Dunsborough') || loc.includes('Roses') || loc.includes('Mullaloo') || loc.includes('Horrocks') || loc.includes('Denmark') || loc.includes('Lancelin') || loc.includes('Seabird') || loc.includes('Whitfords')) stateCounts.WA += count;
-                else if (loc.includes('南澳') || loc.includes('SA') || loc.includes('Fleurieu') || loc.includes('Fowlers') || loc.includes('Robe') || loc.includes('Yorke') || loc.includes('Kangaroo') || loc.includes('Vincent') || loc.includes('Semaphore') || loc.includes('Southend') || loc.includes('Jaffa') || loc.includes('MacDonnell') || loc.includes('Lincoln') || loc.includes('Limestone') || loc.includes('Beachport') || loc.includes('Baudin')) stateCounts.SA += count;
-                else if (loc.includes('新南威爾斯') || loc.includes('NSW') || loc.includes('Hawks Nest')) stateCounts.NSW += count;
-                else if (loc.includes('昆士蘭') || loc.includes('QLD') || loc.includes('Moreton') || loc.includes('Noosa')) stateCounts.QLD += count;
-                else if (loc.includes('維多利亞') || loc.includes('VIC') || loc.includes('Portland') || loc.includes('Victoria')) stateCounts.VIC += count;
-            });
-
-            const gridEl = document.getElementById('by-state-grid');
-            if (gridEl) {
-                gridEl.innerHTML = `
-                    <div>西澳 (WA): <span class="text-white font-bold">${stateCounts.WA} 例</span></div>
-                    <div>南澳 (SA): <span class="text-white font-bold">${stateCounts.SA} 例</span></div>
-                    <div>新州 (NSW): <span class="text-white font-bold">${stateCounts.NSW} 例</span></div>
-                    <div>昆士蘭 (QLD): <span class="text-white font-bold">${stateCounts.QLD} 例</span></div>
-                    <div>維州 (VIC): <span class="text-white font-bold">${stateCounts.VIC} 例</span></div>
-                `;
-            }
+            // 更新指標面板 (發起統一 updateKPIs 函式)
+            updateKPIs();
             
             const latestDate = activeCases.length > 0 ? new Date(activeCases.sort((a,b) => new Date(b.notify_date) - new Date(a.notify_date))[0].notify_date) : new Date();
             const sevenDaysAgo = new Date(latestDate);
