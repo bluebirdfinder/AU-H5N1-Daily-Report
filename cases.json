@@ -642,5 +642,47 @@
     "confirm_date": "陰性 (已排除)",
     "detection_count": 1,
     "notes": "Noosa 海灘北方巨海燕經 Biosecurity Queensland 化驗證實為陰性排除。"
+  },
+  {
+    "id": "CASE-S01",
+    "type": "Suspect",
+    "source_status": "official_announced",
+    "species": "野生海鳥 8 隻 (大鳳頭燕鷗)",
+    "location": "南澳東南部 Beachport 沿海地區",
+    "latitude": -37.4833,
+    "longitude": 140.0167,
+    "found_date": "2026-08-05",
+    "notify_date": "2026-08-06",
+    "confirm_date": "進行中 (Pending)",
+    "detection_count": 8,
+    "notes": "【南澳 PIRSA 8/6 今日最新通報】Beachport 發現 8 隻大鳳頭燕鷗初篩疑似陽性反應，檢體正送往 CSIRO ACDP 進行定序覆核。"
+  },
+  {
+    "id": "CASE-S02",
+    "type": "Suspect",
+    "source_status": "official_announced",
+    "species": "野生海鳥 3 隻 (大鳳頭燕鷗)",
+    "location": "南澳袋鼠島 Seal Bay",
+    "latitude": -35.9766,
+    "longitude": 137.3164,
+    "found_date": "2026-08-05",
+    "notify_date": "2026-08-06",
+    "confirm_date": "進行中 (Pending)",
+    "detection_count": 3,
+    "notes": "【南澳 PIRSA 8/6 今日最新通報】袋鼠島 Seal Bay 發現 3 隻大鳳頭燕鷗初篩疑似陽性反應，檢體正送往 ACDP 進行定序覆核。"
+  },
+  {
+    "id": "CASE-S03",
+    "type": "Suspect",
+    "source_status": "official_announced",
+    "species": "野生海鳥 1 隻 (大鳳頭燕鷗)",
+    "location": "南澳 Fleurieu 半島 Port Elliot",
+    "latitude": -35.53,
+    "longitude": 138.68,
+    "found_date": "2026-08-05",
+    "notify_date": "2026-08-06",
+    "confirm_date": "進行中 (Pending)",
+    "detection_count": 1,
+    "notes": "【南澳 PIRSA 8/6 今日最新通報】Port Elliot 發現 1 隻大鳳頭燕鷗初篩疑似陽性反應，檢體正送往 ACDP 進行定序覆核。"
   }
 ]
