@@ -46,7 +46,7 @@
                 <h1 class="text-lg font-bold tracking-tight text-white">Nestlé Purina Blayney • Bio-Security Monitor</h1>
             </div>
             <div class="text-xs text-slate-400">
-                系統最後更新時間: <span class="text-emerald-400 font-semibold">2026-08-06 18:03:26 (台北時間) / 2026-08-06 20:03:26 (澳洲 AEST)</span>
+                系統最後更新時間: <span class="text-emerald-400 font-semibold">2026-08-06 18:18:19 (台北時間) / 2026-08-06 20:18:19 (澳洲 AEST)</span>
             </div>
         </div>
     </header>
@@ -987,7 +987,7 @@
 
             window.H5N1_CASES.forEach(c => {
                 if (c.type === 'Confirmed') {
-                    const count = c.detection_count || 1;
+                    const count = typeof c.detection_count === 'number' ? c.detection_count : 1;
                     totalConfirmedDetections += count;
                     totalConfirmedEvents += 1;
                     const loc = c.location;
@@ -1126,7 +1126,7 @@
                 }
 
                 // 鳥隻數量 (預設為 1)
-                const count = c.detection_count || 1;
+                const count = typeof c.detection_count === 'number' ? c.detection_count : 1;
                 
                 // 根據鳥隻密度動態計算標籤尺寸與波紋特效
                 let size = 12;
@@ -1224,7 +1224,7 @@
                 // 顯示標籤：如「6月W3」
                 const weekLabel = `${month}月W${weekOfMonth}`;
                 
-                const count = c.detection_count || 1;
+                const count = typeof c.detection_count === 'number' ? c.detection_count : 1;
                 if (!weekMap[weekKey]) {
                     weekMap[weekKey] = { Confirmed: 0, Suspect: 0, label: weekLabel };
                 }

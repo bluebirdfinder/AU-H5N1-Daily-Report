@@ -398,7 +398,7 @@
 
             window.H5N1_CASES.forEach(c => {
                 if (c.type === 'Confirmed') {
-                    const count = c.detection_count || 1;
+                    const count = typeof c.detection_count === 'number' ? c.detection_count : 1;
                     totalConfirmedDetections += count;
                     totalConfirmedEvents += 1;
                     const loc = c.location;
@@ -537,7 +537,7 @@
                 }
 
                 // 鳥隻數量 (預設為 1)
-                const count = c.detection_count || 1;
+                const count = typeof c.detection_count === 'number' ? c.detection_count : 1;
                 
                 // 根據鳥隻密度動態計算標籤尺寸與波紋特效
                 let size = 12;
@@ -635,7 +635,7 @@
                 // 顯示標籤：如「6月W3」
                 const weekLabel = `${month}月W${weekOfMonth}`;
                 
-                const count = c.detection_count || 1;
+                const count = typeof c.detection_count === 'number' ? c.detection_count : 1;
                 if (!weekMap[weekKey]) {
                     weekMap[weekKey] = { Confirmed: 0, Suspect: 0, label: weekLabel };
                 }
