@@ -1,14 +1,15 @@
 # This workflow runs the Python scraper twice a day to check for new H5N1 cases in Australia,
 # updates the cases database, recompiles the HTML report, and deploys it.
+# 使用 Playwright 真實 Chromium 瀏覽器繞過 DAFF 官網 WAF 防火牆
 name: H5N1 Report Auto Update
 
 on:
   schedule:
     # 每天定時執行兩次：
-    # 1. 國際標準時間 02:00 (台灣時間 10:00 AM / 澳洲 AEST 12:00 PM)
-    # 2. 國際標準時間 10:00 (台灣時間 06:00 PM / 澳洲 AEST 08:00 PM)
-    - cron: '0 2 * * *'
-    - cron: '0 10 * * *'
+    # 1. 國際標準時間 05:00 (台灣時間 13:00 / 澳洲 AEST 15:00) → DAFF 每日下午更新後抓取
+    # 2. 國際標準時間 23:00 (台灣時間 07:00 / 澳洲 AEST 09:00) → 每日早晨覆核
+    - cron: '0 5 * * *'
+    - cron: '0 23 * * *'
   workflow_dispatch: # 允許您在 GitHub 介面上手動點擊「Run workflow」隨時觸發更新
 
 permissions:
@@ -29,27 +30,53 @@ jobs:
       - name: 3. 安裝網路爬蟲依賴 (Install Python Dependencies)
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 curl_cffi playwright
-          playwright install chromium
+          pip install requests beautifulsoup4 playwright
+          playwright install chromium --with-deps
 
       - name: 4. 執行爬蟲與自動更新 (Run Scraper and Compile HTML)
         env:
           CF_WORKER_URL: ${{ secrets.CF_WORKER_URL }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python h5n1.py
 
-      - name: 5. 偵測變動並推送到 GitHub (Commit and Push Changes)
+      - name: 4b. 同步所有 HTML 輸出 (Sync HTML Outputs)
+        run: |
+          cp index.html live_page.html
+          cp index.html live_page_utf8.html
+
+      - name: 5. 推送 DAFF 截圖到 Telegram (Send DAFF Screenshot to Telegram)
+        if: ${{ secrets.TELEGRAM_BOT_TOKEN != '' && secrets.TELEGRAM_CHAT_ID != '' }}
+        run: |
+          # 尋找最新的 DAFF 截圖
+          SCREENSHOT=$(ls daff_screenshot_*.png 2>/dev/null | sort | tail -n 1)
+          if [ -n "$SCREENSHOT" ]; then
+            echo "發現截圖: $SCREENSHOT，推送至 Telegram..."
+            curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendPhoto" \
+              -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+              -F photo="@${SCREENSHOT}" \
+              -F caption="🦢 澳洲 H5N1 DAFF 官網自動截圖 $(date +'%Y-%m-%d %H:%M') AEST" \
+              > /dev/null
+            echo "Telegram 截圖推送完成！"
+          else
+            echo "未找到 DAFF 截圖（Playwright 可能未成功執行），跳過 Telegram 推送。"
+          fi
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: 6. 偵測變動並推送到 GitHub (Commit and Push Changes)
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # 將生成的 index.html 與數據庫 cases.json 加入暫存區
-          git add index.html cases.json
+          # 將生成的 index.html、數據庫 cases.json 與同步 HTML 加入暫存區
+          git add index.html cases.json live_page.html live_page_utf8.html
           
-          # 只有在 index.html 內容真正有變更時才執行 commit，避免無意義提交導致 workflow 失敗
+          # 只有在內容真正有變更時才執行 commit，避免無意義提交
           if git diff-index --quiet HEAD --; then
             echo "沒有偵測到 H5N1 最新病例變動，跳過部署。"
           else
             git commit -m "自動更新：同步最新澳洲 H5N1 疫情數據 (系統時間: $(date +'%Y-%m-%d %H:%M:%S'))"
             git push origin main
           fi
-# Config Refreshed: 2026-07-27 15:00
+# Config Refreshed: 2026-08-07
