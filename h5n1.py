@@ -372,20 +372,158 @@ def discover_cases_from_news_rss(rss_text, existing_cases):
         
     return new_discovered
 
+def playwright_fetch_url(url, screenshot_path=None):
+    """
+    使用 Playwright 真實 Chromium 瀏覽器抓取頁面 HTML（繞過 WAF 最有效方案）。
+    支援截圖儲存，可用於 Gemini Vision AI 讀取或稽核存檔。
+    需要在 GitHub Actions 或本機安裝 playwright 及 chromium。
+    """
+    try:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            browser = p.chromium.launch(
+                headless=True,
+                args=[
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-blink-features=AutomationControlled",
+                    "--disable-http2",           # 強制使用 HTTP/1.1，繞過 DAFF 的 HTTP/2 封鎖
+                    "--ignore-certificate-errors",
+                ]
+            )
+            context = browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+                viewport={"width": 1280, "height": 900},
+                locale="en-AU",
+                timezone_id="Australia/Sydney",
+                extra_http_headers={
+                    "Accept-Language": "en-AU,en;q=0.9",
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    "Sec-Fetch-Site": "none",
+                    "Sec-Fetch-Mode": "navigate",
+                    "Sec-Fetch-User": "?1",
+                    "Sec-Fetch-Dest": "document",
+                    "Upgrade-Insecure-Requests": "1",
+                }
+            )
+            page = context.new_page()
+            page.goto(url, wait_until="domcontentloaded", timeout=35000)
+            page.wait_for_timeout(3000)  # 等待動態內容渲染
+            
+            # 儲存截圖（可用於 Gemini Vision AI 讀取或稽核）
+            if screenshot_path:
+                page.screenshot(path=screenshot_path, full_page=True)
+                print(f"[Playwright 截圖] 已儲存至: {screenshot_path}")
+            
+            html_content = page.content()
+            browser.close()
+            print(f"[Playwright 成功] 透過真實瀏覽器抓取: {url} ({len(html_content)} chars)")
+            return html_content
+    except ImportError:
+        print("[Playwright 未安裝] 跳過 Playwright 方案")
+        return None
+    except Exception as e:
+        print(f"[Playwright 失敗] {str(e)[:120]}")
+        return None
+
+
+def parse_screenshot_with_gemini_vision(screenshot_path):
+    """
+    使用 Gemini Vision API 讀取官方網站截圖，自動從截圖圖片中識別最新 H5N1 確診數字。
+    這是當網頁 HTML 爬取失敗時的 AI 視覺辨識備援方案。
+    需要在環境變數設定 GEMINI_API_KEY。
+    """
+    gemini_api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if not gemini_api_key:
+        print("[Gemini Vision] GEMINI_API_KEY 未設定，跳過 AI 視覺辨識")
+        return None
+    
+    if not os.path.exists(screenshot_path):
+        print(f"[Gemini Vision] 截圖檔案不存在: {screenshot_path}")
+        return None
+    
+    try:
+        import base64
+        with open(screenshot_path, "rb") as f:
+            image_data = base64.b64encode(f.read()).decode("utf-8")
+        
+        prompt = """你是澳洲 H5N1 禽流感疫情數據分析師。
+請仔細查看這張澳洲聯邦農業部 (DAFF) 官方網站截圖，找出以下數字：
+1. 全澳確診野鳥總數（confirmed detections）
+2. 各州確診隻數（WA/SA/VIC/NSW/QLD）
+
+請只回傳 JSON 格式，不要其他說明：
+{"total_detections": <int>, "detections_by_state": {"WA": <int>, "SA": <int>, "VIC": <int>, "NSW": <int>, "QLD": <int>}}
+
+如果看不清楚某個數字就填 -1。"""
+        
+        api_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+        payload = {
+            "contents": [{
+                "parts": [
+                    {"text": prompt},
+                    {"inline_data": {"mime_type": "image/png", "data": image_data}}
+                ]
+            }]
+        }
+        headers = {"Content-Type": "application/json"}
+        params = {"key": gemini_api_key}
+        
+        resp = requests.post(api_url, json=payload, headers=headers, params=params, timeout=30, verify=False)
+        if resp.status_code == 200:
+            result_text = resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+            # 從回應中提取 JSON
+            json_match = re.search(r'\{[^{}]+\}', result_text, re.DOTALL)
+            if json_match:
+                vision_data = json.loads(json_match.group(0))
+                print(f"[Gemini Vision 成功] AI 從截圖讀取數字: {vision_data}")
+                return vision_data
+            else:
+                print(f"[Gemini Vision] 無法解析 AI 回應: {result_text[:200]}")
+        else:
+            print(f"[Gemini Vision API 錯誤] status={resp.status_code}: {resp.text[:100]}")
+    except Exception as e:
+        print(f"[Gemini Vision 例外] {str(e)[:120]}")
+    
+    return None
+
+
 def smart_fetch_url(url, headers=None, timeout=10):
     """
-    跨障礙 HTTP 抓取器
+    三段式跨障礙 HTTP 抓取器：
+    第 1 段：Cloudflare Worker 代理（若 CF_WORKER_URL 有設定）
+    第 2 段：Playwright 真實 Chromium 瀏覽器（繞過 WAF 最強方案）
+    第 3 段：直接 requests 連線（最後手段）
     """
+    # 第 1 段：CF Worker 代理
     cf_worker_url = os.environ.get("CF_WORKER_URL", "").strip().rstrip("/")
     if cf_worker_url:
         try:
-            proxy_target = f"{cf_worker_url}/?url={url}"
+            import urllib.parse
+            proxy_target = f"{cf_worker_url}?url={urllib.parse.quote(url)}"
             resp = requests.get(proxy_target, timeout=timeout+5, verify=False)
-            if resp.status_code == 200 and resp.text and len(resp.text) > 200:
+            if resp.status_code == 200 and resp.text and len(resp.text) > 500:
+                print(f"[CF Worker 成功] {url}")
                 return resp.text
-        except Exception:
-            pass
+            else:
+                print(f"[CF Worker 失敗] status={resp.status_code}, 改用 Playwright")
+        except Exception as e:
+            print(f"[CF Worker 例外] {str(e)[:60]}, 改用 Playwright")
 
+    # 第 2 段：Playwright 真實瀏覽器
+    # 為 DAFF 官網儲存截圖
+    screenshot_path = None
+    if "agriculture.gov.au" in url:
+        from datetime import datetime, timezone, timedelta
+        aest_now = datetime.now(timezone.utc) + timedelta(hours=10)
+        screenshot_path = f"daff_screenshot_{aest_now.strftime('%Y%m%d_%H%M')}_AEST.png"
+    
+    playwright_result = playwright_fetch_url(url, screenshot_path=screenshot_path)
+    if playwright_result and len(playwright_result) > 500:
+        return playwright_result
+
+    # 第 3 段：直接 requests（最後手段）
     try:
         resp = requests.get(url, headers=headers, timeout=timeout, verify=False)
         if resp.status_code == 200:
@@ -395,34 +533,80 @@ def smart_fetch_url(url, headers=None, timeout=10):
 
     return None
 
-def parse_daff_official_stats(daff_soup):
+
+def compute_stats_from_cases(cases_data):
+    """
+    從 cases.json 數據庫直接精確計算官方統計數字。
+    這是 DAFF 官網無法連線時的權威回退方案 —— cases.json 本身才是我們維護的唯一真相來源。
+    """
+    loc_map = [
+        ("WA",  ["西澳", "WA"]),
+        ("SA",  ["南澳", "SA"]),
+        ("VIC", ["維多利亞", "VIC", "維州"]),
+        ("NSW", ["新南威爾斯", "NSW", "新州"]),
+        ("QLD", ["昆士蘭", "QLD", "昆州"]),
+        ("TAS", ["塔斯馬尼亞", "TAS"]),
+        ("NT",  ["北領地", "NT"]),
+        ("ACT", ["首都領地", "ACT"]),
+    ]
+    det = {st: 0 for st, _ in loc_map}
+    evt = {st: 0 for st, _ in loc_map}
+    for c in cases_data:
+        if c["type"] != "Confirmed":
+            continue
+        loc = c.get("location", "")
+        count = c.get("detection_count", 1) if isinstance(c.get("detection_count"), int) else 1
+        matched = False
+        for st, kws in loc_map:
+            if any(kw in loc for kw in kws):
+                det[st] += count
+                evt[st] += 1
+                matched = True
+                break
+    total_det = sum(det.values())
+    total_evt = sum(evt.values())
+    return {
+        "total_events": total_evt,
+        "total_detections": total_det,
+        "events_by_state": evt,
+        "detections_by_state": det,
+        "source": "cases_json"
+    }
+
+def parse_daff_official_stats(daff_soup, cases_data=None):
     """
     從 DAFF 官方頁面 (https://www.agriculture.gov.au/campaigns/birdflu)
     精確解析最權威的全澳與各州確診事件數 (Events) 與檢出野鳥隻數 (Detections)。
+    若 DAFF 官網無法連線 (daff_soup=None)，自動以 cases.json 數據庫計算結果作為回退來源。
     """
-    stats = {
-        "total_events": 42,
-        "total_detections": 123,
-        "events_by_state": {"WA": 10, "SA": 22, "VIC": 7, "NSW": 2, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
-        "detections_by_state": {"WA": 10, "SA": 87, "VIC": 23, "NSW": 2, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0}
-    }
-    
+    # 優先從 cases.json 計算真實值 (即使 DAFF 能連線，也可作交叉核對)
+    if cases_data:
+        stats = compute_stats_from_cases(cases_data)
+    else:
+        # 完全沒有任何數據時才使用硬編碼防護兜底
+        stats = {
+            "total_events": 42,
+            "total_detections": 123,
+            "events_by_state": {"WA": 10, "SA": 22, "VIC": 7, "NSW": 2, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
+            "detections_by_state": {"WA": 10, "SA": 87, "VIC": 23, "NSW": 2, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
+            "source": "hardcoded_fallback"
+        }
+
     if not daff_soup:
+        print(f"[DAFF 官網無法連線] 以 cases.json 數據庫計算: {stats['total_detections']} 隻 / {stats['total_events']} 起事件")
         return stats
 
     text = daff_soup.get_text("\n", strip=True)
 
-    # 1. 提煉 detections (隻數)
+    # 若 DAFF 官網解析到更大數字，以官網為準 (可能有新確診尚未納入 cases.json)
     m_det = re.search(r"(\d+)\s+confirmed detections of H5 bird flu", text, re.IGNORECASE)
-    if m_det:
+    if m_det and int(m_det.group(1)) >= stats["total_detections"]:
         stats["total_detections"] = int(m_det.group(1))
 
-    # 2. 提煉 events (事件數)
     m_evt = re.search(r"(\d+)\s+confirmed events", text, re.IGNORECASE)
-    if m_evt:
+    if m_evt and int(m_evt.group(1)) >= stats["total_events"]:
         stats["total_events"] = int(m_evt.group(1))
 
-    # 3. 提煉 detections by state
     det_patterns = [
         ("WA", r"(\d+)\s+in\s+Western Australia"),
         ("SA", r"(\d+)\s+in\s+South Australia"),
@@ -432,10 +616,9 @@ def parse_daff_official_stats(daff_soup):
     ]
     for st, pat in det_patterns:
         m = re.search(pat, text, re.IGNORECASE)
-        if m:
+        if m and int(m.group(1)) >= stats["detections_by_state"].get(st, 0):
             stats["detections_by_state"][st] = int(m.group(1))
 
-    # 4. 提煉 events by state (於 Confirmed event by state 區塊)
     evt_section = re.search(r"Confirmed event by state.*?(?=Definitions|Detection of|Report|$)", text, re.DOTALL | re.IGNORECASE)
     if evt_section:
         sec_text = evt_section.group(0)
@@ -448,7 +631,7 @@ def parse_daff_official_stats(daff_soup):
         ]
         for st, pat in evt_patterns:
             m = re.search(pat, sec_text, re.IGNORECASE)
-            if m:
+            if m and int(m.group(1)) >= stats["events_by_state"].get(st, 0):
                 stats["events_by_state"][st] = int(m.group(1))
 
     print(f"[DAFF 官網精確解析] 確診總隻數: {stats['total_detections']} 隻 | 確診總事件數: {stats['total_events']} 起 | 各州隻數: {stats['detections_by_state']}")
@@ -457,6 +640,7 @@ def parse_daff_official_stats(daff_soup):
 def fetch_daff_updates():
     """
     聯防爬蟲主控函式：爬取全澳官方與新聞流，結合 DAFF 官方直抓與嚴格病例管理。
+    若 DAFF 官網 HTML 爬取失敗，自動以 Playwright 截圖 + Gemini Vision AI 讀取數字。
     """
     sources = {
         "DAFF_Entry": "https://www.agriculture.gov.au/campaigns/birdflu",
@@ -474,11 +658,19 @@ def fetch_daff_updates():
         "Accept-Language": "en-US,en;q=0.9"
     }
     
+    # 產生今日截圖路徑（AEST）
+    from datetime import datetime, timezone, timedelta
+    aest_now = datetime.now(timezone.utc) + timedelta(hours=10)
+    daff_screenshot = f"daff_screenshot_{aest_now.strftime('%Y%m%d_%H%M')}_AEST.png"
+    
     daff_soup = None
+    daff_vision_stats = None   # Gemini Vision AI 從截圖讀取的數字
     soups = []
     
     for name, url in sources.items():
         print(f"正在連線澳洲官方網站 ({name}): {url} ...")
+        # 為 DAFF 主站同時儲存截圖（即使 HTML 失敗，截圖可能成功）
+        shot_path = daff_screenshot if name == "DAFF_Entry" else None
         html_content = smart_fetch_url(url, headers=headers, timeout=8)
         if html_content:
             soup = BeautifulSoup(html_content, "html.parser")
@@ -487,16 +679,19 @@ def fetch_daff_updates():
                 daff_soup = soup
         else:
             print(f"警告: {name} 連線失敗，跳過此站點。")
+            # DAFF 失敗時，嘗試直接用 Playwright 截圖然後交給 Gemini Vision 讀取
+            if name == "DAFF_Entry":
+                print("[DAFF 備援] 嘗試 Playwright 截圖 + Gemini Vision AI 讀取數字...")
+                playwright_fetch_url(url, screenshot_path=shot_path)
+                if os.path.exists(shot_path):
+                    daff_vision_stats = parse_screenshot_with_gemini_vision(shot_path)
             
     print(f"正在連線 Google News RSS: {google_rss_url} ...")
     rss_content = smart_fetch_url(google_rss_url, headers=headers, timeout=12)
     abc_rss_text = rss_content.lower() if rss_content else ""
         
     cases = load_cases_from_json()
-    
-    # 從 DAFF 官網直接解析官方權威數據
-    official_stats = parse_daff_official_stats(daff_soup)
-    
+
     # 第一道防線：官網動態提取新地點 (嚴格去重)
     for s in soups:
         discovered_cases = discover_new_cases(s, cases)
@@ -511,7 +706,24 @@ def fetch_daff_updates():
     # 持久化寫回獨立 cases.json 檔案
     save_cases_to_json(cases)
 
+    # 以 cases.json (最新版) 計算官方統計
+    official_stats = parse_daff_official_stats(daff_soup, cases_data=cases)
+    
+    # 若 Gemini Vision 成功讀到截圖數字，且比 cases.json 計算值更新，則採用官方截圖數字
+    if daff_vision_stats:
+        vision_total = daff_vision_stats.get("total_detections", -1)
+        if isinstance(vision_total, int) and vision_total > official_stats["total_detections"]:
+            print(f"[Gemini Vision 更新] 截圖數字({vision_total}) > cases.json計算值({official_stats['total_detections']})，採用截圖數字！")
+            official_stats["total_detections"] = vision_total
+            # 同時更新各州數字（只更新比現有值更大的）
+            for st, val in daff_vision_stats.get("detections_by_state", {}).items():
+                if isinstance(val, int) and val > 0 and val > official_stats["detections_by_state"].get(st, 0):
+                    official_stats["detections_by_state"][st] = val
+            official_stats["total_events"] = sum(1 for c in cases if c["type"] == "Confirmed")
+            print(f"[Gemini Vision] 更新後數字: {official_stats['total_detections']} 隻 / {official_stats['total_events']} 起")
+
     return cases, official_stats
+
 
 def load_existing_index_cases():
     index_path = "index.html"
@@ -530,15 +742,13 @@ def load_existing_index_cases():
 def generate_dynamic_summary(cases_data, official_stats):
     """
     動態產生包含精確數據的官方事實與媒體觀察摘要。
+    official_stats 已由 parse_daff_official_stats 以 cases.json 計算得出，
+    此函式直接信任 official_stats 即可，不需再重複計算覆蓋。
     """
-    total_detections = official_stats.get("total_detections", 123)
-    total_events = official_stats.get("total_events", 42)
-    det_by_state = official_stats.get("detections_by_state", {"WA": 10, "SA": 87, "VIC": 23, "NSW": 2, "QLD": 1})
-    evt_by_state = official_stats.get("events_by_state", {"WA": 10, "SA": 22, "VIC": 7, "NSW": 2, "QLD": 1})
-
-    calc_detections = sum(c.get("detection_count", 1) for c in cases_data if c["type"] == "Confirmed")
-    if calc_detections > total_detections:
-        total_detections = calc_detections
+    total_detections = official_stats.get("total_detections", 0)
+    total_events = official_stats.get("total_events", 0)
+    det_by_state = official_stats.get("detections_by_state", {})
+    evt_by_state = official_stats.get("events_by_state", {})
 
     daff_link = '<a href="https://www.agriculture.gov.au/campaigns/birdflu" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲聯邦農業部 (DAFF)</a>'
     

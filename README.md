@@ -12,17 +12,19 @@
 5. **動態最短距離計算 (Haversine 公式)**：自動計算各病例到 Blayney 廠的球體直線距離，並在網頁頂部標籤、地緣安全宣告、最下方三大黃金論點第 3 點等三處，自動更新為最新的最近距離。
 6. **動態日期與情境摘要生成**：捨棄硬編碼，自動計算數據庫中最新確診日期並替換，且能根據近 3 日內有無新增案例自動切換「警報語氣」或「常態觀察平穩語氣」。
 7. **自適應動態參考文獻庫**：底部的參考資料（References）完全動態生成，會根據當前數據庫中病例所分布的省份（如西澳 WA、維多利亞州 VIC），自動追加該省政府農業廳的官方監控網址。
-8. **雙時區對齊與陰性排除自動化**：最後編譯時間自動校正顯示台北時間與澳洲 AEST 時間，並實現陰性案例的自動識別與雙向狀態更新。
+8. **Playwright 瀏覽器截圖與 Gemini Vision AI 視覺自動辨識**：當政府官網 HTML 因阻擋或防火牆無法直接爬取時，系統會自動使用 Playwright 無頭 Chromium 瀏覽器開啟 DAFF 官網並拍攝高解析度全頁截圖，接著呼叫 **Gemini 2.0 Flash Vision API** 直接閱讀截圖中的文字與數據框，自動識別最新確診數字並同步至網頁，達到 100% 全自動零人工干預更新。
+9. **雙時區對齊與陰性排除自動化**：最後編譯時間自動校正顯示台北時間與澳洲 AEST 時間，並實現陰性案例的自動識別與雙向狀態更新。
 
 ---
 
 ## 📂 檔案目錄結構
 * **`cases.json`**：**獨立病例數據庫（數據與邏輯徹底解耦）**。存放歷史與即時更新的所有病例節點，爬蟲執行時自動載入並覆寫。
-* **`h5n1.py`**：自動爬取官方與新聞 RSS，自動定位新地點、執行權威對帳並編譯輸出 `index.html` 的 Python 核心引擎。
+* **`h5n1.py`**：自動爬取官方與新聞 RSS，結合 Playwright 截圖與 Gemini Vision AI 視覺識別、自動定位新地點、執行權威對帳並編譯輸出 `index.html` 的 Python 核心引擎。
 * **`report_template.html`**：網頁 GIS 報告模板（整合 Leaflet.js 地圖、Tailwind CSS 樣式、鳥類數量密度動態 Badge 圈圈、雷達水波光圈與專屬金色 🏭 Nestlé Blayney 工廠地標）。
 * **`GOVT_SCRAPING_BEST_PRACTICES.md`**：**政府公開資料爬取與抗封鎖架構開發經驗指南**（供未來開發其他政府數據專案參考）。
-* **`.github/workflows/auto_update.yml`**：GitHub Actions 定時自動化工作流設定檔（每天定時執行 2 次，自動 commit `index.html` 與 `cases.json`）。
+* **`.github/workflows/auto_update.yml`**：GitHub Actions 定時自動化工作流設定檔（每天定時執行 2 次，自動觸發 Playwright+Gemini Vision 並 commit `index.html` 與 `cases.json`）。
 * **`index.html`**：編譯後生成的正式報告網頁。
+* **`live_page.html`** / **`live_page_utf8.html`**：同步生成之線上備用部署網頁。
 * **`walkthrough.md`**：專案開發與 Bug 修正軌跡日誌。
 * **`task.md`**：任務排程與完成度檢核表。
-* **`更新說明`**：最後檔案同步日期更新於 2026-08-06 18:25 (完成 DAFF 官方直抓與雙重去重重構：徹底解決 0||1 JS 轉型與重複抓取 Bug，全澳累計 123 隻確診 / 42 起事件 100% 精確對齊)。
+* **`更新說明`**：最後檔案同步日期更新於 2026-08-07 15:25 (完成 Playwright 瀏覽器截圖 + Gemini Vision AI 圖片讀字全自動化流程建置，並同步更新 2026-08-07 3pm AEST DAFF 最新官方數據：全澳累計 175 隻確診 / 49 起事件)。
