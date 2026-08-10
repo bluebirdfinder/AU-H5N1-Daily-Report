@@ -612,10 +612,10 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
     else:
         # 完全沒有任何數據時才使用硬編碼防護兜底
         stats = {
-            "total_events": 42,
-            "total_detections": 123,
-            "events_by_state": {"WA": 10, "SA": 22, "VIC": 7, "NSW": 2, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
-            "detections_by_state": {"WA": 10, "SA": 87, "VIC": 23, "NSW": 2, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
+            "total_events": 54,
+            "total_detections": 220,
+            "events_by_state": {"WA": 10, "SA": 29, "VIC": 10, "NSW": 4, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
+            "detections_by_state": {"WA": 10, "SA": 152, "VIC": 53, "NSW": 4, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
             "source": "hardcoded_fallback"
         }
 
