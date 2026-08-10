@@ -44,27 +44,7 @@ jobs:
           cp index.html live_page.html
           cp index.html live_page_utf8.html
 
-      - name: 5. 推送 DAFF 截圖到 Telegram (Send DAFF Screenshot to Telegram)
-        if: env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != ''
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          # 尋找最新的 DAFF 截圖
-          SCREENSHOT=$(ls daff_screenshot_*.png 2>/dev/null | sort | tail -n 1)
-          if [ -n "$SCREENSHOT" ]; then
-            echo "發現截圖: $SCREENSHOT，推送至 Telegram..."
-            curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto" \
-              -F chat_id="${TELEGRAM_CHAT_ID}" \
-              -F photo="@${SCREENSHOT}" \
-              -F caption="🦢 澳洲 H5N1 DAFF 官網自動截圖 $(date +'%Y-%m-%d %H:%M') AEST" \
-              > /dev/null
-            echo "Telegram 截圖推送完成！"
-          else
-            echo "未找到 DAFF 截圖（Playwright 可能未成功執行），跳過 Telegram 推送。"
-          fi
-
-      - name: 6. 偵測變動並推送到 GitHub (Commit and Push Changes)
+      - name: 5. 偵測變動並推送到 GitHub (Commit and Push Changes)
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -79,4 +59,4 @@ jobs:
             git commit -m "自動更新：同步最新澳洲 H5N1 疫情數據 (系統時間: $(date +'%Y-%m-%d %H:%M:%S'))"
             git push origin main
           fi
-# Config Refreshed: 2026-08-07
+# Config Refreshed: 2026-08-10
