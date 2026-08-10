@@ -419,6 +419,11 @@
                 }
             });
 
+            const liveSyncMsg = document.getElementById('live-sync-message');
+            if (liveSyncMsg) {
+                liveSyncMsg.textContent = `✅ 已與澳洲聯邦農業部 (DAFF) 官網權威數據同步 (全澳累計 ${totalConfirmedDetections} 隻確診 / ${totalConfirmedEvents} 起事件)`;
+            }
+
             const confirmedEl = document.getElementById('confirmed-indicator');
             if (confirmedEl) {
                 confirmedEl.textContent = `${totalConfirmedDetections} 隻確診 (${totalConfirmedEvents} 起事件)`;
