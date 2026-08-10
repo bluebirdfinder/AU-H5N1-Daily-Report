@@ -46,7 +46,7 @@
                 <h1 class="text-lg font-bold tracking-tight text-white">Nestlé Purina Blayney • Bio-Security Monitor</h1>
             </div>
             <div class="text-xs text-slate-400">
-                系統最後更新時間: <span class="text-emerald-400 font-semibold">2026-08-10 07:21:08 (台北時間) / 2026-08-10 09:21:08 (澳洲 AEST)</span>
+                系統最後更新時間: <span class="text-emerald-400 font-semibold">2026-08-10 11:17:52 (台北時間) / 2026-08-10 13:17:52 (澳洲 AEST)</span>
             </div>
         </div>
     </header>
@@ -1105,6 +1105,11 @@
                     }
                 }
             });
+
+            const liveSyncMsg = document.getElementById('live-sync-message');
+            if (liveSyncMsg) {
+                liveSyncMsg.textContent = `✅ 已與澳洲聯邦農業部 (DAFF) 官網權威數據同步 (全澳累計 ${totalConfirmedDetections} 隻確診 / ${totalConfirmedEvents} 起事件)`;
+            }
 
             const confirmedEl = document.getElementById('confirmed-indicator');
             if (confirmedEl) {
