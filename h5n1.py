@@ -705,10 +705,8 @@ def fetch_daff_updates():
         "Accept-Language": "en-US,en;q=0.9"
     }
     
-    # 產生今日截圖路徑（AEST）
-    from datetime import datetime, timezone, timedelta
-    aest_now = datetime.now(timezone.utc) + timedelta(hours=10)
-    daff_screenshot = f"daff_screenshot_{aest_now.strftime('%Y%m%d_%H%M')}_AEST.png"
+    # 暫存截圖檔名（僅供 Gemini Vision API 讀取，讀取後自動清理）
+    daff_screenshot = "daff_screenshot_temp.png"
     
     daff_soup = None
     daff_vision_stats = None   # Gemini Vision AI 從截圖讀取的數字
@@ -735,6 +733,11 @@ def fetch_daff_updates():
             if os.path.exists(daff_screenshot):
                 print(f"[Gemini Vision 觸發] 發現截圖 {daff_screenshot}，正在推送至 Gemini API 做視覺判讀...")
                 daff_vision_stats = parse_screenshot_with_gemini_vision(daff_screenshot)
+                try:
+                    os.remove(daff_screenshot)
+                    print(f"[Gemini Vision 暫存清理] 已自動刪除臨時截圖: {daff_screenshot}")
+                except Exception:
+                    pass
             
     print(f"正在連線 Google News RSS: {google_rss_url} ...")
     rss_content = smart_fetch_url(google_rss_url, headers=headers, timeout=12)

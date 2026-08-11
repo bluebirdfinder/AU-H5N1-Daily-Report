@@ -51,4 +51,12 @@
   - `[x]` 優化動態地點提取防雜訊過濾器（剔除 health, animal, australian 等非地名單字與換行符號）
   - `[x]` 升級地圖「鳥類數量密度 Badge 圈圈 (12px ~ 36px) + 雷達水波擴散光圈」與「黃金角度螺旋分散」
   - `[x]` 重構「 Nestlé Blayney 廠專屬金色 🏭 工廠地標與旋轉防護金圈」，徹底與紅色野鳥疫區劃清界線
-- `[x]` 全面更新與校對所有專案檔案（h5n1.py, report_template.html, index.html, README.md, walkthrough.md, task.md, .github/workflows/auto_update.yml）
+  - `[x]` 移除 GitHub Actions Workflow Telegram 推播步驟，專注於 Gemini Vision AI 視覺自動辨識
+  - `[x]` 導入 `curl_cffi` Chrome TLS 指紋偽裝與 Playwright `--disable-http2` 防護，解決 Akamai/Cloudflare WAF `ERR_HTTP2_PROTOCOL_ERROR` 封鎖
+  - `[x]` 升級 Gemini Vision API 多模型降級（gemini-2.5-flash / gemini-2.0-flash / gemini-1.5-flash-latest）與 HTTP 429 額度重試機制
+  - `[x]` 實作暫存截圖零殘留生命週期管理（記憶體中刪除 + `.gitignore` 雙重防護，徹底消除 Git 倉庫圖片膨脹）
+  - `[x]` 修正爬蟲動態新地點識別案例號碼 `max_id` 安全計算，徹底杜絕 CASE ID 衝突與案例覆蓋 Bug
+  - `[x]` 精確對齊 8/10 下午 1:00 AEST 官方最新權威數據：全澳 231 隻確診 / 55 起事件（SA 163 隻, VIC 53 隻, NSW 4 隻, WA 10 隻, QLD 1 隻）
+  - `[x]` 登錄 8/11 PIRSA 最新通報：南澳 Coorong & Southend 沿海 25 例與袋鼠島 10 例新疑似病例（現存待複驗疑似案例上升至 51 例）
+  - `[x]` 全面清理專案無用舊檔（移除 `daff.html`, `h5n1_backup.py`, `report_template_backup.html`），保持專案 100% 輕量與乾淨
+- `[x]` 全面更新與校對所有專案檔案（h5n1.py, report_template.html, index.html, README.md, GOVT_SCRAPING_BEST_PRACTICES.md, walkthrough.md, task.md, .github/workflows/auto_update.yml, .gitignore）

@@ -1,0 +1,11 @@
+# Ignore temporary screenshot files for Gemini Vision
+daff_screenshot_*.png
+daff_screenshot_temp.png
+
+# Ignore Python runtime files
+__pycache__/
+*.pyc
+
+# Ignore OS junk files
+.DS_Store
+Thumbs.db
