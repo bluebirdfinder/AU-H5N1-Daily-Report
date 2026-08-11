@@ -7,7 +7,7 @@
 ## 🌟 核心功能特點
 1. **全澳州聯防監控網絡與多重抗封鎖中繼陣列 (curl_cffi & Playwright & Cloudflare Worker)**：同時爬取**澳洲聯邦農業部 (DAFF)** 以及**澳洲全部 8 個州/領地政府**的官方禽流感站點。導入多重抗封鎖架構：優先以 **`curl_cffi` Chrome TLS 指紋偽裝** 與 **Cloudflare Worker 代理** 繞過機房 IP/WAF 阻擋，備有 **Playwright 真實瀏覽器（啟用 `--disable-http2` 防護）** 與 **Google News RSS 兜底**，確保數據 100% 不漏報、不中斷。
 2. **智慧權威數據解析與全域精確去重**：直接從澳洲聯邦農業部 (DAFF) 官網與 `cases.json` 數據庫解析權威確診隻數與事件數（截至目前權威對齊：**231 隻確診 / 55 起事件**），並實作中英文地名別名與 GPS 物理距離 (<2.0km) 雙重去重，徹底防止每日自動排程重複新增或暴增案例。
-3. **Playwright 瀏覽器截圖與 Gemini Vision AI 多模型自動辨識**：當政府官網 HTML 因阻擋或防火牆無法直接爬取時，系統會自動使用 Playwright 無頭 Chromium 瀏覽器開啟 DAFF 官網並拍攝全頁截圖，接著呼叫 **Gemini Vision API**（支援 `gemini-2.5-flash` / `gemini-2.0-flash` / `gemini-1.5-flash-latest` 多模型自動降級與 HTTP 429 額度超限備援）直接閱讀截圖中的文字與數據框，自動識別最新確診數字並同步至網頁。
+3. **Playwright 瀏覽器黃框精確截圖與 Gemini Vision AI 自動辨識**：當政府官網 HTML 因阻擋或防火牆無法直接爬取時，系統會自動使用 Playwright 顯式等待 `#state_stats` / `.callout` 載入、執行 JavaScript 隱藏頂部固定選單列 (Sticky Header)，並專門擷取黃底純數據區塊 (.callout)，最後呼叫 **Gemini Vision API**（搭配 `responseMimeType: application/json` 強制 JSON 輸出與 `gemini-2.5-flash` / `gemini-2.0-flash` 多模型 429 重試）高對比精確辨識最新確診數據並自動更新至網頁。
 4. **零殘留暫存截圖生命週期管理 (Zero-Footprint Screenshot Lifecycle)**：為了防止每日自動排程截圖造成 GitHub 倉庫儲存空間膨脹（Repository Bloat），系統將截圖檔名固定為 `daff_screenshot_temp.png`，在 Gemini API 讀取完畢後**第一時間於記憶體中刪除**；並搭配 `.gitignore` 檔案雙重封鎖，確保 0 圖片殘留於 GitHub 歷史中。
 5. **安全動態案例編號分配 (Safe Max-ID Calculation)**：爬蟲進行動態新地點識別時，會自動掃描歷史資料庫中最大的 CASE 編號（`max_id`）進行遞增（如 `CASE-063`），確保既有病例與最新確診完全不被重複或意外覆蓋。
 6. **媒體確診交叉驗證 (C 方案)**：結合「主流媒體白名單」與「官方首長/國家實驗室發言人及確診詞」雙重過濾，自動將媒體報導的最新疫情於官方網站同步延遲期間內搶先升級，並於前端地圖與表格自動標示精緻的 **`⚠️ 媒體先行 (官網同步中)`** Badge，保證極高的時效性與數據真實性。

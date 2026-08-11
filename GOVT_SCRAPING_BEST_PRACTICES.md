@@ -75,7 +75,7 @@
 | **V2.0** | 2026-07-27 | 導入 TailwindCSS、Leaflet.js GIS、Chart.js 與 GitHub Actions 自動排程。 | 實現視覺化與每日自動更新。 |
 | **V3.0** | 2026-08-01 | 升級全澳 8 州聯防爬蟲、Cloudflare Geocoding 代理、鳥類密度動態圈圈與雷達水波。 | 對應 8/1 全澳大暴增 20 例，解決 IP 封鎖與視覺密度呈現。 |
 | **V4.0** | 2026-08-03 | 導入 **智慧對帳與盲區補齊引擎 (Reconciliation Engine)**、多重 Web Proxy 陣列、動態日期與情境摘要生成。 | 解決 62 例官方對帳落差、官網未釋出具體地名問題、與極強 WAF 阻擋。 |
-| **V5.0** | 2026-08-11 | 導入 `curl_cffi` TLS 指紋偽裝、Playwright `--disable-http2` 防護、Gemini Vision 多模型與 429 Rate Limit 重試降級，以及零殘留暫存截圖清理機制 (`.gitignore` + in-memory remove)。 | 解決 Akamai/Cloudflare `ERR_HTTP2_PROTOCOL_ERROR` 封鎖、Gemini API 429 超限與 Git 倉庫圖片膨脹痛點。 |
+| **V5.0** | 2026-08-11 | 導入 `curl_cffi` TLS 指紋偽裝、Playwright `#state_stats .callout` 黃框精確元素截圖、Hidden Sticky Header 避擋、Gemini Vision `responseMimeType: application/json` 強制輸出與 429 降級，以及零殘留暫存截圖清理。 | 解決 Akamai/Cloudflare `ERR_HTTP2_PROTOCOL_ERROR` 封鎖、全頁截圖文字太小模糊、Gemini API 429 超限與 Git 倉庫圖片膨脹痛點。 |
 
 ---
 

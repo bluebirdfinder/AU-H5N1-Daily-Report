@@ -384,8 +384,9 @@ def discover_cases_from_news_rss(rss_text, existing_cases):
 
 def playwright_fetch_url(url, screenshot_path=None, timeout=25000):
     """
-    使用 Playwright 真實 Chromium 瀏覽器抓取頁面 HTML 並進行全頁截圖。
-    包覆防禦性 try-except，強制停用 HTTP2 避免 ERR_HTTP2_PROTOCOL_ERROR。
+    使用 Playwright 真實 Chromium 瀏覽器抓取頁面 HTML 並進行精確區塊截圖。
+    比照 hpai_monitor_github 精確模式：顯式等待 #state_stats / .callout 區塊，隱藏置頂選單列 (Sticky Header)，
+    優先擷取黃底純數據統計區塊 (.callout)。
     """
     try:
         from playwright.sync_api import sync_playwright
@@ -428,8 +429,37 @@ def playwright_fetch_url(url, screenshot_path=None, timeout=25000):
 
             if screenshot_path:
                 try:
-                    page.screenshot(path=screenshot_path, full_page=True)
-                    print(f"[Playwright 截圖成功] 已儲存截圖至: {screenshot_path}")
+                    # 1. 顯式等待 #state_stats / .callout 區塊渲染 (比照 hpai_monitor_github 模式)
+                    try:
+                        page.wait_for_selector("#state_stats, .callout, div[class*='callout']", timeout=15000)
+                        page.wait_for_timeout(2000)
+                    except Exception:
+                        pass
+
+                    # 2. 隱藏置頂固定選單列 (Sticky Header)，避免遮擋頂部日期時間行
+                    try:
+                        page.evaluate("""() => {
+                            const headerElems = document.querySelectorAll('header, nav, [style*="position: fixed"], [style*="position: sticky"], .sticky-header');
+                            headerElems.forEach(el => {
+                                el.style.display = 'none';
+                            });
+                        }""")
+                    except Exception:
+                        pass
+
+                    # 3. 優先截取 DAFF 黃底純數據區塊 (.callout / #state_stats)，若無精確區塊則退回頁面首屏截圖
+                    stats_elem = page.locator("#state_stats .callout, #state_stats div[class*='callout'], .callout").first
+                    if stats_elem.count() > 0:
+                        stats_elem.screenshot(path=screenshot_path)
+                        print(f"[Playwright 精確元素截圖成功] 已成功截取 DAFF 黃底純數據區塊至: {screenshot_path}")
+                    else:
+                        stats_elem_fallback = page.locator("#state_stats").first
+                        if stats_elem_fallback.count() > 0:
+                            stats_elem_fallback.screenshot(path=screenshot_path)
+                            print(f"[Playwright #state_stats 截圖成功] 已擷取 DAFF #state_stats 區塊至: {screenshot_path}")
+                        else:
+                            page.screenshot(path=screenshot_path, full_page=False)
+                            print(f"[Playwright 頁面首屏截圖成功] 已擷取 DAFF 首屏畫面至: {screenshot_path}")
                 except Exception as ss_e:
                     print(f"[Playwright 截圖警告] 截圖擷取失敗: {str(ss_e)[:100]}")
 
@@ -448,7 +478,7 @@ def playwright_fetch_url(url, screenshot_path=None, timeout=25000):
 
 def parse_screenshot_with_gemini_vision(screenshot_path):
     """
-    使用 Gemini Vision API 讀取官方網站截圖，自動從截圖圖片中識別最新 H5N1 確診數字。
+    使用 Gemini Vision API 讀取官方網站黃底精確數據截圖，自動識別最新 H5N1 確診數字與日期。
     支援多模型（gemini-2.5-flash / gemini-2.0-flash / gemini-1.5-flash-latest / gemini-1.5-pro-latest）與 429 額度超限備援。
     需要在環境變數設定 GEMINI_API_KEY。
     """
@@ -468,14 +498,16 @@ def parse_screenshot_with_gemini_vision(screenshot_path):
             image_data = base64.b64encode(f.read()).decode("utf-8")
         
         prompt = """你是澳洲 H5N1 禽流感疫情數據分析師。
-請仔細查看這張澳洲聯邦農業部 (DAFF) 官方網站截圖，找出以下數據：
-1. 全澳確診野鳥隻數總數（confirmed detections of H5 bird flu）
-2. 全澳確診事件總起數（confirmed events）
-3. 各州確診野鳥隻數（WA/SA/VIC/NSW/QLD/TAS/NT/ACT）
-4. 各州確診事件起數（WA/SA/VIC/NSW/QLD/TAS/NT/ACT）
+請仔細查看這張來自澳洲聯邦農業部 (DAFF) 的黃底疫情統計數據區塊截圖，找出以下數據：
+1. 最新發布的時間字串（例如 "1.00pm AEST, 10 August 2026"）
+2. 全澳確診野鳥隻數總數（confirmed detections of H5 bird flu in wild birds）
+3. 全澳確診事件總起數（confirmed events）
+4. 各州確診野鳥隻數（WA/SA/VIC/NSW/QLD/TAS/NT/ACT）
+5. 各州確診事件起數（WA/SA/VIC/NSW/QLD/TAS/NT/ACT）
 
-請只回傳標準 JSON 格式，不要包含 Markdown 程式碼標記，也不要有其他文字說明：
+請只回傳標準 JSON 格式，包含以下鍵值：
 {
+  "last_update_str": "<string>",
   "total_detections": <int>,
   "total_events": <int>,
   "detections_by_state": {"WA": <int>, "SA": <int>, "VIC": <int>, "NSW": <int>, "QLD": <int>, "TAS": <int>, "NT": <int>, "ACT": <int>},
@@ -497,7 +529,10 @@ def parse_screenshot_with_gemini_vision(screenshot_path):
                         {"text": prompt},
                         {"inline_data": {"mime_type": "image/png", "data": image_data}}
                     ]
-                }]
+                }],
+                "generationConfig": {
+                    "responseMimeType": "application/json"
+                }
             }
             headers = {"Content-Type": "application/json"}
             params = {"key": gemini_api_key}
