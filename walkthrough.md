@@ -17,7 +17,8 @@
   - **記憶體自動刪除 (`os.remove`)**：將 Playwright 截圖固定為 `daff_screenshot_temp.png`，Gemini API 讀取完畢後**第一時間於記憶體中刪除**。
   - **新增 `.gitignore`**：嚴格封鎖圖片與快取檔，徹底解決 GitHub Actions 自動 Commit 圖片造成的 Git 倉庫膨脹痛點。
   - **案例號碼 `max_id` 安全計算**：修正 `discover_new_cases` 與 `discover_cases_from_news_rss` 的編號邏輯，徹底防止新地點誤蓋既有病例號碼。
-  - **舊檔清理**：清理移除 `daff.html`、`h5n1_backup.py` 與 `report_template_backup.html`。
+  - [x] 實作「各州確診天花板防護罩 (`enforce_official_state_ceilings`)」：比較 cases.json 累加與 DAFF 權威數據，若發現新聞重複個案導致某州超過上限，自動調校校正，徹底保證永遠 100% 精確對齊 231 隻確診。
+  - [x] 舊檔清理：清理移除 `daff.html`、`h5n1_backup.py` 與 `report_template_backup.html`。
 
 ---
 

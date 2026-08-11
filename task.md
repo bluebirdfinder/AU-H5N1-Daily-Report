@@ -58,5 +58,6 @@
   - `[x]` 修正爬蟲動態新地點識別案例號碼 `max_id` 安全計算，徹底杜絕 CASE ID 衝突與案例覆蓋 Bug
   - `[x]` 精確對齊 8/10 下午 1:00 AEST 官方最新權威數據：全澳 231 隻確診 / 55 起事件（SA 163 隻, VIC 53 隻, NSW 4 隻, WA 10 隻, QLD 1 隻）
   - `[x]` 登錄 8/11 PIRSA 最新通報：南澳 Coorong & Southend 沿海 25 例與袋鼠島 10 例新疑似病例（現存待複驗疑似案例上升至 51 例）
-  - `[x]` 全面清理專案無用舊檔（移除 `daff.html`, `h5n1_backup.py`, `report_template_backup.html`），保持專案 100% 輕量與乾淨
+  - `[x]` 實作「各州確診天花板防護罩 (`enforce_official_state_ceilings`)」，徹底解決新聞個案導致加總不對齊 (如 233 隻) 之問題
+  - `[x]` 全面清理與重編譯 cases.json (61 筆病例，55 起 Confirmed 事件 / 231 隻確診)
 - `[x]` 全面更新與校對所有專案檔案（h5n1.py, report_template.html, index.html, README.md, GOVT_SCRAPING_BEST_PRACTICES.md, walkthrough.md, task.md, .github/workflows/auto_update.yml, .gitignore）

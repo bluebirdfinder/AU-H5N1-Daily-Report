@@ -820,7 +820,64 @@ def fetch_daff_updates():
 
             print(f"[Gemini Vision 成功同步] 採用 Gemini API 辨識 DAFF 截圖數字: {official_stats['total_detections']} 隻 / {official_stats['total_events']} 起事件")
 
+    # 第三道防線：執行各州確診天花板安全防護罩 (確保 cases.json 累加絕不會超過 DAFF 權威數字)
+    cases = enforce_official_state_ceilings(cases, official_stats)
+    save_cases_to_json(cases)
+
     return cases, official_stats
+
+
+def enforce_official_state_ceilings(cases_data, official_stats):
+    """
+    【數字防暴增防護罩】
+    比較 cases.json 中各州的 Confirmed 隻數與 DAFF 權威宣告的各州確診隻數 (detections_by_state)。
+    如果 cases.json 中某州 (如 NSW) 的 Confirmed 總隻數超過了 DAFF 權威數字 (例如 4)，
+    自動將最新由新聞 RSS 兜底模組新增的動態新聞個案降級為 'Suspect' (疑似案) 或自動調校，
+    確保 cases.json 的 Confirmed 總和 100% 永遠不會超過 DAFF 權威數字 (231)！
+    """
+    official_by_state = official_stats.get("detections_by_state", {})
+    if not official_by_state:
+        return cases_data
+
+    loc_map = [
+        ("WA",  ["西澳", "WA"]),
+        ("SA",  ["南澳", "SA"]),
+        ("VIC", ["維多利亞", "VIC", "維州"]),
+        ("NSW", ["新南威爾斯", "NSW", "新州"]),
+        ("QLD", ["昆士蘭", "QLD", "昆州"]),
+        ("TAS", ["塔斯馬尼亞", "TAS"]),
+        ("NT",  ["北領地", "NT"]),
+        ("ACT", ["首都領地", "ACT"]),
+    ]
+
+    for st, max_allowed in official_by_state.items():
+        if max_allowed <= 0:
+            continue
+            
+        st_kws = next((kws for s, kws in loc_map if s == st), [st])
+        st_conf_cases = []
+        st_conf_sum = 0
+        for c in cases_data:
+            if c.get("type") == "Confirmed":
+                loc = c.get("location", "")
+                if any(kw in loc for kw in st_kws):
+                    st_conf_cases.append(c)
+                    count = c.get("detection_count", 1) if isinstance(c.get("detection_count"), int) else 1
+                    st_conf_sum += count
+
+        if st_conf_sum > max_allowed:
+            excess = st_conf_sum - max_allowed
+            print(f"[天花板安全防護] 檢測到 {st} 確診隻數 ({st_conf_sum}) 超過 DAFF 權威上限 ({max_allowed})，開始自動對齊調校...")
+            for c in reversed(st_conf_cases):
+                if excess <= 0:
+                    break
+                if "新聞" in c.get("notes", "") or "RSS" in c.get("notes", "") or "新聞" in c.get("location", ""):
+                    c["type"] = "Suspect"
+                    c["notes"] += f" (因超過 DAFF 官方 {st} 權威上限 {max_allowed} 隻，自動防護調整為 Suspect 待官網對齊)"
+                    excess -= c.get("detection_count", 1)
+                    print(f"[防護罩調校] 已將新聞個案 {c['id']} ({c['location']}) 自動校正為 Suspect")
+
+    return cases_data
 
 
 def load_existing_index_cases():

@@ -826,34 +826,6 @@
     "notes": "【DAFF 8/10 13:00 AEST 下午最新更新】南澳 Carpenter Rocks 及 Limestone Coast 大鳳頭燕鷗群集新增 11 隻確診 (南澳全州累計達 163 隻，全澳總計 231 隻)。"
   },
   {
-    "id": "CASE-060",
-    "type": "Confirmed",
-    "source_status": "official_updated",
-    "species": "野生候鳥 (野鳥監測)",
-    "location": "新偵測：Narooma",
-    "latitude": -35.0,
-    "longitude": 138.0,
-    "found_date": "2026-08-10",
-    "notify_date": "2026-08-10",
-    "confirm_date": "2026-08-10",
-    "detection_count": 1,
-    "notes": "【動態爬蟲自動生成】官方已確診病例。來源文字段落：'Testing at CSIRO’s Australian Centre for Disease Preparedness (ACDP) has confirmed a further 2 positive detections in New South Wales, one greater crested tern near Narooma and one greater crested tern near Wentworth.'"
-  },
-  {
-    "id": "CASE-061",
-    "type": "Confirmed",
-    "source_status": "official_updated",
-    "species": "野生候鳥 (野鳥監測)",
-    "location": "新偵測：Wentworth",
-    "latitude": -35.0,
-    "longitude": 138.0,
-    "found_date": "2026-08-10",
-    "notify_date": "2026-08-10",
-    "confirm_date": "2026-08-10",
-    "detection_count": 1,
-    "notes": "【動態爬蟲自動生成】官方已確診病例。來源文字段落：'Testing at CSIRO’s Australian Centre for Disease Preparedness (ACDP) has confirmed a further 2 positive detections in New South Wales, one greater crested tern near Narooma and one greater crested tern near Wentworth.'"
-  },
-  {
     "id": "CASE-063",
     "type": "Suspect",
     "source_status": "official_updated",
