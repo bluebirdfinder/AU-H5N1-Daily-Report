@@ -249,7 +249,12 @@ def discover_new_cases(soup, existing_cases):
             unique_candidates[loc] = source_text
             
     new_discovered = []
-    case_idx = len(existing_cases) + 1
+    max_id = 0
+    for ec in existing_cases:
+        m_id = re.search(r"CASE-(\d+)", ec.get("id", ""))
+        if m_id:
+            max_id = max(max_id, int(m_id.group(1)))
+    case_idx = max_id + 1
     
     for loc, src_txt in unique_candidates.items():
         lat, lon = get_coordinates_from_api(loc, existing_cases)
@@ -331,7 +336,12 @@ def discover_cases_from_news_rss(rss_text, existing_cases):
             unique_candidates[loc] = src_text
             
     new_discovered = []
-    case_idx = len(existing_cases) + 1
+    max_id = 0
+    for ec in existing_cases:
+        m_id = re.search(r"CASE-(\d+)", ec.get("id", ""))
+        if m_id:
+            max_id = max(max_id, int(m_id.group(1)))
+    case_idx = max_id + 1
     
     for loc, src_txt in unique_candidates.items():
         lat, lon = get_coordinates_from_api(loc, existing_cases)
@@ -375,7 +385,7 @@ def discover_cases_from_news_rss(rss_text, existing_cases):
 def playwright_fetch_url(url, screenshot_path=None, timeout=25000):
     """
     使用 Playwright 真實 Chromium 瀏覽器抓取頁面 HTML 並進行全頁截圖。
-    包覆防禦性 try-except，確保無論頁面載入是否逾時，只要 DOM / 畫面部分生成，即可成功儲存截圖。
+    包覆防禦性 try-except，強制停用 HTTP2 避免 ERR_HTTP2_PROTOCOL_ERROR。
     """
     try:
         from playwright.sync_api import sync_playwright
@@ -388,6 +398,7 @@ def playwright_fetch_url(url, screenshot_path=None, timeout=25000):
                     "--disable-dev-shm-usage",
                     "--disable-blink-features=AutomationControlled",
                     "--ignore-certificate-errors",
+                    "--disable-http2",
                 ]
             )
             context = browser.new_context(
@@ -438,7 +449,7 @@ def playwright_fetch_url(url, screenshot_path=None, timeout=25000):
 def parse_screenshot_with_gemini_vision(screenshot_path):
     """
     使用 Gemini Vision API 讀取官方網站截圖，自動從截圖圖片中識別最新 H5N1 確診數字。
-    可在多個 Gemini 模型（gemini-2.0-flash / gemini-1.5-flash）之間進行自動降級與備援。
+    支援多模型（gemini-2.5-flash / gemini-2.0-flash / gemini-1.5-flash-latest / gemini-1.5-pro-latest）與 429 額度超限備援。
     需要在環境變數設定 GEMINI_API_KEY。
     """
     gemini_api_key = os.environ.get("GEMINI_API_KEY", "").strip()
@@ -452,6 +463,7 @@ def parse_screenshot_with_gemini_vision(screenshot_path):
     
     try:
         import base64
+        import time
         with open(screenshot_path, "rb") as f:
             image_data = base64.b64encode(f.read()).decode("utf-8")
         
@@ -471,7 +483,12 @@ def parse_screenshot_with_gemini_vision(screenshot_path):
 }
 如果看不清楚某個數字就填 0。"""
 
-        models = ["gemini-2.0-flash", "gemini-1.5-flash"]
+        models = [
+            "gemini-2.5-flash",
+            "gemini-2.0-flash",
+            "gemini-1.5-flash-latest",
+            "gemini-1.5-pro-latest"
+        ]
         for model_name in models:
             api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
             payload = {
@@ -496,8 +513,11 @@ def parse_screenshot_with_gemini_vision(screenshot_path):
                         return vision_data
                     else:
                         print(f"[Gemini Vision ({model_name})] 無法解析 JSON: {result_text[:200]}")
+                elif resp.status_code == 429:
+                    print(f"[Gemini Vision API ({model_name}) 額度限制 Rate Limit 429] 等待 2 秒改用備援模型...")
+                    time.sleep(2)
                 else:
-                    print(f"[Gemini Vision API ({model_name}) 回傳錯誤] status={resp.status_code}: {resp.text[:100]}")
+                    print(f"[Gemini Vision API ({model_name}) 回傳狀態 {resp.status_code}] {resp.text[:100]}")
             except Exception as model_e:
                 print(f"[Gemini Vision ({model_name}) 嘗試例外] {str(model_e)[:100]}")
     except Exception as e:
@@ -612,10 +632,10 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
     else:
         # 完全沒有任何數據時才使用硬編碼防護兜底
         stats = {
-            "total_events": 54,
-            "total_detections": 220,
-            "events_by_state": {"WA": 10, "SA": 29, "VIC": 10, "NSW": 4, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
-            "detections_by_state": {"WA": 10, "SA": 152, "VIC": 53, "NSW": 4, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
+            "total_events": 55,
+            "total_detections": 231,
+            "events_by_state": {"WA": 10, "SA": 30, "VIC": 10, "NSW": 4, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
+            "detections_by_state": {"WA": 10, "SA": 163, "VIC": 53, "NSW": 4, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
             "source": "hardcoded_fallback"
         }
 
