@@ -62,6 +62,11 @@
   - `[x]` 全面清理與重編譯 cases.json (61 筆病例，55 起 Confirmed 事件 / 231 隻確診)
   - `[x]` 解決 8/12 DAFF 官網 HTML 斷行解析 Bug，確保正確辨識全澳 236 隻與維州 58 隻數據
   - `[x]` 實作「數據庫隻數自動擬合器 (`auto_fill_state_shortfalls`)」，確保 `cases.json` 累加與頂部 Banner、數據看板、地圖、表格及趨勢圖 100% 完美同步為 236 隻
-  - `[x]` 新增 City of Casey (維州墨爾本 Casey 市大鳳頭燕鷗) 確診案例與袋鼠島海鳥疑似案至 `cases.json`
-  - `[x]` 升級 `auto_update.yml` 加入 `git pull --rebase`，解決遠端 commit 導致 Action push 被 reject 之問題
-  - `[x]` 全面更新與校對所有專案檔案（h5n1.py, report_template.html, index.html, README.md, GOVT_SCRAPING_BEST_PRACTICES.md, walkthrough.md, task.md, .github/workflows/auto_update.yml, .gitignore）
+  - `[x]` 實現 UI 解耦注入 `window.OFFICIAL_STATS`，確保橫幅與看板永遠直接讀取 DAFF 官方權威數字
+  - `[x]` 升級 DAFF 2026-08-12 19:00 AEST 最新「事件導向通報 (Event-based Reporting)」雙軌架構：
+    - `[x]` 完整保留歷史隻數資料庫 `cases.json` (236 隻 / 55 起事件) 凍結作為 Baseline。
+    - `[x]` 建立獨立事件資料庫 `cases_events.json` 進行 8/12 起最新 151 起 Positive Events 動態追蹤。
+    - `[x]` 頂部 Banner、KPI 指標卡片與各州細分面板全數轉為「151 起確診事件」與「1,307 起陰性排除事件」對齊。
+    - `[x]` 新增「DAFF 2026-08-12 政策改版宣告橫幅」，說明事件導向切換背景。
+    - `[x]` 更新維多利亞州 Agriculture Victoria 專區新 URL (Status 200 OK)。
+    - `[x]` 驗證 `index.html`、`live_page.html` 與 `live_page_utf8.html` 三檔案同步生成。

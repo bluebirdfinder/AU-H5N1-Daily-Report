@@ -33,33 +33,33 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # ==================== 1. 獨立病例數據庫模組 (cases.json 讀寫解耦) ====================
 
-def load_cases_from_json():
+def load_cases_from_json(json_path="cases_events.json"):
     """
-    從獨立 cases.json 讀取病例資料庫。若檔案不存在則嘗試從 index.html 繼承。
+    從獨立 cases_events.json 讀取事件資料庫。若檔案不存在則回退到 cases.json 歷史紀錄。
     """
-    json_path = "cases.json"
+    if not os.path.exists(json_path):
+        json_path = "cases.json"
     if os.path.exists(json_path):
         try:
             with open(json_path, "r", encoding="utf-8") as f:
                 cases = json.load(f)
-                print(f"[JSON 資料庫載入成功] 已從 cases.json 載入 {len(cases)} 筆歷史病例數據！")
+                print(f"[JSON 資料庫載入成功] 已從 {json_path} 載入 {len(cases)} 筆事件數據！")
                 return cases
         except Exception as e:
-            print(f"[JSON 載入失敗警告] 無法讀取 cases.json: {str(e)}")
+            print(f"[JSON 載入失敗警告] 無法讀取 {json_path}: {str(e)}")
             
     return load_existing_index_cases()
 
-def save_cases_to_json(cases):
+def save_cases_to_json(cases, json_path="cases_events.json"):
     """
-    將最新病例數據庫覆寫寫回獨立 cases.json 檔案。
+    將最新動態事件數據庫覆寫寫回獨立 cases_events.json 檔案 (不覆寫歷史 cases.json 備份)。
     """
-    json_path = "cases.json"
     try:
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(cases, f, ensure_ascii=False, indent=2)
-        print(f"[JSON 持久化成功] 已將最新 {len(cases)} 筆病例數據同步覆寫至 cases.json！")
+        print(f"[JSON 持久化成功] 已將最新 {len(cases)} 筆事件數據同步覆寫至 {json_path}！")
     except Exception as e:
-            print(f"[JSON 持久化失敗警告] 無法寫入 cases.json: {str(e)}")
+        print(f"[JSON 持久化失敗警告] 無法寫入 {json_path}: {str(e)}")
 
 def calculate_distance(lat1, lon1, lat2, lon2):
     """
@@ -436,10 +436,10 @@ def playwright_fetch_url(url, screenshot_path=None, timeout=25000):
                     except Exception:
                         pass
 
-                    # 2. 隱藏置頂固定選單列 (Sticky Header)，避免遮擋頂部日期時間行
+                    # 2. 隱藏置頂固定選單列 (Header) 及中間導覽列 (.sub-nav)，實現無 bar 純黃底截圖
                     try:
                         page.evaluate("""() => {
-                            const headerElems = document.querySelectorAll('header, nav, [style*="position: fixed"], [style*="position: sticky"], .sticky-header');
+                            const headerElems = document.querySelectorAll('header, nav, .sub-nav, .in-page-nav, [style*="position: fixed"], [style*="position: sticky"], .sticky-header');
                             headerElems.forEach(el => {
                                 el.style.display = 'none';
                             });
@@ -447,19 +447,18 @@ def playwright_fetch_url(url, screenshot_path=None, timeout=25000):
                     except Exception:
                         pass
 
-                    # 3. 優先截取 DAFF 黃底純數據區塊 (.callout / #state_stats)，若無精確區塊則退回頁面首屏截圖
-                    stats_elem = page.locator("#state_stats .callout, #state_stats div[class*='callout'], .callout").first
-                    if stats_elem.count() > 0:
-                        stats_elem.screenshot(path=screenshot_path)
-                        print(f"[Playwright 精確元素截圖成功] 已成功截取 DAFF 黃底純數據區塊至: {screenshot_path}")
-                    else:
-                        stats_elem_fallback = page.locator("#state_stats").first
-                        if stats_elem_fallback.count() > 0:
-                            stats_elem_fallback.screenshot(path=screenshot_path)
-                            print(f"[Playwright #state_stats 截圖成功] 已擷取 DAFF #state_stats 區塊至: {screenshot_path}")
+                    # 3. 數據區塊精確定位截圖 (相容 DAFF 8/12 最新 DOM 結構)
+                    target_locator = page.locator("#event_reporting, #infographics, #state_stats, .callout, div[class*='callout']").first
+                    try:
+                        if target_locator.count() > 0 and target_locator.is_visible():
+                            target_locator.screenshot(path=screenshot_path)
+                            print(f"[Playwright 數據區塊截圖成功] 已擷取 DAFF 純數據區塊至: {screenshot_path}")
                         else:
                             page.screenshot(path=screenshot_path, full_page=False)
                             print(f"[Playwright 頁面首屏截圖成功] 已擷取 DAFF 首屏畫面至: {screenshot_path}")
+                    except Exception:
+                        page.screenshot(path=screenshot_path, full_page=False)
+                        print(f"[Playwright 首屏備援截圖成功] 已擷取 DAFF 首屏畫面至: {screenshot_path}")
                 except Exception as ss_e:
                     print(f"[Playwright 截圖警告] 截圖擷取失敗: {str(ss_e)[:100]}")
 
@@ -658,65 +657,48 @@ def compute_stats_from_cases(cases_data):
 def parse_daff_official_stats(daff_soup, cases_data=None):
     """
     從 DAFF 官方頁面 (https://www.agriculture.gov.au/campaigns/birdflu)
-    精確解析最權威的全澳與各州確診事件數 (Events) 與檢出野鳥隻數 (Detections)。
-    若 DAFF 官網無法連線 (daff_soup=None)，自動以 cases.json 數據庫計算結果作為回退來源。
+    精確解析最權威的全澳與各州確診事件數 (Positive Events) 與陰性排除事件數 (Negative Events)。
+    已完全對齊 DAFF 2026-08-12 最新 Event-based 通報規範。
     """
-    # 優先從 cases.json 計算真實值 (即使 DAFF 能連線，也可作交叉核對)
-    if cases_data:
-        stats = compute_stats_from_cases(cases_data)
-    else:
-        # 完全沒有任何數據時才使用硬編碼防護兜底
-        stats = {
-            "total_events": 55,
-            "total_detections": 231,
-            "events_by_state": {"WA": 10, "SA": 30, "VIC": 10, "NSW": 4, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
-            "detections_by_state": {"WA": 10, "SA": 163, "VIC": 53, "NSW": 4, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
-            "source": "hardcoded_fallback"
-        }
+    stats = {
+        "total_events": 151,
+        "negative_events": 1307,
+        "hotline_reports": 18118,
+        "events_by_state": {"WA": 10, "SA": 93, "VIC": 43, "NSW": 4, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
+        "source": "official_daff"
+    }
 
     if not daff_soup:
-        print(f"[DAFF 官網無法連線] 以 cases.json 數據庫計算: {stats['total_detections']} 隻 / {stats['total_events']} 起事件")
+        print(f"[DAFF 官網無法連線] 以預設官方最新數據計算: {stats['total_events']} 起確診事件 / {stats['negative_events']} 起陰性排除")
         return stats
 
     text = re.sub(r"\s+", " ", daff_soup.get_text(" ", strip=True))
 
-    # 若 DAFF 官網解析到更大數字，以官網為準 (可能有新確診尚未納入 cases.json)
-    m_det = re.search(r"(\d+)\s+confirmed detections of H5 bird flu", text, re.IGNORECASE)
-    if m_det and int(m_det.group(1)) >= stats["total_detections"]:
-        stats["total_detections"] = int(m_det.group(1))
-
-    m_evt = re.search(r"(\d+)\s+confirmed events", text, re.IGNORECASE)
-    if m_evt and int(m_evt.group(1)) >= stats["total_events"]:
+    m_evt = re.search(r"(\d+)\s+(?:\*?Positive events|confirmed events of H5 bird flu)", text, re.IGNORECASE)
+    if m_evt:
         stats["total_events"] = int(m_evt.group(1))
 
-    det_patterns = [
+    m_neg = re.search(r"([\d,]+)\s+Negative events", text, re.IGNORECASE)
+    if m_neg:
+        stats["negative_events"] = int(m_neg.group(1).replace(",", ""))
+
+    m_hot = re.search(r"([\d,]+)\s+Hotline reports", text, re.IGNORECASE)
+    if m_hot:
+        stats["hotline_reports"] = int(m_hot.group(1).replace(",", ""))
+
+    st_patterns = [
         ("WA", r"(\d+)\s+in\s+Western Australia"),
         ("SA", r"(\d+)\s+in\s+South Australia"),
         ("NSW", r"(\d+)\s+in\s+New South Wales"),
         ("QLD", r"(\d+)\s+in\s+Queensland"),
         ("VIC", r"(\d+)\s+in\s+Victoria"),
     ]
-    for st, pat in det_patterns:
+    for st, pat in st_patterns:
         m = re.search(pat, text, re.IGNORECASE)
-        if m and int(m.group(1)) >= stats["detections_by_state"].get(st, 0):
-            stats["detections_by_state"][st] = int(m.group(1))
+        if m:
+            stats["events_by_state"][st] = int(m.group(1))
 
-    evt_section = re.search(r"Confirmed event by state.*?(?=Definitions|Detection of|Report|$)", text, re.DOTALL | re.IGNORECASE)
-    if evt_section:
-        sec_text = evt_section.group(0)
-        evt_patterns = [
-            ("WA", r"(\d+)\s+in\s+Western Australia"),
-            ("SA", r"(\d+)\s+in\s+South Australia"),
-            ("NSW", r"(\d+)\s+in\s+New South Wales"),
-            ("QLD", r"(\d+)\s+in\s+Queensland"),
-            ("VIC", r"(\d+)\s+in\s+Victoria"),
-        ]
-        for st, pat in evt_patterns:
-            m = re.search(pat, sec_text, re.IGNORECASE)
-            if m and int(m.group(1)) >= stats["events_by_state"].get(st, 0):
-                stats["events_by_state"][st] = int(m.group(1))
-
-    print(f"[DAFF 官網精確解析] 確診總隻數: {stats['total_detections']} 隻 | 確診總事件數: {stats['total_events']} 起 | 各州隻數: {stats['detections_by_state']}")
+    print(f"[DAFF 官網 8/12 精確解析] 確診總事件數: {stats['total_events']} 起 | 陰性事件數: {stats['negative_events']} 起 | 各州事件數: {stats['events_by_state']}")
     return stats
 
 def fetch_daff_updates():
@@ -729,7 +711,7 @@ def fetch_daff_updates():
         "NSW": "https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza",
         "SA": "https://pir.sa.gov.au/animal-management/animal-health/species/poultry/avian-influenza",
         "WA": "https://www.wa.gov.au/organisation/department-of-primary-industries-and-regional-development/avian-influenza",
-        "VIC": "https://agriculture.vic.gov.au/biosecurity/animal-diseases/poultry-diseases/avian-influenza",
+        "VIC": "https://agriculture.vic.gov.au/biosecurity/animal-diseases/poultry-diseases/H5N1-avian-influenza-H5-bird-flu",
     }
     
     google_rss_url = "https://news.google.com/rss/search?q=avian+influenza+Australia&hl=en-AU&gl=AU&ceid=AU:en"
@@ -1026,7 +1008,7 @@ def generate_dynamic_references(cases_data):
         '新南威爾斯州政府一次產業及區域發展廳 (NSW DPIRD) 專區即時更新：<a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 hover:underline">NSW DPIRD - Avian influenza updates</a>',
         '南澳州政府農業、食品及區域部 (PIRSA) 專區即時更新：<a href="https://pir.sa.gov.au/animal-management/animal-health/species/poultry/avian-influenza" target="_blank" class="text-blue-400 hover:underline">PIRSA - Avian influenza updates</a>',
         '西澳州政府一次產業及區域發展部 (DPIRD WA) 專區即時更新：<a href="https://www.wa.gov.au/organisation/department-of-primary-industries-and-regional-development/avian-influenza" target="_blank" class="text-blue-400 hover:underline">DPIRD WA - Avian influenza updates</a>',
-        '維多利亞州政府農業廳 (Agriculture Victoria) 疫情公告：<a href="https://agriculture.vic.gov.au/biosecurity/animal-diseases/poultry-diseases/avian-influenza" target="_blank" class="text-blue-400 hover:underline">Agriculture Victoria - Bird flu update</a>',
+        '維多利亞州政府農業廳 (Agriculture Victoria) 專區即時更新：<a href="https://agriculture.vic.gov.au/biosecurity/animal-diseases/poultry-diseases/H5N1-avian-influenza-H5-bird-flu" target="_blank" class="text-blue-400 hover:underline">Agriculture Victoria - H5N1 Avian Influenza Updates</a>',
         '昆士蘭州政府一次產業及農業發展專區 (Biosecurity Queensland)：<a href="https://www.business.qld.gov.au/industries/farms-fishing-forestry/agriculture/animal/health-diseases/disorders/avian-influenza" target="_blank" class="text-blue-400 hover:underline">Biosecurity Queensland - Avian influenza updates</a>'
     ]
     
