@@ -1,41 +1,31 @@
 # 專案開發與 Bug 修正軌跡日誌 (Walkthrough Log)
 
-## 2026-08-12 DAFF 官方數據通報規範大改版升級 (Event-Based Reporting Transition)
+## 2026-08-12 雙層獨立版塊 (Dual-Section Architecture) 網頁大升級
 
-### 📌 變更背景與官方聲明
-澳洲聯邦農業部 (DAFF) 於 **2026 年 8 月 12 日晚間 19:00 (AEST)** 正式宣告通報規範升級：
-> *“From 12 August 2026, we have changed how we report on H5 bird flu detections. Reporting will be based on events, rather than individual bird detections, where an event may involve one or more birds... As H5 bird flu is confirmed in more locations and species in Australia it will not be necessary to continue testing all species in known areas of transmission.”*
+### 📌 重構目標與版面架構
+應使用者需求，報告網頁已全面重構為**「上下雙層完全獨立專區」**架構：
 
-因應野生鳥類社區傳播擴大，官方正式由「單隻鳥隻數量統計 (236 隻)」轉為國際標準的**「確診事件導向 (Positive Events)」**，不再持續統計或公佈單鳥計數。
+1. **【上半部】最新事件導向即時監測專區 (`#live-events-section`)**：
+   - 專注於 DAFF 2026-08-12 起最新國際標準：**全澳 151 起確診事件 (Positive Events)**、**1,307 起陰性排除** 與 **18,118 筆熱線通報**。
+   - **完全不出現單鳥「0 隻」或隻數字樣**。
+   - 包含獨立之**最新中文摘要、事件動態儀表板 (Event KPIs)、事件每週增長趨勢圖 (`eventTrendChart` - 雙 Y 軸)、151 起事件點位地圖 (`eventMap` - 帶序號發光圓圈)、151 起可滾動與可搜尋排序明細表 (`eventTableBody`)**。
 
----
+2. **【中間區塊】DAFF 2026-08-12 數據規範切換告示欄 (`#policy-transition-divider`)**：
+   - 標註生效時間：**2026 年 8 月 12 日 19:00 AEST (台北時間 17:00)**。
+   - 包含完整流行病學改版原因說明（野生動物廣泛傳播期與 WOAH/FAO 事件導向資源優化），並宣告下半部歷史隻數庫完整封存告示。
 
-### 🛠️ 雙軌資料庫與前端 UI 重構說明
+3. **【下半部】歷史隻數 (236 隻) 完整凍結資料庫專區 (`#historical-birds-section`)**：
+   - 完整紀錄截至 2026-08-12 17:00 AEST 官方凍結計數前之 **236 隻單鳥確診 / 55 起歷史個案**（南澳 163 隻、維州 58 隻、西澳 10 隻、新州 4 隻、昆州 1 隻）。
+   - 包含獨立之**歷史中文摘要、歷史隻數儀表板 (Bird KPIs)、歷史隻數每週增長趨勢圖 (`historicalBirdChart` - 完全還原圖 A 雙 Y 軸)、歷史隻數點位與發光紅藍綠圓圈地圖 (`historicalBirdMap` - 完全還原圖 B 帶鳥隻數字 Badge)、歷史 64 筆詳細病歷記錄表 (`historicalBirdTableBody`)**。
 
-1. **資料庫新舊雙軌保留 (Dual-Track Database Architecture)**：
-   - **`cases.json`（歷史單鳥隻數備份 - 完全凍結不覆寫）**：完整封封保存截至 2026-08-12 17:00 AEST 官方凍結之全澳 236 隻單鳥確診 / 55 起事件歷史資料庫。
-   - **`cases_events.json`（動態事件資料庫 - 8/12 起即時追蹤）**：獨立開設新檔，專門存放 2026-08-12 19:00 AEST 官方改版後之 151 起 Positive Events 動態事件節點。
-
-2. **前端 UI 與數字對齊**：
-   - **頂部 Banner**：`✅ 已與澳洲聯邦農業部 (DAFF) 官網最新政策同步 (全澳累計 151 起確診事件 / 1,307 起陰性排除)`
-   - **KPI 數據卡片**：`151 起確診事件`（下附 `1,307 起陰性排除事件 / 18,118 筆熱線通報`）
-   - **各州確診事件細分 (Events by State)**：
-     - 南澳 (SA): **93 起事件**
-     - 維州 (VIC): **43 起事件**
-     - 西澳 (WA): **10 起事件**
-     - 新州 (NSW): **4 起事件**
-     - 昆州 (QLD): **1 起事件**
-     - *(總和 93 + 43 + 10 + 4 + 1 = 151 起事件)*
-   - **政策改版告示橫幅**：在報告頂部加入藍色宣告欄，清楚說明 DAFF 8/12 數據規範改版原因與新舊雙軌保存機制。
-
-3. **地方政府專區 URL 更新**：
-   - **維多利亞州 (Agriculture Victoria)** 專區網址失效修正：已更新為最新 URL `https://agriculture.vic.gov.au/biosecurity/animal-diseases/poultry-diseases/H5N1-avian-influenza-H5-bird-flu` (Status 200 OK)。
+4. **【全新升級】表格欄位點擊排序 (Click-to-Sort) 與即時關鍵字搜尋 (Search Filter)**：
+   - **點擊排序**：上下表格所有欄位標頭（案件編號、通報日期、發現日期、確診隻數、地理位置、物種、判定狀態）均支援點擊切換升冪 `▲` / 降冪 `▼`。
+   - **即時過濾**：提供對話輸入框，支援鍵入 `NSW`、`VIC`、`Casey`、`Esperance`、`確診` 或特定日期，即時過濾顯示符合條件的案例。
 
 ---
 
-### 🧪 實時驗證結果
-
-透過 Playwright 無頭瀏覽器實際載入編譯後的 `index.html` 進行全流程自動化測試：
-- **控制台 Console 錯誤**：`0`（完全無 JS 語法或載入錯誤）。
-- **畫面渲染**：頂部告示橫幅、KPI 指標卡片、各州網格、GIS 地圖與增長趨勢圖全數正常顯示與對齊！
-- **多檔案同步**：`index.html`、`live_page.html` 與 `live_page_utf8.html` 均完美同步生成！
+### 🧪 Playwright 自動化實實測試結果
+透過無頭瀏覽器驗證 `index.html`：
+- **Section 1 151 起事件表格**：151 筆完整加載，`nsw` 關鍵字即時過濾出 4 筆新州個案，欄位點擊排序順暢切換。
+- **Section 2 歷史 64 筆個案表格**：64 筆完整加載，排序與過濾功能完全正常。
+- **雙地圖與雙趨勢圖**：全數 100% 渲染成功！

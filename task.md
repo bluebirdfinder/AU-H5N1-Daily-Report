@@ -64,9 +64,10 @@
   - `[x]` 實作「數據庫隻數自動擬合器 (`auto_fill_state_shortfalls`)」，確保 `cases.json` 累加與頂部 Banner、數據看板、地圖、表格及趨勢圖 100% 完美同步為 236 隻
   - `[x]` 實現 UI 解耦注入 `window.OFFICIAL_STATS`，確保橫幅與看板永遠直接讀取 DAFF 官方權威數字
   - `[x]` 升級 DAFF 2026-08-12 19:00 AEST 最新「事件導向通報 (Event-based Reporting)」雙軌架構：
-    - `[x]` 完整保留歷史隻數資料庫 `cases.json` (236 隻 / 55 起事件) 凍結作為 Baseline。
-    - `[x]` 建立獨立事件資料庫 `cases_events.json` 進行 8/12 起最新 151 起 Positive Events 動態追蹤。
-    - `[x]` 頂部 Banner、KPI 指標卡片與各州細分面板全數轉為「151 起確診事件」與「1,307 起陰性排除事件」對齊。
-    - `[x]` 新增「DAFF 2026-08-12 政策改版宣告橫幅」，說明事件導向切換背景。
-    - `[x]` 更新維多利亞州 Agriculture Victoria 專區新 URL (Status 200 OK)。
+    - `[x]` 完整保留歷史隻數資料庫 `cases.json` (236 隻 / 55 起事件 / 9 陰性排除共 64 筆病歷) 凍結作為 Baseline。
+    - `[x]` 建立獨立事件資料庫 `cases_events.json` 進行 8/12 起最新 151 起 Positive Events 動態追蹤 (EVENT-001 ~ EVENT-151)。
+    - `[x]` 頂部 Banner、KPI 指標卡片與各州細分面板全數轉為「151 起確診事件」與「1,307 起陰性排除事件」對齊（100% 無隻數或 0隻字樣）。
+    - `[x]` 新增「DAFF 2026-08-12 政策改版宣告橫幅」與流行病學改版原因說明。
+    - `[x]` 完全還原原版「疫情週次增長趨勢 (WEEKLY EPI-CURVE)」雙 Y 軸圖表 (圖 A) 與發光圓圈數字地圖 (圖 B)。
+    - `[x]` 新增上下表格「欄位點擊排序 (Click-to-Sort ▲/▼)」與「即時關鍵字搜尋 (Search Filter - 支援 NSW/VIC/SA 等智慧別名)」。
     - `[x]` 驗證 `index.html`、`live_page.html` 與 `live_page_utf8.html` 三檔案同步生成。
