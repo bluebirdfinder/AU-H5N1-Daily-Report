@@ -57,6 +57,7 @@ jobs:
             echo "沒有偵測到 H5N1 最新病例變動，跳過部署。"
           else
             git commit -m "自動更新：同步最新澳洲 H5N1 疫情數據 (系統時間: $(date +'%Y-%m-%d %H:%M:%S'))"
+            git pull --rebase origin main
             git push origin main
           fi
 # Config Refreshed: 2026-08-10
