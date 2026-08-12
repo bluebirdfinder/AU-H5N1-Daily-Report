@@ -46,7 +46,7 @@
                 <h1 class="text-lg font-bold tracking-tight text-white">Nestlé Purina Blayney • Bio-Security Monitor</h1>
             </div>
             <div class="text-xs text-slate-400">
-                系統最後更新時間: <span class="text-emerald-400 font-semibold">2026-08-12 15:57:40 (台北時間) / 2026-08-12 17:57:40 (澳洲 AEST)</span>
+                系統最後更新時間: <span class="text-emerald-400 font-semibold">2026-08-12 18:40:56 (台北時間) / 2026-08-12 20:40:56 (澳洲 AEST)</span>
             </div>
         </div>
     </header>
@@ -63,11 +63,11 @@
                     <div class="mt-4 space-y-4 text-slate-300 leading-relaxed text-sm">
                         <p>
                             <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider mb-1">📢 澳洲官方防線事實 (Official Status)</span>
-                            依據 <a href="https://www.agriculture.gov.au/campaigns/birdflu" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲聯邦農業部 (DAFF)</a> 及各州政府 **2026 年 8 月 12 日 最新數據**，全澳高致病性 H5N1 野鳥確診總數累計為 **236 隻**（共 **56 起官方通報事件**）！當前確診野鳥隻數分布統計：西澳 10 隻（10起事件）、南澳 163 隻（30起事件）、維多利亞州 58 隻（11起事件）、新南威爾斯州 4 隻（4起事件）、昆士蘭州 1 隻（1起事件）。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈與原料供應安全無虞。
+                            依據 <a href="https://www.agriculture.gov.au/campaigns/birdflu" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲聯邦農業部 (DAFF)</a> 及各州政府 **2026 年 8 月 12 日 最新數據**，全澳高致病性 H5N1 野鳥確診總數累計為 **236 隻**（共 **151 起官方通報事件**）！當前確診野鳥隻數分布統計：西澳 10 隻（10起事件）、南澳 163 隻（30起事件）、維多利亞州 58 隻（11起事件）、新南威爾斯州 4 隻（4起事件）、昆士蘭州 1 隻（1起事件）。全澳家禽產業及商業飼料生產體系 100% 維持無疫區（Area Freedom）狀態，生產鏈與原料供應安全無虞。
                         </p>
                         <p>
                             <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider mb-1">📰 媒體與生態監測風向 (Media & Ecology Watch)</span>
-                            根據 <a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a> 與 <a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">新南威爾斯州政府 (NSW DPIRD)</a> 等媒體與官方平台 **2026 年 8 月 12 日 最新數據**，全澳野生海鳥確診累計 **236 隻**（56 起事件），主要集中於南澳、西澳與維州西南海岸野鳥棲息帶。聯邦首席獸醫官重申：**澳洲所有商業家禽農場維持 100% 零感染，對一般人類健康風險極低**。
+                            根據 <a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a> 與 <a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">新南威爾斯州政府 (NSW DPIRD)</a> 等媒體與官方平台 **2026 年 8 月 12 日 最新數據**，全澳野生海鳥確診累計 **236 隻**（151 起事件），主要集中於南澳、西澳與維州西南海岸野鳥棲息帶。聯邦首席獸醫官重申：**澳洲所有商業家禽農場維持 100% 零感染，對一般人類健康風險極低**。
                         </p>
                     </div>
                 </div>
@@ -316,7 +316,7 @@
     <script>
         // 【DAFF 官方權威數據注入點】
         window.OFFICIAL_STATS = /* OFFICIAL_STATS_PLACEHOLDER */ {
-  "total_events": 56,
+  "total_events": 151,
   "total_detections": 236,
   "events_by_state": {
     "WA": 10,
@@ -339,9 +339,7 @@
     "ACT": 0
   },
   "source": "cases_json"
-},
-            "events_by_state": {"WA": 10, "SA": 30, "VIC": 10, "NSW": 4, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0}
-        };
+};
 
         // 【動態資料注入點】
         // 請勿刪除此註解或變更變數宣告格式，Python 爬蟲會將此處自動覆蓋更新
@@ -1253,10 +1251,10 @@
 
         // 初始化地圖與資料渲染
         window.addEventListener('load', () => {
-            updateKPIs();
-            initTable();
-            initMap();
-            initChart();
+            try { updateKPIs(); } catch(e) { console.error('updateKPIs error:', e); }
+            try { initTable(); } catch(e) { console.error('initTable error:', e); }
+            try { initMap(); } catch(e) { console.error('initMap error:', e); }
+            try { initChart(); } catch(e) { console.error('initChart error:', e); }
         });
 
         // 動態計算全澳累計確診數與各州分佈細分 (優先直接讀取 DAFF 官方權威數字)
@@ -1501,6 +1499,10 @@
         // 3. 初始化疫情週次增長柱狀/折線混合圖表 (Chart.js - 週次分組 + 月份標示)
         let trendChart;
         function initChart() {
+            if (typeof Chart === 'undefined') {
+                console.warn('Chart.js Library failed to load from CDN. Skipping trend chart render.');
+                return;
+            }
             const canvas = document.getElementById('trendChart');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');

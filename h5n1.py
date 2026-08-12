@@ -1097,8 +1097,15 @@ def main():
     
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(updated_html)
+
+    for alt_path in ["live_page.html", "live_page_utf8.html"]:
+        try:
+            with open(alt_path, "w", encoding="utf-8") as f:
+                f.write(updated_html)
+        except Exception:
+            pass
         
-    print(f"網頁自動編譯成功！已順利生成最新 H5N1 戰略決策報告 '{output_path}'。")
+    print(f"網頁自動編譯成功！已順利生成最新 H5N1 戰略決策報告 '{output_path}'、'live_page.html' 與 'live_page_utf8.html'。")
 
 if __name__ == "__main__":
     main()
