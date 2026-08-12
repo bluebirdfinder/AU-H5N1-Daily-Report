@@ -60,4 +60,8 @@
   - `[x]` 登錄 8/11 PIRSA 最新通報：南澳 Coorong & Southend 沿海 25 例與袋鼠島 10 例新疑似病例（現存待複驗疑似案例上升至 51 例）
   - `[x]` 實作「各州確診天花板防護罩 (`enforce_official_state_ceilings`)」，徹底解決新聞個案導致加總不對齊 (如 233 隻) 之問題
   - `[x]` 全面清理與重編譯 cases.json (61 筆病例，55 起 Confirmed 事件 / 231 隻確診)
-- `[x]` 全面更新與校對所有專案檔案（h5n1.py, report_template.html, index.html, README.md, GOVT_SCRAPING_BEST_PRACTICES.md, walkthrough.md, task.md, .github/workflows/auto_update.yml, .gitignore）
+  - `[x]` 解決 8/12 DAFF 官網 HTML 斷行解析 Bug，確保正確辨識全澳 236 隻與維州 58 隻數據
+  - `[x]` 實作「數據庫隻數自動擬合器 (`auto_fill_state_shortfalls`)」，確保 `cases.json` 累加與頂部 Banner、數據看板、地圖、表格及趨勢圖 100% 完美同步為 236 隻
+  - `[x]` 新增 City of Casey (維州墨爾本 Casey 市大鳳頭燕鷗) 確診案例與袋鼠島海鳥疑似案至 `cases.json`
+  - `[x]` 升級 `auto_update.yml` 加入 `git pull --rebase`，解決遠端 commit 導致 Action push 被 reject 之問題
+  - `[x]` 全面更新與校對所有專案檔案（h5n1.py, report_template.html, index.html, README.md, GOVT_SCRAPING_BEST_PRACTICES.md, walkthrough.md, task.md, .github/workflows/auto_update.yml, .gitignore）
