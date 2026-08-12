@@ -1075,8 +1075,8 @@ def main():
     
     stats_json_str = json.dumps(official_stats, ensure_ascii=False, indent=2)
     updated_html = re.sub(
-        r'/\* OFFICIAL_STATS_PLACEHOLDER \*/\s*\{.*?\}', 
-        f"/* OFFICIAL_STATS_PLACEHOLDER */ {stats_json_str}", 
+        r'/\* OFFICIAL_STATS_PLACEHOLDER \*/\s*\{.*?\};', 
+        f"/* OFFICIAL_STATS_PLACEHOLDER */ {stats_json_str};", 
         updated_html, 
         flags=re.DOTALL
     )

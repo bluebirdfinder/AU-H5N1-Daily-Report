@@ -391,10 +391,10 @@
 
         // 初始化地圖與資料渲染
         window.addEventListener('load', () => {
-            updateKPIs();
-            initTable();
-            initMap();
-            initChart();
+            try { updateKPIs(); } catch(e) { console.error('updateKPIs error:', e); }
+            try { initTable(); } catch(e) { console.error('initTable error:', e); }
+            try { initMap(); } catch(e) { console.error('initMap error:', e); }
+            try { initChart(); } catch(e) { console.error('initChart error:', e); }
         });
 
         // 動態計算全澳累計確診數與各州分佈細分 (優先直接讀取 DAFF 官方權威數字)
@@ -639,6 +639,10 @@
         // 3. 初始化疫情週次增長柱狀/折線混合圖表 (Chart.js - 週次分組 + 月份標示)
         let trendChart;
         function initChart() {
+            if (typeof Chart === 'undefined') {
+                console.warn('Chart.js Library failed to load from CDN. Skipping trend chart render.');
+                return;
+            }
             const canvas = document.getElementById('trendChart');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
