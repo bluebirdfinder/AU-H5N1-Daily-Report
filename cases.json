@@ -855,7 +855,7 @@
   },
   {
     "id": "CASE-065",
-    "type": "Confirmed",
+    "type": "Suspect",
     "source_status": "official_updated",
     "species": "野生候鳥 (野鳥監測)",
     "location": "新偵測：Narooma",
@@ -869,7 +869,7 @@
   },
   {
     "id": "CASE-066",
-    "type": "Confirmed",
+    "type": "Suspect",
     "source_status": "official_updated",
     "species": "野生候鳥 (野鳥監測)",
     "location": "新偵測：Wentworth",

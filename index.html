@@ -46,7 +46,7 @@
                 <h1 class="text-lg font-bold tracking-tight text-white">Nestlé Purina Blayney • Bio-Security Monitor</h1>
             </div>
             <div class="text-xs text-slate-400">
-                系統最後更新時間: <span class="text-emerald-400 font-semibold">2026-08-12 15:23:23 (台北時間) / 2026-08-12 17:23:23 (澳洲 AEST)</span>
+                系統最後更新時間: <span class="text-emerald-400 font-semibold">2026-08-12 15:44:01 (台北時間) / 2026-08-12 17:44:01 (澳洲 AEST)</span>
             </div>
         </div>
     </header>
@@ -314,6 +314,35 @@
 
     <!-- 核心數據庫：此處將供 Python 爬蟲定時自動替換注入最新 JSON -->
     <script>
+        // 【DAFF 官方權威數據注入點】
+        window.OFFICIAL_STATS = /* OFFICIAL_STATS_PLACEHOLDER */ {
+  "total_events": 56,
+  "total_detections": 236,
+  "events_by_state": {
+    "WA": 10,
+    "SA": 30,
+    "VIC": 11,
+    "NSW": 4,
+    "QLD": 1,
+    "TAS": 0,
+    "NT": 0,
+    "ACT": 0
+  },
+  "detections_by_state": {
+    "WA": 10,
+    "SA": 163,
+    "VIC": 58,
+    "NSW": 4,
+    "QLD": 1,
+    "TAS": 0,
+    "NT": 0,
+    "ACT": 0
+  },
+  "source": "cases_json"
+},
+            "events_by_state": {"WA": 10, "SA": 30, "VIC": 10, "NSW": 4, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0}
+        };
+
         // 【動態資料注入點】
         // 請勿刪除此註解或變更變數宣告格式，Python 爬蟲會將此處自動覆蓋更新
         window.H5N1_CASES = /* CASES_DATABASE_PLACEHOLDER */ [
@@ -1173,7 +1202,7 @@
   },
   {
     "id": "CASE-065",
-    "type": "Confirmed",
+    "type": "Suspect",
     "source_status": "official_updated",
     "species": "野生候鳥 (野鳥監測)",
     "location": "新偵測：Narooma",
@@ -1187,7 +1216,7 @@
   },
   {
     "id": "CASE-066",
-    "type": "Confirmed",
+    "type": "Suspect",
     "source_status": "official_updated",
     "species": "野生候鳥 (野鳥監測)",
     "location": "新偵測：Wentworth",
@@ -1230,35 +1259,46 @@
             initChart();
         });
 
-        // 動態計算全澳累計確診數與各州分佈細分 (明確區分隻數與事件數)
+        // 動態計算全澳累計確診數與各州分佈細分 (優先直接讀取 DAFF 官方權威數字)
         function updateKPIs() {
             let totalConfirmedDetections = 0;
             let totalConfirmedEvents = 0;
             const stateDetections = { WA: 0, SA: 0, NSW: 0, VIC: 0, QLD: 0, TAS: 0, NT: 0, ACT: 0 };
             const stateEvents = { WA: 0, SA: 0, NSW: 0, VIC: 0, QLD: 0, TAS: 0, NT: 0, ACT: 0 };
 
-            window.H5N1_CASES.forEach(c => {
-                if (c.type === 'Confirmed') {
-                    const count = typeof c.detection_count === 'number' ? c.detection_count : 1;
-                    totalConfirmedDetections += count;
-                    totalConfirmedEvents += 1;
-                    const loc = c.location;
-                    let st = 'Other';
-                    if (loc.includes('西澳') || loc.includes('WA')) st = 'WA';
-                    else if (loc.includes('南澳') || loc.includes('SA')) st = 'SA';
-                    else if (loc.includes('新南威爾斯') || loc.includes('NSW') || loc.includes('新州')) st = 'NSW';
-                    else if (loc.includes('維多利亞') || loc.includes('VIC') || loc.includes('維州')) st = 'VIC';
-                    else if (loc.includes('昆士蘭') || loc.includes('QLD') || loc.includes('昆州')) st = 'QLD';
-                    else if (loc.includes('塔斯馬尼亞') || loc.includes('TAS')) st = 'TAS';
-                    else if (loc.includes('北領地') || loc.includes('NT')) st = 'NT';
-                    else if (loc.includes('首都領地') || loc.includes('ACT')) st = 'ACT';
-                    
-                    if (st !== 'Other') {
-                        stateDetections[st] += count;
-                        stateEvents[st] += 1;
-                    }
+            if (window.OFFICIAL_STATS && typeof window.OFFICIAL_STATS.total_detections === 'number' && window.OFFICIAL_STATS.total_detections > 0) {
+                totalConfirmedDetections = window.OFFICIAL_STATS.total_detections;
+                totalConfirmedEvents = window.OFFICIAL_STATS.total_events || 55;
+                if (window.OFFICIAL_STATS.detections_by_state) {
+                    Object.assign(stateDetections, window.OFFICIAL_STATS.detections_by_state);
                 }
-            });
+                if (window.OFFICIAL_STATS.events_by_state) {
+                    Object.assign(stateEvents, window.OFFICIAL_STATS.events_by_state);
+                }
+            } else {
+                window.H5N1_CASES.forEach(c => {
+                    if (c.type === 'Confirmed') {
+                        const count = typeof c.detection_count === 'number' ? c.detection_count : 1;
+                        totalConfirmedDetections += count;
+                        totalConfirmedEvents += 1;
+                        const loc = c.location;
+                        let st = 'Other';
+                        if (loc.includes('西澳') || loc.includes('WA')) st = 'WA';
+                        else if (loc.includes('南澳') || loc.includes('SA')) st = 'SA';
+                        else if (loc.includes('新南威爾斯') || loc.includes('NSW') || loc.includes('新州')) st = 'NSW';
+                        else if (loc.includes('維多利亞') || loc.includes('VIC') || loc.includes('維州')) st = 'VIC';
+                        else if (loc.includes('昆士蘭') || loc.includes('QLD') || loc.includes('昆州')) st = 'QLD';
+                        else if (loc.includes('塔斯馬尼亞') || loc.includes('TAS')) st = 'TAS';
+                        else if (loc.includes('北領地') || loc.includes('NT')) st = 'NT';
+                        else if (loc.includes('首都領地') || loc.includes('ACT')) st = 'ACT';
+                        
+                        if (st !== 'Other') {
+                            stateDetections[st] += count;
+                            stateEvents[st] += 1;
+                        }
+                    }
+                });
+            }
 
             const liveSyncMsg = document.getElementById('live-sync-message');
             if (liveSyncMsg) {

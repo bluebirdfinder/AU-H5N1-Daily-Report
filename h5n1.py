@@ -963,11 +963,11 @@ def enforce_official_state_ceilings(cases_data, official_stats):
             for c in reversed(st_conf_cases):
                 if excess <= 0:
                     break
-                if "新聞" in c.get("notes", "") or "RSS" in c.get("notes", "") or "新聞" in c.get("location", ""):
-                    c["type"] = "Suspect"
-                    c["notes"] += f" (因超過 DAFF 官方 {st} 權威上限 {max_allowed} 隻，自動防護調整為 Suspect 待官網對齊)"
-                    excess -= c.get("detection_count", 1)
-                    print(f"[防護罩調校] 已將新聞個案 {c['id']} ({c['location']}) 自動校正為 Suspect")
+                c["type"] = "Suspect"
+                c["notes"] += f" (因超過 DAFF 官方 {st} 權威上限 {max_allowed} 隻，自動防護調整為 Suspect 待官網對齊)"
+                count = c.get("detection_count", 1) if isinstance(c.get("detection_count"), int) else 1
+                excess -= count
+                print(f"[防護罩調校] 已將個案 {c['id']} ({c['location']}) 自動校正為 Suspect")
 
     return cases_data
 
@@ -1073,6 +1073,14 @@ def main():
     
     updated_html = updated_html.replace("<!-- MIN_DISTANCE_PLACEHOLDER -->", min_dist_str)
     
+    stats_json_str = json.dumps(official_stats, ensure_ascii=False, indent=2)
+    updated_html = re.sub(
+        r'/\* OFFICIAL_STATS_PLACEHOLDER \*/\s*\{.*?\}', 
+        f"/* OFFICIAL_STATS_PLACEHOLDER */ {stats_json_str}", 
+        updated_html, 
+        flags=re.DOTALL
+    )
+
     cases_json_str = json.dumps(cases_data, ensure_ascii=False, indent=2)
     updated_html = re.sub(
         r'/\* CASES_DATABASE_PLACEHOLDER \*/\s*\[.*?\]\s*;', 
