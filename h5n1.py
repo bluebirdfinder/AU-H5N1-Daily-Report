@@ -109,6 +109,8 @@ LOCAL_GAZETTEER = {
     "port vincent": (-34.7773, 137.8613),
     "fleurieu": (-35.5325, 138.6214),
     "fowlers bay": (-31.9912, 132.4331),
+    "tas": (-42.8821, 147.3272),
+    "tasmania": (-42.8821, 147.3272),
     "wa": (-31.9505, 115.8605),
     "western australia": (-31.9505, 115.8605),
     "sa": (-34.9285, 138.6007),
@@ -278,6 +280,8 @@ def discover_new_cases(soup, existing_cases):
         species_tag = "野生候鳥 (野鳥監測)"
         if any(kw in src_txt.lower() for kw in ["silver gull", "gull", "海鷗", "銀鷗"]):
             species_tag = "野生海鷗 (銀鷗 / Silver Gull)"
+        elif any(kw in src_txt.lower() for kw in ["skua", "brown skua", "賊鷗", "棕賊鷗"]):
+            species_tag = "野生海鳥 (棕賊鷗 / Brown Skua)"
         elif any(kw in src_txt.lower() for kw in ["mass mortality", "die-off", "dead terns", "集體死亡"]):
             species_tag = "野生海鳥群聚 (集體死亡事件)"
 
@@ -731,6 +735,8 @@ def fetch_daff_updates():
         "SA": "https://pir.sa.gov.au/animal-management/animal-health/species/poultry/avian-influenza",
         "WA": "https://www.wa.gov.au/organisation/department-of-primary-industries-and-regional-development/avian-influenza",
         "VIC": "https://agriculture.vic.gov.au/biosecurity/animal-diseases/poultry-diseases/H5N1-avian-influenza-H5-bird-flu",
+        "TAS": "https://nre.tas.gov.au/biosecurity-tasmania/animal-biosecurity/animal-health/poultry-and-pigeons/bird-flu",
+        "QLD": "https://www.business.qld.gov.au/industries/farms-fishing-forestry/agriculture/animal/health-diseases/disorders/avian-influenza",
     }
     
     google_rss_url = "https://news.google.com/rss/search?q=avian+influenza+Australia&hl=en-AU&gl=AU&ceid=AU:en"
@@ -987,9 +993,75 @@ def load_existing_index_cases():
         pass
     return []
 
+def generate_gemini_grounded_summary(official_stats=None):
+    """
+    【Gemini Google Search Grounding 實時新聞連網摘要引擎】
+    利用 Gemini API 的 google_search 工具，主動連網搜尋當下最新澳洲 H5N1 新聞（如塔斯馬尼亞 TAS 首例、各州最新動態），
+    產出最即時、權威的中文報導摘要。
+    若 GEMINI_API_KEY 未提供或連線失敗，自動回退到靜態預設摘要，零風險。
+    """
+    gemini_api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if not gemini_api_key:
+        print("[Gemini Grounding Summary] 未設定 GEMINI_API_KEY，使用預設模板摘要")
+        return None
+
+    utc_now = datetime.now(timezone.utc)
+    taipei_now = utc_now + timedelta(hours=8)
+    latest_date_str = f"{taipei_now.year} 年 {taipei_now.month} 月 {taipei_now.day} 日"
+
+    prompt = (
+        f"你是專業的澳洲 H5N1 禽流感疫情新聞分析師。"
+        f"請使用 Google 搜尋即時檢索截至今天 ({latest_date_str}) 澳洲最新 H5N1 禽流感新聞報導與各州政府官方公告（包含塔斯馬尼亞州 TAS、維多利亞州 VIC、新州 NSW、南澳 SA、西澳 WA 等）。\n"
+        f"請整理撰寫一段約 150~200 字的『最新媒體與各州動態中文報導摘要』，內容需滿足以下重點：\n"
+        f"1. 重點說明最新確診或疑似動態（包含塔斯馬尼亞州 TAS 是否出現首起棕賊鷗案例、維州或其它州最新狀況）。\n"
+        f"2. 重申全澳所有商業家禽農場維護 100% 零感染與生產鏈安全。\n"
+        f"3. 說明公眾健康風險維持極低。\n"
+        f"格式要求：回傳純 HTML 段落（包含 <a href='...'> 連結標籤與 <strong> 關鍵字強調標籤），請勿包含 ```html 區塊標頭。"
+    )
+
+    models = [
+        "gemini-2.0-flash",
+        "gemini-2.5-flash",
+        "gemini-1.5-flash-latest"
+    ]
+
+    for model_name in models:
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+        payload = {
+            "contents": [{
+                "parts": [{"text": prompt}]
+            }],
+            "tools": [
+                {"google_search": {}}
+            ]
+        }
+        headers = {"Content-Type": "application/json"}
+        params = {"key": gemini_api_key}
+
+        try:
+            print(f"[Gemini Search Grounding 觸發 ({model_name})] 正在發動實時 Google 搜尋產出最新中文新聞摘要...")
+            resp = requests.post(api_url, json=payload, headers=headers, params=params, timeout=35, verify=False)
+            if resp.status_code == 200:
+                resp_json = resp.json()
+                text_result = resp_json["candidates"][0]["content"]["parts"][0]["text"].strip()
+                clean_html = re.sub(r"^```html\s*", "", text_result, flags=re.IGNORECASE)
+                clean_html = re.sub(r"\s*```$", "", clean_html, flags=re.IGNORECASE).strip()
+                if len(clean_html) > 50:
+                    print(f"[Gemini Search Grounding 成功 ({model_name})] 已成功產出實時連網新聞摘要！({len(clean_html)} chars)")
+                    return clean_html
+            elif resp.status_code == 429:
+                print(f"[Gemini API ({model_name}) 429 超限] 改用下一模型...")
+            else:
+                print(f"[Gemini API ({model_name}) 回傳 {resp.status_code}] {resp.text[:120]}")
+        except Exception as e:
+            print(f"[Gemini Grounding ({model_name}) 例外] {str(e)[:100]}")
+
+    return None
+
 def generate_dynamic_summary(cases_data, official_stats):
     """
     動態產生包含精確數據的官方事實與媒體觀察摘要。
+    【雙引擎架構】媒體摘要優先調用 Gemini Google Search Grounding 實時連網生成。
     """
     total_events = official_stats.get("total_events", 151)
     negative_events = official_stats.get("negative_events", 1307)
@@ -1012,12 +1084,17 @@ def generate_dynamic_summary(cases_data, official_stats):
         f"依據 {daff_link} 及各州政府 <strong>{latest_date_str} 最新數據</strong>，全澳高致病性 H5N1 野生動物確診總數累計為 <strong>{total_events} 起確診事件 (Positive Events)</strong>，陰性排除事件達 <strong>{negative_events:,} 起</strong>，民眾與專家通報數達 <strong>{hotline_reports:,} 筆</strong>！確診事件分布統計：南澳 {sa_evt} 起、維州 {vic_evt} 起、西澳 {wa_evt} 起、新州 {nsw_evt} 起、昆州 {qld_evt} 起。全澳商業家禽產業及飼料生產體系 100% 維持無疫區 (Area Freedom) 狀態，生產鏈安全無虞。"
     )
 
-    nsw_dpird_link = '<a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">新南威爾斯州政府 (NSW DPIRD)</a>'
-    abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a>'
-
-    media_text = (
-        f"根據 {abc_link} 與 {nsw_dpird_link} 等媒體 <strong>{latest_date_str} 最新報導</strong>，澳洲官方自 8/12 起正式採用國際標準「事件導向 (Event-based Reporting)」統計，全澳累計 <strong>{total_events} 起確診事件</strong>（陰性排除 <strong>{negative_events:,} 起</strong>）。聯邦首席獸醫官重申：<strong>澳洲所有商業家禽農場維持 100% 零感染，對一般人類健康風險極低</strong>。"
-    )
+    # 1. 優先嘗試調用 Gemini API + Google Search Grounding 生成實時新聞摘要
+    grounded_media_summary = generate_gemini_grounded_summary(official_stats)
+    if grounded_media_summary:
+        media_text = grounded_media_summary
+    else:
+        # 2. 備援預設模板摘要
+        nsw_dpird_link = '<a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">新南威爾斯州政府 (NSW DPIRD)</a>'
+        abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a>'
+        media_text = (
+            f"根據 {abc_link} 與 {nsw_dpird_link} 等媒體 <strong>{latest_date_str} 最新報導</strong>，澳洲官方自 8/12 起正式採用國際標準「事件導向 (Event-based Reporting)」統計，全澳累計 <strong>{total_events} 起確診事件</strong>（陰性排除 <strong>{negative_events:,} 起</strong>）。聯邦首席獸醫官重申：<strong>澳洲所有商業家禽農場維持 100% 零感染，對一般人類健康風險極低</strong>。"
+        )
 
     return official_text, media_text
 
@@ -1028,6 +1105,7 @@ def generate_dynamic_references(cases_data):
         '南澳州政府農業、食品及區域部 (PIRSA) 專區即時更新：<a href="https://pir.sa.gov.au/animal-management/animal-health/species/poultry/avian-influenza" target="_blank" class="text-blue-400 hover:underline">PIRSA - Avian influenza updates</a>',
         '西澳州政府一次產業及區域發展部 (DPIRD WA) 專區即時更新：<a href="https://www.wa.gov.au/organisation/department-of-primary-industries-and-regional-development/avian-influenza" target="_blank" class="text-blue-400 hover:underline">DPIRD WA - Avian influenza updates</a>',
         '維多利亞州政府農業廳 (Agriculture Victoria) 專區即時更新：<a href="https://agriculture.vic.gov.au/biosecurity/animal-diseases/poultry-diseases/H5N1-avian-influenza-H5-bird-flu" target="_blank" class="text-blue-400 hover:underline">Agriculture Victoria - H5N1 Avian Influenza Updates</a>',
+        '塔斯馬尼亞州政府一次產業、水務及環境部 (Biosecurity Tasmania)：<a href="https://nre.tas.gov.au/biosecurity-tasmania/animal-biosecurity/animal-health/poultry-and-pigeons/bird-flu" target="_blank" class="text-blue-400 hover:underline">Biosecurity Tasmania - Avian Influenza Updates</a>',
         '昆士蘭州政府一次產業及農業發展專區 (Biosecurity Queensland)：<a href="https://www.business.qld.gov.au/industries/farms-fishing-forestry/agriculture/animal/health-diseases/disorders/avian-influenza" target="_blank" class="text-blue-400 hover:underline">Biosecurity Queensland - Avian influenza updates</a>'
     ]
     

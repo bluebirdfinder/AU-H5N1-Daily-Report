@@ -71,3 +71,12 @@
     - `[x]` 完全還原原版「疫情週次增長趨勢 (WEEKLY EPI-CURVE)」雙 Y 軸圖表 (圖 A) 與發光圓圈數字地圖 (圖 B)。
     - `[x]` 新增上下表格「欄位點擊排序 (Click-to-Sort ▲/▼)」與「即時關鍵字搜尋 (Search Filter - 支援 NSW/VIC/SA 等智慧別名)」。
     - `[x]` 驗證 `index.html`、`live_page.html` 與 `live_page_utf8.html` 三檔案同步生成。
+- `[x]` 對齊 DAFF 2026-08-13 數據結算規範（每日 17:00 AEST 結算）與排程優化
+  - `[x]` 分析 DAFF 免責聲明：每日 17:00 AEST 為官方各州數據結算基準點
+  - `[x]` 調整第一班主抓時間為 `08:00 UTC`（台灣時間 16:00 / 澳洲 AEST 18:00），於結算後 1 小時精準抓取
+  - `[x]` 保留第二班 `23:00 UTC`（台灣時間 07:00 / 澳洲 AEST 09:00）作為早晨覆核、各州官網與澳洲媒體 RSS 雙重保險
+  - `[x]` 導入 **雙引擎 (Dual-Engine) AI 架構**：整合 `Gemini API Google Search Grounding (google_search)` 實現實時連網新聞檢索與報導摘要
+  - `[x]` 更新塔斯馬尼亞州官方專區 URL (`https://nre.tas.gov.au/biosecurity-tasmania/animal-biosecurity/animal-health/poultry-and-pigeons/bird-flu`) 並新增棕賊鷗 (`Brown Skua`) 物種辨識標籤
+  - `[x]` 更新 `.github/workflows/auto_update.yml`
+  - `[x]` 同步更新 `README.md`、`task.md`、`walkthrough.md` 與 `GOVT_SCRAPING_BEST_PRACTICES.md`
+

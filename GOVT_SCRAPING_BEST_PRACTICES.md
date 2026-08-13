@@ -76,6 +76,10 @@
 | **V3.0** | 2026-08-01 | 升級全澳 8 州聯防爬蟲、Cloudflare Geocoding 代理、鳥類密度動態圈圈與雷達水波。 | 對應 8/1 全澳大暴增 20 例，解決 IP 封鎖與視覺密度呈現。 |
 | **V4.0** | 2026-08-03 | 導入 **智慧對帳與盲區補齊引擎 (Reconciliation Engine)**、多重 Web Proxy 陣列、動態日期與情境摘要生成。 | 解決 62 例官方對帳落差、官網未釋出具體地名問題、與極強 WAF 阻擋。 |
 | **V5.0** | 2026-08-11 | 導入 `curl_cffi` TLS 指紋偽裝、Playwright `#state_stats .callout` 黃框精確元素截圖、Hidden Sticky Header 避擋、Gemini Vision `responseMimeType: application/json` 強制輸出與 429 降級，以及零殘留暫存截圖清理與「各州確診天花板防護罩 (`enforce_official_state_ceilings`)」。 | 解決 Akamai/Cloudflare `ERR_HTTP2_PROTOCOL_ERROR` 封鎖、全頁截圖文字太小模糊、Gemini API 429 超限、新聞重複抓取造成 233 隻暴增不對齊與 Git 倉庫圖片膨脹痛點。 |
+| **V6.0** | 2026-08-13 | 對齊 DAFF 官方 Disclaimer 聲明「每日 17:00 AEST 數據結算點」，重新校準 GitHub Actions 自動排程為 `08:00 UTC` (台灣 16:00 / AEST 18:00) 與 `23:00 UTC` (台灣 07:00 / AEST 09:00)。 | 解決舊排程 (AEST 15:00) 早於官方結算時間導致下午漏抓痛點；同時兼顧各州官網與澳洲媒體 RSS 異步新聞動態。 |
+| **V7.0** | 2026-08-13 | 導入 **雙引擎 (Dual-Engine) AI 架構**：整合 `Gemini API Google Search Grounding (google_search)` 實現實時連網新聞檢索與報導摘要；並新增塔斯馬尼亞 (TAS Biosecurity) 官方專區與棕賊鷗 (`Brown Skua`) 物種辨識標籤。 | 解決 DAFF 官方數據延遲更新空檔期，無法即時在摘要反應各州（如 TAS 棕賊鷗首例）最新突發新聞的痛點；實現「新聞零時差 + 數據 100% 擬合」。 |
+
+
 
 ---
 
