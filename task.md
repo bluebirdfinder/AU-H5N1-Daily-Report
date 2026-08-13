@@ -79,4 +79,13 @@
   - `[x]` 更新塔斯馬尼亞州官方專區 URL (`https://nre.tas.gov.au/biosecurity-tasmania/animal-biosecurity/animal-health/poultry-and-pigeons/bird-flu`) 並新增棕賊鷗 (`Brown Skua`) 物種辨識標籤
   - `[x]` 更新 `.github/workflows/auto_update.yml`
   - `[x]` 同步更新 `README.md`、`task.md`、`walkthrough.md` 與 `GOVT_SCRAPING_BEST_PRACTICES.md`
-
+- `[x]` 2026-08-13 Self Audit：發現並修復四項關鍵 Bug
+  - `[x]` **Bug #1【最致命】** 修復 `main()` 中 `len(events_cases) < 151` 條件判斷導致 `fetch_daff_updates()` 永遠被跳過，DAFF 數字凍結在 151 無法更新
+  - `[x]` **Bug #2** 移除兩處 model list 中已廢棄的 `gemini-2.0-flash`（Google 已回傳 404），改為 `gemini-2.5-flash → gemini-2.5-flash-lite → gemini-1.5-flash-latest`
+  - `[x]` **Bug #3** 更新 `parse_daff_official_stats()` Fallback 預設值至 DAFF 2026-08-13 最新數字（186/SA123/VIC48/1273陰性/18869通報），補加 TAS 州別解析
+  - `[x]` **Bug #4** 停用 `auto_fill_state_shortfalls()` 對 `cases_events.json` 的誤用（函數以 236 鳥隻數比對事件數，每次虛增幻象紀錄）
+  - `[x]` 確認修復後 DAFF 精確解析：186 起確診事件 / SA 123 / VIC 48 / 1,273 陰性 / 18,869 通報
+- `[x]` 2026-08-13 實作方案 A：數據來源透明標示
+  - `[x]` `parse_daff_official_stats()` 成功解析後寫入 `"source": "live"` 與 `"scrape_time"` 時間戳；連線失敗時寫入 `"source": "fallback"`
+  - `[x]` `report_template.html` 頂部橫幅由 JS 讀取 `window.OFFICIAL_STATS.source` 動態顯示綠色（即時）或橘色（備援）狀態
+  - `[x]` 同步更新 `README.md`、`task.md`、`walkthrough.md`

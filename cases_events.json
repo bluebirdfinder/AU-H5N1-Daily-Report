@@ -2112,5 +2112,33 @@
     "confirm_date": "2026-06-18",
     "detection_count": 1,
     "notes": "【DAFF 官方 8/12 事件導向個案】判定為 QLD 獨立確診事件。"
+  },
+  {
+    "id": "CASE-001",
+    "type": "Confirmed",
+    "source_status": "official_updated",
+    "species": "野生候鳥 (野鳥監測)",
+    "location": "新偵測：Wentworth",
+    "latitude": -35.0,
+    "longitude": 138.0,
+    "found_date": "2026-08-13",
+    "notify_date": "2026-08-13",
+    "confirm_date": "2026-08-13",
+    "detection_count": 1,
+    "notes": "【動態爬蟲自動生成】官方已確診病例。來源文字段落：'Testing at CSIRO’s Australian Centre for Disease Preparedness (ACDP) has confirmed a further 2 positive detections in New South Wales, one greater crested tern near Narooma and one greater crested tern near Wentworth.'"
+  },
+  {
+    "id": "CASE-002",
+    "type": "Confirmed",
+    "source_status": "official_updated",
+    "species": "野生海鳥 (墨爾本 Casey 市大鳳頭燕鷗及沿海最新通報)",
+    "location": "維多利亞州墨爾本東南部 City of Casey (凱西市)",
+    "latitude": -38.03,
+    "longitude": 145.32,
+    "found_date": "2026-08-13",
+    "notify_date": "2026-08-13",
+    "confirm_date": "2026-08-13",
+    "detection_count": 84,
+    "notes": "【DAFF 全澳總數精確對齊個案】官方最新發布確診案（共 84 隻），維州總數達 58 隻、全澳達 236 隻。"
   }
 ]

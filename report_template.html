@@ -58,13 +58,39 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
 
-    <!-- 官網數據權威同步橫幅 -->
-    <div id="live-sync-banner" class="bg-emerald-600/90 text-white text-xs px-4 py-2.5 text-center font-medium sticky top-0 z-[100] transition-all duration-300 backdrop-blur border-b border-emerald-500/20">
+    <!-- 官網數據權威同步橫幅 (動態：綠色=即時官方數據 / 橘色=備援預設值) -->
+    <div id="live-sync-banner" class="text-white text-xs px-4 py-2.5 text-center font-medium sticky top-0 z-[100] transition-all duration-300 backdrop-blur border-b">
         <span class="inline-flex items-center gap-1.5 justify-center">
-            <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-            <span id="live-sync-message">✅ 已與澳洲聯邦農業部 (DAFF) 官網最新政策同步 (全澳累計 151 起確診事件 / 1,307 起陰性排除 / 18,118 筆通報)</span>
+            <span id="live-sync-dot" class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+            <span id="live-sync-message">正在初始化...</span>
         </span>
     </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const stats = window.OFFICIAL_STATS || {};
+        const banner = document.getElementById('live-sync-banner');
+        const msg    = document.getElementById('live-sync-message');
+        const dot    = document.getElementById('live-sync-dot');
+        if (!banner || !msg) return;
+
+        const isLive = stats.source === 'live';
+        const total  = stats.total_events   || '—';
+        const neg    = (stats.negative_events || 0).toLocaleString();
+        const hot    = (stats.hotline_reports || 0).toLocaleString();
+        const ts     = stats.scrape_time || '不明';
+
+        if (isLive) {
+            banner.className = banner.className + ' bg-emerald-600/90 border-emerald-500/20';
+            msg.textContent  = `✅ 即時官方數據 · 已與 DAFF 官網同步 (${ts}) — 全澳累計 ${total} 起確診事件 / ${neg} 起陰性排除 / ${hot} 筆通報`;
+        } else {
+            banner.className = banner.className + ' bg-amber-600/90 border-amber-500/30';
+            dot.classList.remove('animate-pulse');
+            dot.style.backgroundColor = '#fbbf24';
+            msg.textContent  = `⚠️ 備援數據 · DAFF 官網連線異常，目前顯示硬編碼預設值（非即時） — 全澳 ${total} 起確診 / ${neg} 陰性 / ${hot} 通報`;
+        }
+    });
+    </script>
+
 
     <!-- 頂部導航與動態更新標記 -->
     <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-[37px] z-50">

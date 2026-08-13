@@ -539,7 +539,7 @@ def parse_screenshot_with_gemini_vision(screenshot_path):
 
         models = [
             "gemini-2.5-flash",
-            "gemini-2.0-flash",
+            "gemini-2.5-flash-lite",
             "gemini-1.5-flash-latest",
             "gemini-1.5-pro-latest"
         ]
@@ -681,18 +681,21 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
     """
     從 DAFF 官方頁面 (https://www.agriculture.gov.au/campaigns/birdflu)
     精確解析最權威的全澳與各州確診事件數 (Positive Events) 與陰性排除事件數 (Negative Events)。
-    已完全對齊 DAFF 2026-08-12 最新 Event-based 通報規範。
+    已完全對齊 DAFF 2026-08-13 最新 Event-based 通報規範 (186 起確診事件)。
+    【Fallback 預設值】僅在 DAFF 官網完全無法連線時使用，應與最新官方數字同步更新。
     """
     stats = {
-        "total_events": 151,
-        "negative_events": 1307,
-        "hotline_reports": 18118,
-        "events_by_state": {"WA": 10, "SA": 93, "VIC": 43, "NSW": 4, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
-        "source": "official_daff"
+        "total_events": 186,
+        "negative_events": 1273,
+        "hotline_reports": 18869,
+        "events_by_state": {"WA": 10, "SA": 123, "VIC": 48, "NSW": 4, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
+        "source": "fallback",   # 預設標記為備援值；成功從 DAFF 解析後會覆蓋為 "live"
+        "scrape_time": None     # 成功連線後才填入，Fallback 時為 None
     }
 
     if not daff_soup:
         print(f"[DAFF 官網無法連線] 以預設官方最新數據計算: {stats['total_events']} 起確診事件 / {stats['negative_events']} 起陰性排除")
+        print(f"[警告] source=fallback：網頁將顯示硬編碼舊數字，非即時數據！")
         return stats
 
     text = re.sub(r"\s+", " ", daff_soup.get_text(" ", strip=True))
@@ -715,13 +718,17 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
         ("NSW", r"(\d+)\s+in\s+New South Wales"),
         ("QLD", r"(\d+)\s+in\s+Queensland"),
         ("VIC", r"(\d+)\s+in\s+Victoria"),
+        ("TAS", r"(\d+)\s+in\s+Tasmania"),
     ]
     for st, pat in st_patterns:
         m = re.search(pat, text, re.IGNORECASE)
         if m:
             stats["events_by_state"][st] = int(m.group(1))
 
-    print(f"[DAFF 官網 8/12 精確解析] 確診總事件數: {stats['total_events']} 起 | 陰性事件數: {stats['negative_events']} 起 | 各州事件數: {stats['events_by_state']}")
+    # 解析成功：標記為即時數據，記錄抓取時間
+    stats["source"] = "live"
+    stats["scrape_time"] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    print(f"[DAFF 官網精確解析 ({datetime.now(timezone.utc).strftime('%Y-%m-%d')})] 確診總事件數: {stats['total_events']} 起 | 陰性事件數: {stats['negative_events']} 起 | 各州事件數: {stats['events_by_state']}")
     return stats
 
 def fetch_daff_updates():
@@ -827,11 +834,13 @@ def fetch_daff_updates():
 
             print(f"[Gemini Vision 成功同步] 採用 Gemini API 辨識 DAFF 截圖數字: {official_stats['total_detections']} 隻 / {official_stats['total_events']} 起事件")
 
-    # 第三道防線：執行各州確診天花板安全防護罩 (確保 cases.json 累加絕不會超過 DAFF 權威數字)
+    # 第三道防線：執行各州確診天花板安全防護罩 (確保 cases_events.json 累加絕不會超過 DAFF 事件數上限)
     cases = enforce_official_state_ceilings(cases, official_stats)
-    
-    # 第四道防線：執行各州確診隻數自動補齊 (確保 cases.json 加總 100% 精確與 DAFF 236 隻對齊)
-    cases = auto_fill_state_shortfalls(cases, official_stats)
+
+    # 第四道防線：執行各州確診隻數自動補齊 (僅適用於歷史隻數 cases.json，不適用 cases_events.json)
+    # cases_events.json 追蹤的是事件數（Event），而非隻數（Bird Count），兩者單位不同，不可混用！
+    # auto_fill_state_shortfalls 比較的是 total_detections（236 隻）vs 事件筆數，會產生幻象紀錄，故停用。
+    # cases = auto_fill_state_shortfalls(cases, official_stats)  # ← 僅供歷史 cases.json 使用，勿啟用
     save_cases_to_json(cases)
 
     return cases, official_stats
@@ -1020,8 +1029,8 @@ def generate_gemini_grounded_summary(official_stats=None):
     )
 
     models = [
-        "gemini-2.0-flash",
         "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
         "gemini-1.5-flash-latest"
     ]
 
@@ -1116,17 +1125,10 @@ def generate_dynamic_references(cases_data):
     return "\n".join(html_lines)
 
 def main():
+    # 【關鍵修復】永遠執行 fetch_daff_updates()，確保每次都從 DAFF 官網抓取最新 official_stats
+    # 舊版錯誤：len(events_cases) < 151 條件成立時才呼叫，cases_events.json 已有 151 筆後就永遠用舊硬編碼數字
+    events_cases, official_stats = fetch_daff_updates()
     events_cases = load_cases_from_json("cases_events.json")
-    if not events_cases or len(events_cases) < 151:
-        events_cases, official_stats = fetch_daff_updates()
-        events_cases = load_cases_from_json("cases_events.json")
-    else:
-        official_stats = {
-            "total_events": 151,
-            "negative_events": 1307,
-            "hotline_reports": 18118,
-            "events_by_state": {'SA': 93, 'VIC': 43, 'WA': 10, 'NSW': 4, 'QLD': 1}
-        }
     
     events_cases.sort(key=lambda x: x.get("notify_date", ""))
     

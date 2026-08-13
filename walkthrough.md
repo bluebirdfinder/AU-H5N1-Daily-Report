@@ -19,12 +19,12 @@
    - 包含獨立之**歷史中文摘要、歷史隻數儀表板 (Bird KPIs)、歷史隻數每週增長趨勢圖 (`historicalBirdChart` - 完全還原圖 A 雙 Y 軸)、歷史隻數點位與發光紅藍綠圓圈地圖 (`historicalBirdMap` - 完全還原圖 B 帶鳥隻數字 Badge)、歷史 64 筆詳細病歷記錄表 (`historicalBirdTableBody`)**。
 
 4. **【全新升級】表格欄位點擊排序 (Click-to-Sort) 與即時關鍵字搜尋 (Search Filter)**：
-   - **點擊排序**：上下表格所有欄位標頭（案件編號、通報日期、發現日期、確診隻數、地理位置、物種、判定狀態）均支援點擊切換升冪 `▲` / 降冪 `▼`。
+   - **點擊排序**：上下表格所有欄位標頭均支援點擊切換升冪 `▲` / 降冪 `▼`。
    - **即時過濾**：提供對話輸入框，支援鍵入 `NSW`、`VIC`、`Casey`、`Esperance`、`確診` 或特定日期，即時過濾顯示符合條件的案例。
 
 ---
 
-### 🧪 Playwright 自動化實實測試結果
+### 🧪 Playwright 自動化實測結果
 透過無頭瀏覽器驗證 `index.html`：
 - **Section 1 151 起事件表格**：151 筆完整加載，`nsw` 關鍵字即時過濾出 4 筆新州個案，欄位點擊排序順暢切換。
 - **Section 2 歷史 64 筆個案表格**：64 筆完整加載，排序與過濾功能完全正常。
@@ -32,25 +32,54 @@
 
 ---
 
-## 2026-08-13 澳洲 DAFF 17:00 AEST 結算規範對齊與 GitHub Actions 自動排程優化
+## 2026-08-13 排程優化、雙引擎 AI 升級與關鍵 Bug 修復
 
-### 📌 關鍵發現與背景
+### 📌 背景：DAFF 17:00 AEST 結算規範確認
 根據 DAFF 官網最新 Disclaimer 免責聲明條款：
 > *"Data reflects information provided by state and territory governments to the Australian Government as at 17:00 AEST daily."*
 
 官方每日固定於 **17:00 AEST** 完成全澳各州與領地之 H5N1 數據匯總與結算。舊排程的第一班（AEST 15:00 / 台灣 13:00）比官方結算點早了 2 小時，導致下午無法即時捕捉當天發布。
 
-### ⚙️ 自動排程優化與雙保險機制
-工作流 [.github/workflows/auto_update.yml](file:///c:/Users/TWLaiAl/OneDrive%20-%20NESTLE/Nestle/Antigravity/AU_H5N1_Daily_Update/.github/workflows/auto_update.yml) 已重構為雙班次完美對齊架構：
-1. **主抓班次 (台灣時間 16:00 / AEST 18:00 / UTC 08:00)**：給予 DAFF 17:00 AEST 結算後 1 小時作業緩衝，精準抓取最新國家級數據。
-2. **早晨覆核班次 (台灣時間 07:00 / AEST 09:00 / UTC 23:00)**：持續備援掃瞄，同時捕捉各州政府官網（如 NSW DPIRD, VIC Agriculture Victoria, SA PIRSA, TAS Biosecurity）與澳洲媒體 RSS（如 ABC News）在非官方結算時間發布的動態新聞與事件。
+### ⚙️ 自動排程優化
+工作流 `.github/workflows/auto_update.yml` 已重構為雙班次對齊架構：
+1. **主抓班次 (台灣時間 16:00 / AEST 18:00 / UTC 08:00)**：於 DAFF 17:00 AEST 結算後 1 小時精準抓取。
+2. **早晨覆核班次 (台灣時間 07:00 / AEST 09:00 / UTC 23:00)**：備援掃瞄，同時捕捉各州官網與澳洲媒體 RSS 即時動態。
 
-### 🚀 雙引擎 (Dual-Engine) AI 架構大升級
-1. **新聞摘要：Gemini API Google Search Grounding 實時連網**  
-   在 `generate_gemini_grounded_summary()` 函數中整合 Gemini API 的 `tools: [{"google_search": {}}]` 功能。每次執行時，Gemini 會像真人一樣主動去 Google 搜尋當下最新澳洲 H5N1 報導與各州官方公告（自動捕捉如塔斯馬尼亞州 TAS 首起棕賊鷗案例、維州新增案例等突發新聞），產出無時差的即時中文報導摘要。
-2. **指標/地圖：確定性數據庫 + 對帳防護罩**  
-   儀表板 KPI 卡片、GIS 地圖與事件明細表維持由 `cases_events.json` 數據庫運算，結合強大的對帳引擎，確保數據 100% 精確且無 AI 幻覺。
-3. **TAS 塔斯馬尼亞專區整合**：  
-   已加入 TAS 官方頁面 (`https://nre.tas.gov.au/biosecurity-tasmania/animal-biosecurity/animal-health/poultry-and-pigeons/bird-flu`) 並新增 `Brown Skua / 棕賊鷗` 關鍵字標籤。
+### 🚀 雙引擎 (Dual-Engine) AI 架構升級
+1. **新聞摘要：Gemini API Google Search Grounding 實時連網**
+   整合 Gemini API 的 `tools: [{"google_search": {}}]` 功能，每次執行時 Gemini 主動搜尋當下最新澳洲 H5N1 報導，產出零時差即時中文報導摘要（自動捕捉如 TAS 首起棕賊鷗案例等突發新聞）。
+2. **指標/地圖：確定性數據庫 + 對帳防護罩**
+   KPI 卡片、GIS 地圖與事件明細表維持由 `cases_events.json` 運算，確保數據 100% 精確且無 AI 幻覺。
+3. **TAS 塔斯馬尼亞整合**：
+   已加入 TAS 官方頁面並新增 `Brown Skua / 棕賊鷗` 關鍵字標籤。
 
+### 🐛 重大 Bug 修復（四項）
 
+#### Bug #1【最致命】`main()` 永遠跳過 DAFF 爬取
+- **問題**：舊邏輯 `if len(events_cases) < 151: fetch_daff_updates()` — `cases_events.json` 已有 151 筆後，條件永遠為 `False`，`fetch_daff_updates()` 從未執行，DAFF 數字永遠凍結在 151。
+- **修復**：移除條件判斷，永遠執行 `fetch_daff_updates()`。DAFF 數字當日已從 151 暴增至 **186 起（SA 123 / VIC 48）**，修復後網頁立即反映最新數字。
+
+#### Bug #2 `gemini-2.0-flash` 已被 Google 廢棄（404）
+- **問題**：GitHub Actions 日誌顯示 `"This model models/gemini-2.0-flash is no longer available"`，浪費一次 API 呼叫延遲才降級。
+- **修復**：兩處 model list（Vision API + Grounding API）移除廢棄模型，改以 `gemini-2.5-flash → gemini-2.5-flash-lite → gemini-1.5-flash-latest` 為優先順序。
+
+#### Bug #3 `parse_daff_official_stats()` Fallback 預設值過時
+- **問題**：Fallback 仍是舊的 151/SA93/VIC43，若 DAFF 官網斷線，網頁顯示舊數字。
+- **修復**：Fallback 同步更新至 DAFF 2026-08-13 最新值（186/SA123/VIC48/1273陰性/18869通報）；同時補加 TAS（塔斯馬尼亞）的州別解析模式。
+
+#### Bug #4 `auto_fill_state_shortfalls()` 單位混用（事件數 vs. 鳥隻數）
+- **問題**：此函數設計用於歷史鳥隻數對帳（比對 236 隻），卻被誤用於事件資料庫（cases_events.json），把 152 起事件誤判為「少了 84 隻鳥」，每次執行都虛增幻象紀錄。
+- **修復**：在 `fetch_daff_updates()` 中停用此函數對事件庫的呼叫（加詳細停用說明註解）。
+
+### 🆕 方案 A：數據來源透明標示
+
+**設計目標**：讓使用者一眼辨識網頁數字是「即時 DAFF 爬取」還是「備援硬編碼值」。
+
+**實作方式**：
+- `parse_daff_official_stats()` 成功解析時寫入 `"source": "live"` 與 `"scrape_time": "2026-08-13 08:14 UTC"`；連線失敗時寫入 `"source": "fallback"`。
+- `report_template.html` 頂部橫幅由 JS 讀取 `window.OFFICIAL_STATS.source`，動態套用顏色與文字：
+
+| 狀態 | 橫幅顏色 | 內容 |
+|:---:|:---:|:---|
+| `source: "live"` | 🟢 綠色 + 閃爍點 | `✅ 即時官方數據 · 已與 DAFF 官網同步 (2026-08-13 08:14 UTC) — 全澳 186 起確診...` |
+| `source: "fallback"` | 🟡 橘色 + 靜止點 | `⚠️ 備援數據 · DAFF 官網連線異常，目前顯示硬編碼預設值（非即時）...` |
