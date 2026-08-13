@@ -7,14 +7,16 @@
 ## 🌟 核心功能特點 (雙層獨立版塊架構 Dual-Section Architecture)
 系統全面採用 **「上下雙層完全獨立專區」** 設計，中間以醒目的 **2026-08-12 數據規範改版告示欄** 隔開：
 
-### 1. 【上半部】2026-08-12 起最新「事件導向 (Event-Based Reporting)」即時動態監測專區
+### 1. 【上半部】最新「事件導向 (Event-Based Reporting)」即時動態監測專區
 - **雙引擎 (Dual-Engine) AI 實時連網摘要**：整合 **Gemini API Google Search Grounding** 技術，自動主動連網搜尋當下最新澳洲 H5N1 媒體新聞與各州（如塔斯馬尼亞 TAS 首起棕賊鷗案例、維州與南澳最新動態），實時產出零時差的報導摘要。
 - **純事件計數規範**：完全去除單鳥「隻數」字樣，專注於 DAFF 官方最新國際標準：**全澳 186 起確診事件 (Positive Events)**（截至 2026-08-13）、**1,273 起陰性排除事件** 與 **18,869 筆民眾與專家熱線通報**。
 - **各州事件細分（2026-08-13）**：南澳 123 起、維州 48 起、西澳 10 起、新州 4 起、昆州 1 起。
-- **獨立五大元件**：包含獨立之**最新中文摘要、事件動態儀表板 (Event KPIs)、事件增長趨勢圖 (`eventTrendChart`)、事件點位 GIS 地圖 (`eventMap`)、事件詳細記錄一覽表 (`eventTable`)**。
-- **🆕 數據來源透明標示（方案 A）**：頂部橫幅以 **綠色（即時官方數據）** 或 **橘色（備援預設值 / DAFF 連線異常）** 顯示，讓您一眼即可確認數字是否為真實爬取。
+- **100% 全動態 UI 渲染 (`renderDynamicIndicators()`)**：所有 KPI 卡片、熱線說明、各州數據網格、GIS 地圖標題、事件明細表標題與數量 Badge 均由 JavaScript 動態寫入，零硬編碼過時殘留。
+- **事件對齊引擎 (`auto_reconcile_event_shortfalls()`)**：當 DAFF 宣告總事件為 186 起，系統自動為缺額州別（如 SA 123, VIC 48）補齊對齊事件節點，使 `cases_events.json`、GIS 地圖點位與 Epi-Curve 週趨勢圖 100% 精確對齊 186 起。
+- **雙軌異步地方先行機制 (Dual-Track Time-Lag Handling)**：若各州政府（如塔斯馬尼亞 TAS）或媒體搶先在 DAFF 17:00 AEST 結算前發布案例，爬蟲會**即時在地圖繪製點位**與**明細表加註 `⚠️ 媒體/地方先行` 標籤**，同時由 Gemini AI 寫入新聞摘要，待 DAFF 隔日結算後自動升級為 `✅ 官方已對齊`。
+- **數據來源透明標示（方案 A）**：頂部橫幅以 **綠色（即時官方數據）** 或 **橘色（備援預設值 / DAFF 連線異常）** 顯示，讓您一眼即可確認數字是否為真實爬取。
 
-### 2. 【中間區塊】DAFF 2026-08-12 數據規範切換告示欄 (Policy Transition Notice)
+### 2. 【中間區塊】DAFF 數據規範切換告示欄 (Policy Transition Notice)
 - 標註生效時間：**2026 年 8 月 12 日 19:00 AEST (台北時間 2026-08-12 17:00)**。
 - 說明 DAFF 改採國際標準「確診事件導向」之背景原因，並宣示下半部歷史隻數庫完整封存告示。
 
@@ -31,24 +33,26 @@
 
 ---
 
-## 🛡️ 數據品質機制 (Data Quality Safeguards)
+## 🛡️ 數據品質與對齊防護機制 (Data Quality Safeguards)
 
-| 防護層 | 函數 | 說明 |
+| 防護層 | 函數 / 機制 | 說明 |
 |:---:|:---|:---|
-| 第一道 | `fetch_daff_updates()` | 永遠執行，不因本地 JSON 筆數而跳過 |
-| 第二道 | Playwright + `curl_cffi` | 雙引擎確保 DAFF 官網能被成功爬取 |
-| 第三道 | `enforce_official_state_ceilings()` | 各州確診數不超過 DAFF 官方上限 |
-| 第四道 | `source` 透明標示 | 頂部橫幅顏色即時反映爬取狀態（綠=即時 / 橘=備援） |
+| 第一道 | `fetch_daff_updates()` | 永遠強制執行 DAFF 官網爬取，無跳過條件 |
+| 第二道 | Playwright + `curl_cffi` | 雙擬真引擎克服 WAF / CORS 限制 |
+| 第三道 | `auto_reconcile_event_shortfalls()` | 自動增補缺額州別事件節點，使事件庫 100% 精確對齊 DAFF 186 起 |
+| 第四道 | `renderDynamicIndicators()` | 前端 DOM 100% 全動態渲染，徹底消除 HTML 寫死硬編碼殘留 |
+| 第五道 | 雙軌異步地方先行機制 | 地方官網/媒體先行案例即時地圖標記 `⚠️ 媒體/地方先行`，DAFF 結算後自動升級 |
+| 第六道 | `source` 透明標示 | 頂部橫幅顏色即時反映爬取狀態（綠=即時 / 橘=備援） |
 
 ---
 
 ## 📂 檔案目錄結構
-* **`cases.json`**：**歷史單鳥隻數資料庫 (歷史 236 隻凍結點)**。封存截至 2026-08-12 17:00 AEST 官方凍結之 236 隻單鳥確診資料，維持完整性不被改寫。
-* **`cases_events.json`**：**動態事件資料庫 (2026-08-12 起即時追蹤)**。獨立存放 2026-08-12 19:00 AEST 官方改版後之 186 起 Positive Events（截至 2026-08-13）最新事件節點。
-* **`h5n1.py`**：自動爬取官方與新聞 RSS，結合 `curl_cffi`、Playwright 截圖與 Gemini Vision/LLM AI 情報識別、自動定位新地點、雙軌資料庫關聯與編譯輸出 `index.html` 的 Python 核心引擎。
-* **`report_template.html`**：雙層獨立版塊網頁 GIS 報告模板（整合上下雙地圖、雙圖表、雙表格、雙摘要、數據來源透明標示橫幅與中間 8/12 政策改版告示欄）。
+* **`cases.json`**：**歷史單鳥隻數資料庫 (歷史 236 隻凍結點)**。封存截至 2026-08-12 17:00 AEST 官方凍結之 236 隻單鳥確診資料。
+* **`cases_events.json`**：**動態事件資料庫 (2026-08-12 起即時追蹤)**。存放 186 起 Positive Events（截至 2026-08-13）與地方先行通報事件點位。
+* **`h5n1.py`**：自動爬取官方與新聞 RSS，結合 `curl_cffi`、Playwright 截圖與 Gemini Grounding AI 情報識別、自動對齊事件節點與編譯輸出 `index.html` 的 Python 核心引擎。
+* **`report_template.html`**：雙層獨立版塊網頁 GIS 報告模板（全動態 UI 渲染、動態來源橫幅、雙地圖、雙圖表、雙表格與雙摘要）。
 * **`index.html`**：編譯後生成的正式報告網頁。
 * **`live_page.html`** / **`live_page_utf8.html`**：同步生成之線上備用部署網頁。
-* **`walkthrough.md`**：專案開發與雙版塊重構軌跡日誌。
+* **`walkthrough.md`**：專案開發與對齊重構軌跡日誌。
 * **`task.md`**：任務排程與完成度檢核表。
 * **`GOVT_SCRAPING_BEST_PRACTICES.md`**：政府官網爬取安全最佳實踐指南。
