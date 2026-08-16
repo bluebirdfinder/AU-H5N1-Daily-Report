@@ -1,0 +1,118 @@
+{
+  "silver gull": {
+    "name_zh": "銀鷗 (Silver Gull / 海鷗)",
+    "icon": "🕊️",
+    "migratory_status": "留鳥 / 廣泛游動",
+    "habit": "雜食性，強烈高度適應人類城鎮、港口碼頭、廢棄物處理場與露天餐廳，社會性高度群聚。",
+    "risk_level": "🔴 高風險向量 (High Risk)",
+    "risk_color": "red",
+    "risk_note": "極易在野外濕地與人類城鎮之間穿梭，有較高風險將病毒帶入人類生活圈或飼料堆放區，為重點防範目標。",
+    "daff_count": "28 起 (12%)"
+  },
+  "crested tern": {
+    "name_zh": "大鳳頭燕鷗 (Crested Tern)",
+    "icon": "🪶",
+    "migratory_status": "沿海游動性海鳥",
+    "habit": "專一食魚，極度偏好在沿海沙洲、外島進行數千隻規模的高密度密集群聚繁殖。",
+    "risk_level": "🟠 高群聚爆發風險 (Mass Mortality Risk)",
+    "risk_color": "amber",
+    "risk_note": "易在沿海棲地爆發大規模群體死亡（占全澳 75% 確診個案，南澳與維州主因），但很少深入內陸高地。",
+    "daff_count": "178 起 (75%)"
+  },
+  "giant petrel": {
+    "name_zh": "巨鸌類 (Giant Petrel / 南方巨鸌)",
+    "icon": "🌊",
+    "migratory_status": "遠洋巡航性海鳥",
+    "habit": "體型巨大且食性強悍，具備腐食與掠食習性，經常跟隨漁船、海獸屍體或於遠洋海岸巡航巡遊。",
+    "risk_level": "🟡 海洋巡航向量 (Coastal Scavenger)",
+    "risk_color": "blue",
+    "risk_note": "長距離沿海巡遊能力強，容易因掠食染病海鳥而帶毒，為沿海主要監視物種之一。",
+    "daff_count": "18 起 (8%)"
+  },
+  "pacific gull": {
+    "name_zh": "太平洋鷗 (Pacific Gull)",
+    "icon": "🦤",
+    "migratory_status": "澳洲南部特有留鳥",
+    "habit": "大型海鷗，專門棲息於基岩海岸與沙灘，以甲殼類、魚類及沿岸廢棄物為食。",
+    "risk_level": "🟡 中度沿海風險 (Moderate Coastal Risk)",
+    "risk_color": "amber",
+    "risk_note": "活動範圍高度集中於沿岸棲地，鮮少深入內陸高地或農場內部。",
+    "daff_count": "4 起 (2%)"
+  },
+  "brown skua": {
+    "name_zh": "棕賊鷗 (Brown Skua)",
+    "icon": "🦅",
+    "migratory_status": "跨洋遠洋長途候鳥",
+    "habit": "掠食與腐食性，分布於亞南極海域，具備極強的跨洋飛行能力與強悍羽翼。",
+    "risk_level": "🟡 跨域帶毒向量 (Long-Distance Carrier)",
+    "risk_color": "blue",
+    "risk_note": "將南極/亞南極海域病毒向北攜帶至澳洲南部島嶼（如 8/13 塔斯馬尼亞 Rocky Cape 首例個案）。",
+    "daff_count": "2 起 (1%)"
+  },
+  "black-faced cormorant": {
+    "name_zh": "黑面鸕鶿 (Black-faced Cormorant)",
+    "icon": "🦆",
+    "migratory_status": "沿海留鳥 / 潛水鳥類",
+    "habit": "專一潛水捕魚，群聚棲息於沿海岩礁與崖壁，鮮少遠離海濱。",
+    "risk_level": "🟢 近海棲地風險 (Coastal Risk Only)",
+    "risk_color": "emerald",
+    "risk_note": "棲息活動嚴格限定於海水沿岸岩礁，無內陸擴散威脅。",
+    "daff_count": "2 起 (1%)"
+  },
+  "little penguin": {
+    "name_zh": "小企鵝 (Little Penguin)",
+    "icon": "🐧",
+    "migratory_status": "沿岸留鳥 / 潛水鳥類",
+    "habit": "棲息於澳洲南部海岸與外島（如菲利普島 Phillip Island），夜間歸巢，不具飛行能力。",
+    "risk_level": "🟢 內陸傳播風險極低 (Low Inland Risk)",
+    "risk_color": "emerald",
+    "risk_note": "活動僅限沿岸近海，無法飛行跨區，主要為海岸邊受害者，對內陸無威脅。",
+    "daff_count": "1 起 (0.4%)"
+  },
+  "peregrine falcon": {
+    "name_zh": "遊隼 / 猛禽 (Peregrine Falcon)",
+    "icon": "🦅",
+    "migratory_status": "猛禽 / 留鳥",
+    "habit": "頂級空中肉食猛禽，俯衝捕食中小型鳥類（如海鷗或鴿子），具備高空遠距離飛行能力。",
+    "risk_level": "🟣 猛禽高空跨區向量 (Raptor Vector)",
+    "risk_color": "purple",
+    "risk_note": "因捕食染病海鷗而感染，具備飛行深入內陸的能力，為生物安全重點追蹤標的。",
+    "daff_count": "1 起 (0.4%)"
+  },
+  "大鳳頭燕鷗/銀鷗/南方巨鸌": {
+    "name_zh": "野生動物 (大鳳頭燕鷗/銀鷗/南方巨鸌)",
+    "icon": "🐾",
+    "migratory_status": "野生動物 / 沿海游動",
+    "habit": "棲息於澳洲野生生態環境之物種 (大鳳頭燕鷗/銀鷗/南方巨鸌)。",
+    "risk_level": "🟡 動態評估中 (Pending Risk)",
+    "risk_color": "blue",
+    "risk_note": "官方最新通報物種，建議密切關注其棲息地與活動動向。"
+  },
+  "野鳥監測": {
+    "name_zh": "野生動物 (野鳥監測)",
+    "icon": "🐾",
+    "migratory_status": "野生動物 / 沿海游動",
+    "habit": "棲息於澳洲野生生態環境之物種 (野鳥監測)。",
+    "risk_level": "🟡 動態評估中 (Pending Risk)",
+    "risk_color": "blue",
+    "risk_note": "官方最新通報物種，建議密切關注其棲息地與活動動向。"
+  },
+  "墨爾本 casey 市大鳳頭燕鷗及沿海最新通報": {
+    "name_zh": "野生動物 (墨爾本 Casey 市大鳳頭燕鷗及沿海最新通報)",
+    "icon": "🐾",
+    "migratory_status": "野生動物 / 沿海游動",
+    "habit": "棲息於澳洲野生生態環境之物種 (墨爾本 Casey 市大鳳頭燕鷗及沿海最新通報)。",
+    "risk_level": "🟡 動態評估中 (Pending Risk)",
+    "risk_color": "blue",
+    "risk_note": "官方最新通報物種，建議密切關注其棲息地與活動動向。"
+  },
+  "daff 官方通報確診事件": {
+    "name_zh": "野生動物 (DAFF 官方通報確診事件)",
+    "icon": "🐾",
+    "migratory_status": "野生動物 / 沿海游動",
+    "habit": "棲息於澳洲野生生態環境之物種 (DAFF 官方通報確診事件)。",
+    "risk_level": "🟡 動態評估中 (Pending Risk)",
+    "risk_color": "blue",
+    "risk_note": "官方最新通報物種，建議密切關注其棲息地與活動動向。"
+  }
+}

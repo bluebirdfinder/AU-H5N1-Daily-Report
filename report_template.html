@@ -192,8 +192,8 @@
                             <!-- 核心指標 1：全澳累計確診事件 -->
                             <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/50">
                                 <span class="text-slate-400 text-xs block mb-1">野生動物累計確診事件 (Positive Events)*</span>
-                                <span id="event-confirmed-indicator" class="text-3xl font-black text-red-500 tracking-tight">186 起確診事件</span>
-                                <span id="event-hotline-indicator" class="text-[10px] text-blue-400 block mt-1 font-semibold">（1,273 起陰性排除事件 / 18,869 筆熱線通報）</span>
+                                <span id="event-confirmed-indicator" class="text-3xl font-black text-red-500 tracking-tight">236 起確診事件</span>
+                                <span id="event-hotline-indicator" class="text-[10px] text-blue-400 block mt-1 font-semibold">（1,273 起陰性排除事件 / 21,041 筆熱線通報）</span>
                             </div>
 
                             <!-- 核心指標 2：受影響家禽 -->
@@ -203,15 +203,18 @@
                                 <span class="text-[10px] text-emerald-500 block mt-1 font-semibold">✓ 100% 安全無疫區 (Area Freedom)</span>
                             </div>
 
-                            <!-- 州級分佈統計 (EVENTS) -->
+                            <!-- 州級分佈統計 (EVENTS - 包含全部 8 個行政區) -->
                             <div class="bg-slate-900/30 p-3.5 rounded-xl border border-slate-700/40 text-xs space-y-2">
-                                <span class="text-slate-400 block font-semibold mb-1">各州確診事件細分 (Events By State)</span>
+                                <span class="text-slate-400 block font-semibold mb-1">全澳各州與行政區確診細分 (Events By Territory)</span>
                                 <div id="event-by-state-grid" class="grid grid-cols-2 gap-2 text-slate-300 font-mono">
-                                    <div>南澳 (SA): <span class="text-white font-bold">123 起事件</span></div>
-                                    <div>維州 (VIC): <span class="text-white font-bold">48 起事件</span></div>
+                                    <div>南澳 (SA): <span class="text-white font-bold">166 起事件</span></div>
+                                    <div>維州 (VIC): <span class="text-white font-bold">53 起事件</span></div>
                                     <div>西澳 (WA): <span class="text-white font-bold">10 起事件</span></div>
                                     <div>新州 (NSW): <span class="text-white font-bold">4 起事件</span></div>
+                                    <div>塔州 (TAS): <span class="text-white font-bold">2 起事件</span></div>
                                     <div>昆州 (QLD): <span class="text-white font-bold">1 起事件</span></div>
+                                    <div>北領地 (NT): <span class="text-slate-400 font-bold">0 起事件</span></div>
+                                    <div>首都區 (ACT): <span class="text-slate-400 font-bold">0 起事件</span></div>
                                 </div>
                             </div>
                         </div>
@@ -230,6 +233,59 @@
                 </div>
             </div>
 
+            <!-- ========================================================================= -->
+            <!-- 【新增】：受影響野生鳥類物種與生態生物安全指南 (Wild Bird Ecology & Bio-Security Guide) -->
+            <!-- ========================================================================= -->
+            <div class="bg-slate-800/90 p-6 rounded-2xl border border-blue-900/50 shadow-xl space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-700 pb-4 gap-2">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span>🦅</span> 受影響野生鳥類物種與生態生物安全指南 (Species Bio-Security Guide)
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-1">
+                            針對全澳 236 起確診事件之主要野生鳥類物種，提供候鳥/留鳥屬性、生態習性與對廠區供應鏈之風險層級說明。
+                        </p>
+                    </div>
+                    <span class="text-xs font-mono bg-blue-950 text-blue-300 border border-blue-700/50 px-3 py-1 rounded-full w-fit">
+                        數據源: DAFF Surveillance Database
+                    </span>
+                </div>
+
+                <!-- 生態與物種現況中文摘要導讀卡片 -->
+                <div class="bg-blue-950/60 p-4 rounded-xl border border-blue-800/50 text-xs text-slate-300 leading-relaxed space-y-1.5">
+                    <div class="font-bold text-blue-300 flex items-center gap-1.5 text-sm">
+                        <span>💡</span> 全澳野生鳥類生態與傳播現況中文摘要說明：
+                    </div>
+                    <p class="text-slate-300">
+                        全澳 <strong>236 起 H5N1 確診事件</strong> 主要集中於沿海野生海鳥棲地。其中以高密度群聚繁殖的 <strong>大鳳頭燕鷗 (Crested tern)</strong> 與廣泛游動於城鎮港口、廢棄物堆置場與露天餐廳的 <strong>銀鷗/海鷗 (Silver gull)</strong> 佔據最大感染比例；亞南極遠洋候鳥 <strong>棕賊鷗 (Brown skua)</strong> 為跨洲長途帶毒向量（促成 8/13 塔斯馬尼亞 Rocky Cape 爆發首例）；不具飛行能力的 <strong>小企鵝 (Little penguin)</strong> 則受限於近海棲地，內陸傳播風險極低。建議布萊尼廠區持續強化露天飼料倉儲對海鷗等城鎮棲息鳥類之防鳥網與生物安全隔離防線。
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- 左側：物種分佈比例環狀圖 (Chart.js + 數字統計標籤) -->
+                    <div class="bg-slate-900/70 p-5 rounded-xl border border-slate-700/60 flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">📊 確診事件物種分佈比例 (SPECIES EPI-CHART)</h4>
+                            <p class="text-[11px] text-slate-400 mb-3">以全澳 236 起確診事件之物種歸類統計個案起數與比例。</p>
+                        </div>
+                        <div class="h-[180px] w-full relative flex items-center justify-center">
+                            <canvas id="speciesDonutChart"></canvas>
+                        </div>
+                        <div id="species-legend-grid" class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] font-mono border-t border-slate-800 pt-3">
+                            <!-- JS 將動態填入各物種精確起數與百分比 (如: 大鳳頭燕鷗: 142起 (60%)) -->
+                        </div>
+                    </div>
+
+                    <!-- 右側：動態物種生態與生物安全風險卡片 (可垂直捲動瀏覽全部物種) -->
+                    <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[540px] overflow-y-auto pr-1">
+                        <!-- DYNAMIC_SPECIES_CARDS_PLACEHOLDER -->
+                    </div>
+                </div>
+            </div>
+
+                </div>
+            </div>
+
             <!-- 上半部 GIS 事件地圖 (圓圈高亮 + 數字 Badge) -->
             <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
                 <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
@@ -245,6 +301,17 @@
                     </div>
                 </div>
                 <div id="eventMap" class="map-container"></div>
+            </div>
+
+            <!-- 一鍵快篩按鈕控制列 (位在地圖與病例明細表之間，直觀連結表格檢索) -->
+            <div class="flex flex-wrap items-center gap-2 bg-slate-800/90 p-3.5 rounded-xl border border-slate-700 shadow-md">
+                <span class="text-xs font-bold text-slate-400 mr-2 flex items-center gap-1">⚡ 病例表一鍵快篩:</span>
+                <button onclick="setQuickFilter(this, '')" class="quick-filter-btn bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition shadow">全部 236 起事件</button>
+                <button onclick="setQuickFilter(this, 'TAS')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition">🏝️ 塔斯馬尼亞 (TAS 首例 2起)</button>
+                <button onclick="setQuickFilter(this, 'NSW')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition">🏭 新州 (NSW 工廠同州 4起)</button>
+                <button onclick="setQuickFilter(this, '銀鷗')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition">🔴 銀鷗/海鷗 (城鎮高風險)</button>
+                <button onclick="setQuickFilter(this, '棕賊鷗')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition">🦅 棕賊鷗 (遠洋遷徙)</button>
+                <button onclick="setQuickFilter(this, '企鵝')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition">🐧 小企鵝 (沿海留鳥)</button>
             </div>
 
             <!-- 上半部 事件可滾動明細表格 (支援搜尋與欄位點擊排序) -->
@@ -531,10 +598,10 @@
 
         function renderDynamicIndicators() {
             const stats = window.OFFICIAL_STATS || {};
-            const totalEvents = stats.total_events || 186;
+            const totalEvents = stats.total_events || 236;
             const negEvents = (stats.negative_events || 1273).toLocaleString();
-            const hotline = (stats.hotline_reports || 18869).toLocaleString();
-            const evtByState = stats.events_by_state || { 'SA': 123, 'VIC': 48, 'WA': 10, 'NSW': 4, 'QLD': 1 };
+            const hotline = (stats.hotline_reports || 21041).toLocaleString();
+            const evtByState = stats.events_by_state || { 'SA': 166, 'VIC': 53, 'WA': 10, 'NSW': 4, 'TAS': 2, 'QLD': 1 };
 
             const elConf = document.getElementById('event-confirmed-indicator');
             if (elConf) elConf.textContent = `${totalEvents} 起確診事件`;
@@ -549,11 +616,11 @@
                     <div>維州 (VIC): <span class="text-white font-bold">${evtByState.VIC || 0} 起事件</span></div>
                     <div>西澳 (WA): <span class="text-white font-bold">${evtByState.WA || 0} 起事件</span></div>
                     <div>新州 (NSW): <span class="text-white font-bold">${evtByState.NSW || 0} 起事件</span></div>
+                    <div>塔州 (TAS): <span class="text-white font-bold">${evtByState.TAS || 0} 起事件</span></div>
                     <div>昆州 (QLD): <span class="text-white font-bold">${evtByState.QLD || 0} 起事件</span></div>
+                    <div>北領地 (NT): <span class="text-slate-400 font-bold">${evtByState.NT || 0} 起事件</span></div>
+                    <div>首都區 (ACT): <span class="text-slate-400 font-bold">${evtByState.ACT || 0} 起事件</span></div>
                 `;
-                if (evtByState.TAS) {
-                    gridHtml += `<div>塔州 (TAS): <span class="text-white font-bold">${evtByState.TAS} 起事件</span></div>`;
-                }
                 elGrid.innerHTML = gridHtml;
             }
 
@@ -570,6 +637,86 @@
             filterAndSortEvents();
             initEventMap();
             initEventWeeklyChart();
+            initSpeciesChart();
+        }
+
+        function setQuickFilter(btnElem, keyword) {
+            const searchInput = document.getElementById('event-search');
+            if (searchInput) {
+                searchInput.value = keyword;
+                filterAndSortEvents();
+            }
+            document.querySelectorAll('.quick-filter-btn').forEach(btn => {
+                btn.className = 'quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition';
+            });
+            if (btnElem) {
+                btnElem.className = 'quick-filter-btn bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition shadow';
+            }
+        }
+
+        function initSpeciesChart() {
+            const ctx = document.getElementById('speciesDonutChart');
+            if (!ctx) return;
+            
+            // 精確對齊 DAFF 官方 Power BI (Positive events by species) 權威數據
+            let counts = {
+                '大鳳頭燕鷗 (Crested Tern)': 178,
+                '銀鷗 / 海鷗 (Silver Gull)': 28,
+                '巨鸌類 (Giant Petrel)': 18,
+                '太平洋鷗 (Pacific Gull)': 4,
+                '棕賊鷗 (Brown Skua)': 2,
+                '黑面鸕鶿 (Cormorant)': 2,
+                '小企鵝 (Little Penguin)': 1,
+                '遊隼/其它 (Falcon & Other)': 3,
+            };
+
+            const total = 236;
+            const legendGrid = document.getElementById('species-legend-grid');
+            if (legendGrid) {
+                const colors = {
+                    '大鳳頭燕鷗 (Crested Tern)': '#f59e0b',
+                    '銀鷗 / 海鷗 (Silver Gull)': '#ef4444',
+                    '巨鸌類 (Giant Petrel)': '#3b82f6',
+                    '太平洋鷗 (Pacific Gull)': '#eab308',
+                    '棕賊鷗 (Brown Skua)': '#8b5cf6',
+                    '黑面鸕鶿 (Cormorant)': '#06b6d4',
+                    '小企鵝 (Little Penguin)': '#10b981',
+                    '遊隼/其它 (Falcon & Other)': '#64748b'
+                };
+                let legendHtml = '';
+                for (const [name, cnt] of Object.entries(counts)) {
+                    const pct = (cnt / total * 100).toFixed(cnt < 2 ? 1 : 0);
+                    const color = colors[name] || '#64748b';
+                    legendHtml += `<div class="flex items-center justify-between bg-slate-950/60 px-2 py-1 rounded border border-slate-800">
+                        <span class="flex items-center gap-1.5 text-slate-300 truncate text-[10px]">
+                            <span class="w-2 h-2 rounded-full inline-block shrink-0" style="background-color: ${color}"></span>
+                            ${name.split(' ')[0]}
+                        </span>
+                        <span class="font-bold text-white shrink-0 ml-1 text-[11px]">${cnt}起 <span class="text-slate-400 font-normal text-[9px]">(${pct}%)</span></span>
+                    </div>`;
+                }
+                legendGrid.innerHTML = legendHtml;
+            }
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(counts),
+                    datasets: [{
+                        data: Object.values(counts),
+                        backgroundColor: ['#f59e0b', '#ef4444', '#3b82f6', '#eab308', '#8b5cf6', '#06b6d4', '#10b981', '#64748b'],
+                        borderWidth: 2,
+                        borderColor: '#0f172a'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
         }
 
         function sortEvents(colKey) {

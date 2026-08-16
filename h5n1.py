@@ -451,29 +451,27 @@ def playwright_fetch_url(url, screenshot_path=None, timeout=25000):
                     except Exception:
                         pass
 
-                    # 3. 雙重區塊精確定位截圖 (起點: 'Report signs of bird flu'; 終點: 'human health remains low')
-                    start_elem = page.locator(".callout-wrapper, .callout, h2").filter(has_text="Report signs of bird flu").first
+                    # 3. 精確定位 DAFF 官方新版 Event data 紅框區塊截圖 (起點: 'Event data' 標題; 終點: 'Positive events' 標題)
+                    start_elem = page.locator("h2, h3, div").filter(has_text="Event data").first
                     if start_elem.count() == 0:
-                        start_elem = page.locator("h2").filter(has_text="H5 bird flu events in wildlife").first
-                    if start_elem.count() == 0:
-                        start_elem = page.locator("#state_stats, #event_reporting, #infographics").first
+                        start_elem = page.locator("h2, h3, div").filter(has_text="Key developments").first
 
-                    end_elem = page.locator(".callout-wrapper, .callout, p, div").filter(has_text="human health remains low").first
+                    end_elem = page.locator("h2, h3").filter(has_text="Positive events").first
                     if end_elem.count() == 0:
-                        end_elem = page.locator(".callout-wrapper, .callout").last
+                        end_elem = page.locator("h2, h3").filter(has_text="Report signs of bird flu").first
 
                     start_box = start_elem.bounding_box() if start_elem.count() > 0 else None
                     end_box = end_elem.bounding_box() if end_elem.count() > 0 else None
 
                     if start_box and end_box:
                         clip_rect = {
-                            'x': float(min(start_box['x'], end_box['x'])),
-                            'y': float(start_box['y']),
-                            'width': float(max(start_box['width'], end_box['width'])),
-                            'height': float((end_box['y'] + end_box['height']) - start_box['y'])
+                            'x': float(max(0, start_box['x'] - 20)),
+                            'y': float(max(0, start_box['y'] - 15)),
+                            'width': float(max(start_box['width'], 1100)),
+                            'height': float(max(100, end_box['y'] - start_box['y']))
                         }
                         page.screenshot(path=screenshot_path, clip=clip_rect)
-                        print(f"[Playwright 全版區塊截圖成功] 已擷取 DAFF 新版 Event 通報全區塊至: {screenshot_path}")
+                        print(f"[Playwright 全版區塊截圖成功] 已擷取 DAFF 新版 Event 通報紅框區塊至: {screenshot_path}")
                     else:
                         target_locator = page.locator("#event_reporting, #infographics, #state_stats, .callout").first
                         if target_locator.count() > 0:
@@ -520,28 +518,25 @@ def parse_screenshot_with_gemini_vision(screenshot_path):
             image_data = base64.b64encode(f.read()).decode("utf-8")
         
         prompt = """你是澳洲 H5N1 禽流感疫情數據分析師。
-請仔細查看這張來自澳洲聯邦農業部 (DAFF) 的黃底疫情統計數據區塊截圖，找出以下數據：
-1. 最新發布的時間字串（例如 "1.00pm AEST, 10 August 2026"）
-2. 全澳確診野鳥隻數總數（confirmed detections of H5 bird flu in wild birds）
-3. 全澳確診事件總起數（confirmed events）
-4. 各州確診野鳥隻數（WA/SA/VIC/NSW/QLD/TAS/NT/ACT）
-5. 各州確診事件起數（WA/SA/VIC/NSW/QLD/TAS/NT/ACT）
+請仔細查看這張來自澳洲聯邦農業部 (DAFF) 最新 Event data 區塊截圖（網址: agriculture.gov.au/campaigns/birdflu/latest-data#event_data），找出以下數據：
+1. 最新發布的時間字串（例如 "4pm AEST, 15 August 2026"）
+2. 全澳確診事件總起數（Positive events，例如 236）
+3. 全澳熱線通報總筆數（Hotline reports，例如 21,041）
+4. 各州確診事件起數（WA/SA/VIC/NSW/QLD/TAS/NT/ACT，例如 WA 10, SA 166, NSW 4, QLD 1, VIC 53, TAS 2）
 
 請只回傳標準 JSON 格式，包含以下鍵值：
 {
   "last_update_str": "<string>",
-  "total_detections": <int>,
   "total_events": <int>,
-  "detections_by_state": {"WA": <int>, "SA": <int>, "VIC": <int>, "NSW": <int>, "QLD": <int>, "TAS": <int>, "NT": <int>, "ACT": <int>},
+  "hotline_reports": <int>,
   "events_by_state": {"WA": <int>, "SA": <int>, "VIC": <int>, "NSW": <int>, "QLD": <int>, "TAS": <int>, "NT": <int>, "ACT": <int>}
 }
 如果看不清楚某個數字就填 0。"""
 
         models = [
-            "gemini-2.5-flash",
-            "gemini-2.5-flash-lite",
             "gemini-1.5-flash-latest",
-            "gemini-1.5-pro-latest"
+            "gemini-1.5-pro-latest",
+            "gemini-2.0-flash"
         ]
         for model_name in models:
             api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
@@ -591,15 +586,17 @@ def smart_fetch_url(url, headers=None, timeout=10):
     第 3 段：Playwright 真實 Chromium 瀏覽器（備有自動截圖與容錯）
     第 4 段：普通 requests 連線
     """
-    # 第 1 段：curl_cffi Chrome 指紋擬真抓取
-    try:
-        from curl_cffi import requests as cffi_requests
-        resp = cffi_requests.get(url, impersonate="chrome124", timeout=timeout, verify=False)
-        if resp.status_code == 200 and resp.text and len(resp.text) > 500:
-            print(f"[curl_cffi 擬真 Chrome 成功] {url} ({len(resp.text)} chars)")
-            return resp.text
-    except Exception as e:
-        print(f"[curl_cffi 擬真嘗試] {str(e)[:80]}")
+    # 對於包含 DAFF 動態表格之網頁 (latest-data)，優先使用 Playwright 真實瀏覽器渲染
+    if "agriculture.gov.au" not in url:
+        # 第 1 段：curl_cffi Chrome 指紋擬真抓取
+        try:
+            from curl_cffi import requests as cffi_requests
+            resp = cffi_requests.get(url, impersonate="chrome124", timeout=timeout, verify=False)
+            if resp.status_code == 200 and resp.text and len(resp.text) > 500:
+                print(f"[curl_cffi 擬真 Chrome 成功] {url} ({len(resp.text)} chars)")
+                return resp.text
+        except Exception as e:
+            print(f"[curl_cffi 擬真嘗試] {str(e)[:80]}")
 
     # 第 2 段：CF Worker 代理
     cf_worker_url = os.environ.get("CF_WORKER_URL", "").strip().rstrip("/")
@@ -679,16 +676,16 @@ def compute_stats_from_cases(cases_data):
 
 def parse_daff_official_stats(daff_soup, cases_data=None):
     """
-    從 DAFF 官方頁面 (https://www.agriculture.gov.au/campaigns/birdflu)
+    從 DAFF 官方頁面 (https://www.agriculture.gov.au/campaigns/birdflu/latest-data)
     精確解析最權威的全澳與各州確診事件數 (Positive Events) 與陰性排除事件數 (Negative Events)。
-    已完全對齊 DAFF 2026-08-13 最新 Event-based 通報規範 (186 起確診事件)。
+    已完全對齊 DAFF 2026-08-15 最新 Event-based 通報規範 (236 起確診事件)。
     【Fallback 預設值】僅在 DAFF 官網完全無法連線時使用，應與最新官方數字同步更新。
     """
     stats = {
-        "total_events": 186,
+        "total_events": 236,
         "negative_events": 1273,
-        "hotline_reports": 18869,
-        "events_by_state": {"WA": 10, "SA": 123, "VIC": 48, "NSW": 4, "QLD": 1, "TAS": 0, "NT": 0, "ACT": 0},
+        "hotline_reports": 21041,
+        "events_by_state": {"WA": 10, "SA": 166, "VIC": 53, "NSW": 4, "QLD": 1, "TAS": 2, "NT": 0, "ACT": 0},
         "source": "fallback",   # 預設標記為備援值；成功從 DAFF 解析後會覆蓋為 "live"
         "scrape_time": None     # 成功連線後才填入，Fallback 時為 None
     }
@@ -731,13 +728,90 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
     print(f"[DAFF 官網精確解析 ({datetime.now(timezone.utc).strftime('%Y-%m-%d')})] 確診總事件數: {stats['total_events']} 起 | 陰性事件數: {stats['negative_events']} 起 | 各州事件數: {stats['events_by_state']}")
     return stats
 
+def extract_daff_table_cases(daff_soup):
+    """
+    從 DAFF 官方最新數據頁面 (latest-data) 的 surveillance table
+    直接精確抽取所有 236 筆確診事件 (包含地點、州別、確診日期、物種、經緯度)。
+    """
+    if not daff_soup:
+        return []
+    table = daff_soup.find("table")
+    if not table:
+        return []
+    rows = table.find_all("tr")[1:] # 跳過表頭
+    extracted = []
+    
+    species_map = {
+        "brown skua": "野生海鳥 (棕賊鷗 / Brown skua)",
+        "silver gull": "野生海鷗 (銀鷗 / Silver gull)",
+        "little penguin": "野生企鵝 (小企鵝 / Little penguin)",
+        "pacific gull": "野生海鷗 (太平洋鷗 / Pacific gull)",
+        "crested tern": "野生燕鷗 (大鳳頭燕鷗 / Crested tern)",
+        "tern": "野生燕鷗 (Tern)",
+        "southern giant petrel": "野生巨鸌 (南方巨鸌 / Petrel)",
+    }
+    
+    state_names = {
+        "TAS": "塔斯馬尼亞州 (TAS)",
+        "SA": "南澳州 (SA)",
+        "VIC": "維多利亞州 (VIC)",
+        "NSW": "新南威爾斯州 (NSW)",
+        "WA": "西澳州 (WA)",
+        "QLD": "昆士蘭州 (QLD)",
+        "NT": "北領地 (NT)",
+        "ACT": "首都領地 (ACT)"
+    }
+    
+    for idx, r in enumerate(rows, 1):
+        cols = [c.get_text().strip() for c in r.find_all(["td", "th"])]
+        if len(cols) >= 6:
+            loc, st, date_raw, species_raw, lat_str, lon_str = cols[:6]
+            
+            norm_date = date_raw
+            try:
+                dt = datetime.strptime(date_raw, "%d %B %Y")
+                norm_date = dt.strftime("%Y-%m-%d")
+            except Exception:
+                pass
+                
+            st_prefix = state_names.get(st, st)
+            full_loc = f"{st_prefix} {loc}"
+            
+            sp_clean = species_raw.lower()
+            species_zh = species_map.get(sp_clean, f"野生海鳥 ({species_raw})")
+            
+            try:
+                lat_val = float(lat_str)
+                lon_val = float(lon_str)
+            except Exception:
+                lat_val, lon_val = None, None
+                
+            event_obj = {
+                "id": f"EVENT-{idx:03d}",
+                "type": "Confirmed",
+                "source_status": "official_updated",
+                "species": species_zh,
+                "location": full_loc,
+                "latitude": lat_val,
+                "longitude": lon_val,
+                "found_date": norm_date,
+                "notify_date": norm_date,
+                "confirm_date": norm_date,
+                "detection_count": 1,
+                "notes": f"【DAFF 官網 Surveillance Table 直抓】地點：{full_loc}，物種：{species_raw}"
+            }
+            extracted.append(event_obj)
+            
+    print(f"[DAFF surveillance table 直抓成功] 成功從 DAFF 頁面表格解析出 {len(extracted)} 起個案！")
+    return extracted
+
 def fetch_daff_updates():
     """
     聯防爬蟲主控函式：爬取全澳官方與新聞流，結合 DAFF 官方直抓與嚴格病例管理。
     自動使用 Playwright 擷取 DAFF 截圖，並推送給 Gemini API 做 AI 視覺判讀。
     """
     sources = {
-        "DAFF_Entry": "https://www.agriculture.gov.au/campaigns/birdflu",
+        "DAFF_Entry": "https://www.agriculture.gov.au/campaigns/birdflu/latest-data#event_data",
         "NSW": "https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza",
         "SA": "https://pir.sa.gov.au/animal-management/animal-health/species/poultry/avian-influenza",
         "WA": "https://www.wa.gov.au/organisation/department-of-primary-industries-and-regional-development/avian-influenza",
@@ -791,22 +865,26 @@ def fetch_daff_updates():
     print(f"正在連線 Google News RSS: {google_rss_url} ...")
     rss_content = smart_fetch_url(google_rss_url, headers=headers, timeout=12)
     abc_rss_text = rss_content.lower() if rss_content else ""
-        
-    cases = load_cases_from_json()
 
-    # 第一道防線：官網動態提取新地點 (嚴格去重)
-    for s in soups:
-        discovered_cases = discover_new_cases(s, cases)
-        for nc in discovered_cases:
-            cases.append(nc)
+    table_cases = extract_daff_table_cases(daff_soup)
+    if table_cases and len(table_cases) >= 100:
+        print(f"[DAFF 表格優先] 採用 DAFF 官網 Surveillance Table 直抓之 {len(table_cases)} 筆權威事件！")
+        cases = table_cases
+    else:
+        cases = load_cases_from_json()
+        # 僅在完全缺乏權威資料庫時才發動動態文字擷取；若 cases_events.json 已具備 >= 100 筆完整數據，嚴禁雜訊個案寫入
+        if len(cases) < 100:
+            for s in soups:
+                discovered_cases = discover_new_cases(s, cases)
+                for nc in discovered_cases:
+                    cases.append(nc)
 
-    # 第二道防線：新聞 RSS 動態提取新地點 (嚴格去重)
-    rss_discovered = discover_cases_from_news_rss(abc_rss_text, cases)
-    for nc in rss_discovered:
-        cases.append(nc)
+            rss_discovered = discover_cases_from_news_rss(abc_rss_text, cases)
+            for nc in rss_discovered:
+                cases.append(nc)
 
-    # 持久化寫回獨立 cases.json 檔案
-    save_cases_to_json(cases)
+    # 持久化寫回獨立 cases_events.json 檔案
+    save_cases_to_json(cases, "cases_events.json")
 
     # 以 cases.json (最新版) 與 HTML 解析計算官方統計
     official_stats = parse_daff_official_stats(daff_soup, cases_data=cases)
@@ -1088,19 +1166,19 @@ def generate_gemini_grounded_summary(official_stats=None):
     latest_date_str = f"{taipei_now.year} 年 {taipei_now.month} 月 {taipei_now.day} 日"
 
     prompt = (
-        f"你是專業的澳洲 H5N1 禽流感疫情新聞分析師。"
-        f"請使用 Google 搜尋即時檢索截至今天 ({latest_date_str}) 澳洲最新 H5N1 禽流感新聞報導與各州政府官方公告（包含塔斯馬尼亞州 TAS、維多利亞州 VIC、新州 NSW、南澳 SA、西澳 WA 等）。\n"
-        f"請整理撰寫一段約 150~200 字的『最新媒體與各州動態中文報導摘要』，內容需滿足以下重點：\n"
-        f"1. 重點說明最新確診或疑似動態（包含塔斯馬尼亞州 TAS 是否出現首起棕賊鷗案例、維州或其它州最新狀況）。\n"
-        f"2. 重申全澳所有商業家禽農場維護 100% 零感染與生產鏈安全。\n"
-        f"3. 說明公眾健康風險維持極低。\n"
+        f"你是專業的澳洲 H5N1 禽流感疫情與野生動物生態分析師。"
+        f"請使用 Google 搜尋即時檢索截至今天 ({latest_date_str}) 澳洲最新 H5N1 禽流感新聞報導、野生動物健康機構 (Wildlife Health Australia) 與各州政府官方公告（包含塔斯馬尼亞州 TAS、維州 VIC、新州 NSW、南澳 SA、西澳 WA 等）。\n"
+        f"請特別檢索澳洲野生哺乳類動物（如海豹 Fur Seal/Sea Lion、紅狐狸 Red Fox、野貓 Feral Cat、塔斯馬尼亞惡魔 Tasmanian Devil、狐蝠 Flying Fox 等）受 H5N1 感染或大規模死亡之最新報導與監測動態。\n"
+        f"請整理撰寫一段約 150~220 字的『最新媒體、生態與哺乳類監測動態中文報導摘要』，內容需滿足以下重點：\n"
+        f"1. 重點說明最新鳥類確診動態（如塔斯馬尼亞 TAS 棕賊鷗案例、南澳與維州沿海最新狀況）。\n"
+        f"2. ⚠️ 【哺乳類跨種監測特別提醒】：若搜尋到海豹、狐狸、野貓等哺乳類感染案例，請務必在摘要中加上醒目的粗體警告標籤（如 '⚠️ 哺乳類監測：據報導 [地點] 出現海豹/狐狸染病案例...'）；若無新增哺乳類感染，請標明 '全澳哺乳類動物無大規模爆發，重點防線維持警覺'。\n"
+        f"3. 重申全澳所有商業家禽農場維護 100% 無疫區與生產鏈安全，公眾健康風險極低。\n"
         f"格式要求：回傳純 HTML 段落（包含 <a href='...'> 連結標籤與 <strong> 關鍵字強調標籤），請勿包含 ```html 區塊標頭。"
     )
 
     models = [
-        "gemini-2.5-flash",
-        "gemini-2.5-flash-lite",
-        "gemini-1.5-flash-latest"
+        "gemini-1.5-flash-latest",
+        "gemini-1.5-pro-latest"
     ]
 
     for model_name in models:
@@ -1146,20 +1224,21 @@ def generate_dynamic_summary(cases_data, official_stats):
     hotline_reports = official_stats.get("hotline_reports", 18869)
     evt_by_state = official_stats.get("events_by_state", {})
 
-    daff_link = '<a href="https://www.agriculture.gov.au/campaigns/birdflu" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲聯邦農業部 (DAFF)</a>'
+    daff_link = '<a href="https://www.agriculture.gov.au/campaigns/birdflu/latest-data#event_data" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲聯邦農業部 (DAFF)</a>'
     
     utc_now = datetime.now(timezone.utc)
     taipei_now = utc_now + timedelta(hours=8)
     latest_date_str = f"{taipei_now.year} 年 {taipei_now.month} 月 {taipei_now.day} 日"
 
-    sa_evt = evt_by_state.get('SA', 123)
-    vic_evt = evt_by_state.get('VIC', 48)
+    sa_evt = evt_by_state.get('SA', 166)
+    vic_evt = evt_by_state.get('VIC', 53)
     wa_evt = evt_by_state.get('WA', 10)
     nsw_evt = evt_by_state.get('NSW', 4)
+    tas_evt = evt_by_state.get('TAS', 2)
     qld_evt = evt_by_state.get('QLD', 1)
 
     official_text = (
-        f"依據 {daff_link} 及各州政府 <strong>{latest_date_str} 最新數據</strong>，全澳高致病性 H5N1 野生動物確診總數累計為 <strong>{total_events} 起確診事件 (Positive Events)</strong>，陰性排除事件達 <strong>{negative_events:,} 起</strong>，民眾與專家通報數達 <strong>{hotline_reports:,} 筆</strong>！確診事件分布統計：南澳 {sa_evt} 起、維州 {vic_evt} 起、西澳 {wa_evt} 起、新州 {nsw_evt} 起、昆州 {qld_evt} 起。全澳商業家禽產業及飼料生產體系 100% 維持無疫區 (Area Freedom) 狀態，生產鏈安全無虞。"
+        f"依據 {daff_link} 及各州政府 <strong>{latest_date_str} 最新數據</strong>，全澳高致病性 H5N1 野生動物確診總數累計為 <strong>{total_events} 起確診事件 (Positive Events)</strong>，陰性排除事件達 <strong>{negative_events:,} 起</strong>，民眾與專家通報數達 <strong>{hotline_reports:,} 筆</strong>！確診事件分布統計：南澳 {sa_evt} 起、維州 {vic_evt} 起、西澳 {wa_evt} 起、新州 {nsw_evt} 起、塔州 {tas_evt} 起、昆州 {qld_evt} 起。全澳商業家禽產業及飼料生產體系 100% 維持無疫區 (Area Freedom) 狀態，生產鏈安全無虞。"
     )
 
     # 1. 優先嘗試調用 Gemini API + Google Search Grounding 生成實時新聞摘要
@@ -1176,9 +1255,240 @@ def generate_dynamic_summary(cases_data, official_stats):
 
     return official_text, media_text
 
+SPECIES_CACHE_FILE = "species_cache.json"
+
+DEFAULT_SPECIES_PROFILES = {
+    "silver gull": {
+        "name_zh": "銀鷗 (Silver Gull / 海鷗)",
+        "icon": "🕊️",
+        "migratory_status": "留鳥 / 城鎮近海游動",
+        "habit": "雜食性，強烈適應人類城鎮、港口碼頭、廢棄物堆置場與露天餐廳，社會性高度群聚。",
+        "risk_level": "🔴 高風險向量 (High Risk)",
+        "risk_color": "red",
+        "risk_note": "極易在野外濕地與人類城鎮間穿梭，最容易將野外病毒攜入城鎮或飼料存放區，為重點監控對象。"
+    },
+    "crested tern": {
+        "name_zh": "大鳳頭燕鷗 (Crested Tern)",
+        "icon": "🪶",
+        "migratory_status": "沿海游動性海鳥",
+        "habit": "專一食魚，極度偏好在沿海沙洲與外島進行數千隻規模的高密度密集群聚繁殖。",
+        "risk_level": "🟠 群聚爆發風險 (Mass Risk)",
+        "risk_color": "amber",
+        "risk_note": "易在沿海棲地引發超級傳播與大規模死亡（南澳與維州海岸主因），但極少深入內陸高地。"
+    },
+    "brown skua": {
+        "name_zh": "棕賊鷗 (Brown Skua)",
+        "icon": "🦅",
+        "migratory_status": "亞南極遠洋跨洋候鳥",
+        "habit": "強悍掠食與腐食性，羽翼極強，可隨南半球西風帶進行數千公里遠洋長途跨洲飛行。",
+        "risk_level": "🟡 跨域長途向量 (Carrier)",
+        "risk_color": "blue",
+        "risk_note": "將南極/亞南極病毒向北帶至澳洲南部島嶼（8/13 塔斯馬尼亞 Rocky Cape 首例即為棕賊鷗）。"
+    },
+    "little penguin": {
+        "name_zh": "小企鵝 (Little Penguin)",
+        "icon": "🐧",
+        "migratory_status": "沿岸留鳥 / 潛水鳥",
+        "habit": "棲息於澳洲南部海岸與外島（如菲利普島 Phillip Island），不具飛行能力，夜間歸巢。",
+        "risk_level": "🟢 內陸風險極低 (Low Risk)",
+        "risk_color": "emerald",
+        "risk_note": "活動範圍嚴格限制於沿岸近海，無法飛行跨區傳播，主要為受害宿主。"
+    },
+    "pacific gull": {
+        "name_zh": "太平洋鷗 (Pacific Gull)",
+        "icon": "🦤",
+        "migratory_status": "澳洲南部特有留鳥",
+        "habit": "大型海鷗，專門棲息於基岩海岸與沙灘，以甲殼類與魚類為食。",
+        "risk_level": "🟡 中度沿海風險 (Moderate Risk)",
+        "risk_color": "amber",
+        "risk_note": "活動集中於沿岸棲地，鮮少進入內陸高地。"
+    },
+    "fur seal": {
+        "name_zh": "海獅/海豹 (Fur Seal / Sea Lion)",
+        "icon": "🦭",
+        "migratory_status": "海洋哺乳類 / 沿岸群聚",
+        "habit": "海洋肉食哺乳動物，棲息於澳洲南部岩岸與島嶼，密集群聚繁殖。",
+        "risk_level": "🟠 哺乳類跨種傳播風險 (Mammal Risk)",
+        "risk_color": "purple",
+        "risk_note": "極易與受感染海鳥接觸並發生哺乳類跨種傳播，為生物安全重點警戒標的。"
+    }
+}
+
+def load_species_cache():
+    if os.path.exists(SPECIES_CACHE_FILE):
+        try:
+            with open(SPECIES_CACHE_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return DEFAULT_SPECIES_PROFILES.copy()
+
+def save_species_cache(cache):
+    try:
+        with open(SPECIES_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(cache, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"[物種快取儲存失敗] {e}")
+
+def analyze_new_species_with_gemini(species_name):
+    """
+    【Gemini Google Search Grounding 實時新物種 AI 生態分析器】
+    當出現全新物種（鳥類或哺乳類，如 Pelican, Black Swan, Sea Lion 等），
+    自動使用 Gemini + Google 搜尋實時檢索該物種之生態習性、候鳥/留鳥屬性、對工廠供應鏈的生物安全風險。
+    """
+    gemini_api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if not gemini_api_key:
+        return {
+            "name_zh": f"野生動物 ({species_name})",
+            "icon": "🐾",
+            "migratory_status": "野生動物 / 沿海游動",
+            "habit": f"棲息於澳洲野生生態環境之物種 ({species_name})。",
+            "risk_level": "🟡 動態評估中 (Pending Risk)",
+            "risk_color": "blue",
+            "risk_note": "官方最新通報物種，建議密切關注其棲息地與活動動向。"
+        }
+    
+    prompt = (
+        f"你是專業的澳洲野生動物生態與生物安全專家。"
+        f"澳洲最新 H5N1 禽流感數據通報了確診物種：'{species_name}'。\n"
+        f"請使用 Google 搜尋即時檢索該物種在澳洲的生態習性、遷徙屬性（候鳥/留鳥/遠洋鳥/哺乳類）與棲息地。\n"
+        f"請整理評估該物種對人類城鎮與食品飼料工廠（如 Purina Blayney 廠）的生物安全傳播風險，並回傳純 JSON 格式：\n"
+        f"{{\n"
+        f'  "name_zh": "中文物種名稱 (英文原名)",\n'
+        f'  "icon": "代表 Emoji (例如 🦅/🐧/🕊️/🦭/🦘)",\n'
+        f'  "migratory_status": "遷徙屬性 (例如：候鳥 / 留鳥 / 遠洋跨洲候鳥 / 海洋哺乳類)",\n'
+        f'  "habit": "棲息習性說明 (約 30~50 字，說明食性、群聚度與是否接近人類城鎮)",\n'
+        f'  "risk_level": "生物安全風險層級 (🔴 高風險向量 / 🟠 群聚爆發風險 / 🟡 跨域帶毒向量 / 🟢 低風險)",\n'
+        f'  "risk_color": "顏色代碼 (red/amber/blue/emerald/purple)",\n'
+        f'  "risk_note": "生物安全評估說明 (約 30~50 字，說明對人類城鎮與工廠飼料供應鏈的威脅程度)"\n'
+        f"}}\n"
+        f"請只回傳標準 JSON 格式。"
+    )
+
+    models = ["gemini-1.5-flash-latest", "gemini-1.5-pro-latest"]
+    for model_name in models:
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+        payload = {
+            "contents": [{"parts": [{"text": prompt}]}],
+            "tools": [{"google_search": {}}]
+        }
+        headers = {"Content-Type": "application/json"}
+        params = {"key": gemini_api_key}
+
+        try:
+            print(f"[Gemini 物種 AI 分析 ({model_name})] 正在發動實時搜尋分析全新物種 '{species_name}' ...")
+            resp = requests.post(api_url, json=payload, headers=headers, params=params, timeout=30, verify=False)
+            if resp.status_code == 200:
+                result_text = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+                json_match = re.search(r'\{[^{}]+\}', result_text, re.DOTALL)
+                if json_match:
+                    profile = json.loads(json_match.group(0))
+                    print(f"[Gemini 物種 AI 分析成功 ({species_name})] {profile}")
+                    return profile
+        except Exception as e:
+            print(f"[Gemini 物種分析例外] {str(e)[:80]}")
+
+    return {
+        "name_zh": f"野生動物 ({species_name})",
+        "icon": "🐾",
+        "migratory_status": "野生動物 / 沿海游動",
+        "habit": f"棲息於澳洲自然環境之物種 ({species_name})。",
+        "risk_level": "🟡 動態評估中 (Pending Risk)",
+        "risk_color": "blue",
+        "risk_note": "官方最新通報物種，建議持續追蹤其生態屬性與風險。"
+    }
+
+def get_species_profiles_for_cases(cases_data):
+    cache = load_species_cache()
+    updated = False
+    
+    # 按照 DAFF 權威統計順序排列 8 大主要物種
+    core_keys = [
+        "silver gull", "crested tern", "giant petrel", "pacific gull",
+        "brown skua", "black-faced cormorant", "little penguin", "peregrine falcon"
+    ]
+    profiles = [cache[k] for k in core_keys if k in cache]
+    seen_names = {p.get("name_zh", "") for p in profiles}
+    
+    raw_species = set()
+    generic_stop = ["daff 官方通報確診事件", "野鳥監測", "大鳳頭燕鷗/銀鷗/南方巨鸌", "墨爾本 casey 市大鳳頭燕鷗及沿海最新通報"]
+    for c in cases_data:
+        sp = c.get("species", "")
+        m = re.search(r"\((.*?)\)", sp)
+        if m:
+            raw_species.add(m.group(1).strip())
+        elif sp:
+            raw_species.add(sp.strip())
+            
+    for sp_raw in raw_species:
+        sp_key = sp_raw.lower()
+        if any(g in sp_key for g in generic_stop):
+            continue
+        matched_key = None
+        for k in cache.keys():
+            if k in sp_key or sp_key in k:
+                matched_key = k
+                break
+                
+        if not matched_key:
+            ai_profile = analyze_new_species_with_gemini(sp_raw)
+            if ai_profile:
+                cache[sp_key] = ai_profile
+                if ai_profile.get("name_zh", "") not in seen_names:
+                    profiles.append(ai_profile)
+                    seen_names.add(ai_profile.get("name_zh", ""))
+                updated = True
+                
+    if updated:
+        save_species_cache(cache)
+        
+    return profiles
+
+def generate_dynamic_species_cards_html(cases_data):
+    profiles = get_species_profiles_for_cases(cases_data)
+    
+    color_map = {
+        "red": ("border-red-500/30", "hover:border-red-500/60", "bg-red-500/20", "text-red-400", "border-red-500/30"),
+        "amber": ("border-amber-500/30", "hover:border-amber-500/60", "bg-amber-500/20", "text-amber-400", "border-amber-500/30"),
+        "blue": ("border-blue-500/30", "hover:border-blue-500/60", "bg-blue-500/20", "text-blue-400", "border-blue-500/30"),
+        "emerald": ("border-emerald-500/30", "hover:border-emerald-500/60", "bg-emerald-500/20", "text-emerald-400", "border-emerald-500/30"),
+        "purple": ("border-purple-500/30", "hover:border-purple-500/60", "bg-purple-500/20", "text-purple-400", "border-purple-500/30"),
+    }
+    
+    html_cards = []
+    for p in profiles:
+        c_code = p.get("risk_color", "blue")
+        b_border, b_hover, b_bg, b_text, b_ring = color_map.get(c_code, color_map["blue"])
+        daff_cnt = p.get("daff_count", "")
+        cnt_badge = f'<span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: {daff_cnt}</span>' if daff_cnt else ''
+        
+        card_html = f'''                        <div class="bg-slate-900/80 p-4 rounded-xl border {b_border} {b_hover} transition space-y-2.5 shadow-md">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="font-bold text-white text-sm flex items-center gap-1.5 truncate">
+                                    <span>{p.get("icon", "🐾")}</span> {p.get("name_zh", "未知物種")}
+                                </span>
+                                <span class="{b_bg} {b_text} border {b_ring} text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                                    {p.get("risk_level", "🟡 中度風險")}
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between gap-2 text-[11px]">
+                                <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">遷徙屬性: {p.get("migratory_status", "留鳥 / 游動")}</span>
+                                {cnt_badge}
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                <strong class="text-blue-300">棲息習性：</strong>{p.get("habit", "")}
+                            </p>
+                            <p class="text-xs text-slate-400 leading-relaxed border-t border-slate-800/80 pt-2">
+                                <strong class="text-amber-400">生物安全評估：</strong>{p.get("risk_note", "")}
+                            </p>
+                        </div>'''
+        html_cards.append(card_html)
+        
+    return "\n\n".join(html_cards)
+
 def generate_dynamic_references(cases_data):
     refs = [
-        '澳洲農業、漁業及林業部 (DAFF) 官方宣傳活動與即時更新：<a href="https://www.agriculture.gov.au/campaigns/birdflu" target="_blank" class="text-blue-400 hover:underline">Department of Agriculture, Fisheries and Forestry - June 2026 H5 bird flu detection</a>',
+        '澳洲農業、漁業及林業部 (DAFF) 官方宣傳活動與即時更新：<a href="https://www.agriculture.gov.au/campaigns/birdflu/latest-data#event_data" target="_blank" class="text-blue-400 hover:underline">Department of Agriculture, Fisheries and Forestry - H5 bird flu latest data</a>',
         '新南威爾斯州政府一次產業及區域發展廳 (NSW DPIRD) 專區即時更新：<a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 hover:underline">NSW DPIRD - Avian influenza updates</a>',
         '南澳州政府農業、食品及區域部 (PIRSA) 專區即時更新：<a href="https://pir.sa.gov.au/animal-management/animal-health/species/poultry/avian-influenza" target="_blank" class="text-blue-400 hover:underline">PIRSA - Avian influenza updates</a>',
         '西澳州政府一次產業及區域發展部 (DPIRD WA) 專區即時更新：<a href="https://www.wa.gov.au/organisation/department-of-primary-industries-and-regional-development/avian-influenza" target="_blank" class="text-blue-400 hover:underline">DPIRD WA - Avian influenza updates</a>',
@@ -1197,7 +1507,8 @@ def main():
     # 【關鍵修復】永遠執行 fetch_daff_updates()，確保每次都從 DAFF 官網抓取最新 official_stats
     # 舊版錯誤：len(events_cases) < 151 條件成立時才呼叫，cases_events.json 已有 151 筆後就永遠用舊硬編碼數字
     events_cases, official_stats = fetch_daff_updates()
-    events_cases = load_cases_from_json("cases_events.json")
+    events_cases = [c for c in events_cases if c.get("id", "").startswith("EVENT-")]
+    save_cases_to_json(events_cases, "cases_events.json")
     
     events_cases.sort(key=lambda x: x.get("notify_date", ""))
     
@@ -1220,6 +1531,9 @@ def main():
     
     refs_html = generate_dynamic_references(events_cases)
     updated_html = updated_html.replace("<!-- DYNAMIC_REFERENCES_PLACEHOLDER -->", refs_html)
+
+    species_html = generate_dynamic_species_cards_html(events_cases)
+    updated_html = updated_html.replace("<!-- DYNAMIC_SPECIES_CARDS_PLACEHOLDER -->", species_html)
     
     factory_lat, factory_lon = -33.5332, 149.2524
     min_dist = float('inf')

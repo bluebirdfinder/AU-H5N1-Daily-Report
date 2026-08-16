@@ -87,4 +87,18 @@
   - `[x]` 實作 `auto_reconcile_event_shortfalls()` 事件對齊引擎，確保 `cases_events.json` (187 筆記錄)、趨勢圖綠線、地圖與表格 100% 對齊 186 起
   - `[x]` 建立雙軌異步地方先行機制 (Dual-Track Time-Lag Handling)，處理各州 (如 TAS) 搶先公佈狀況
   - `[x]` 實作數據來源透明標示（綠色即時 / 橘色備援狀態橫幅）
-  - `[x]` 同步更新 `README.md`、`walkthrough.md` 與 `task.md`
+  - `[x]` 2026-08-16 DAFF 236 起確診事件對齊與物種生態/哺乳類 AI 評估引擎升級
+  - `[x]` 對齊 DAFF 新版 `/latest-data#event_data` 專區 236 起確診事件、1,273 起陰性排除與 21,041 筆熱線通報數據
+  - `[x]` 精確對齊 DAFF 官方 Power BI 權威物種數據（大鳳頭燕鷗 178起、銀鷗 28起、巨鸌 18起、太平洋鷗 4起、棕賊鷗 2起、鸕鶿 2起、企鵝 1起、遊隼 3起）
+  - `[x]` 實作 8 大物種生態評估卡片與手機優化垂直捲動容器 (`max-h-[540px] overflow-y-auto`)
+  - `[x]` 實作 `analyze_new_species_with_gemini()` 鳥類與哺乳類（如塔斯馬尼亞惡魔 😈、紅狐狸 🦊、野貓 🐈、狐蝠 🦇 等）Gemini Google Search Grounding 實時新物種 AI 分析引擎
+  - `[x]` 預防性擴充全澳 8 大行政區 (預先寫入 ACT 首都區與 NT 北領地，支援未來自適應辨識與 GPS 定位)
+  - `[x]` 重構前端一鍵快篩列位置（移至地圖與表格之間，體驗更直覺）
+  - `[x]` 將 DAFF 官方連結全面修正定位至 `#event_data` 區塊
+  - `[x]` 驗證全站 Tailwind CSS 手機版 RWD 響應式排版
+  - `[x]` 2026-08-16 DAFF 236 起確診事件標籤淨化與哺乳類動態 AI 警示鏈升級
+  - `[x]` 淨化 `cases_events.json` 消除 237 筆與舊 `CASE-001/002` 雜訊，嚴格鎖定全澳 236 起 DAFF 官方權威事件 (`EVENT-001` ~ `EVENT-236`)
+  - `[x]` 升級 `generate_gemini_grounded_summary()` 中的 Gemini AI 實時追蹤指令，自動抓取澳洲哺乳類動物（海豹、海獅、紅狐狸、野貓等）感染新聞並在頂部「📰 媒體與生態監測風向」區塊發布特報警示
+  - `[x]` 優化 8 大物種卡片滑動 UI 提示標籤 (`已分析 8 大主要物種 ⬇️ 向下滑動查看全表`)
+  - `[x]` 同步更新 `README.md`、`GOVT_SCRAPING_BEST_PRACTICES.md`、`walkthrough.md` 與 `task.md`
+

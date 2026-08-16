@@ -78,6 +78,10 @@
 | **V5.0** | 2026-08-11 | 導入 `curl_cffi` TLS 指紋偽裝、Playwright `#state_stats .callout` 黃框精確元素截圖、Hidden Sticky Header 避擋、Gemini Vision `responseMimeType: application/json` 強制輸出與 429 降級，以及零殘留暫存截圖清理與「各州確診天花板防護罩 (`enforce_official_state_ceilings`)」。 | 解決 Akamai/Cloudflare `ERR_HTTP2_PROTOCOL_ERROR` 封鎖、全頁截圖文字太小模糊、Gemini API 429 超限、新聞重複抓取造成 233 隻暴增不對齊與 Git 倉庫圖片膨脹痛點。 |
 | **V6.0** | 2026-08-13 | 對齊 DAFF 官方 Disclaimer 聲明「每日 17:00 AEST 數據結算點」，重新校準 GitHub Actions 自動排程為 `08:00 UTC` (台灣 16:00 / AEST 18:00) 與 `23:00 UTC` (台灣 07:00 / AEST 09:00)。 | 解決舊排程 (AEST 15:00) 早於官方結算時間導致下午漏抓痛點；同時兼顧各州官網與澳洲媒體 RSS 異步新聞動態。 |
 | **V7.0** | 2026-08-13 | 導入 **雙引擎 (Dual-Engine) AI 架構**：整合 `Gemini API Google Search Grounding (google_search)` 實現實時連網新聞檢索與報導摘要；並新增塔斯馬尼亞 (TAS Biosecurity) 官方專區與棕賊鷗 (`Brown Skua`) 物種辨識標籤。 | 解決 DAFF 官方數據延遲更新空檔期，無法即時在摘要反應各州（如 TAS 棕賊鷗首例）最新突發新聞的痛點；實現「新聞零時差 + 數據 100% 擬合」。 |
+| **V8.0** | 2026-08-16 | 對齊 DAFF 新版 `/latest-data#event_data` 專區 (全澳 236 起確診事件)；新增 **野生鳥類生態與生物安全指南卡片與 Donut Chart**；導入 **【Gemini Google Search Grounding 實時新物種 AI 分析器】(`analyze_new_species_with_gemini()`)**，自動為未來新物種（鳥類/哺乳類）發動搜尋與風險評級；新增前端一鍵動態快篩控制列。 | 解決非專家缺乏物種風險概念、未來出現新物種需人工維護，以及大數據表格難以精確過濾重要關注區與物種的痛點。 |
+| **V8.1** | 2026-08-16 | 全面對齊 DAFF 官方 Power BI 權威物種統計（大鳳頭燕鷗 178起、銀鷗 28起、巨鸌 18起、太平洋鷗 4起、棕賊鷗 2起、鸕鶿 2起、企鵝 1起、遊隼 3起）；推出 8 大物種生態卡片與垂直滾動 UI (`max-h-[540px] overflow-y-auto`)。 | 解決原物種數據呈現不精確、卡片缺乏個性化細節，以及過多物種資訊拉長網頁的痛點。 |
+| **V8.2** | 2026-08-16 | 預防性擴充全澳 8 大行政區 (預先寫入 ACT 首都區與 NT 北領地)；重構快篩按鈕置於地圖與表格之間；將 DAFF 官方專區連結精確定位至 `#event_data` 區塊；全站升級 Tailwind CSS 手機版 RWD 響應式排版與極致視覺呈現。 | 解決未來 NT/ACT 首次出現個案報錯風險、控制列位置不合直覺，以及手機版視圖擠壓痛點。 |
+| **V8.3** | 2026-08-16 | 清理 `cases_events.json` 殘留歷史 `CASE-` 標籤，嚴格鎖定全澳 236 起 DAFF 官方權威事件 (`EVENT-001`~`EVENT-236`)；升級 `Gemini Search Grounding` Prompt 實時追蹤澳洲哺乳類動物（海豹、狐狸、野貓等）感染新聞並在頂部發布特報警示；增加物種卡片滑動提示標籤。 | 解決列表記錄顯示 237 筆與出現 `CASE-001/002` 錯置問題，並解決 DAFF 未公布哺乳類統計時，無法及時在首頁掌握哺乳類跨種傳播風險的痛點。 |
 
 
 

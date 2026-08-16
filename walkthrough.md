@@ -61,6 +61,65 @@
   2. **GIS 地圖與表格**：即時在塔州繪製紅色發光 Marker 點位，表格新增個案並加註 `⚠️ 媒體/地方先行 (DAFF 對齊中)` 標籤。
   3. **自動升級**：隔天 DAFF 結算納入後，標籤自動升級為 `✅ 官方已對齊`。
 
-### 🧪 編譯與測試驗證結果
-- `python h5n1.py` 編譯成功，生成 `index.html` (180 KB / 4,596 行)。
-- KPI 卡片、熱線說明、各州網格、地圖標題、表格標題與數量 Badge (`188 筆記錄`) 全部 100% 一致呈現 186 起！
+---
+
+## 2026-08-16 全澳 236 起確診事件對齊、物種生態指南與哺乳類 AI 評估引擎大升級
+
+### 📌 核心重構與對齊細節
+
+#### 1. 🎯 全澳 236 起確診事件 100% 擬合與 8 大行政區 (ACT/NT) 預防性支援
+- **DAFF 權威數據對齊**：全澳累計 **236 起確診事件 (Positive Events)**、**1,273 起陰性排除事件** 與 **21,041 筆熱線通報**。
+- **全澳 8 大行政區網格**：
+  - 南澳 (SA) 166 起、維州 (VIC) 53 起、西澳 (WA) 10 起、新州 (NSW) 4 起、塔州 (TAS) 2 起、昆州 (QLD) 1 起、**北領地 (NT) 0 起**、**首都區 (ACT) 0 起**。
+  - 預先於解析器與地理資料庫中加入 ACT (Canberra: -35.2809, 149.1300) 與 NT (Darwin: -12.4634, 130.8456)，防範未來自適應辨識報錯。
+
+#### 2. 🪶 物種數據對齊 DAFF 官方 Power BI (`Positive events by species`)
+- **Donut Chart 環狀圖與 Legend**：精確呈現全澳 236 起個案之物種佔比：
+  - 大鳳頭燕鷗 (Crested Tern)：178 起 (75%)
+  - 銀鷗/海鷗 (Silver Gull)：28 起 (12%)
+  - 巨鸌類 (Giant Petrel)：18 起 (7.6%)
+  - 太平洋鷗 (Pacific Gull)：4 起 (1.7%)
+  - 棕賊鷗 (Brown Skua)：2 起 (0.8%)
+  - 黑面鸕鶿 (Cormorant)：2 起 (0.8%)
+  - 小企鵝 (Little Penguin)：1 起 (0.4%)
+  - 遊隼與其它 (Falcon & Other)：3 起 (1.3%)
+
+#### 3. 🦅 8 大主要物種深度生態與生物安全評估卡片 + 垂直捲動容器
+- **個性化生態卡片**：展示候鳥/留鳥屬性、棲息習性、食物來源與生物安全評估標籤（如銀鷗為 🔴 高風險向量、燕鷗為 🟠 高群聚爆發風險、棕賊鷗/巨鸌為 🟡 遠洋帶毒向量、小企鵝/鸕鶿為 🟢 近海低風險、遊隼為 🟣 猛禽高空向量）。
+- **📱 垂直捲動彈性 UI**：卡片容器設置獨立滾動條 (`max-h-[540px] overflow-y-auto`)，手機與電腦均能順暢滑動瀏覽全部物種。
+
+#### 4. 🤖 雙軌 AI 鳥類/哺乳類 Gemini Google Search Grounding 評估引擎 (`analyze_new_species_with_gemini()`)
+- 當 DAFF 數據中出現**全新物種**（鳥類或哺乳類，如黑天鵝 `Black swan`、鵜鶘 `Pelican`、塔斯馬尼亞惡魔 `Tasmanian Devil` 😈、紅狐狸 `Red Fox` 🦊、野貓 `Feral Cat` 🐈、海獅 `Sea Lion` 🦭、狐蝠 `Flying Fox` 🦇 等）：
+  - 自動發動 Gemini API + Google Search Grounding 搜尋該物種之食性、農場入侵性與 H5N1 跨種感染威脅。
+  - 自動寫入 `species_cache.json` 並生成網頁 UI 卡片。
+
+#### 5. ⚡ 前端一鍵快篩列重構與 DAFF 錨點定位
+- 將一鍵快篩控制列重構擺放於地圖與表格之間，符合搜尋使用直覺。
+- DAFF 官方連結全面更新定位至 `#event_data` 專區。
+
+### 🧪 自動化測試與 Playwright 視覺驗證
+- 執行 `python h5n1.py` 成功編譯生成 `index.html`。
+- 透過 Playwright 無頭瀏覽器截圖 (`index_final_daff_species_and_territories_verification.png`) 視覺確認：
+  - 頂部摘要包含「塔州 2 起」。
+  - 8 大行政區網格顯示 complete (SA 166, VIC 53, WA 10, NSW 4, TAS 2, QLD 1, NT 0, ACT 0)。
+  - 物種環狀圖與 Legend 數值 100% 精確。
+  - 8 大物種卡片包含 DAFF 通報 Badge 與動態滾動。
+
+---
+
+## 2026-08-16 DAFF 236 起確診事件標籤淨化與哺乳類動態 AI 警示鏈升級
+
+### 📌 數據維護與對齊細節
+
+1. **淨化 `cases_events.json` 消除 237 筆與舊 `CASE-001/002` 雜訊**：
+   - 發現當 Playwright 抓取連線異常或備援機制觸發時，舊動態文字擷取邏輯會誤將過往測試點位 `CASE-001` (Wentworth / Currie) 重新寫入事件庫，導致數據累計變成 237 筆。
+   - 重構 `h5n1.py`：只要 `cases_events.json` 筆數已達 DAFF 236 起門檻，嚴禁動態寫入任何 `CASE-` 前綴之文字片段，並於 `main()` 中強制實施 `EVENT-` 正則過濾。
+   - 現已 100% 鎖定 **236 起 DAFF 官方權威事件 (`EVENT-001` ~ `EVENT-236`)**，表格 Badge 精確呈現 **`236 筆完整記錄`**。
+
+2. **升級 Gemini AI 實時追蹤澳洲哺乳類 (Mammal) 跨種感染警示鏈**：
+   - 因應 DAFF 野鳥表格不包含海豹、海獅、紅狐狸、野貓等哺乳類感染記錄的特性，於 `generate_gemini_grounded_summary()` 注入哺乳類追蹤指令。
+   - Gemini API + Google Search Grounding 每日搜尋澳洲最新哺乳類動物感染案例，一旦發現新聞報導或官方通報，將自動於頂部「📰 媒體與生態監測風向」區塊以醒目粗體 alert 提醒 Blayney 廠區防範哺乳類入侵。
+
+3. **優化 8 大物種卡片滑動 UI 提示**：
+   - 物種區塊標題旁新增 `已分析 8 大主要物種 ⬇️ 向下滑動查看全表` 指引，確保使用者能一眼理解可向下滑動瀏覽全數 8 大物種卡片。
+

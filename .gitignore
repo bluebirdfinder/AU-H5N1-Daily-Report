@@ -1,6 +1,7 @@
-# Ignore temporary screenshot files for Gemini Vision
+# Ignore temporary screenshot files
 daff_screenshot_*.png
 daff_screenshot_temp.png
+*.png
 
 # Ignore Python runtime files
 __pycache__/
