@@ -386,11 +386,12 @@ def discover_cases_from_news_rss(rss_text, existing_cases):
         
     return new_discovered
 
-def playwright_fetch_url(url, screenshot_path=None, timeout=45000):
+def playwright_fetch_url(url, html_content=None, screenshot_path=None, timeout=30000):
     """
-    使用 Playwright 真實 Chromium 瀏覽器抓取頁面 HTML 並進行精確區塊截圖。
+    使用 Playwright 真實 Chromium 瀏覽器渲染頁面 HTML 並進行精確區塊截圖。
     比照 hpai_monitor_github 精確模式：顯式等待 #state_stats / .callout 區塊，隱藏置頂選單列 (Sticky Header)，
     優先擷取黃底純數據統計區塊 (.callout)。
+    若傳入 html_content，優先使用 page.set_content() 瞬間完成本地渲染，100% 避免 GitHub Actions 網路逾時與 WAF 阻擋！
     """
     try:
         from playwright.sync_api import sync_playwright
@@ -417,22 +418,30 @@ def playwright_fetch_url(url, screenshot_path=None, timeout=45000):
                 }
             )
             page = context.new_page()
-            html_content = None
+            fetched_html = html_content
             
-            print(f"[Playwright 導向] 進入目標頁面: {url}")
-            try:
-                page.goto(url, wait_until="domcontentloaded", timeout=timeout)
-                page.wait_for_timeout(3000)
-            except Exception as nav_e:
-                print(f"[Playwright 導向提醒/逾時] {str(nav_e)[:100]} (嘗試備援 commit 導向模式...)")
+            if html_content:
+                print(f"[Playwright 本地渲染] 採用已知 HTML ({len(html_content)} chars) 瞬間載入 DOM...")
                 try:
-                    page.goto(url, wait_until="commit", timeout=timeout)
-                    page.wait_for_timeout(5000)
-                except Exception as nav_e2:
-                    print(f"[Playwright 重試導向逾時] {str(nav_e2)[:100]} (將繼續嘗試讀取 DOM 與擷取畫面)")
+                    page.set_content(html_content, wait_until="commit", timeout=5000)
+                    page.wait_for_timeout(1000)
+                except Exception as set_e:
+                    print(f"[Playwright set_content 提醒] {str(set_e)[:100]}")
+            else:
+                print(f"[Playwright 導向] 進入目標頁面: {url}")
+                try:
+                    page.goto(url, wait_until="domcontentloaded", timeout=timeout)
+                    page.wait_for_timeout(3000)
+                except Exception as nav_e:
+                    print(f"[Playwright 導向提醒/逾時] {str(nav_e)[:100]} (嘗試備援 commit 導向模式...)")
+                    try:
+                        page.goto(url, wait_until="commit", timeout=timeout)
+                        page.wait_for_timeout(5000)
+                    except Exception as nav_e2:
+                        print(f"[Playwright 重試導向逾時] {str(nav_e2)[:100]} (將繼續嘗試讀取 DOM 與擷取畫面)")
 
             try:
-                html_content = page.content()
+                fetched_html = page.content()
             except Exception:
                 pass
 
@@ -634,22 +643,20 @@ def parse_screenshot_with_gemini_vision(screenshot_path):
 def smart_fetch_url(url, headers=None, timeout=10):
     """
     多段式跨障礙 HTTP 抓取器：
-    第 1 段：curl_cffi Chrome TLS 指紋偽裝（100% 複製 Chrome 底層 TLS 握手特徵）
+    第 1 段：curl_cffi Chrome TLS 指紋偽裝（100% 複製 Chrome 底層 TLS 握手特徵，完美繞過 Cloudflare/Akamai WAF）
     第 2 段：Cloudflare Worker 代理（若 CF_WORKER_URL 有設定）
     第 3 段：Playwright 真實 Chromium 瀏覽器（備有自動截圖與容錯）
     第 4 段：普通 requests 連線
     """
-    # 對於包含 DAFF 動態表格之網頁 (latest-data)，優先使用 Playwright 真實瀏覽器渲染
-    if "agriculture.gov.au" not in url:
-        # 第 1 段：curl_cffi Chrome 指紋擬真抓取
-        try:
-            from curl_cffi import requests as cffi_requests
-            resp = cffi_requests.get(url, impersonate="chrome124", timeout=timeout, verify=False)
-            if resp.status_code == 200 and resp.text and len(resp.text) > 500:
-                print(f"[curl_cffi 擬真 Chrome 成功] {url} ({len(resp.text)} chars)")
-                return resp.text
-        except Exception as e:
-            print(f"[curl_cffi 擬真嘗試] {str(e)[:80]}")
+    # 第 1 段：curl_cffi Chrome 指紋擬真抓取 (適用包含 DAFF 在內之所有政府官網)
+    try:
+        from curl_cffi import requests as cffi_requests
+        resp = cffi_requests.get(url, impersonate="chrome124", timeout=timeout, verify=False)
+        if resp.status_code == 200 and resp.text and len(resp.text) > 500:
+            print(f"[curl_cffi 擬真 Chrome 成功] {url} ({len(resp.text)} chars)")
+            return resp.text
+    except Exception as e:
+        print(f"[curl_cffi 擬真嘗試] {str(e)[:80]}")
 
     # 第 2 段：CF Worker 代理
     cf_worker_url = os.environ.get("CF_WORKER_URL", "").strip().rstrip("/")
@@ -899,11 +906,14 @@ def fetch_daff_updates():
         else:
             print(f"警告: {name} 連線 HTML 失敗。")
 
-        # 若為 DAFF 官網，檢查是否有生成截圖並進行 Gemini API 判讀
+        # 若為 DAFF 官網，優先使用已成功抓取之 HTML 進行 Playwright set_content 本地渲染與精確截圖
         if name == "DAFF_Entry":
-            if not os.path.exists(daff_screenshot):
-                # 嘗試專門擷取一次截圖
-                print("[Playwright 專用截圖] 為 Gemini Vision 生成 DAFF 全頁截圖...")
+            if html_content:
+                print("[Playwright 本地渲染截圖] 採用 curl_cffi 直抓 HTML 讓 Playwright 渲染生成 DAFF 截圖...")
+                playwright_fetch_url(url, html_content=html_content, screenshot_path=daff_screenshot)
+            elif not os.path.exists(daff_screenshot):
+                # 備援：若 curl_cffi 未抓到，再嘗試 Playwright 獨立導向
+                print("[Playwright 備援連線截圖] 為 Gemini Vision 生成 DAFF 頁面截圖...")
                 playwright_fetch_url(url, screenshot_path=daff_screenshot, timeout=20000)
             
             if os.path.exists(daff_screenshot):
