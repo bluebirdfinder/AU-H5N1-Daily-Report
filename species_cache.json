@@ -114,5 +114,32 @@
     "risk_level": "🟡 動態評估中 (Pending Risk)",
     "risk_color": "blue",
     "risk_note": "官方最新通報物種，建議密切關注其棲息地與活動動向。"
+  },
+  "南方巨鸌 / petrel": {
+    "name_zh": "野生動物 (南方巨鸌 / Petrel)",
+    "icon": "🐾",
+    "migratory_status": "野生動物 / 沿海游動",
+    "habit": "棲息於澳洲野生生態環境之物種 (南方巨鸌 / Petrel)。",
+    "risk_level": "🟡 動態評估中 (Pending Risk)",
+    "risk_color": "blue",
+    "risk_note": "官方最新通報物種，建議密切關注其棲息地與活動動向。"
+  },
+  "黑面鸕鶿 / cormorant": {
+    "name_zh": "野生動物 (黑面鸕鶿 / Cormorant)",
+    "icon": "🐾",
+    "migratory_status": "野生動物 / 沿海游動",
+    "habit": "棲息於澳洲野生生態環境之物種 (黑面鸕鶿 / Cormorant)。",
+    "risk_level": "🟡 動態評估中 (Pending Risk)",
+    "risk_color": "blue",
+    "risk_note": "官方最新通報物種，建議密切關注其棲息地與活動動向。"
+  },
+  "遊隼與其它": {
+    "name_zh": "野生動物 (遊隼與其它)",
+    "icon": "🐾",
+    "migratory_status": "野生動物 / 沿海游動",
+    "habit": "棲息於澳洲野生生態環境之物種 (遊隼與其它)。",
+    "risk_level": "🟡 動態評估中 (Pending Risk)",
+    "risk_color": "blue",
+    "risk_note": "官方最新通報物種，建議密切關注其棲息地與活動動向。"
   }
 }

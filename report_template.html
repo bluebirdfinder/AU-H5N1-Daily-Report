@@ -667,8 +667,9 @@
             const ctx = document.getElementById('speciesDonutChart');
             if (!ctx) return;
             
+            const stats = window.OFFICIAL_STATS || {};
             const events = (window.H5N1_EVENTS && window.H5N1_EVENTS.length > 0) ? window.H5N1_EVENTS : [];
-            const totalEvents = (window.OFFICIAL_STATS && window.OFFICIAL_STATS.total_events) ? window.OFFICIAL_STATS.total_events : (events.length || 236);
+            const totalEvents = stats.total_events || (events.length || 239);
 
             // 動態更新文字標籤中的起數
             const headerTotalEl = document.getElementById('species-section-header-total');
@@ -680,7 +681,6 @@
             const chartSubtitleEl = document.getElementById('species-chart-subtitle');
             if (chartSubtitleEl) chartSubtitleEl.textContent = `以全澳 ${totalEvents} 起確診事件之物種歸類統計個案起數與比例。`;
 
-            // 從 window.H5N1_EVENTS 資料庫動態計算物種個案
             let counts = {
                 '大鳳頭燕鷗 (Crested Tern)': 0,
                 '銀鷗 / 海鷗 (Silver Gull)': 0,
@@ -692,11 +692,22 @@
                 '遊隼/其它 (Falcon & Other)': 0,
             };
 
-            if (events.length > 0) {
+            // 優先從 OFFICIAL_STATS 讀取官網權威 Power BI 視覺對帳數字
+            const sc = stats.species_counts;
+            if (sc && (sc['Crested Tern'] || sc['Silver Gull'])) {
+                counts['大鳳頭燕鷗 (Crested Tern)'] = sc['Crested Tern'] || 180;
+                counts['銀鷗 / 海鷗 (Silver Gull)'] = sc['Silver Gull'] || 29;
+                counts['巨鸌類 (Giant Petrel)'] = sc['Giant Petrel'] || 17;
+                counts['太平洋鷗 (Pacific Gull)'] = sc['Pacific Gull'] || 4;
+                counts['棕賊鷗 (Brown Skua)'] = sc['Brown Skua'] || 2;
+                counts['黑面鸕鶿 (Cormorant)'] = sc['Cormorant'] || 2;
+                counts['小企鵝 (Little Penguin)'] = sc['Little Penguin'] || 1;
+                counts['遊隼/其它 (Falcon & Other)'] = sc['Falcon & Other'] || 4;
+            } else if (events.length > 0) {
                 events.forEach(ev => {
                     if (ev.type === 'Confirmed' || !ev.type) {
                         const sp = (ev.species || '').toLowerCase();
-                        if (sp.includes('燕鷗') || sp.includes('crested tern') || sp.includes('tern')) {
+                        if (sp.includes('大鳳頭燕鷗') || sp.includes('crested tern') || sp.includes('燕鷗')) {
                             counts['大鳳頭燕鷗 (Crested Tern)']++;
                         } else if (sp.includes('銀鷗') || sp.includes('silver gull') || sp.includes('海鷗')) {
                             counts['銀鷗 / 海鷗 (Silver Gull)']++;
@@ -717,14 +728,14 @@
                 });
             } else {
                 counts = {
-                    '大鳳頭燕鷗 (Crested Tern)': 178,
-                    '銀鷗 / 海鷗 (Silver Gull)': 28,
-                    '巨鸌類 (Giant Petrel)': 18,
+                    '大鳳頭燕鷗 (Crested Tern)': 180,
+                    '銀鷗 / 海鷗 (Silver Gull)': 29,
+                    '巨鸌類 (Giant Petrel)': 17,
                     '太平洋鷗 (Pacific Gull)': 4,
                     '棕賊鷗 (Brown Skua)': 2,
                     '黑面鸕鶿 (Cormorant)': 2,
                     '小企鵝 (Little Penguin)': 1,
-                    '遊隼/其它 (Falcon & Other)': 3,
+                    '遊隼/其它 (Falcon & Other)': 4,
                 };
             }
 

@@ -592,18 +592,29 @@ def parse_screenshot_with_gemini_vision(screenshot_path):
             image_data = base64.b64encode(f.read()).decode("utf-8")
         
         prompt = """你是澳洲 H5N1 禽流感疫情數據分析師。
-請仔細查看這張來自澳洲聯邦農業部 (DAFF) 最新 Event data 區塊截圖（網址: agriculture.gov.au/campaigns/birdflu/latest-data#event_data），找出以下數據：
-1. 最新發布的時間字串（例如 "4pm AEST, 15 August 2026"）
-2. 全澳確診事件總起數（Positive events，例如 236）
-3. 全澳熱線通報總筆數（Hotline reports，例如 21,041）
-4. 各州確診事件起數（WA/SA/VIC/NSW/QLD/TAS/NT/ACT，例如 WA 10, SA 166, NSW 4, QLD 1, VIC 53, TAS 2）
+請仔細查看這張來自澳洲聯邦農業部 (DAFF) 最新數據截圖（包含 Power BI 儀表板圖表），找出以下數據：
+1. 最新發布的時間字串（例如 "4pm AEST, 16 August 2026"）
+2. 全澳確診事件總起數（Positive events，例如 239）
+3. 全澳熱線通報總筆數（Hotline reports，例如 21,265）
+4. 各州確診事件起數（WA/SA/VIC/NSW/QLD/TAS/NT/ACT，例如 WA 10, SA 169, NSW 4, QLD 1, VIC 53, TAS 2）
+5. 「Positive events by species」條形圖中各物種確診起數（如 Greater Crested Tern 180, Silver Gull 29, Giant Petrel 8, Southern Giant-Petrel 7, Pacific Gull 4, Black-faced Cormorant 2, Brown Skua 2, Northern Giant-Petrel 2, Little Penguin 1, Peregrine Falcon 1 等）
 
 請只回傳標準 JSON 格式，包含以下鍵值：
 {
   "last_update_str": "<string>",
   "total_events": <int>,
   "hotline_reports": <int>,
-  "events_by_state": {"WA": <int>, "SA": <int>, "VIC": <int>, "NSW": <int>, "QLD": <int>, "TAS": <int>, "NT": <int>, "ACT": <int>}
+  "events_by_state": {"WA": <int>, "SA": <int>, "VIC": <int>, "NSW": <int>, "QLD": <int>, "TAS": <int>, "NT": <int>, "ACT": <int>},
+  "species_counts": {
+    "Crested Tern": <int>,
+    "Silver Gull": <int>,
+    "Giant Petrel": <int>,
+    "Pacific Gull": <int>,
+    "Brown Skua": <int>,
+    "Cormorant": <int>,
+    "Little Penguin": <int>,
+    "Falcon & Other": <int>
+  }
 }
 如果看不清楚某個數字就填 0。"""
 
@@ -742,10 +753,20 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
     【Fallback 預設值】僅在 DAFF 官網完全無法連線時使用，應與最新官方數字同步更新。
     """
     stats = {
-        "total_events": 236,
+        "total_events": 239,
         "negative_events": 1273,
-        "hotline_reports": 21041,
-        "events_by_state": {"WA": 10, "SA": 166, "VIC": 53, "NSW": 4, "QLD": 1, "TAS": 2, "NT": 0, "ACT": 0},
+        "hotline_reports": 21265,
+        "events_by_state": {"WA": 10, "SA": 169, "VIC": 53, "NSW": 4, "QLD": 1, "TAS": 2, "NT": 0, "ACT": 0},
+        "species_counts": {
+            "Crested Tern": 180,
+            "Silver Gull": 29,
+            "Giant Petrel": 17,
+            "Pacific Gull": 4,
+            "Brown Skua": 2,
+            "Cormorant": 2,
+            "Little Penguin": 1,
+            "Falcon & Other": 4
+        },
         "source": "fallback",   # 預設標記為備援值；成功從 DAFF 解析後會覆蓋為 "live"
         "scrape_time": None     # 成功連線後才填入，Fallback 時為 None
     }
@@ -973,7 +994,11 @@ def fetch_daff_updates():
                     if val >= official_stats["events_by_state"].get(st, 0):
                         official_stats["events_by_state"][st] = val
 
-            print(f"[Gemini Vision 成功同步] 採用 Gemini API 辨識 DAFF 截圖數字: {official_stats['total_detections']} 隻 / {official_stats['total_events']} 起事件")
+            species_v = daff_vision_stats.get("species_counts", {})
+            if isinstance(species_v, dict) and len(species_v) > 0:
+                official_stats["species_counts"] = species_v
+
+            print(f"[Gemini Vision 成功同步] 採用 Gemini API 辨識 DAFF 截圖數字: {official_stats['total_events']} 起事件 / 物種: {official_stats.get('species_counts')}")
 
     # 第三道防線：執行各州確診天花板安全防護罩 (確保 cases_events.json 累加絕不會超過 DAFF 事件數上限)
     cases = enforce_official_state_ceilings(cases, official_stats)
@@ -1264,10 +1289,78 @@ def generate_gemini_grounded_summary(official_stats=None):
 
     return None
 
+def colorize_summary_text(html_text):
+    """
+    為摘要內容的關鍵字（數據、物種、安全事實、警示）自動加上高對比度且極富美感的 Tailwind CSS 顏色與徽章標籤，
+    提升視覺讀取效率與閱覽體驗。
+    """
+    if not html_text:
+        return html_text
+
+    # 1. 核心安全事實與 100% 無疫區 (翡翠綠亮顯徽章)
+    html_text = re.sub(
+        r"(100%\s*(?:維持)?無疫區(?:\s*\(Area Freedom\)\s*狀態)?|100%\s*零感染|生產鏈安全無虞|對一般人類健康風險極低)",
+        r'<span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">\1</span>',
+        html_text
+    )
+
+    # 2. 確診事件數字 (鮮紅高亮)
+    html_text = re.sub(
+        r"(\d+\s*起確診事件(?:\s*\(Positive Events\))?)",
+        r'<span class="text-red-400 font-extrabold text-base">\1</span>',
+        html_text
+    )
+
+    # 3. 陰性排除與熱線通報 (天藍高亮)
+    html_text = re.sub(
+        r"(\d[\d,]*\s*起陰性排除(?:事件)?|\d[\d,]*\s*筆(?:熱線)?通報)",
+        r'<span class="text-sky-400 font-bold">\1</span>',
+        html_text
+    )
+
+    # 4. 各州確診數據 (琥珀金高亮)
+    html_text = re.sub(
+        r"((?:南澳|維州|西澳|新州|塔州|昆州|北領地|首都區)\s*\d+\s*起)",
+        r'<span class="text-amber-300 font-semibold">\1</span>',
+        html_text
+    )
+
+    # 5. 重要野生鳥類與哺乳類物種 (專屬色彩標籤)
+    species_highlights = [
+        ("棕賊鷗", "text-purple-300 font-extrabold bg-purple-950/60 px-1 py-0.5 rounded border border-purple-700/50"),
+        ("小企鵝", "text-cyan-300 font-extrabold bg-cyan-950/60 px-1 py-0.5 rounded border border-cyan-700/50"),
+        ("大鳳頭燕鷗", "text-amber-300 font-extrabold bg-amber-950/60 px-1 py-0.5 rounded border border-amber-700/50"),
+        ("冠鳳頭燕鷗", "text-amber-300 font-extrabold bg-amber-950/60 px-1 py-0.5 rounded border border-amber-700/50"),
+        ("銀鷗", "text-rose-300 font-extrabold bg-rose-950/60 px-1 py-0.5 rounded border border-rose-700/50"),
+        ("海鷗", "text-rose-300 font-extrabold bg-rose-950/60 px-1 py-0.5 rounded border border-rose-700/50"),
+        ("野生哺乳類動物", "text-fuchsia-300 font-extrabold bg-fuchsia-950/70 px-1.5 py-0.5 rounded border border-fuchsia-500/40"),
+        ("哺乳類動物", "text-fuchsia-300 font-extrabold bg-fuchsia-950/70 px-1.5 py-0.5 rounded border border-fuchsia-500/40"),
+        ("哺乳類", "text-fuchsia-300 font-bold"),
+        ("塔斯馬尼亞惡魔", "text-fuchsia-300 font-bold"),
+        ("海豹", "text-fuchsia-300 font-bold"),
+        ("海獅", "text-fuchsia-300 font-bold"),
+        ("紅狐狸", "text-fuchsia-300 font-bold"),
+        ("野貓", "text-fuchsia-300 font-bold"),
+    ]
+
+    for term, css_class in species_highlights:
+        pattern = re.compile(r'(?<![="/>])' + re.escape(term) + r'(?![^<]*>)')
+        html_text = pattern.sub(f'<span class="{css_class}">{term}</span>', html_text)
+
+    # 6. 哺乳類警示標題/警報
+    html_text = re.sub(
+        r"(全澳哺乳類動物無大規模爆發[，,]?\s*重點防線維持警覺)",
+        r'<span class="text-amber-300 font-bold bg-slate-800/90 px-2 py-1 rounded border border-amber-500/40 inline-block my-1 shadow-sm">\1</span>',
+        html_text
+    )
+
+    return html_text
+
 def generate_dynamic_summary(cases_data, official_stats):
     """
     動態產生包含精確數據的官方事實與媒體觀察摘要。
     【雙引擎架構】媒體摘要優先調用 Gemini Google Search Grounding 實時連網生成。
+    自動調用 colorize_summary_text 進行高對比度關鍵字色彩標示。
     """
     total_events = official_stats.get("total_events", 186)
     negative_events = official_stats.get("negative_events", 1273)
@@ -1288,7 +1381,9 @@ def generate_dynamic_summary(cases_data, official_stats):
     qld_evt = evt_by_state.get('QLD', 1)
 
     official_text = (
-        f"依據 {daff_link} 及各州政府 <strong>{latest_date_str} 最新數據</strong>，全澳高致病性 H5N1 野生動物確診總數累計為 <strong>{total_events} 起確診事件 (Positive Events)</strong>，陰性排除事件達 <strong>{negative_events:,} 起</strong>，民眾與專家通報數達 <strong>{hotline_reports:,} 筆</strong>！確診事件分布統計：南澳 {sa_evt} 起、維州 {vic_evt} 起、西澳 {wa_evt} 起、新州 {nsw_evt} 起、塔州 {tas_evt} 起、昆州 {qld_evt} 起。全澳商業家禽產業及飼料生產體系 100% 維持無疫區 (Area Freedom) 狀態，生產鏈安全無虞。"
+        f"依據 {daff_link} 及各州政府 <span class=\"text-amber-400 font-bold\">{latest_date_str} 最新數據</span>，全澳高致病性 H5N1 野生動物確診總數累計為 <span class=\"text-red-400 font-extrabold text-base px-1 bg-red-950/40 rounded border border-red-500/30\">{total_events} 起確診事件 (Positive Events)</span>，陰性排除事件達 <span class=\"text-sky-400 font-bold\">{negative_events:,} 起</span>，民眾與專家通報數達 <span class=\"text-sky-300 font-semibold\">{hotline_reports:,} 筆</span>！"
+        f"確診事件分布統計：<span class=\"text-amber-300 font-semibold\">南澳 {sa_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">維州 {vic_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">西澳 {wa_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">新州 {nsw_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">塔州 {tas_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">昆州 {qld_evt} 起</span>。"
+        f"全澳商業家禽產業及飼料生產體系 <span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">100% 維持無疫區 (Area Freedom) 狀態</span>，生產鏈安全無虞。"
     )
 
     # 1. 優先嘗試調用 Gemini API + Google Search Grounding 生成實時新聞摘要
@@ -1300,10 +1395,14 @@ def generate_dynamic_summary(cases_data, official_stats):
         nsw_dpird_link = '<a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">新南威爾斯州政府 (NSW DPIRD)</a>'
         abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a>'
         media_text = (
-            f"根據 {abc_link} 與 {nsw_dpird_link} 等媒體 <strong>{latest_date_str} 最新報導</strong>，澳洲官方自 8/12 起正式採用國際標準「事件導向 (Event-based Reporting)」統計，全澳累計 <strong>{total_events} 起確診事件</strong>（陰性排除 <strong>{negative_events:,} 起</strong>）。聯邦首席獸醫官重申：<strong>澳洲所有商業家禽農場維持 100% 零感染，對一般人類健康風險極低</strong>。"
+            f"根據 {abc_link} 與 {nsw_dpird_link} 等媒體 <span class=\"text-amber-400 font-bold\">{latest_date_str} 最新報導</span>，澳洲官方自 8/12 起正式採用國際標準「事件導向 (Event-based Reporting)」統計，全澳累計 <span class=\"text-red-400 font-bold\">{total_events} 起確診事件</span>（陰性排除 <span class=\"text-sky-400 font-semibold\">{negative_events:,} 起</span>）。聯邦首席獸醫官重申：<span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">澳洲所有商業家禽農場維持 100% 零感染，對一般人類健康風險極低</span>。"
         )
 
-    return official_text, media_text
+    # 套用關鍵字繽紛色彩高亮
+    official_colored = colorize_summary_text(official_text)
+    media_colored = colorize_summary_text(media_text)
+
+    return official_colored, media_colored
 
 SPECIES_CACHE_FILE = "species_cache.json"
 
