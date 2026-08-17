@@ -386,7 +386,7 @@ def discover_cases_from_news_rss(rss_text, existing_cases):
         
     return new_discovered
 
-def playwright_fetch_url(url, screenshot_path=None, timeout=25000):
+def playwright_fetch_url(url, screenshot_path=None, timeout=45000):
     """
     使用 Playwright 真實 Chromium 瀏覽器抓取頁面 HTML 並進行精確區塊截圖。
     比照 hpai_monitor_github 精確模式：顯式等待 #state_stats / .callout 區塊，隱藏置頂選單列 (Sticky Header)，
@@ -424,7 +424,12 @@ def playwright_fetch_url(url, screenshot_path=None, timeout=25000):
                 page.goto(url, wait_until="domcontentloaded", timeout=timeout)
                 page.wait_for_timeout(3000)
             except Exception as nav_e:
-                print(f"[Playwright 導向提醒/逾時] {str(nav_e)[:100]} (將繼續嘗試讀取 DOM 與擷取畫面)")
+                print(f"[Playwright 導向提醒/逾時] {str(nav_e)[:100]} (嘗試備援 commit 導向模式...)")
+                try:
+                    page.goto(url, wait_until="commit", timeout=timeout)
+                    page.wait_for_timeout(5000)
+                except Exception as nav_e2:
+                    print(f"[Playwright 重試導向逾時] {str(nav_e2)[:100]} (將繼續嘗試讀取 DOM 與擷取畫面)")
 
             try:
                 html_content = page.content()
@@ -496,10 +501,71 @@ def playwright_fetch_url(url, screenshot_path=None, timeout=25000):
 
 
 
+def call_gemini_api_with_retry(payload, params, headers, timeout=35):
+    """
+    通用 Gemini API 指數退避重試與 Fallback 模型調用器。
+    - 主力模型 (Primary): gemini-2.5-flash
+    - 備援模型 1 (Fallback 1): gemini-2.5-flash-lite
+    - 備援模型 2 (Fallback 2): gemini-2.5-pro
+    已徹底移除所有舊版 gemini-1.5-* 模型。
+    針對 503 (High Demand)、429 (Rate Limit) 及連線超時等暫時性錯誤，
+    實作 3 次指數退避重試 (2s, 4s, 8s + 隨機 jitter)。
+    只有當單一模型 3 次重試均告失敗後，才切換至下一個備援模型。
+    """
+    import time
+    import random
+    
+    models = [
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+        "gemini-2.5-pro"
+    ]
+    
+    for model_index, model_name in enumerate(models, 1):
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+        role_label = "Primary 主力模型" if model_index == 1 else f"Fallback {model_index - 1} 備援模型"
+        print(f"[Gemini API 啟動] 開始呼叫 {role_label}: '{model_name}'")
+        
+        for attempt in range(1, 4):
+            try:
+                resp = requests.post(api_url, json=payload, headers=headers, params=params, timeout=timeout, verify=False)
+                if resp.status_code == 200:
+                    print(f"[Gemini API 成功] 模型 '{model_name}' 於第 {attempt} 次嘗試連線成功！")
+                    return resp.json(), model_name
+                elif resp.status_code in (429, 503, 500, 502, 504):
+                    # 指數退避: 2s, 4s, 8s + 隨機 jitter
+                    backoff_sec = (2 ** (attempt - 1) * 2) + random.uniform(0.1, 0.9)
+                    err_msg = resp.text[:150].replace('\n', ' ')
+                    print(f"[Gemini API 暫時性錯誤] 模型 '{model_name}' 回傳 HTTP {resp.status_code} (高負載/限流)。[嘗試 {attempt}/3] 即將等待 {backoff_sec:.2f} 秒後進行指數退避重試... 錯誤內容: {err_msg}")
+                    if attempt < 3:
+                        time.sleep(backoff_sec)
+                        continue
+                    else:
+                        print(f"[Gemini API 模型降級] 模型 '{model_name}' 已完成 3 次重試均告失敗，準備切換至下一個 Fallback 備援模型...")
+                        break
+                else:
+                    err_msg = resp.text[:150].replace('\n', ' ')
+                    print(f"[Gemini API 終端錯誤] 模型 '{model_name}' 回傳 HTTP {resp.status_code} (非重試狀態碼): {err_msg}")
+                    break
+            except Exception as e:
+                backoff_sec = (2 ** (attempt - 1) * 2) + random.uniform(0.1, 0.9)
+                print(f"[Gemini API 網路連線例外] 模型 '{model_name}' 發生連線/逾時例外: {str(e)[:120]}。[嘗試 {attempt}/3] 即將等待 {backoff_sec:.2f} 秒後重試...")
+                if attempt < 3:
+                    time.sleep(backoff_sec)
+                    continue
+                else:
+                    print(f"[Gemini API 模型降級] 模型 '{model_name}' 3 次連線失敗，準備切換至下一個 Fallback 備援模型...")
+                    break
+                    
+    print("[Gemini API 失敗警告] 所有設定之 Gemini 模型 (Primary & Fallbacks) 3 次重試均已嘗試完畢，未獲取回應。")
+    return None, None
+
+
 def parse_screenshot_with_gemini_vision(screenshot_path):
     """
     使用 Gemini Vision API 讀取官方網站黃底精確數據截圖，自動識別最新 H5N1 確診數字與日期。
-    支援多模型（gemini-2.5-flash / gemini-2.0-flash / gemini-1.5-flash-latest / gemini-1.5-pro-latest）與 429 額度超限備援。
+    採用 gemini-2.5-flash (Primary), gemini-2.5-flash-lite (Fallback 1), gemini-2.5-pro (Fallback 2)。
+    實作 3 次指數退避重試與完整的 Logging 追蹤。
     需要在環境變數設定 GEMINI_API_KEY。
     """
     gemini_api_key = os.environ.get("GEMINI_API_KEY", "").strip()
@@ -513,7 +579,6 @@ def parse_screenshot_with_gemini_vision(screenshot_path):
     
     try:
         import base64
-        import time
         with open(screenshot_path, "rb") as f:
             image_data = base64.b64encode(f.read()).decode("utf-8")
         
@@ -533,46 +598,33 @@ def parse_screenshot_with_gemini_vision(screenshot_path):
 }
 如果看不清楚某個數字就填 0。"""
 
-        models = [
-            "gemini-2.5-flash",
-            "gemini-1.5-flash",
-            "gemini-2.5-pro",
-            "gemini-1.5-pro"
-        ]
-        for model_name in models:
-            api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
-            payload = {
-                "contents": [{
-                    "parts": [
-                        {"text": prompt},
-                        {"inline_data": {"mime_type": "image/png", "data": image_data}}
-                    ]
-                }],
-                "generationConfig": {
-                    "responseMimeType": "application/json"
-                }
+        payload = {
+            "contents": [{
+                "parts": [
+                    {"text": prompt},
+                    {"inline_data": {"mime_type": "image/png", "data": image_data}}
+                ]
+            }],
+            "generationConfig": {
+                "responseMimeType": "application/json"
             }
-            headers = {"Content-Type": "application/json"}
-            params = {"key": gemini_api_key}
-            
+        }
+        headers = {"Content-Type": "application/json"}
+        params = {"key": gemini_api_key}
+        
+        resp_json, used_model = call_gemini_api_with_retry(payload, params, headers, timeout=30)
+        if resp_json:
             try:
-                resp = requests.post(api_url, json=payload, headers=headers, params=params, timeout=30, verify=False)
-                if resp.status_code == 200:
-                    result_text = resp.json()["candidates"][0]["content"]["parts"][0]["text"]
-                    json_match = re.search(r'\{[^{}]+\}', result_text, re.DOTALL)
-                    if json_match:
-                        vision_data = json.loads(json_match.group(0))
-                        print(f"[Gemini Vision 成功 ({model_name})] AI 從截圖讀取數字: {vision_data}")
-                        return vision_data
-                    else:
-                        print(f"[Gemini Vision ({model_name})] 無法解析 JSON: {result_text[:200]}")
-                elif resp.status_code == 429:
-                    print(f"[Gemini Vision API ({model_name}) 額度限制 Rate Limit 429] 等待 2 秒改用備援模型...")
-                    time.sleep(2)
+                result_text = resp_json["candidates"][0]["content"]["parts"][0]["text"]
+                json_match = re.search(r'\{[^{}]+\}', result_text, re.DOTALL)
+                if json_match:
+                    vision_data = json.loads(json_match.group(0))
+                    print(f"[Gemini Vision 成功 ({used_model})] AI 從截圖讀取數字: {vision_data}")
+                    return vision_data
                 else:
-                    print(f"[Gemini Vision API ({model_name}) 回傳狀態 {resp.status_code}] {resp.text[:100]}")
-            except Exception as model_e:
-                print(f"[Gemini Vision ({model_name}) 嘗試例外] {str(model_e)[:100]}")
+                    print(f"[Gemini Vision ({used_model})] 無法解析回應 JSON: {result_text[:200]}")
+            except Exception as parse_e:
+                print(f"[Gemini Vision ({used_model}) 解析例外] {str(parse_e)[:120]}")
     except Exception as e:
         print(f"[Gemini Vision 嚴重例外] {str(e)[:120]}")
     
@@ -1177,43 +1229,28 @@ def generate_gemini_grounded_summary(official_stats=None):
         f"格式要求：回傳純 HTML 段落（包含 <a href='...'> 連結標籤與 <strong> 關鍵字強調標籤），請勿包含 ```html 區塊標頭。"
     )
 
-    models = [
-        "gemini-2.5-flash",
-        "gemini-1.5-flash",
-        "gemini-2.5-pro",
-        "gemini-1.5-pro"
-    ]
+    payload = {
+        "contents": [{
+            "parts": [{"text": prompt}]
+        }],
+        "tools": [
+            {"google_search": {}}
+        ]
+    }
+    headers = {"Content-Type": "application/json"}
+    params = {"key": gemini_api_key}
 
-    for model_name in models:
-        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
-        payload = {
-            "contents": [{
-                "parts": [{"text": prompt}]
-            }],
-            "tools": [
-                {"google_search": {}}
-            ]
-        }
-        headers = {"Content-Type": "application/json"}
-        params = {"key": gemini_api_key}
-
+    resp_json, used_model = call_gemini_api_with_retry(payload, params, headers, timeout=35)
+    if resp_json:
         try:
-            print(f"[Gemini Search Grounding 觸發 ({model_name})] 正在發動實時 Google 搜尋產出最新中文新聞摘要...")
-            resp = requests.post(api_url, json=payload, headers=headers, params=params, timeout=35, verify=False)
-            if resp.status_code == 200:
-                resp_json = resp.json()
-                text_result = resp_json["candidates"][0]["content"]["parts"][0]["text"].strip()
-                clean_html = re.sub(r"^```html\s*", "", text_result, flags=re.IGNORECASE)
-                clean_html = re.sub(r"\s*```$", "", clean_html, flags=re.IGNORECASE).strip()
-                if len(clean_html) > 50:
-                    print(f"[Gemini Search Grounding 成功 ({model_name})] 已成功產出實時連網新聞摘要！({len(clean_html)} chars)")
-                    return clean_html
-            elif resp.status_code == 429:
-                print(f"[Gemini API ({model_name}) 429 超限] 改用下一模型...")
-            else:
-                print(f"[Gemini API ({model_name}) 回傳 {resp.status_code}] {resp.text[:120]}")
-        except Exception as e:
-            print(f"[Gemini Grounding ({model_name}) 例外] {str(e)[:100]}")
+            text_result = resp_json["candidates"][0]["content"]["parts"][0]["text"].strip()
+            clean_html = re.sub(r"^```html\s*", "", text_result, flags=re.IGNORECASE)
+            clean_html = re.sub(r"\s*```$", "", clean_html, flags=re.IGNORECASE).strip()
+            if len(clean_html) > 50:
+                print(f"[Gemini Search Grounding 成功 ({used_model})] 已成功產出實時連網新聞摘要！({len(clean_html)} chars)")
+                return clean_html
+        except Exception as parse_e:
+            print(f"[Gemini Search Grounding ({used_model}) 解析例外] {str(parse_e)[:120]}")
 
     return None
 
@@ -1368,28 +1405,24 @@ def analyze_new_species_with_gemini(species_name):
         f"請只回傳標準 JSON 格式。"
     )
 
-    models = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-2.5-pro", "gemini-1.5-pro"]
-    for model_name in models:
-        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
-        payload = {
-            "contents": [{"parts": [{"text": prompt}]}],
-            "tools": [{"google_search": {}}]
-        }
-        headers = {"Content-Type": "application/json"}
-        params = {"key": gemini_api_key}
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "tools": [{"google_search": {}}]
+    }
+    headers = {"Content-Type": "application/json"}
+    params = {"key": gemini_api_key}
 
+    resp_json, used_model = call_gemini_api_with_retry(payload, params, headers, timeout=30)
+    if resp_json:
         try:
-            print(f"[Gemini 物種 AI 分析 ({model_name})] 正在發動實時搜尋分析全新物種 '{species_name}' ...")
-            resp = requests.post(api_url, json=payload, headers=headers, params=params, timeout=30, verify=False)
-            if resp.status_code == 200:
-                result_text = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
-                json_match = re.search(r'\{[^{}]+\}', result_text, re.DOTALL)
-                if json_match:
-                    profile = json.loads(json_match.group(0))
-                    print(f"[Gemini 物種 AI 分析成功 ({species_name})] {profile}")
-                    return profile
-        except Exception as e:
-            print(f"[Gemini 物種分析例外] {str(e)[:80]}")
+            result_text = resp_json["candidates"][0]["content"]["parts"][0]["text"].strip()
+            json_match = re.search(r'\{[^{}]+\}', result_text, re.DOTALL)
+            if json_match:
+                profile = json.loads(json_match.group(0))
+                print(f"[Gemini 物種 AI 分析成功 ({used_model})] {profile}")
+                return profile
+        except Exception as parse_e:
+            print(f"[Gemini 物種 AI 分析 ({used_model}) 解析例外] {str(parse_e)[:120]}")
 
     return {
         "name_zh": f"野生動物 ({species_name})",
