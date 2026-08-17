@@ -534,9 +534,10 @@ def parse_screenshot_with_gemini_vision(screenshot_path):
 如果看不清楚某個數字就填 0。"""
 
         models = [
-            "gemini-1.5-flash-latest",
-            "gemini-1.5-pro-latest",
-            "gemini-2.0-flash"
+            "gemini-2.5-flash",
+            "gemini-1.5-flash",
+            "gemini-2.5-pro",
+            "gemini-1.5-pro"
         ]
         for model_name in models:
             api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
@@ -1177,8 +1178,10 @@ def generate_gemini_grounded_summary(official_stats=None):
     )
 
     models = [
-        "gemini-1.5-flash-latest",
-        "gemini-1.5-pro-latest"
+        "gemini-2.5-flash",
+        "gemini-1.5-flash",
+        "gemini-2.5-pro",
+        "gemini-1.5-pro"
     ]
 
     for model_name in models:
@@ -1365,7 +1368,7 @@ def analyze_new_species_with_gemini(species_name):
         f"請只回傳標準 JSON 格式。"
     )
 
-    models = ["gemini-1.5-flash-latest", "gemini-1.5-pro-latest"]
+    models = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-2.5-pro", "gemini-1.5-pro"]
     for model_name in models:
         api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
         payload = {
