@@ -100,13 +100,12 @@
   - `[x]` 淨化 `cases_events.json` 消除 237 筆與舊 `CASE-001/002` 雜訊，嚴格鎖定全澳 236 起 DAFF 官方權威事件 (`EVENT-001` ~ `EVENT-236`)
   - `[x]` 升級 `generate_gemini_grounded_summary()` 中的 Gemini AI 實時追蹤指令，自動抓取澳洲哺乳類動物（海豹、海獅、紅狐狸、野貓等）感染新聞並在頂部「📰 媒體與生態監測風向」區塊發布特報警示
   - `[x]` 優化 8 大物種卡片滑動 UI 提示標籤 (`已分析 8 大主要物種 ⬇️ 向下滑動查看全表`)
-  - `[x]` 2026-08-18 全頁面分區分段 Mobile RWD 手機版體驗與排版重構 Self-Audit：
-    - `[x]` **頂部 Header & 宣告橫幅**：取消硬編碼 `top-[37px]` 靜態高度，改為 `sticky top-0` 彈性排版（單行 ➔ 兩行響應式 `flex-col sm:flex-row`），解決手機版長橫幅折行後壓住 Header 之問題
-    - `[x]` **GIS 互動地圖高度優化**：新增自適應地圖高度媒介查詢 (`.map-container` 手機版 340px / 桌面版 500px)，防止手機使用者向下滾動時誤觸地圖地緣平移
-    - `[x]` **地圖控制按鈕與快篩按鈕**：按鈕群組改為 `w-full` 與 `flex-1` 滿寬填滿，快篩按鈕字級與 Padding 縮微優化 (`text-[11px] px-2.5 py-1.5`)，提升手指觸控點擊率
-    - `[x]` **搜尋框與表格**：搜尋對話框改為 `w-full flex-1` 手機滿寬，表格套用 `min-w-[680px]` 與 `px-3 py-3` 手機極佳閱讀間距，確保橫向滾動文字不擠壓
-    - `[x]` **參考文獻 URL**：加上 `break-all` 強制長網址自然斷行，消除手機橫向爆開溢出問題
-    - `[x]` 執行 `python h5n1.py` 重新編譯 `index.html`、`live_page.html` 與 `live_page_utf8.html` 驗證無誤
+  - `[x]` 2026-08-18 全面 Deeply Self-Audit 官方 18/08/2026 最新發布之 **Positive events by species** 數據對齊：
+    - `[x]` **對齊 DAFF 官網最新發布 18/08 柱狀圖數據**：確診總事件數 251 起，物種精確起數為 `Greater Crested Tern 189起 (75%)`、`Silver Gull 31起 (12%)`、`Petrel (巨鸌類) 18起 (7%)` (南方 7 + 巨鸌 8 + 北方 2 + 白頭 1)、`Pacific Gull 4起 (2%)`、`Brown Skua 2起`、`Cormorant 2起`、`Little Penguin 1起`、`Peregrine Falcon & Other 4起`
+    - `[x]` **定位並徹底修復 Bug Root Cause 1 (關鍵字比對順序碰撞)**：原系統在比對物種名稱時，`Silver Gull` 比對條件包含 `'海鷗'`，先於 `Pacific Gull (太平洋鷗)` 執行，導致 4 起 `Pacific Gull` 被錯誤計入 `Silver Gull` (使銀鷗變成 35 起、太平洋鷗變成 0 起)。現已將 `Pacific Gull` 判讀優先權調至 `Silver Gull` 之前，徹底解決數據歸類錯誤問題。
+    - `[x]` **定位並徹底修復 Bug Root Cause 2 (官網 Power BI 數據備援寫死值與多餘覆蓋)**：移除 `parse_daff_official_stats()` 中舊版硬編碼 `180` / `29` 備援數據與不適當的覆蓋邏輯，將 DAFF 官方柱狀圖圖表數據直接鎖定為 `189` 與 `31`。
+    - `[x]` **Cases 數據庫完全淨化**：執行 Python 腳本對 `cases_events.json` 251 筆確診個案物種標籤進行統一歸類對齊，使地圖、Donut Chart 圖表、圖例 Grid 與物種風險卡片達到 **100% 完全相同之精確數字**。
+    - `[x]` 執行 `python h5n1.py` 重新編譯產出 `index.html`、`live_page.html` 與 `live_page_utf8.html` 驗證無誤！
 
 
 

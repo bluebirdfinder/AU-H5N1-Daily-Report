@@ -7,7 +7,7 @@
     "risk_level": "🔴 高風險向量 (High Risk)",
     "risk_color": "red",
     "risk_note": "極易在野外濕地與人類城鎮之間穿梭，有較高風險將病毒帶入人類生活圈或飼料堆放區，為重點防範目標。",
-    "daff_count": "28 起 (12%)"
+    "daff_count": "31 起 (12%)"
   },
   "crested tern": {
     "name_zh": "大鳳頭燕鷗 (Crested Tern)",
@@ -17,7 +17,7 @@
     "risk_level": "🟠 高群聚爆發風險 (Mass Mortality Risk)",
     "risk_color": "amber",
     "risk_note": "易在沿海棲地爆發大規模群體死亡（占全澳 75% 確診個案，南澳與維州主因），但很少深入內陸高地。",
-    "daff_count": "178 起 (75%)"
+    "daff_count": "189 起 (75%)"
   },
   "giant petrel": {
     "name_zh": "巨鸌類 (Giant Petrel / 南方巨鸌)",
@@ -27,7 +27,7 @@
     "risk_level": "🟡 海洋巡航向量 (Coastal Scavenger)",
     "risk_color": "blue",
     "risk_note": "長距離沿海巡遊能力強，容易因掠食染病海鳥而帶毒，為沿海主要監視物種之一。",
-    "daff_count": "18 起 (8%)"
+    "daff_count": "18 起 (7%)"
   },
   "pacific gull": {
     "name_zh": "太平洋鷗 (Pacific Gull)",

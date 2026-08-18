@@ -9,12 +9,12 @@
 
 ### 1. 【上半部】最新「事件導向 (Event-Based Reporting)」即時動態監測專區
 - **雙引擎 (Dual-Engine) AI 實時連網摘要**：整合 **Gemini 2.5 API Google Search Grounding** 技術，主力模型採用 `gemini-2.5-flash`（備援為 `gemini-2.5-flash-lite` 與 `gemini-2.5-pro`，配有指數退避重試機制），自動主動連網搜尋當下最新澳洲 H5N1 媒體新聞與各州最新動態，實時產出零時差報導摘要。
-- **純事件計數規範**：完全對齊 DAFF 官方最新國際標準：**全澳 239 起確診事件 (Positive Events)**（截至 2026-08-18）、**1,273 起陰性排除事件** 與 **21,265 筆民眾與專家熱線通報**。
+- **純事件計數規範**：完全對齊 DAFF 官方最新國際標準：**全澳 251 起確診事件 (Positive Events)**（截至 2026-08-18）、**1,273 起陰性排除事件** 與 **21,265 筆民眾與專家熱線通報**。
 - **全澳 8 大州與行政區完整統計 (Events By Territory)**：
-  - 南澳 (SA) 169 起、維州 (VIC) 53 起、西澳 (WA) 10 起、新州 (NSW) 4 起（Blayney 工廠同州）、塔州 (TAS) 2 起、昆州 (QLD) 1 起、**北領地 (NT) 0 起**、**首都區 (ACT) 0 起**。
-- **100% 全動態 UI 渲染 (`renderDynamicIndicators()`)**：所有 KPI 卡片、熱線說明、各州數據網格、一鍵快篩控制列按鈕（如 `全部 239 起事件`）、GIS 地圖標題、事件明細表標題與數量 Badge 均由 JavaScript 動態寫入，零硬編碼過時殘留。
+  - 南澳 (SA) 178 起、維州 (VIC) 55 起、西澳 (WA) 10 起、新州 (NSW) 4 起（Blayney 工廠同州）、塔州 (TAS) 3 起、昆州 (QLD) 1 起、**北領地 (NT) 0 起**、**首都區 (ACT) 0 起**。
+- **100% 全動態 UI 渲染 (`renderDynamicIndicators()`)**：所有 KPI 卡片、熱線說明、各州數據網格、一鍵快篩控制列按鈕（如 `全部 251 起事件`）、GIS 地圖標題、事件明細表標題與數量 Badge 均由 JavaScript 動態寫入，零硬編碼過時殘留。
 - **野生動物與物種生態指南 (Species Bio-Security Guide)**：
-  - **資料庫驅動物種圓餅圖 (`speciesDonutChart`)**：從 `cases_events.json` 動態加總解析大鳳頭燕鷗、銀鷗/海鷗、巨鸌類、太平洋鷗、棕賊鷗、黑面鸕鶿、小企鵝、遊隼與其它物種個案起數與百分比，圖表與文案隨數據更新自動即時計算。
+  - **資料庫驅動物種圓餅圖 (`speciesDonutChart`)**：從 `cases_events.json` 動態加總解析大鳳頭燕鷗 (189起, 75%)、銀鷗/海鷗 (31起, 12%)、巨鸌類 (18起, 7%)、太平洋鷗 (4起, 2%)、棕賊鷗 (2起)、黑面鸕鶿 (2起)、小企鵝 (1起)、遊隼與其它物種 (4起) 個案起數與百分比，圖表與文案隨數據更新自動即時計算。
   - **8 大主要物種深度生態與生物安全評估卡片**：詳細標示候鳥/留鳥屬性、棲息習性、食物來源與對廠區供應鏈之風險層級說明。
   - **📱 垂直捲動彈性排版 (`max-h-[540px] overflow-y-auto`)**：卡片區塊獨立可滾動，手機與平板電腦均能順暢滑動瀏覽全部物種。
 - **🤖 【Gemini API Google Search Grounding 實時新物種與哺乳類 AI 分析警示鏈】 (`analyze_new_species_with_gemini()` & `generate_gemini_grounded_summary()`)**：

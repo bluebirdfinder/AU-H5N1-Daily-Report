@@ -700,9 +700,9 @@
             // 優先從 OFFICIAL_STATS 讀取官網權威 Power BI 視覺對帳數字
             const sc = stats.species_counts;
             if (sc && (sc['Crested Tern'] || sc['Silver Gull'])) {
-                counts['大鳳頭燕鷗 (Crested Tern)'] = sc['Crested Tern'] || 180;
-                counts['銀鷗 / 海鷗 (Silver Gull)'] = sc['Silver Gull'] || 29;
-                counts['巨鸌類 (Giant Petrel)'] = sc['Giant Petrel'] || 17;
+                counts['大鳳頭燕鷗 (Crested Tern)'] = sc['Crested Tern'] || 189;
+                counts['銀鷗 / 海鷗 (Silver Gull)'] = sc['Silver Gull'] || 31;
+                counts['巨鸌類 (Giant Petrel)'] = sc['Giant Petrel'] || 18;
                 counts['太平洋鷗 (Pacific Gull)'] = sc['Pacific Gull'] || 4;
                 counts['棕賊鷗 (Brown Skua)'] = sc['Brown Skua'] || 2;
                 counts['黑面鸕鶿 (Cormorant)'] = sc['Cormorant'] || 2;
@@ -714,12 +714,12 @@
                         const sp = (ev.species || '').toLowerCase();
                         if (sp.includes('大鳳頭燕鷗') || sp.includes('crested tern') || sp.includes('燕鷗')) {
                             counts['大鳳頭燕鷗 (Crested Tern)']++;
+                        } else if (sp.includes('太平洋鷗') || sp.includes('pacific gull')) {
+                            counts['太平洋鷗 (Pacific Gull)']++;
                         } else if (sp.includes('銀鷗') || sp.includes('silver gull') || sp.includes('海鷗')) {
                             counts['銀鷗 / 海鷗 (Silver Gull)']++;
                         } else if (sp.includes('巨鸌') || sp.includes('petrel')) {
                             counts['巨鸌類 (Giant Petrel)']++;
-                        } else if (sp.includes('太平洋鷗') || sp.includes('pacific gull')) {
-                            counts['太平洋鷗 (Pacific Gull)']++;
                         } else if (sp.includes('賊鷗') || sp.includes('skua')) {
                             counts['棕賊鷗 (Brown Skua)']++;
                         } else if (sp.includes('鸕鶿') || sp.includes('cormorant')) {
@@ -733,9 +733,9 @@
                 });
             } else {
                 counts = {
-                    '大鳳頭燕鷗 (Crested Tern)': 180,
-                    '銀鷗 / 海鷗 (Silver Gull)': 29,
-                    '巨鸌類 (Giant Petrel)': 17,
+                    '大鳳頭燕鷗 (Crested Tern)': 189,
+                    '銀鷗 / 海鷗 (Silver Gull)': 31,
+                    '巨鸌類 (Giant Petrel)': 18,
                     '太平洋鷗 (Pacific Gull)': 4,
                     '棕賊鷗 (Brown Skua)': 2,
                     '黑面鸕鶿 (Cormorant)': 2,
