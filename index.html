@@ -20,11 +20,16 @@
             font-family: 'Inter', 'Noto Sans TC', sans-serif;
         }
         .map-container {
-            height: 500px;
+            height: 340px;
             width: 100%;
             border-radius: 0.75rem;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             z-index: 10;
+        }
+        @media (min-width: 640px) {
+            .map-container {
+                height: 500px;
+            }
         }
         /* 原圖風格：高亮紅/藍/綠圓圈數字 Marker */
         .glowing-circle-badge {
@@ -93,14 +98,14 @@
 
 
     <!-- 頂部導航與動態更新標記 -->
-    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-[37px] z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <span class="bg-red-600 text-white text-xs px-2.5 py-1 rounded-full font-bold animate-pulse">LIVE TRACKING</span>
-                <h1 class="text-lg font-bold tracking-tight text-white">Nestlé Purina Blayney • Bio-Security Monitor</h1>
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5 sm:gap-0">
+            <div class="flex items-center space-x-2.5">
+                <span class="bg-red-600 text-white text-[10px] sm:text-xs px-2 py-0.5 sm:py-1 rounded-full font-bold animate-pulse shrink-0">LIVE TRACKING</span>
+                <h1 class="text-sm sm:text-lg font-bold tracking-tight text-white truncate">Nestlé Purina Blayney • Bio-Security Monitor</h1>
             </div>
-            <div class="text-xs text-slate-400">
-                系統最後更新時間: <span class="text-emerald-400 font-semibold">2026-08-18 16:26:25 (台北時間) / 2026-08-18 18:26:25 (澳洲 AEST)</span>
+            <div class="text-[11px] sm:text-xs text-slate-400">
+                系統最後更新時間: <span class="text-emerald-400 font-semibold">2026-08-18 16:44:52 (台北時間) / 2026-08-18 18:44:52 (澳洲 AEST)</span>
             </div>
         </div>
     </header>
@@ -136,9 +141,7 @@
                             <div>
                                 <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider mb-1">📰 媒體與生態監測風向 (MEDIA & ECOLOGY WATCH)</span>
                                 <div class="text-slate-200 text-sm leading-relaxed">
-                                    <p>澳洲 H5N1 禽流感疫情持續受到密切監測。截至 2026 年 8 月 18 日，全國已累計 251 起野鳥 H5 禽流感事件。塔斯馬尼亞州於 8 月 13 日確認首例<span class="text-purple-300 font-extrabold bg-purple-950/60 px-1 py-0.5 rounded border border-purple-700/50">棕賊鷗</span> (Brown Skua) 檢測呈陽性，該病毒已蔓延至全澳六個州。南澳州沿海地區疫情嚴峻，已報告 169 起事件，並發生<span class="text-amber-300 font-extrabold bg-amber-950/60 px-1 py-0.5 rounded border border-amber-700/50">冠鳳頭燕鷗</span> (Greater Crested Tern) 大規模死亡，<span class="text-rose-300 font-extrabold bg-rose-950/60 px-1 py-0.5 rounded border border-rose-700/50">銀鷗</span> (Silver Gull) 也受影響。維多利亞州則有 62 起事件，包括在西港灣 (Western Port Bay) 附近和西南海岸的檢測，並確認了首例<span class="text-cyan-300 font-extrabold bg-cyan-950/60 px-1 py-0.5 rounded border border-cyan-700/50">小企鵝</span>死亡病例。維州已針對 50 隻以上家禽實施圈養要求。</p>
-<p><strong>⚠️ <span class="text-fuchsia-300 font-bold">哺乳類</span>監測：</strong>雖然澳洲大陸尚未有<span class="text-fuchsia-300 font-extrabold bg-fuchsia-950/70 px-1.5 py-0.5 rounded border border-fuchsia-500/40">野生<span class="text-fuchsia-300 font-extrabold bg-fuchsia-950/70 px-1.5 py-0.5 rounded border border-fuchsia-500/40">哺乳類動物</span></span>感染 H5N1 的確診案例，但澳洲次南極領地赫德島與麥唐納群島在 2025 年 10 月至 2026 年 1 月間，已確認南方象鼻<span class="text-fuchsia-300 font-bold">海豹</span> (Southern Elephant Seal) 幼崽出現大規模死亡事件，部分地區死亡率高達 97%。當地亦檢測到南極毛皮<span class="text-fuchsia-300 font-bold">海豹</span> (Antarctic Fur Seal) 感染該病毒。專家持續對澳洲<span class="text-fuchsia-300 font-bold">海豹</span>、<span class="text-fuchsia-300 font-bold">海獅</span>及<span class="text-fuchsia-300 font-bold">塔斯馬尼亞惡魔</span> (Tasmanian Devil) 等撿食性或食肉性哺乳動物的潛在風險保持高度警覺。目前全澳<span class="text-fuchsia-300 font-extrabold bg-fuchsia-950/70 px-1.5 py-0.5 rounded border border-fuchsia-500/40">哺乳類動物</span>無大規模爆發，重點防線維持警覺。</p>
-<p>全澳所有商業家禽農場持續維護 <span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">100% 無疫區</span>狀態與生產鏈安全。公眾健康風險極低，但仍建議避免接觸生病或死亡的野鳥及其他野生動物。</p>
+                                    根據 <a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a> 與 <a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">新南威爾斯州政府 (NSW DPIRD)</a> 等媒體 <span class="text-amber-400 font-bold">2026 年 8 月 18 日 最新報導</span>，澳洲官方自 8/12 起正式採用國際標準「事件導向 (Event-based Reporting)」統計，全澳累計 <span class="text-red-400 font-bold"><span class="text-red-400 font-extrabold text-base">251 起確診事件</span></span>（陰性排除 <span class="text-sky-400 font-semibold">1,273 起</span>）。聯邦首席獸醫官重申：<span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40">澳洲所有商業家禽農場維持 <span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">100% 零感染</span>，<span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">對一般人類健康風險極低</span></span>。
                                 </div>
                             </div>
                         </div>
@@ -281,17 +284,17 @@
                     <!-- 右側：動態物種生態與生物安全風險卡片 (可垂直捲動瀏覽全部物種) -->
                     <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[540px] overflow-y-auto pr-1">
                                                 <div class="bg-slate-900/80 p-4 rounded-xl border border-red-500/30 hover:border-red-500/60 transition space-y-2.5 shadow-md">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="font-bold text-white text-sm flex items-center gap-1.5 truncate">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                                <span class="font-bold text-white text-sm flex items-center gap-1.5 leading-snug">
                                     <span>🕊️</span> 銀鷗 (Silver Gull / 海鷗)
                                 </span>
-                                <span class="bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                                <span class="bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap shrink-0">
                                     🔴 高風險向量 (High Risk)
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between gap-2 text-[11px]">
+                            <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                                 <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">遷徙屬性: 留鳥 / 廣泛游動</span>
-                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 28 起 (12%)</span>
+                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 29 起 (12%)</span>
                             </div>
                             <p class="text-xs text-slate-300 leading-relaxed">
                                 <strong class="text-blue-300">棲息習性：</strong>雜食性，強烈高度適應人類城鎮、港口碼頭、廢棄物處理場與露天餐廳，社會性高度群聚。
@@ -302,17 +305,17 @@
                         </div>
 
                         <div class="bg-slate-900/80 p-4 rounded-xl border border-amber-500/30 hover:border-amber-500/60 transition space-y-2.5 shadow-md">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="font-bold text-white text-sm flex items-center gap-1.5 truncate">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                                <span class="font-bold text-white text-sm flex items-center gap-1.5 leading-snug">
                                     <span>🪶</span> 大鳳頭燕鷗 (Crested Tern)
                                 </span>
-                                <span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                                <span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap shrink-0">
                                     🟠 高群聚爆發風險 (Mass Mortality Risk)
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between gap-2 text-[11px]">
+                            <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                                 <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">遷徙屬性: 沿海游動性海鳥</span>
-                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 178 起 (75%)</span>
+                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 180 起 (72%)</span>
                             </div>
                             <p class="text-xs text-slate-300 leading-relaxed">
                                 <strong class="text-blue-300">棲息習性：</strong>專一食魚，極度偏好在沿海沙洲、外島進行數千隻規模的高密度密集群聚繁殖。
@@ -323,17 +326,17 @@
                         </div>
 
                         <div class="bg-slate-900/80 p-4 rounded-xl border border-blue-500/30 hover:border-blue-500/60 transition space-y-2.5 shadow-md">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="font-bold text-white text-sm flex items-center gap-1.5 truncate">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                                <span class="font-bold text-white text-sm flex items-center gap-1.5 leading-snug">
                                     <span>🌊</span> 巨鸌類 (Giant Petrel / 南方巨鸌)
                                 </span>
-                                <span class="bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                                <span class="bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap shrink-0">
                                     🟡 海洋巡航向量 (Coastal Scavenger)
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between gap-2 text-[11px]">
+                            <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                                 <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">遷徙屬性: 遠洋巡航性海鳥</span>
-                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 18 起 (8%)</span>
+                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 17 起 (7%)</span>
                             </div>
                             <p class="text-xs text-slate-300 leading-relaxed">
                                 <strong class="text-blue-300">棲息習性：</strong>體型巨大且食性強悍，具備腐食與掠食習性，經常跟隨漁船、海獸屍體或於遠洋海岸巡航巡遊。
@@ -344,15 +347,15 @@
                         </div>
 
                         <div class="bg-slate-900/80 p-4 rounded-xl border border-amber-500/30 hover:border-amber-500/60 transition space-y-2.5 shadow-md">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="font-bold text-white text-sm flex items-center gap-1.5 truncate">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                                <span class="font-bold text-white text-sm flex items-center gap-1.5 leading-snug">
                                     <span>🦤</span> 太平洋鷗 (Pacific Gull)
                                 </span>
-                                <span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                                <span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap shrink-0">
                                     🟡 中度沿海風險 (Moderate Coastal Risk)
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between gap-2 text-[11px]">
+                            <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                                 <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">遷徙屬性: 澳洲南部特有留鳥</span>
                                 <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 4 起 (2%)</span>
                             </div>
@@ -365,17 +368,17 @@
                         </div>
 
                         <div class="bg-slate-900/80 p-4 rounded-xl border border-blue-500/30 hover:border-blue-500/60 transition space-y-2.5 shadow-md">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="font-bold text-white text-sm flex items-center gap-1.5 truncate">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                                <span class="font-bold text-white text-sm flex items-center gap-1.5 leading-snug">
                                     <span>🦅</span> 棕賊鷗 (Brown Skua)
                                 </span>
-                                <span class="bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                                <span class="bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap shrink-0">
                                     🟡 跨域帶毒向量 (Long-Distance Carrier)
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between gap-2 text-[11px]">
+                            <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                                 <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">遷徙屬性: 跨洋遠洋長途候鳥</span>
-                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 2 起 (1%)</span>
+                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 2 起 (0.8%)</span>
                             </div>
                             <p class="text-xs text-slate-300 leading-relaxed">
                                 <strong class="text-blue-300">棲息習性：</strong>掠食與腐食性，分布於亞南極海域，具備極強的跨洋飛行能力與強悍羽翼。
@@ -386,17 +389,17 @@
                         </div>
 
                         <div class="bg-slate-900/80 p-4 rounded-xl border border-emerald-500/30 hover:border-emerald-500/60 transition space-y-2.5 shadow-md">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="font-bold text-white text-sm flex items-center gap-1.5 truncate">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                                <span class="font-bold text-white text-sm flex items-center gap-1.5 leading-snug">
                                     <span>🦆</span> 黑面鸕鶿 (Black-faced Cormorant)
                                 </span>
-                                <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                                <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap shrink-0">
                                     🟢 近海棲地風險 (Coastal Risk Only)
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between gap-2 text-[11px]">
+                            <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                                 <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">遷徙屬性: 沿海留鳥 / 潛水鳥類</span>
-                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 2 起 (1%)</span>
+                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 2 起 (0.8%)</span>
                             </div>
                             <p class="text-xs text-slate-300 leading-relaxed">
                                 <strong class="text-blue-300">棲息習性：</strong>專一潛水捕魚，群聚棲息於沿海岩礁與崖壁，鮮少遠離海濱。
@@ -407,15 +410,15 @@
                         </div>
 
                         <div class="bg-slate-900/80 p-4 rounded-xl border border-emerald-500/30 hover:border-emerald-500/60 transition space-y-2.5 shadow-md">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="font-bold text-white text-sm flex items-center gap-1.5 truncate">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                                <span class="font-bold text-white text-sm flex items-center gap-1.5 leading-snug">
                                     <span>🐧</span> 小企鵝 (Little Penguin)
                                 </span>
-                                <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                                <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap shrink-0">
                                     🟢 內陸傳播風險極低 (Low Inland Risk)
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between gap-2 text-[11px]">
+                            <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                                 <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">遷徙屬性: 沿岸留鳥 / 潛水鳥類</span>
                                 <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 1 起 (0.4%)</span>
                             </div>
@@ -428,17 +431,17 @@
                         </div>
 
                         <div class="bg-slate-900/80 p-4 rounded-xl border border-purple-500/30 hover:border-purple-500/60 transition space-y-2.5 shadow-md">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="font-bold text-white text-sm flex items-center gap-1.5 truncate">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                                <span class="font-bold text-white text-sm flex items-center gap-1.5 leading-snug">
                                     <span>🦅</span> 遊隼 / 猛禽 (Peregrine Falcon)
                                 </span>
-                                <span class="bg-purple-500/20 text-purple-400 border border-purple-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                                <span class="bg-purple-500/20 text-purple-400 border border-purple-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap shrink-0">
                                     🟣 猛禽高空跨區向量 (Raptor Vector)
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between gap-2 text-[11px]">
+                            <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                                 <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">遷徙屬性: 猛禽 / 留鳥</span>
-                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 1 起 (0.4%)</span>
+                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 4 起 (2%)</span>
                             </div>
                             <p class="text-xs text-slate-300 leading-relaxed">
                                 <strong class="text-blue-300">棲息習性：</strong>頂級空中肉食猛禽，俯衝捕食中小型鳥類（如海鷗或鴿子），具備高空遠距離飛行能力。
@@ -463,23 +466,23 @@
                             紅色代表確診事件點位、天藍色為疑似、綠色為陰性排除點、黃色地標為我司布萊尼工廠所在地。
                         </p>
                     </div>
-                    <div class="mt-2 md:mt-0 flex gap-2">
-                        <button onclick="zoomToFactory('eventMap')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded transition">定位 Blayney 工廠</button>
-                        <button onclick="resetMapView('eventMap')" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded transition">重設全澳洲視角</button>
+                    <div class="mt-2.5 md:mt-0 flex gap-2 w-full md:w-auto">
+                        <button onclick="zoomToFactory('eventMap')" class="flex-1 md:flex-initial bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg transition font-medium shadow text-center">🏭 定位 Blayney 工廠</button>
+                        <button onclick="resetMapView('eventMap')" class="flex-1 md:flex-initial bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded-lg transition font-medium text-center">🗺️ 重設全澳洲視角</button>
                     </div>
                 </div>
                 <div id="eventMap" class="map-container"></div>
             </div>
 
             <!-- 一鍵快篩按鈕控制列 (位在地圖與病例明細表之間，直觀連結表格檢索) -->
-            <div class="flex flex-wrap items-center gap-2 bg-slate-800/90 p-3.5 rounded-xl border border-slate-700 shadow-md">
-                <span class="text-xs font-bold text-slate-400 mr-2 flex items-center gap-1">⚡ 病例表一鍵快篩:</span>
-                <button id="btn-filter-all" onclick="setQuickFilter(this, '')" class="quick-filter-btn bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition shadow">全部 236 起事件</button>
-                <button id="btn-filter-tas" onclick="setQuickFilter(this, 'TAS')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition">🏝️ 塔斯馬尼亞 (TAS 首例 2起)</button>
-                <button id="btn-filter-nsw" onclick="setQuickFilter(this, 'NSW')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition">🏭 新州 (NSW 工廠同州 4起)</button>
-                <button onclick="setQuickFilter(this, '銀鷗')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition">🔴 銀鷗/海鷗 (城鎮高風險)</button>
-                <button onclick="setQuickFilter(this, '棕賊鷗')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition">🦅 棕賊鷗 (遠洋遷徙)</button>
-                <button onclick="setQuickFilter(this, '企鵝')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition">🐧 小企鵝 (沿海留鳥)</button>
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 bg-slate-800/90 p-3 sm:p-3.5 rounded-xl border border-slate-700 shadow-md">
+                <span class="w-full sm:w-auto text-xs font-bold text-slate-400 mr-2 flex items-center gap-1">⚡ 病例表一鍵快篩:</span>
+                <button id="btn-filter-all" onclick="setQuickFilter(this, '')" class="quick-filter-btn bg-blue-600 text-white text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg font-medium transition shadow">全部 236 起事件</button>
+                <button id="btn-filter-tas" onclick="setQuickFilter(this, 'TAS')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg font-medium transition">🏝️ 塔斯馬尼亞 (TAS 首例 2起)</button>
+                <button id="btn-filter-nsw" onclick="setQuickFilter(this, 'NSW')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg font-medium transition">🏭 新州 (NSW 工廠同州 4起)</button>
+                <button onclick="setQuickFilter(this, '銀鷗')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg font-medium transition">🔴 銀鷗/海鷗 (城鎮高風險)</button>
+                <button onclick="setQuickFilter(this, '棕賊鷗')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg font-medium transition">🦅 棕賊鷗 (遠洋遷徙)</button>
+                <button onclick="setQuickFilter(this, '企鵝')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg font-medium transition">🐧 小企鵝 (沿海留鳥)</button>
             </div>
 
             <!-- 上半部 事件可滾動明細表格 (支援搜尋與欄位點擊排序) -->
@@ -489,13 +492,13 @@
                         <h3 id="event-table-title" class="text-lg font-bold text-white">最新 H5N1 186 起確診事件與排除案例明細表</h3>
                         <p class="text-xs text-slate-400 mt-1">可點擊表頭欄位名稱進行排序，或透過對話框即時過濾檢索。</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <input type="text" id="event-search" oninput="filterAndSortEvents()" onkeyup="filterAndSortEvents()" placeholder="🔍 搜尋地點 (例: NSW, Casey)、物種或編號..." class="bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 w-64 md:w-80 shadow-inner">
-                        <span id="event-count-badge" class="bg-blue-600/30 text-blue-300 border border-blue-500/40 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap">188 筆記錄</span>
+                    <div class="flex items-center justify-between sm:justify-start gap-2.5 w-full md:w-auto">
+                        <input type="text" id="event-search" oninput="filterAndSortEvents()" onkeyup="filterAndSortEvents()" placeholder="🔍 搜尋地點 (例: NSW, Casey)、物種或編號..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 flex-1 sm:w-64 md:w-80 shadow-inner">
+                        <span id="event-count-badge" class="bg-blue-600/30 text-blue-300 border border-blue-500/40 text-xs px-2.5 py-1.5 rounded-full font-bold whitespace-nowrap shrink-0">188 筆記錄</span>
                     </div>
                 </div>
                 <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
-                    <table class="w-full text-left text-sm">
+                    <table class="w-full text-left text-sm min-w-[680px]">
                         <thead class="bg-slate-900 text-slate-300 text-xs uppercase font-semibold sticky top-0 z-20 shadow-md">
                             <tr>
                                 <th onclick="sortEvents('id')" class="px-6 py-4 sortable-header">
@@ -643,9 +646,9 @@
                             紅色代表確診海鳥、天藍色為疑似病例、綠色為陰性排除點、紅色星號為我司布萊尼工廠所在地。
                         </p>
                     </div>
-                    <div class="mt-2 md:mt-0 flex gap-2">
-                        <button onclick="zoomToFactory('historicalBirdMap')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded transition">定位 Blayney 工廠</button>
-                        <button onclick="resetMapView('historicalBirdMap')" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded transition">重設全澳洲視角</button>
+                    <div class="mt-2.5 md:mt-0 flex gap-2 w-full md:w-auto">
+                        <button onclick="zoomToFactory('historicalBirdMap')" class="flex-1 md:flex-initial bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg transition font-medium shadow text-center">🏭 定位 Blayney 工廠</button>
+                        <button onclick="resetMapView('historicalBirdMap')" class="flex-1 md:flex-initial bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded-lg transition font-medium text-center">🗺️ 重設全澳洲視角</button>
                     </div>
                 </div>
                 <div id="historicalBirdMap" class="map-container"></div>
@@ -658,13 +661,13 @@
                         <h3 class="text-lg font-bold text-white">歷史 H5N1 野鳥檢測詳細記錄清單 (64 筆歷史凍結病歷)</h3>
                         <p class="text-xs text-slate-400 mt-1">歷史庫 `cases.json` 完整備份（點擊表頭可切換排序）。</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <input type="text" id="historical-search" oninput="filterAndSortHistorical()" onkeyup="filterAndSortHistorical()" placeholder="🔍 搜尋歷史地點 (例: Esperance, SA)、物種或編號..." class="bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 w-64 md:w-80 shadow-inner">
-                        <span id="historical-count-badge" class="bg-amber-600/30 text-amber-300 border border-amber-500/40 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap">64 筆凍結紀錄</span>
+                    <div class="flex items-center justify-between sm:justify-start gap-2.5 w-full md:w-auto">
+                        <input type="text" id="historical-search" oninput="filterAndSortHistorical()" onkeyup="filterAndSortHistorical()" placeholder="🔍 搜尋歷史地點 (例: Esperance, SA)、物種或編號..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 flex-1 sm:w-64 md:w-80 shadow-inner">
+                        <span id="historical-count-badge" class="bg-amber-600/30 text-amber-300 border border-amber-500/40 text-xs px-2.5 py-1.5 rounded-full font-bold whitespace-nowrap shrink-0">64 筆凍結紀錄</span>
                     </div>
                 </div>
                 <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
-                    <table class="w-full text-left text-sm">
+                    <table class="w-full text-left text-sm min-w-[680px]">
                         <thead class="bg-slate-900 text-slate-300 text-xs uppercase font-semibold sticky top-0 z-20 shadow-md">
                             <tr>
                                 <th onclick="sortHistorical('id')" class="px-6 py-4 sortable-header">
@@ -702,7 +705,7 @@
         <footer class="pt-8 border-t border-slate-800 text-xs text-slate-500 space-y-4">
             <div>
                 <h4 class="font-bold text-slate-400 mb-2 uppercase tracking-wider">🔗 澳洲聯邦與各州政府官方即時權威數據來源 (Official References)</h4>
-                <ul class="space-y-1.5 list-disc pl-5 text-slate-400">
+                <ul class="space-y-1.5 list-disc pl-5 text-slate-400 break-all">
                                     <li>
                     [1] 澳洲農業、漁業及林業部 (DAFF) 官方宣傳活動與即時更新：<a href="https://www.agriculture.gov.au/campaigns/birdflu/latest-data#event_data" target="_blank" class="text-blue-400 hover:underline">Department of Agriculture, Fisheries and Forestry - H5 bird flu latest data</a>
                 </li>
@@ -5174,7 +5177,7 @@
     "Falcon & Other": 4
   },
   "source": "live",
-  "scrape_time": "2026-08-18 08:26 UTC"
+  "scrape_time": "2026-08-18 08:44 UTC"
 };
 
         const factoryLat = -33.5332;

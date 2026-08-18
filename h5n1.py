@@ -1589,9 +1589,48 @@ def get_species_profiles_for_cases(cases_data):
         
     return profiles
 
-def generate_dynamic_species_cards_html(cases_data):
+def generate_dynamic_species_cards_html(cases_data, official_stats=None):
     profiles = get_species_profiles_for_cases(cases_data)
     
+    stats = official_stats or {}
+    total_events = stats.get("total_events", 239)
+    sc = stats.get("species_counts", {})
+    
+    key_mapping = {
+        "crested tern": "Crested Tern",
+        "silver gull": "Silver Gull",
+        "giant petrel": "Giant Petrel",
+        "pacific gull": "Pacific Gull",
+        "brown skua": "Brown Skua",
+        "black-faced cormorant": "Cormorant",
+        "cormorant": "Cormorant",
+        "little penguin": "Little Penguin",
+        "peregrine falcon": "Falcon & Other",
+        "falcon": "Falcon & Other"
+    }
+
+    event_species_counts = {}
+    if cases_data:
+        for ev in cases_data:
+            if ev.get("type") == "Confirmed" or not ev.get("type"):
+                sp_text = (ev.get("species") or "").lower()
+                if "大鳳頭燕鷗" in sp_text or "crested tern" in sp_text or "燕鷗" in sp_text:
+                    event_species_counts["Crested Tern"] = event_species_counts.get("Crested Tern", 0) + 1
+                elif "銀鷗" in sp_text or "silver gull" in sp_text or "海鷗" in sp_text:
+                    event_species_counts["Silver Gull"] = event_species_counts.get("Silver Gull", 0) + 1
+                elif "巨鸌" in sp_text or "petrel" in sp_text:
+                    event_species_counts["Giant Petrel"] = event_species_counts.get("Giant Petrel", 0) + 1
+                elif "太平洋鷗" in sp_text or "pacific gull" in sp_text:
+                    event_species_counts["Pacific Gull"] = event_species_counts.get("Pacific Gull", 0) + 1
+                elif "賊鷗" in sp_text or "skua" in sp_text:
+                    event_species_counts["Brown Skua"] = event_species_counts.get("Brown Skua", 0) + 1
+                elif "鸕鶿" in sp_text or "cormorant" in sp_text:
+                    event_species_counts["Cormorant"] = event_species_counts.get("Cormorant", 0) + 1
+                elif "企鵝" in sp_text or "penguin" in sp_text:
+                    event_species_counts["Little Penguin"] = event_species_counts.get("Little Penguin", 0) + 1
+                else:
+                    event_species_counts["Falcon & Other"] = event_species_counts.get("Falcon & Other", 0) + 1
+
     color_map = {
         "red": ("border-red-500/30", "hover:border-red-500/60", "bg-red-500/20", "text-red-400", "border-red-500/30"),
         "amber": ("border-amber-500/30", "hover:border-amber-500/60", "bg-amber-500/20", "text-amber-400", "border-amber-500/30"),
@@ -1604,19 +1643,38 @@ def generate_dynamic_species_cards_html(cases_data):
     for p in profiles:
         c_code = p.get("risk_color", "blue")
         b_border, b_hover, b_bg, b_text, b_ring = color_map.get(c_code, color_map["blue"])
-        daff_cnt = p.get("daff_count", "")
-        cnt_badge = f'<span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: {daff_cnt}</span>' if daff_cnt else ''
+        
+        sp_name_lower = p.get("name_zh", "").lower()
+        matched_sc_key = None
+        for k_raw, k_mapped in key_mapping.items():
+            if k_raw in sp_name_lower:
+                matched_sc_key = k_mapped
+                break
+
+        cnt = 0
+        if matched_sc_key and matched_sc_key in sc:
+            cnt = sc[matched_sc_key]
+        elif matched_sc_key and matched_sc_key in event_species_counts:
+            cnt = event_species_counts[matched_sc_key]
+        else:
+            cnt = p.get("count", 0)
+
+        calc_total = total_events if total_events > 0 else 239
+        pct = (cnt / calc_total * 100) if calc_total > 0 else 0
+        pct_str = f"{pct:.1f}%" if pct < 1 else f"{pct:.0f}%"
+        
+        cnt_badge = f'<span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: {cnt} 起 ({pct_str})</span>' if cnt > 0 else ''
         
         card_html = f'''                        <div class="bg-slate-900/80 p-4 rounded-xl border {b_border} {b_hover} transition space-y-2.5 shadow-md">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="font-bold text-white text-sm flex items-center gap-1.5 truncate">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                                <span class="font-bold text-white text-sm flex items-center gap-1.5 leading-snug">
                                     <span>{p.get("icon", "🐾")}</span> {p.get("name_zh", "未知物種")}
                                 </span>
-                                <span class="{b_bg} {b_text} border {b_ring} text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                                <span class="{b_bg} {b_text} border {b_ring} text-[10px] px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap shrink-0">
                                     {p.get("risk_level", "🟡 中度風險")}
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between gap-2 text-[11px]">
+                            <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                                 <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">遷徙屬性: {p.get("migratory_status", "留鳥 / 游動")}</span>
                                 {cnt_badge}
                             </div>
@@ -1677,7 +1735,7 @@ def main():
     refs_html = generate_dynamic_references(events_cases)
     updated_html = updated_html.replace("<!-- DYNAMIC_REFERENCES_PLACEHOLDER -->", refs_html)
 
-    species_html = generate_dynamic_species_cards_html(events_cases)
+    species_html = generate_dynamic_species_cards_html(events_cases, official_stats)
     updated_html = updated_html.replace("<!-- DYNAMIC_SPECIES_CARDS_PLACEHOLDER -->", species_html)
     
     factory_lat, factory_lon = -33.5332, 149.2524

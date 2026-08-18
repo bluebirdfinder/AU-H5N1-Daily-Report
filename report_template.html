@@ -20,11 +20,16 @@
             font-family: 'Inter', 'Noto Sans TC', sans-serif;
         }
         .map-container {
-            height: 500px;
+            height: 340px;
             width: 100%;
             border-radius: 0.75rem;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             z-index: 10;
+        }
+        @media (min-width: 640px) {
+            .map-container {
+                height: 500px;
+            }
         }
         /* 原圖風格：高亮紅/藍/綠圓圈數字 Marker */
         .glowing-circle-badge {
@@ -93,13 +98,13 @@
 
 
     <!-- 頂部導航與動態更新標記 -->
-    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-[37px] z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <span class="bg-red-600 text-white text-xs px-2.5 py-1 rounded-full font-bold animate-pulse">LIVE TRACKING</span>
-                <h1 class="text-lg font-bold tracking-tight text-white">Nestlé Purina Blayney • Bio-Security Monitor</h1>
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5 sm:gap-0">
+            <div class="flex items-center space-x-2.5">
+                <span class="bg-red-600 text-white text-[10px] sm:text-xs px-2 py-0.5 sm:py-1 rounded-full font-bold animate-pulse shrink-0">LIVE TRACKING</span>
+                <h1 class="text-sm sm:text-lg font-bold tracking-tight text-white truncate">Nestlé Purina Blayney • Bio-Security Monitor</h1>
             </div>
-            <div class="text-xs text-slate-400">
+            <div class="text-[11px] sm:text-xs text-slate-400">
                 系統最後更新時間: <span class="text-emerald-400 font-semibold"><!-- COMPILE_TIME_PLACEHOLDER --></span>
             </div>
         </div>
@@ -295,23 +300,23 @@
                             紅色代表確診事件點位、天藍色為疑似、綠色為陰性排除點、黃色地標為我司布萊尼工廠所在地。
                         </p>
                     </div>
-                    <div class="mt-2 md:mt-0 flex gap-2">
-                        <button onclick="zoomToFactory('eventMap')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded transition">定位 Blayney 工廠</button>
-                        <button onclick="resetMapView('eventMap')" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded transition">重設全澳洲視角</button>
+                    <div class="mt-2.5 md:mt-0 flex gap-2 w-full md:w-auto">
+                        <button onclick="zoomToFactory('eventMap')" class="flex-1 md:flex-initial bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg transition font-medium shadow text-center">🏭 定位 Blayney 工廠</button>
+                        <button onclick="resetMapView('eventMap')" class="flex-1 md:flex-initial bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded-lg transition font-medium text-center">🗺️ 重設全澳洲視角</button>
                     </div>
                 </div>
                 <div id="eventMap" class="map-container"></div>
             </div>
 
             <!-- 一鍵快篩按鈕控制列 (位在地圖與病例明細表之間，直觀連結表格檢索) -->
-            <div class="flex flex-wrap items-center gap-2 bg-slate-800/90 p-3.5 rounded-xl border border-slate-700 shadow-md">
-                <span class="text-xs font-bold text-slate-400 mr-2 flex items-center gap-1">⚡ 病例表一鍵快篩:</span>
-                <button id="btn-filter-all" onclick="setQuickFilter(this, '')" class="quick-filter-btn bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition shadow">全部 236 起事件</button>
-                <button id="btn-filter-tas" onclick="setQuickFilter(this, 'TAS')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition">🏝️ 塔斯馬尼亞 (TAS 首例 2起)</button>
-                <button id="btn-filter-nsw" onclick="setQuickFilter(this, 'NSW')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition">🏭 新州 (NSW 工廠同州 4起)</button>
-                <button onclick="setQuickFilter(this, '銀鷗')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition">🔴 銀鷗/海鷗 (城鎮高風險)</button>
-                <button onclick="setQuickFilter(this, '棕賊鷗')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition">🦅 棕賊鷗 (遠洋遷徙)</button>
-                <button onclick="setQuickFilter(this, '企鵝')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium transition">🐧 小企鵝 (沿海留鳥)</button>
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 bg-slate-800/90 p-3 sm:p-3.5 rounded-xl border border-slate-700 shadow-md">
+                <span class="w-full sm:w-auto text-xs font-bold text-slate-400 mr-2 flex items-center gap-1">⚡ 病例表一鍵快篩:</span>
+                <button id="btn-filter-all" onclick="setQuickFilter(this, '')" class="quick-filter-btn bg-blue-600 text-white text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg font-medium transition shadow">全部 236 起事件</button>
+                <button id="btn-filter-tas" onclick="setQuickFilter(this, 'TAS')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg font-medium transition">🏝️ 塔斯馬尼亞 (TAS 首例 2起)</button>
+                <button id="btn-filter-nsw" onclick="setQuickFilter(this, 'NSW')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg font-medium transition">🏭 新州 (NSW 工廠同州 4起)</button>
+                <button onclick="setQuickFilter(this, '銀鷗')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg font-medium transition">🔴 銀鷗/海鷗 (城鎮高風險)</button>
+                <button onclick="setQuickFilter(this, '棕賊鷗')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg font-medium transition">🦅 棕賊鷗 (遠洋遷徙)</button>
+                <button onclick="setQuickFilter(this, '企鵝')" class="quick-filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] sm:text-xs px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg font-medium transition">🐧 小企鵝 (沿海留鳥)</button>
             </div>
 
             <!-- 上半部 事件可滾動明細表格 (支援搜尋與欄位點擊排序) -->
@@ -321,13 +326,13 @@
                         <h3 id="event-table-title" class="text-lg font-bold text-white">最新 H5N1 186 起確診事件與排除案例明細表</h3>
                         <p class="text-xs text-slate-400 mt-1">可點擊表頭欄位名稱進行排序，或透過對話框即時過濾檢索。</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <input type="text" id="event-search" oninput="filterAndSortEvents()" onkeyup="filterAndSortEvents()" placeholder="🔍 搜尋地點 (例: NSW, Casey)、物種或編號..." class="bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 w-64 md:w-80 shadow-inner">
-                        <span id="event-count-badge" class="bg-blue-600/30 text-blue-300 border border-blue-500/40 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap">188 筆記錄</span>
+                    <div class="flex items-center justify-between sm:justify-start gap-2.5 w-full md:w-auto">
+                        <input type="text" id="event-search" oninput="filterAndSortEvents()" onkeyup="filterAndSortEvents()" placeholder="🔍 搜尋地點 (例: NSW, Casey)、物種或編號..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 flex-1 sm:w-64 md:w-80 shadow-inner">
+                        <span id="event-count-badge" class="bg-blue-600/30 text-blue-300 border border-blue-500/40 text-xs px-2.5 py-1.5 rounded-full font-bold whitespace-nowrap shrink-0">188 筆記錄</span>
                     </div>
                 </div>
                 <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
-                    <table class="w-full text-left text-sm">
+                    <table class="w-full text-left text-sm min-w-[680px]">
                         <thead class="bg-slate-900 text-slate-300 text-xs uppercase font-semibold sticky top-0 z-20 shadow-md">
                             <tr>
                                 <th onclick="sortEvents('id')" class="px-6 py-4 sortable-header">
@@ -475,9 +480,9 @@
                             紅色代表確診海鳥、天藍色為疑似病例、綠色為陰性排除點、紅色星號為我司布萊尼工廠所在地。
                         </p>
                     </div>
-                    <div class="mt-2 md:mt-0 flex gap-2">
-                        <button onclick="zoomToFactory('historicalBirdMap')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded transition">定位 Blayney 工廠</button>
-                        <button onclick="resetMapView('historicalBirdMap')" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded transition">重設全澳洲視角</button>
+                    <div class="mt-2.5 md:mt-0 flex gap-2 w-full md:w-auto">
+                        <button onclick="zoomToFactory('historicalBirdMap')" class="flex-1 md:flex-initial bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg transition font-medium shadow text-center">🏭 定位 Blayney 工廠</button>
+                        <button onclick="resetMapView('historicalBirdMap')" class="flex-1 md:flex-initial bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded-lg transition font-medium text-center">🗺️ 重設全澳洲視角</button>
                     </div>
                 </div>
                 <div id="historicalBirdMap" class="map-container"></div>
@@ -490,13 +495,13 @@
                         <h3 class="text-lg font-bold text-white">歷史 H5N1 野鳥檢測詳細記錄清單 (64 筆歷史凍結病歷)</h3>
                         <p class="text-xs text-slate-400 mt-1">歷史庫 `cases.json` 完整備份（點擊表頭可切換排序）。</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <input type="text" id="historical-search" oninput="filterAndSortHistorical()" onkeyup="filterAndSortHistorical()" placeholder="🔍 搜尋歷史地點 (例: Esperance, SA)、物種或編號..." class="bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 w-64 md:w-80 shadow-inner">
-                        <span id="historical-count-badge" class="bg-amber-600/30 text-amber-300 border border-amber-500/40 text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap">64 筆凍結紀錄</span>
+                    <div class="flex items-center justify-between sm:justify-start gap-2.5 w-full md:w-auto">
+                        <input type="text" id="historical-search" oninput="filterAndSortHistorical()" onkeyup="filterAndSortHistorical()" placeholder="🔍 搜尋歷史地點 (例: Esperance, SA)、物種或編號..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 flex-1 sm:w-64 md:w-80 shadow-inner">
+                        <span id="historical-count-badge" class="bg-amber-600/30 text-amber-300 border border-amber-500/40 text-xs px-2.5 py-1.5 rounded-full font-bold whitespace-nowrap shrink-0">64 筆凍結紀錄</span>
                     </div>
                 </div>
                 <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
-                    <table class="w-full text-left text-sm">
+                    <table class="w-full text-left text-sm min-w-[680px]">
                         <thead class="bg-slate-900 text-slate-300 text-xs uppercase font-semibold sticky top-0 z-20 shadow-md">
                             <tr>
                                 <th onclick="sortHistorical('id')" class="px-6 py-4 sortable-header">
@@ -534,7 +539,7 @@
         <footer class="pt-8 border-t border-slate-800 text-xs text-slate-500 space-y-4">
             <div>
                 <h4 class="font-bold text-slate-400 mb-2 uppercase tracking-wider">🔗 澳洲聯邦與各州政府官方即時權威數據來源 (Official References)</h4>
-                <ul class="space-y-1.5 list-disc pl-5 text-slate-400">
+                <ul class="space-y-1.5 list-disc pl-5 text-slate-400 break-all">
                     <!-- DYNAMIC_REFERENCES_PLACEHOLDER -->
                 </ul>
             </div>

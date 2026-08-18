@@ -100,5 +100,13 @@
   - `[x]` 淨化 `cases_events.json` 消除 237 筆與舊 `CASE-001/002` 雜訊，嚴格鎖定全澳 236 起 DAFF 官方權威事件 (`EVENT-001` ~ `EVENT-236`)
   - `[x]` 升級 `generate_gemini_grounded_summary()` 中的 Gemini AI 實時追蹤指令，自動抓取澳洲哺乳類動物（海豹、海獅、紅狐狸、野貓等）感染新聞並在頂部「📰 媒體與生態監測風向」區塊發布特報警示
   - `[x]` 優化 8 大物種卡片滑動 UI 提示標籤 (`已分析 8 大主要物種 ⬇️ 向下滑動查看全表`)
-  - `[x]` 同步更新 `README.md`、`GOVT_SCRAPING_BEST_PRACTICES.md`、`walkthrough.md` 與 `task.md`
+  - `[x]` 2026-08-18 全頁面分區分段 Mobile RWD 手機版體驗與排版重構 Self-Audit：
+    - `[x]` **頂部 Header & 宣告橫幅**：取消硬編碼 `top-[37px]` 靜態高度，改為 `sticky top-0` 彈性排版（單行 ➔ 兩行響應式 `flex-col sm:flex-row`），解決手機版長橫幅折行後壓住 Header 之問題
+    - `[x]` **GIS 互動地圖高度優化**：新增自適應地圖高度媒介查詢 (`.map-container` 手機版 340px / 桌面版 500px)，防止手機使用者向下滾動時誤觸地圖地緣平移
+    - `[x]` **地圖控制按鈕與快篩按鈕**：按鈕群組改為 `w-full` 與 `flex-1` 滿寬填滿，快篩按鈕字級與 Padding 縮微優化 (`text-[11px] px-2.5 py-1.5`)，提升手指觸控點擊率
+    - `[x]` **搜尋框與表格**：搜尋對話框改為 `w-full flex-1` 手機滿寬，表格套用 `min-w-[680px]` 與 `px-3 py-3` 手機極佳閱讀間距，確保橫向滾動文字不擠壓
+    - `[x]` **參考文獻 URL**：加上 `break-all` 強制長網址自然斷行，消除手機橫向爆開溢出問題
+    - `[x]` 執行 `python h5n1.py` 重新編譯 `index.html`、`live_page.html` 與 `live_page_utf8.html` 驗證無誤
+
+
 
