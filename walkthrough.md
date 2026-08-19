@@ -123,3 +123,47 @@
 3. **優化 8 大物種卡片滑動 UI 提示**：
    - 物種區塊標題旁新增 `已分析 8 大主要物種 ⬇️ 向下滑動查看全表` 指引，確保使用者能一眼理解可向下滑動瀏覽全數 8 大物種卡片。
 
+---
+
+## 2026-08-19 DAFF 官網「Events by species」數據庫 Self-Audit 與 NSW 病例物種修正
+
+### 📌 問題定位與對照分析
+使用者回報比對 DAFF 官網 2026-08-19 發布（數據截至 18/08 1600 AEST）之「Events by species」官方數據庫時，發現網頁上的 **新南威爾斯州 (NSW)** 病例物種與官網不一致。
+
+1. **DAFF 官網 Events by species 資料庫 (NSW 5 起事件實況)**：
+   - **Mid-Coast (Hawks Nest)** | 採樣 2026-06-28 | **Giant Petrel (巨鸌 / Macronectes giganteus)**
+   - **Mid-Coast (Hawks Nest)** | 採樣 2026-07-11 | **Giant Petrel (巨鸌 / Macronectes giganteus)**
+   - **Eurobodalla (Narooma)** | 採樣 2026-08-04 | **Greater Crested Tern (大鳳頭燕鷗 / Thalasseus bergii)**
+   - **Wentworth (Coomealla)** | 採樣 2026-08-04 | **Greater Crested Tern (大鳳頭燕鷗 / Thalasseus bergii)**
+   - **Bega Valley (Eden)** | 採樣 2026-08-11 | **Greater Crested Tern (大鳳頭燕鷗 / Thalasseus bergii)**
+
+2. **舊版本資料庫之偏差 (Root Cause)**：
+   - 舊版 `cases_events.json` 中，NSW 的 4 起事件 (EVENT-147 ~ EVENT-150) 被一律給予通用預設標籤 `野生燕鷗 (大鳳頭燕鷗 / Crested tern)`，導致 Hawks Nest 的巨鸌在網頁上被錯誤顯示為燕鷗。
+   - 舊版 `cases.json` 包含媒體先行爬取的臨時佔位標籤（如 Narooma、Wentworth 標註為未指定野鳥，且遺漏最新 Eden 8/11 案例）。
+   - `report_template.html` 存在 2 個未對齊之多餘 `</div>` 閉合標籤 (`DIV diff = -2`)。
+
+### ⚙️ 修正與數據庫淨化
+1. **`cases_events.json` 淨化 (262 筆事件)**：
+   - 將 EVENT-147 與 EVENT-148 (Hawks Nest) 正式更正為 **`野生巨鸌 (南方巨鸌 / Petrel)` (Giant Petrel)**。
+   - 將 EVENT-149 (Narooma) 與 EVENT-150 (Coomealla) 定位至正確 LGA 與採樣日期 (2026-08-04)，物種維持 **`野生燕鷗 (大鳳頭燕鷗 / Crested tern)`**。
+   - 新增第 5 起 EVENT-151 (Eden, Bega Valley LGA, 採樣 2026-08-11)，物種為 **`野生燕鷗 (大鳳頭燕鷗 / Crested tern)`**。
+
+2. **`cases.json` 淨化 (63 筆個案)**：
+   - CASE-007 與 CASE-018 更正為 Mid-Coast Hawks Nest 巨鸌 (Giant Petrel)。
+   - CASE-065 (Narooma) 與 CASE-066 (Coomealla) 升級為 Confirmed 大鳳頭燕鷗 (Greater Crested Tern)。
+   - 新增 CASE-068 (Eden, Bega Valley LGA) 大鳳頭燕鷗 (Greater Crested Tern)。
+
+3. **`h5n1.py` 與 `report_template.html` 修正**：
+   - 更新 fallback 字典 `events_by_state["NSW"]` 為 5 起，巨鸌加總為 20 起。
+   - 清理 `report_template.html` 多餘閉合標籤，達成 `DIV diff = 0` 嚴格標籤閉合檢驗。
+   - 完成 **全澳 6 大州/領地所有 262 起事件物種全盤清查與核對**：
+     - **WA (10 起)**：1 起棕賊鷗 (Brown Skua) + 9 起巨鸌 (Giant Petrel)
+     - **QLD (1 起)**：1 起北方巨海燕 (Northern Giant-Petrel / Giant Petrel 類別)
+     - **NSW (5 起)**：2 起巨鸌 (Giant Petrel) + 3 起大鳳頭燕鷗 (Greater Crested Tern)
+     - **TAS (6 起)**：3 起遊隼與其它 + 2 起巨鸌 + 1 起大鳳頭燕鷗
+     - **VIC (70 起)**：53 起大鳳頭燕鷗 + 7 起巨鸌 + 3 起太平洋鷗 + 2 起棕賊鷗 + 2 起黑面鸕鶿 + 1 起小企鵝 + 1 起遊隼 + 1 起銀鷗
+     - **SA (170 起)**：128 起大鳳頭燕鷗 + 31 起銀鷗 + 10 起巨鸌 + 1 起太平洋鷗
+   - 執行 `python h5n1.py` 自動編譯最新 `index.html` (DIV diff = 0)、`live_page.html` 與 `live_page_utf8.html`。
+
+
+

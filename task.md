@@ -106,6 +106,14 @@
     - `[x]` **定位並徹底修復 Bug Root Cause 2 (官網 Power BI 數據備援寫死值與多餘覆蓋)**：移除 `parse_daff_official_stats()` 中舊版硬編碼 `180` / `29` 備援數據與不適當的覆蓋邏輯，將 DAFF 官方柱狀圖圖表數據直接鎖定為 `189` 與 `31`。
     - `[x]` **Cases 數據庫完全淨化**：執行 Python 腳本對 `cases_events.json` 251 筆確診個案物種標籤進行統一歸類對齊，使地圖、Donut Chart 圖表、圖例 Grid 與物種風險卡片達到 **100% 完全相同之精確數字**。
     - `[x]` 執行 `python h5n1.py` 重新編譯產出 `index.html`、`live_page.html` 與 `live_page_utf8.html` 驗證無誤！
+  - `[x]` 2026-08-19 徹底 Self-Audit DAFF 官網「Events by species」數據庫對照 (NSW 病例物種修復與對齊)：
+    - `[x]` **對照 DAFF 官網發布之 Events by species 表格**：全澳 NSW 州共有 5 起確診事件，分別為 Mid-Coast Hawks Nest 2 起 (皆為 Giant Petrel 巨鸌)、Eurobodalla Narooma 1 起 (Greater Crested Tern 大鳳頭燕鷗)、Wentworth Coomealla 1 起 (Greater Crested Tern 大鳳頭燕鷗)、Bega Valley Eden 1 起 (Greater Crested Tern 大鳳頭燕鷗)。
+    - `[x]` **定位並徹底修復 Bug Root Cause**：先前 `cases_events.json` 中 NSW 舊個案全數被預設標註為通用 `野生燕鷗 (大鳳頭燕鷗 / Crested tern)`，導致 Hawks Nest 的巨鸌在網頁上被錯誤顯示為燕鷗。
+    - `[x]` **數據庫與腳本完全淨化對齊**：已將 `cases_events.json` (262 筆事件) 與 `cases.json` 中 NSW 5 起事件之物種、採樣日期 (6/28, 7/11, 8/4, 8/4, 8/11) 與 LGA 完全更正為 DAFF 官方紀錄 (2 起巨鸌 + 3 起大鳳頭燕鷗)，並修正 `report_template.html` 閉合標籤 (`diff = 0`)。
+    - `[x]` **全澳所有州/領地物種全盤 Audit**：全盤排查並對齊 WA (1起棕賊鷗 + 9起巨鸌)、QLD (1起北方巨海燕/巨鸌)、TAS (3起遊隼與其它 + 2起巨鸌 + 1起燕鷗)、SA (128起燕鷗 + 31起銀鷗 + 10起巨鸌 + 1起太平洋鷗) 與 VIC (53起燕鷗 + 7起巨鸌 + 3起太平洋鷗 + 2起棕賊鷗 + 2起鸕鶿 + 1起企鵝 + 1起遊隼 + 1起銀鷗) 的精確物種。
+    - `[x]` 重新執行 `python h5n1.py` 自動編譯最新 `index.html` (DIV diff = 0)、`live_page.html` 與 `live_page_utf8.html`！
+
+
 
 
 

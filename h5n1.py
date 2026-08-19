@@ -752,14 +752,14 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
     對齊 DAFF 2026-08-18 最新發布數據 (全澳 251 起確診事件 / 1,273 起陰性排除 / 21,265 筆通報)。
     """
     stats = {
-        "total_events": 251,
+        "total_events": 252,
         "negative_events": 1273,
         "hotline_reports": 21265,
-        "events_by_state": {"WA": 10, "SA": 178, "VIC": 55, "NSW": 4, "QLD": 1, "TAS": 3, "NT": 0, "ACT": 0},
+        "events_by_state": {"WA": 10, "SA": 178, "VIC": 55, "NSW": 5, "QLD": 1, "TAS": 3, "NT": 0, "ACT": 0},
         "species_counts": {
-            "Crested Tern": 189,
+            "Crested Tern": 188,
             "Silver Gull": 31,
-            "Giant Petrel": 18,
+            "Giant Petrel": 20,
             "Pacific Gull": 4,
             "Brown Skua": 2,
             "Cormorant": 2,
@@ -1427,7 +1427,7 @@ def generate_dynamic_summary(cases_data, official_stats):
     sa_evt = evt_by_state.get('SA', 166)
     vic_evt = evt_by_state.get('VIC', 53)
     wa_evt = evt_by_state.get('WA', 10)
-    nsw_evt = evt_by_state.get('NSW', 4)
+    nsw_evt = evt_by_state.get('NSW', 5)
     tas_evt = evt_by_state.get('TAS', 2)
     qld_evt = evt_by_state.get('QLD', 1)
 
