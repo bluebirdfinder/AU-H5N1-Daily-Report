@@ -1756,6 +1756,59 @@ def generate_dynamic_references(cases_data):
         
     return "\n".join(html_lines)
 
+def generate_dynamic_weekly_archive_html():
+    weekly_dir = "weekly_reports"
+    os.makedirs(weekly_dir, exist_ok=True)
+
+    files = [f for f in os.listdir(weekly_dir) if f.startswith("h5n1_weekly_report_") and f.endswith(".html")]
+    files.sort(reverse=True)
+
+    card_items = []
+    card_items.append('''
+        <a href="h5n1_weekly_slides.html" target="_blank" class="block bg-blue-950/70 hover:bg-blue-900/80 border border-blue-600/50 p-3 rounded-xl transition shadow-md">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">📺</span>
+                    <div>
+                        <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                            本週最新 16:9 簡報投影片 (Latest Slides)
+                            <span class="bg-red-600 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">LATEST</span>
+                        </div>
+                        <div class="text-[11px] text-blue-300 font-mono">h5n1_weekly_slides.html</div>
+                    </div>
+                </div>
+                <span class="text-blue-400 text-xs font-bold">線上開啟簡報 ➔</span>
+            </div>
+        </a>
+    ''')
+
+    for fname in files:
+        date_part = fname.replace("h5n1_weekly_report_", "").replace(".html", "")
+        parts = date_part.split("_")
+        date_label = date_part
+        if len(parts) == 2 and len(parts[0]) == 8 and len(parts[1]) == 8:
+            d1 = f"{parts[0][:4]}/{parts[0][4:6]}/{parts[0][6:]}"
+            d2 = f"{parts[1][:4]}/{parts[1][4:6]}/{parts[1][6:]}"
+            date_label = f"{d1} ~ {d2} 核心疫情一週摘要簡報"
+
+        rel_path = f"weekly_reports/{fname}"
+        card_items.append(f'''
+            <a href="{rel_path}" target="_blank" class="block bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 p-3 rounded-xl transition">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">📁</span>
+                        <div>
+                            <div class="text-xs font-bold text-slate-200">{date_label}</div>
+                            <div class="text-[10px] text-slate-400 font-mono">{fname}</div>
+                        </div>
+                    </div>
+                    <span class="text-slate-400 text-xs font-semibold">開啟歷史週報 ➔</span>
+                </div>
+            </a>
+        ''')
+
+    return "\n".join(card_items)
+
 def main():
     # 【關鍵修復】永遠執行 fetch_daff_updates()，確保每次都從 DAFF 官網抓取最新 official_stats
     # 舊版錯誤：len(events_cases) < 151 條件成立時才呼叫，cases_events.json 已有 151 筆後就永遠用舊硬編碼數字
@@ -1788,7 +1841,10 @@ def main():
     species_html = generate_dynamic_species_cards_html(events_cases, official_stats)
     updated_html = updated_html.replace("<!-- DYNAMIC_SPECIES_CARDS_PLACEHOLDER -->", species_html)
     
-    factory_lat, factory_lon = -33.5332, 149.2524
+    archive_html = generate_dynamic_weekly_archive_html()
+    updated_html = updated_html.replace("<!-- DYNAMIC_WEEKLY_ARCHIVE_PLACEHOLDER -->", archive_html)
+    
+    factory_lat, factory_lon = -33.521027, 149.236425
     min_dist = float('inf')
     for case in events_cases:
         if case.get("type") != "Negative" and "latitude" in case and "longitude" in case:
@@ -1843,6 +1899,36 @@ def main():
             pass
         
     print(f"網頁自動編譯成功！已順利生成最新 H5N1 戰略決策報告 '{output_path}'、'live_page.html' 與 'live_page_utf8.html'。")
+
+    # 每週一自動每週簡報對齊與歸檔
+    try:
+        sync_weekly_slides(official_stats, events_cases)
+    except Exception as e:
+        print(f"[週報歸檔警告] 自動歸檔失敗: {e}")
+
+def sync_weekly_slides(official_stats, events_cases):
+    slides_path = "h5n1_weekly_slides.html"
+    if not os.path.exists(slides_path):
+        return
+
+    weekly_dir = "weekly_reports"
+    os.makedirs(weekly_dir, exist_ok=True)
+
+    today = datetime.now()
+    # 每週一 (weekday == 0) 或本機執行時自動對齊與備份
+    start_dt = today - timedelta(days=7)
+    start_str = start_dt.strftime("%Y%m%d")
+    end_str = today.strftime("%Y%m%d")
+    archive_filename = f"h5n1_weekly_report_{start_str}_{end_str}.html"
+    archive_path = os.path.join(weekly_dir, archive_filename)
+
+    with open(slides_path, "r", encoding="utf-8") as f:
+        slides_html = f.read()
+
+    with open(archive_path, "w", encoding="utf-8") as f:
+        f.write(slides_html)
+
+    print(f"[週報自動歸檔] 已成功將每週簡報自動更新並歸檔存檔至: {archive_path}")
 
 if __name__ == "__main__":
     main()

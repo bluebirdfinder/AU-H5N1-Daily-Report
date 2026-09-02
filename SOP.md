@@ -17,24 +17,18 @@
 - **API 與官網數據稽核**：比對 DAFF 官方最新文字/表格數據、各州 DPIRD/PIRSA 官網數據與本機 JSON 檔案。
 - **視覺數據稽核**：核對圖表 (Donut Chart)、圖例 Grid、物種風險卡片與明細表格，確保各區塊間數字 **100% 絕對完全一致**（如燕鷗 189起, 銀鷗 31起）。
 
-#### Step 4: Mobile RWD & Readability Self-Audit (手機排版與易閱讀性審計) 📱
+#### Step 4: Mobile RWD & Modal Readability Self-Audit (手機排版與彈窗審計) 📱
 - **實機 Viewport 驗證 (375px~430px)**：使用 Playwright 模擬手機螢幕載入畫面。
-- **手機排版與觸控友善度**：
-  - 頂部 sticky Header 採用彈性高 (`sticky top-0 z-50` 兩行/單行自適應)，解決長橫幅折行後壓住 Header 之問題。
-  - 地圖容器 `.map-container` 新增媒體查詢（手機版 340px / 桌面版 500px），保留上下滾動空隙，避免手機大拇指滑動頁面時誤觸地圖。
-  - 控制與快篩按鈕群組設置 `w-full` 與 `flex-1` 滿寬填滿、微調 Padding 與字級 (`text-[11px] px-2.5 py-1.5`)，確保單手觸控精準。
-- **視覺防遮蔽與易閱讀性**：
-  - 物種卡片標題區套用 `flex-wrap` 與 `shrink-0 whitespace-nowrap`，杜絕文字剪裁、疊字或 Badge 遮蔽。
-  - 表格設定 `min-w-[680px]` 配合 `overflow-x-auto` 橫向滑動，避免手機端欄位文字過度擠壓。
-  - 參考文獻 URL 套用 `break-all` 強制長網址自然折行，杜絕手機版 X 軸爆開白邊。
-- **0 Errors 檢測**：確保 Playwright / 瀏覽器 Console 達 **0 Console Errors / 0 Warnings**。
+- **頂部 Header 週報控制列驗證**：
+  - 驗證 `📺 16:9 週報簡報 (Slides)` 與 `📂 歷次週報歸檔` 按鈕在手機版與桌面版無疊字、無溢出。
+  - 驗證點擊 `📂 歷次週報歸檔` 後，Modal 彈窗能順暢展開、背景半透明 Blur 遮罩運作正常，且點擊連結可開起對應週報簡報。
 
-#### Step 5: Engine Compilation & Output Build (引擎自動編譯與簡報生成)
-- 執行 `python h5n1.py` 重新生成 `index.html`、`live_page.html` 與 `live_page_utf8.html`，並確認控制台輸出 `網頁自動編譯成功！`。
-- 驗證 `h5n1_weekly_slides.html` 16:9 Web 簡報網頁佈局與 Chart.js 每週趨勢圖表無異常。
+#### Step 5: Engine Compilation & Output Build (引擎自動編譯與簡報歸檔)
+- 執行 `python h5n1.py` 重新生成 `index.html`、`live_page.html` 與 `live_page_utf8.html`，並確認控制台輸出 `網頁自動編譯成功！` 與 `[週報自動歸檔]`。
+- 驗證 `h5n1_weekly_slides.html` 16:9 Web 簡報網頁佈局、Chart.js 每週趨勢圖表及 Gemini AIGrounding 新聞情報無異常。
 
 #### Step 6: Documentation Sync (版本與文檔同步)
-- 更新 `README.md` 中的數據結算起數、物種對齊說明與版本歷史紀錄。
+- 更新 `README.md` 中的數據結算起數、物種對齊說明、Gemini AI 整合與版本歷史記錄 (v2.5.2)。
 - 同步更新 `CHANGELOG.md` 紀錄版本變更與修復細節。
 - 更新 `task.md` 與 `walkthrough.md` 記錄最新稽核完成項目。
 

@@ -112,7 +112,7 @@
     <!-- 頂部導航與動態更新標記 -->
     <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
         <div
-            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5 sm:gap-0">
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
             <div class="flex items-center space-x-2.5">
                 <span
                     class="bg-red-600 text-white text-[10px] sm:text-xs px-2 py-0.5 sm:py-1 rounded-full font-bold animate-pulse shrink-0">LIVE
@@ -120,8 +120,18 @@
                 <h1 class="text-sm sm:text-lg font-bold tracking-tight text-white truncate">Nestlé Purina Blayney •
                     Bio-Security Monitor</h1>
             </div>
-            <div class="text-[11px] sm:text-xs text-slate-400">
-                系統最後更新時間: <span class="text-emerald-400 font-semibold">2026-09-02 14:13:32 (台北時間) / 2026-09-02 16:13:32 (澳洲 AEST)</span>
+            <div class="flex items-center gap-3">
+                <a href="h5n1_weekly_slides.html" target="_blank"
+                    class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg shadow-md flex items-center gap-1.5 transition">
+                    <span>📺</span> 16:9 週報簡報 (Slides)
+                </a>
+                <button onclick="toggleArchiveModal()"
+                    class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
+                    <span>📂</span> 歷次週報歸檔
+                </button>
+                <div class="text-[11px] sm:text-xs text-slate-400 hidden lg:block">
+                    更新時間: <span class="text-emerald-400 font-semibold">2026-09-02 14:24:05 (台北時間) / 2026-09-02 16:24:05 (澳洲 AEST)</span>
+                </div>
             </div>
         </div>
     </header>
@@ -342,7 +352,7 @@
                             </div>
                             <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                                 <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">遷徙屬性: 留鳥 / 廣泛游動</span>
-                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 60 起 (13%)</span>
+                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 61 起 (13%)</span>
                             </div>
                             <p class="text-xs text-slate-300 leading-relaxed">
                                 <strong class="text-blue-300">棲息習性：</strong>雜食性，強烈高度適應人類城鎮、港口碼頭、廢棄物處理場與露天餐廳，社會性高度群聚。
@@ -363,7 +373,7 @@
                             </div>
                             <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                                 <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">遷徙屬性: 沿海游動性海鳥</span>
-                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 317 起 (70%)</span>
+                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 326 起 (71%)</span>
                             </div>
                             <p class="text-xs text-slate-300 leading-relaxed">
                                 <strong class="text-blue-300">棲息習性：</strong>專一食魚，極度偏好在沿海沙洲、外島進行數千隻規模的高密度密集群聚繁殖。
@@ -8135,8 +8145,8 @@
     "ACT": 0
   },
   "species_counts": {
-    "Crested Tern": 317,
-    "Silver Gull": 60,
+    "Crested Tern": 326,
+    "Silver Gull": 61,
     "Giant Petrel": 55,
     "Pacific Gull": 4,
     "Brown Skua": 3,
@@ -8145,7 +8155,7 @@
     "Falcon & Other": 4
   },
   "source": "live",
-  "scrape_time": "2026-09-02 06:13 UTC"
+  "scrape_time": "2026-09-02 06:24 UTC"
 };
 
         const factoryLat = -33.521027;
@@ -8870,13 +8880,79 @@
                 targetMap.setView([factoryLat, factoryLng], 9);
             }
         }
-        function resetMapView(mapTarget) {
-            const targetMap = mapTarget === 'eventMap' ? eventMapObj : historicalMapObj;
-            if (targetMap) {
-                targetMap.setView([-28.0, 134.0], 4);
+        // 歷次週報歸檔 Modal 控制
+        function toggleArchiveModal() {
+            const modal = document.getElementById('weekly-archive-modal');
+            if (modal) {
+                modal.classList.toggle('hidden');
             }
         }
     </script>
+
+    <!-- 歷次週報歸檔庫 Modal -->
+    <div id="weekly-archive-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span>📂</span> 澳洲 H5N1 歷史每週簡報歸檔庫 (Weekly Report Archives)
+                </h3>
+                <button onclick="toggleArchiveModal()" class="text-slate-400 hover:text-white text-xl font-bold p-1">&times;</button>
+            </div>
+            <p class="text-xs text-slate-300">
+                系統每週一自動對齊 DAFF 權威數據與 Gemini AI 實時情報，自動生成 16:9 簡報檔並永久留檔。點擊下方列表即可線上開啟與簡報：
+            </p>
+            <div class="space-y-2.5 max-h-[320px] overflow-y-auto pr-1">
+                
+        <a href="h5n1_weekly_slides.html" target="_blank" class="block bg-blue-950/70 hover:bg-blue-900/80 border border-blue-600/50 p-3 rounded-xl transition shadow-md">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">📺</span>
+                    <div>
+                        <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                            本週最新 16:9 簡報投影片 (Latest Slides)
+                            <span class="bg-red-600 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">LATEST</span>
+                        </div>
+                        <div class="text-[11px] text-blue-300 font-mono">h5n1_weekly_slides.html</div>
+                    </div>
+                </div>
+                <span class="text-blue-400 text-xs font-bold">線上開啟簡報 ➔</span>
+            </div>
+        </a>
+    
+
+            <a href="weekly_reports/h5n1_weekly_report_20260826_20260902.html" target="_blank" class="block bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 p-3 rounded-xl transition">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">📁</span>
+                        <div>
+                            <div class="text-xs font-bold text-slate-200">2026/08/26 ~ 2026/09/02 核心疫情一週摘要簡報</div>
+                            <div class="text-[10px] text-slate-400 font-mono">h5n1_weekly_report_20260826_20260902.html</div>
+                        </div>
+                    </div>
+                    <span class="text-slate-400 text-xs font-semibold">開啟歷史週報 ➔</span>
+                </div>
+            </a>
+        
+
+            <a href="weekly_reports/h5n1_weekly_report_20260824_20260902.html" target="_blank" class="block bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 p-3 rounded-xl transition">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">📁</span>
+                        <div>
+                            <div class="text-xs font-bold text-slate-200">2026/08/24 ~ 2026/09/02 核心疫情一週摘要簡報</div>
+                            <div class="text-[10px] text-slate-400 font-mono">h5n1_weekly_report_20260824_20260902.html</div>
+                        </div>
+                    </div>
+                    <span class="text-slate-400 text-xs font-semibold">開啟歷史週報 ➔</span>
+                </div>
+            </a>
+        
+            </div>
+            <div class="text-right pt-3 border-t border-slate-800">
+                <button onclick="toggleArchiveModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-4 py-2 rounded-lg font-semibold transition">關閉窗口</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

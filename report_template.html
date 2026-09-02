@@ -112,7 +112,7 @@
     <!-- 頂部導航與動態更新標記 -->
     <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
         <div
-            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5 sm:gap-0">
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
             <div class="flex items-center space-x-2.5">
                 <span
                     class="bg-red-600 text-white text-[10px] sm:text-xs px-2 py-0.5 sm:py-1 rounded-full font-bold animate-pulse shrink-0">LIVE
@@ -120,8 +120,18 @@
                 <h1 class="text-sm sm:text-lg font-bold tracking-tight text-white truncate">Nestlé Purina Blayney •
                     Bio-Security Monitor</h1>
             </div>
-            <div class="text-[11px] sm:text-xs text-slate-400">
-                系統最後更新時間: <span class="text-emerald-400 font-semibold"><!-- COMPILE_TIME_PLACEHOLDER --></span>
+            <div class="flex items-center gap-3">
+                <a href="h5n1_weekly_slides.html" target="_blank"
+                    class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg shadow-md flex items-center gap-1.5 transition">
+                    <span>📺</span> 16:9 週報簡報 (Slides)
+                </a>
+                <button onclick="toggleArchiveModal()"
+                    class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
+                    <span>📂</span> 歷次週報歸檔
+                </button>
+                <div class="text-[11px] sm:text-xs text-slate-400 hidden lg:block">
+                    更新時間: <span class="text-emerald-400 font-semibold"><!-- COMPILE_TIME_PLACEHOLDER --></span>
+                </div>
             </div>
         </div>
     </header>
@@ -1390,13 +1400,35 @@
                 targetMap.setView([factoryLat, factoryLng], 9);
             }
         }
-        function resetMapView(mapTarget) {
-            const targetMap = mapTarget === 'eventMap' ? eventMapObj : historicalMapObj;
-            if (targetMap) {
-                targetMap.setView([-28.0, 134.0], 4);
+        // 歷次週報歸檔 Modal 控制
+        function toggleArchiveModal() {
+            const modal = document.getElementById('weekly-archive-modal');
+            if (modal) {
+                modal.classList.toggle('hidden');
             }
         }
     </script>
+
+    <!-- 歷次週報歸檔庫 Modal -->
+    <div id="weekly-archive-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span>📂</span> 澳洲 H5N1 歷史每週簡報歸檔庫 (Weekly Report Archives)
+                </h3>
+                <button onclick="toggleArchiveModal()" class="text-slate-400 hover:text-white text-xl font-bold p-1">&times;</button>
+            </div>
+            <p class="text-xs text-slate-300">
+                系統每週一自動對齊 DAFF 權威數據與 Gemini AI 實時情報，自動生成 16:9 簡報檔並永久留檔。點擊下方列表即可線上開啟與簡報：
+            </p>
+            <div class="space-y-2.5 max-h-[320px] overflow-y-auto pr-1">
+                <!-- DYNAMIC_WEEKLY_ARCHIVE_PLACEHOLDER -->
+            </div>
+            <div class="text-right pt-3 border-t border-slate-800">
+                <button onclick="toggleArchiveModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-4 py-2 rounded-lg font-semibold transition">關閉窗口</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
