@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>澳洲 H5N1 高致病性禽流感一週核心疫情簡報 (2026.08.24 - 09.02)</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: rgba(18, 25, 41, 0.75);
+            --bg-card-hover: rgba(28, 38, 61, 0.85);
+            --border-card: rgba(255, 255, 255, 0.1);
+            --border-highlight: rgba(255, 59, 92, 0.4);
+            
+            --accent-crimson: #ff3b5c;
+            --accent-crimson-glow: rgba(ff, 59, 92, 0.35);
+            --accent-amber: #ffb800;
+            --accent-cyan: #00f2fe;
+            --accent-blue: #3a86ff;
+            --accent-emerald: #00e676;
+            --accent-purple: #9d4edd;
+
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            --slide-width: 1280px;
+            --slide-height: 720px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Noto Sans TC', 'Inter', sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(58, 134, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(255, 59, 92, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.03) 0%, transparent 60%);
+        }
+
+        /* 16:9 Deck Scaler */
+        .viewport {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide-container {
+            width: var(--slide-width);
+            height: var(--slide-height);
+            position: relative;
+            background: rgba(13, 19, 33, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
+                        0 0 0 1px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            transform-origin: center center;
+            transition: transform 0.2s ease-out;
+        }
+
+        /* Top Progress Bar */
+        .progress-bar-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 100;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 11.11%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-crimson));
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px var(--accent-crimson);
+        }
+
+        /* Header Bar inside slides */
+        .slide-header {
+            position: absolute;
+            top: 20px;
+            left: 40px;
+            right: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .header-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(255, 59, 92, 0.12);
+            border: 1px solid rgba(255, 59, 92, 0.3);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-crimson);
+            letter-spacing: 0.5px;
+        }
+
+        .header-tag.green {
+            background: rgba(0, 230, 118, 0.12);
+            border-color: rgba(0, 230, 118, 0.3);
+            color: var(--accent-emerald);
+        }
+
+        .header-tag.cyan {
+            background: rgba(0, 242, 254, 0.12);
+            border-color: rgba(0, 242, 254, 0.3);
+            color: var(--accent-cyan);
+        }
+
+        .header-date {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        /* Slide Content Area */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 70px 50px 70px 50px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(40px) scale(0.98);
+            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0) scale(1);
+        }
+
+        .slide.prev-slide {
+            transform: translateX(-40px) scale(0.98);
+        }
+
+        /* Slide Titles */
+        .slide-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            line-height: 1.2;
+        }
+
+        .slide-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+            font-weight: 400;
+        }
+
+        /* Grid Layout Utilities */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            flex: 1;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .grid-1-2 {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 24px;
+            flex: 1;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: var(--bg-card-hover);
+        }
+
+        .card.alert-card {
+            border-color: var(--border-highlight);
+            background: linear-gradient(145deg, rgba(35, 18, 28, 0.8), rgba(18, 25, 41, 0.8));
+        }
+
+        .card.emerald-card {
+            border-color: rgba(0, 230, 118, 0.3);
+            background: linear-gradient(145deg, rgba(12, 35, 25, 0.8), rgba(18, 25, 41, 0.8));
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 14px;
+            color: var(--accent-cyan);
+        }
+
+        .card.alert-card .card-icon {
+            background: rgba(255, 59, 92, 0.15);
+            color: var(--accent-crimson);
+        }
+
+        .card.emerald-card .card-icon {
+            background: rgba(0, 230, 118, 0.15);
+            color: var(--accent-emerald);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Stat Counter Card */
+        .stat-box {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .stat-number {
+            font-family: 'Outfit', sans-serif;
+            font-size: 44px;
+            font-weight: 800;
+            line-height: 1;
+            margin: 8px 0;
+            background: linear-gradient(180deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-number.crimson {
+            background: linear-gradient(180deg, #ff6b81, #ff3b5c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-number.cyan {
+            background: linear-gradient(180deg, #6ee7b7, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-crimson);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            background: rgba(255, 59, 92, 0.15);
+            border-radius: 12px;
+            margin-top: 6px;
+        }
+
+        /* Slide 1 Cover Specifics */
+        .cover-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .cover-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: linear-gradient(90deg, rgba(255, 59, 92, 0.2), rgba(255, 184, 0, 0.1));
+            border: 1px solid rgba(255, 59, 92, 0.4);
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-crimson);
+            margin-bottom: 24px;
+            box-shadow: 0 0 20px var(--accent-crimson-glow);
+        }
+
+        .cover-title {
+            font-size: 48px;
+            font-weight: 900;
+            line-height: 1.15;
+            color: #ffffff;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+            max-width: 900px;
+        }
+
+        .cover-title span {
+            background: linear-gradient(90deg, #ff3b5c, #ffb800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cover-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 750px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .cover-meta {
+            display: flex;
+            gap: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 24px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .meta-item i {
+            color: var(--accent-cyan);
+        }
+
+        /* Image Mockup Frames */
+        .image-frame {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-card);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            position: relative;
+            background: #000;
+        }
+
+        .image-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+        }
+
+        .image-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 16px;
+            background: rgba(9, 13, 22, 0.85);
+            backdrop-filter: blur(8px);
+            font-size: 12px;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Bottom Controls Bar */
+        .controls-bar {
+            position: absolute;
+            bottom: 16px;
+            left: 40px;
+            right: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .slide-counter {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .slide-counter span {
+            color: #ffffff;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-nav {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .btn-nav:hover {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(58, 134, 255, 0.3);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .dots-container {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            width: 24px;
+            background: var(--accent-crimson);
+            box-shadow: 0 0 8px var(--accent-crimson);
+        }
+
+        /* Animation helper list */
+        .list-styled {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .list-styled li {
+            position: relative;
+            padding-left: 24px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        .list-styled li::before {
+            content: "\f054";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            top: 2px;
+            color: var(--accent-cyan);
+            font-size: 12px;
+        }
+
+        .list-styled.alert li::before {
+            color: var(--accent-crimson);
+        }
+
+        .badge-pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 6px;
+        }
+
+        .badge-red { background: rgba(255, 59, 92, 0.2); color: var(--accent-crimson); }
+        .badge-green { background: rgba(0, 230, 118, 0.2); color: var(--accent-emerald); }
+        .badge-amber { background: rgba(255, 184, 0, 0.2); color: var(--accent-amber); }
+        .badge-cyan { background: rgba(0, 242, 254, 0.2); color: var(--accent-cyan); }
+
+        /* Key Highlights Box */
+        .highlight-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 4px solid var(--accent-crimson);
+            padding: 14px 18px;
+            border-radius: 0 10px 10px 0;
+            margin-top: 14px;
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        .highlight-box.green {
+            border-left-color: var(--accent-emerald);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="viewport">
+        <div class="slide-container" id="slideContainer">
+            
+            <!-- Top Progress Bar -->
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <!-- Slide 1: Cover -->
+            <div class="slide active" id="slide-1">
+                <div class="slide-header">
+                    <div class="header-tag"><i class="fa-solid fa-triangle-exclamation"></i> 核心疫情週報</div>
+                    <div class="header-date">2026.08.24 – 2026.09.02</div>
+                </div>
+                <div class="cover-content">
+                    <div class="cover-badge">
+                        <i class="fa-solid fa-bolt"></i> 爆發以來最嚴峻的跨物種擴散期
+                    </div>
+                    <h1 class="cover-title">
+                        澳洲 H5N1 高致病性禽流感<br>
+                        <span>一週核心疫情摘要與風險評估</span>
+                    </h1>
+                    <p class="cover-subtitle">
+                        本週記錄了全澳野生動物疫情爆發以來最關鍵的轉折：病毒突破海洋生態圈邁向陸地哺乳類，極地研究站啟動歷史性撤離，全澳確診事件單週激增 137 起。
+                    </p>
+                    <div class="cover-meta">
+                        <div class="meta-item"><i class="fa-solid fa-map-location-dot"></i> 評估範圍：澳洲全國 / NSW 專題</div>
+                        <div class="meta-item"><i class="fa-solid fa-shield-virus"></i> 商業養殖場：完美零確診</div>
+                        <div class="meta-item"><i class="fa-solid fa-user-shield"></i> 人類風險：低風險等級</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2: Core Data Metrics -->
+            <div class="slide" id="slide-2">
+                <div class="slide-header">
+                    <div class="header-tag cyan"><i class="fa-solid fa-chart-line"></i> 數據監測</div>
+                    <div class="header-date">全國與新州統計數據</div>
+                </div>
+                <h2 class="slide-title"><i class="fa-solid fa-chart-pie" style="color: var(--accent-cyan)"></i> 核心數據一週劇烈變化</h2>
+                <p class="slide-subtitle">春季繁殖季野鳥高密度聚集，驅使全澳確診事件呈爆發式增長</p>
+
+                <div class="grid-3" style="margin-bottom: 20px;">
+                    <div class="card alert-card">
+                        <div class="card-icon"><i class="fa-solid fa-virus"></i></div>
+                        <div class="card-title">全國確診總數</div>
+                        <div class="stat-number crimson">446 <span style="font-size:18px;">起</span></div>
+                        <div class="stat-change"><i class="fa-solid fa-arrow-trend-up"></i> 一週內激增 +137 起</div>
+                        <div class="card-desc" style="margin-top: 10px;">自上週一 (8/24) 約 309 起爆發增長至 446 起。</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon" style="color: var(--accent-amber); background: rgba(255,184,0,0.15);"><i class="fa-solid fa-location-dot"></i></div>
+                        <div class="card-title">新南威爾斯州 (NSW)</div>
+                        <div class="stat-number" style="color: var(--accent-amber);">17 <span style="font-size:18px;">起</span></div>
+                        <div class="stat-change" style="background: rgba(255,184,0,0.15); color: var(--accent-amber);"><i class="fa-solid fa-plus"></i> 一週增加 +6 起</div>
+                        <div class="card-desc" style="margin-top: 10px;">由上週 11 起微幅升至 17 起 (聯邦數據審核時差記 16 起)。</div>
+                    </div>
+
+                    <div class="card emerald-card">
+                        <div class="card-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div class="card-title">安全底線防禦</div>
+                        <div class="stat-number cyan">100% <span style="font-size:18px;">安全</span></div>
+                        <div class="stat-change" style="background: rgba(0,230,118,0.15); color: var(--accent-emerald);"><i class="fa-solid fa-check"></i> 商業產業完美零確診</div>
+                        <div class="card-desc" style="margin-top: 10px;">所有商業家禽、蛋場與乳牛場維持安全，人類公共衛生風險維持「低」。</div>
+                    </div>
+                </div>
+
+                <div class="highlight-box green">
+                    <strong><i class="fa-solid fa-circle-check"></i> 關鍵結論：</strong> 儘管野外野生動物確診數呈爆發式增長，商業供應鏈防線與人類公共衛生底線依然穩固。
+                </div>
+            </div>
+
+            <!-- Slide 3: Incident 1 - Mammal Infections -->
+            <div class="slide" id="slide-3">
+                <div class="slide-header">
+                    <div class="header-tag"><i class="fa-solid fa-biohazard"></i> 重大突發 01</div>
+                    <div class="header-date">生態圈突破警訊</div>
+                </div>
+                <h2 class="slide-title"><i class="fa-solid fa-skull-crossbones" style="color: var(--accent-crimson)"></i> 陸海哺乳類全面失守 (南澳首例)</h2>
+                <p class="slide-subtitle">繼 8/23 長鼻海狗後，病毒正迅速突破哺乳動物物種障壁</p>
+
+                <div class="grid-2">
+                    <div class="card alert-card">
+                        <div class="card-title" style="color: var(--accent-crimson);"><i class="fa-solid fa-water"></i> 首例海洋哺乳類：海豚 (Dolphin)</div>
+                        <ul class="list-styled alert">
+                            <li><span class="badge-pill badge-red">確診地點</span> 南澳弗勒里厄半島 (Fleurieu Peninsula)</li>
+                            <li><span class="badge-pill badge-red">發現過程</span> 一隻野生海豚被發現擱淺死亡，經體液與組織採樣驗出 H5N1 陽性。</li>
+                            <li><span class="badge-pill badge-amber">生態意涵</span> 證實海豚等大型鯨豚類在澳洲水域具高度染疫風險。</li>
+                        </ul>
+                    </div>
+
+                    <div class="card alert-card">
+                        <div class="card-title" style="color: var(--accent-crimson);"><i class="fa-solid fa-dog"></i> 首例陸生肉食哺乳類：紅狐 (Red Fox)</div>
+                        <ul class="list-styled alert">
+                            <li><span class="badge-pill badge-red">確診地點</span> 阿德萊德西北部 (Adelaide NW)</li>
+                            <li><span class="badge-pill badge-red">感染途徑</span> 具腐食習性，因啃咬並食入海灘染疫死鳥組織而確診。</li>
+                            <li><span class="badge-pill badge-red">重大轉折</span> 標誌著病毒正式從<b>海洋生態圈蔓延至陸地哺乳類</b>。</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <strong><i class="fa-solid fa-triangle-exclamation"></i> 警示：</strong> 陸生肉食哺乳類確診意味著捕食性與腐食性陸生動物（包含犬科）感染風險大幅提升。
+                </div>
+            </div>
+
+            <!-- Slide 4: Incident 2 - Antarctic Evacuation -->
+            <div class="slide" id="slide-4">
+                <div class="slide-header">
+                    <div class="header-tag"><i class="fa-solid fa-snowflake"></i> 重大突發 02</div>
+                    <div class="header-date">極地緊急應對</div>
+                </div>
+                <h2 class="slide-title"><i class="fa-solid fa-ship" style="color: var(--accent-cyan)"></i> 南極科學基地啟動「歷史性緊急撤離」</h2>
+                <p class="slide-subtitle">澳洲南極局 (AAD) 決定於 10 月初派遣破冰船撤離麥夸里島 24 名隊員</p>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-icon" style="color: var(--accent-cyan);"><i class="fa-solid fa-person-military-pointing"></i></div>
+                        <div class="card-title">撤離行動背景 (Macquarie Island)</div>
+                        <ul class="list-styled">
+                            <li><b>關鍵時間點：</b>9 月起成千上萬海豹與企鵝進入大繁殖期。</li>
+                            <li><b>極高風險：</b>動物高密度聚集極可能引發數萬隻動物集體暴斃的慘劇。</li>
+                            <li><b>人員編制：</b>研究站共有 24 名科研與後勤隊員。</li>
+                        </ul>
+                    </div>
+
+                    <div class="card alert-card">
+                        <div class="card-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+                        <div class="card-title">緊急撤離三大主因</div>
+                        <ul class="list-styled alert">
+                            <li><b>避免心理創傷 (PTSD)：</b>防範少數隊員獨自面對成千上萬動物屍體的毀滅性創傷。</li>
+                            <li><b>阻斷傳播媒介：</b>防止工作人員在島上走動時鞋底或裝備成為病毒傳播者。</li>
+                            <li><b>物資與醫療考量：</b>避免島上有限的防護物資與醫療資源在爆發時崩潰。</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <strong><i class="fa-solid fa-quote-left"></i> AAD 官方表示：</strong> 這是澳洲南極科學史上極罕見的全站預防性緊急撤離行動。
+                </div>
+            </div>
+
+            <!-- Slide 5: Incident 3 & 4 - King Island & DAFF Audit -->
+            <div class="slide" id="slide-5">
+                <div class="slide-header">
+                    <div class="header-tag"><i class="fa-solid fa-dove"></i> 重大突發 03 & 04</div>
+                    <div class="header-date">企鵝集體死亡與數據發布</div>
+                </div>
+                <h2 class="slide-title"><i class="fa-solid fa-feather-pointed" style="color: var(--accent-amber)"></i> 金島企鵝暴斃 & 聯邦審核時間差</h2>
+                <p class="slide-subtitle">塔斯馬尼亞生態重創與聯邦數據發布流程說明</p>
+
+                <div class="grid-2">
+                    <div class="card alert-card">
+                        <div class="card-title" style="color: var(--accent-amber);"><i class="fa-solid fa-crow"></i> 金島百隻小企鵝集體死亡</div>
+                        <ul class="list-styled alert">
+                            <li><span class="badge-pill badge-red">發生地點</span> 塔斯馬尼亞外島金島 (King Island) 南端。</li>
+                            <li><span class="badge-pill badge-red">受害物種</span> 約 100 隻神仙小企鵝 (Little Penguins) 屍體被發現。</li>
+                            <li><span class="badge-pill badge-amber">數據跳升</span> 該集體死亡事件使塔州確診案例迅速跳升至 <b>20 起</b>。</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title" style="color: var(--accent-cyan);"><i class="fa-solid fa-clock-rotate-left"></i> 聯邦 DAFF 數據「審核時間差」</div>
+                        <ul class="list-styled">
+                            <li><span class="badge-pill badge-cyan">原因解析</span> 各州送驗至 CSIRO 國家實驗室檢體量暴增。</li>
+                            <li><span class="badge-pill badge-cyan">複驗流程</span> 聯邦需進行二次基因測序與跨單位嚴格審核。</li>
+                            <li><span class="badge-pill badge-green">官方澄清</span> 週一未更新改於週二 (9/1) 補更，DAFF 數據為<b>有進展隨時更新</b>，並非改為固定一三五。</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="highlight-box green">
+                    <strong><i class="fa-solid fa-database"></i> 數據透明度：</strong> 聯邦 DAFF 嚴格複驗確保每一起對外發布的確診個案皆具備 100% 分子生物學實驗室證據。
+                </div>
+            </div>
+
+            <!-- Slide 6: NSW Status -->
+            <div class="slide" id="slide-6">
+                <div class="slide-header">
+                    <div class="header-tag green"><i class="fa-solid fa-location-crosshairs"></i> 新州專題</div>
+                    <div class="header-date">NSW 區域風險評估</div>
+                </div>
+                <h2 class="slide-title"><i class="fa-solid fa-map" style="color: var(--accent-emerald)"></i> NSW（新南威爾斯州）本週現況</h2>
+                <p class="slide-subtitle">局勢總體溫和且控制良好，未發生大規模生態浩劫</p>
+
+                <div class="grid-3" style="margin-bottom: 16px;">
+                    <div class="card">
+                        <div class="card-title"><i class="fa-solid fa-location-pin" style="color: var(--accent-amber);"></i> 確診個案微幅增加</div>
+                        <div class="card-desc">
+                            全州確診事件微幅增至 <b>17 起</b>。最新定點出現在肖爾黑文 (Shoalhaven) 的<b>海豚點 (Dolphin Point)</b>，確診物種為一隻澳洲燕鷗。
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title"><i class="fa-solid fa-compass" style="color: var(--accent-cyan);"></i> 地理涵蓋集中南海岸</div>
+                        <div class="card-desc">
+                            除最新定點外，其餘個案仍舊高度侷限在南海岸的<b>梅里姆布拉 (Merimbula)</b>、<b>百慕基 (Bermagui)</b> 與 <b>伊登 (Eden)</b>。
+                        </div>
+                    </div>
+
+                    <div class="card emerald-card">
+                        <div class="card-title" style="color: var(--accent-emerald);"><i class="fa-solid fa-shield-check"></i> 無大規模暴斃事件</div>
+                        <div class="card-desc">
+                            新州初級產業部 (DPIRD) 指出，新州境內目前完全沒有發生像南澳那樣上千隻海鳥或海獅暴斃的浩劫。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box green">
+                    <strong><i class="fa-solid fa-vial-circle-check"></i> 內陸警報解除：</strong> 日前新州西部內陸門迪迪湖 (Menindee Lakes) 數百隻鵜鶘集體死亡，本週化驗結果正式出爐，<b>正式排除 H5N1 禽流感</b>！
+                </div>
+            </div>
+
+            <!-- Slide 7: Official Directives -->
+            <div class="slide" id="slide-7">
+                <div class="slide-header">
+                    <div class="header-tag"><i class="fa-solid fa-bullhorn"></i> 防禦指引</div>
+                    <div class="header-date">新州官方最新公告</div>
+                </div>
+                <h2 class="slide-title"><i class="fa-solid fa-hand-holding-hand" style="color: var(--accent-cyan)"></i> 新州官方本週最新防範要求</h2>
+                <p class="slide-subtitle">鑑於南澳已出現狐狸與海豚確診，新州 DPIRD 發布更嚴格陸地防範措施</p>
+
+                <div class="grid-2">
+                    <div class="card alert-card">
+                        <div class="card-icon"><i class="fa-solid fa-dog"></i></div>
+                        <div class="card-title" style="color: var(--accent-crimson);">1. 海灘與公園遛狗：必須繫繩 (Leash Required)</div>
+                        <ul class="list-styled alert">
+                            <li><b>強制措施：</b>所有公共海灘、沿海公園遛狗時必須全程使用牽引繩。</li>
+                            <li><b>關鍵原因：</b>紅狐感染證實哺乳動物可因食入或嗅聞染疫鳥屍感染。</li>
+                            <li><b>核心目標：</b>絕對防止寵物犬去嗅聞、接觸或啃咬海灘上的野鳥屍體或糞便。</li>
+                        </ul>
+                    </div>
+
+                    <div class="card alert-card">
+                        <div class="card-icon" style="color: var(--accent-amber); background: rgba(255,184,0,0.15);"><i class="fa-solid fa-feather"></i></div>
+                        <div class="card-title" style="color: var(--accent-amber);">2. 後院養雞戶：提升生物安全級別</div>
+                        <ul class="list-styled">
+                            <li><b>強制圈養：</b>呼籲所有後院飼養蛋雞或家禽的民眾，盡快將雞隻轉為<b>完全室內圈養</b>。</li>
+                            <li><b>防範重點：</b>設置防鳥網與封閉飼料槽，徹底切斷後院家禽與野生鳥類的接觸。</li>
+                            <li><b>水質安全：</b>避免使用未經消毒的地表水或雨水作為家禽飲用水。</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <strong><i class="fa-solid fa-phone-volume"></i> 通報機制：</strong> 若發現野生鳥類或哺乳動物異常死亡，請勿觸碰，立即撥打野生動物緊急通報熱線 1800 675 888。
+                </div>
+            </div>
+
+            <!-- Slide 8: Core Summary & Epi-Curve Chart -->
+            <div class="slide" id="slide-8">
+                <div class="slide-header">
+                    <div class="header-tag cyan"><i class="fa-solid fa-chart-column"></i> 數據與趨勢</div>
+                    <div class="header-date">2026.06.W3 – 2026.09.W1</div>
+                </div>
+                <h2 class="slide-title"><i class="fa-solid fa-chart-line" style="color: var(--accent-cyan)"></i> 澳洲疫情統計摘要與每週增長趨勢</h2>
+                <p class="slide-subtitle">全澳累計 446 起確診事件之官方數據摘要與每週增長曲線 (WEEKLY EPI-CURVE)</p>
+
+                <div class="grid-2">
+                    <!-- Left: Core Summary Card -->
+                    <div class="card alert-card">
+                        <div>
+                            <div class="card-title" style="color: var(--accent-cyan);"><i class="fa-solid fa-clipboard-list"></i> 全澳疫情核心數據摘要</div>
+                            <ul class="list-styled" style="margin-top: 10px; gap: 8px;">
+                                <li><b>全澳確診總數：</b><span class="badge-pill badge-red" style="font-size:14px;">446 起確診事件</span> (單週激增 +137 起)</li>
+                                <li><b>通報與排除：</b><span class="badge-pill badge-cyan">1,273 起</span> 陰性排除 / <span class="badge-pill badge-cyan">34,358 筆</span> 熱線通報</li>
+                                <li><b>商業產業防線：</b><span class="badge-pill badge-green">100% 完美零確診</span> (家禽、蛋場與乳牛場安全)</li>
+                                <li><b>人類公衛風險：</b><span class="badge-pill badge-green">極低風險等級</span></li>
+                            </ul>
+                        </div>
+
+                        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; margin-top: 12px;">
+                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 700; margin-bottom: 6px;">🏛️ 各州與行政區確診統計 (Events By Territory)</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 13px; font-family: 'Outfit', sans-serif;">
+                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 南澳 (SA): <strong style="color:#fff;">260 起</strong></div>
+                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 維州 (VIC): <strong style="color:#fff;">138 起</strong></div>
+                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 塔州 (TAS): <strong style="color:#fff;">20 起</strong></div>
+                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 新州 (NSW): <strong style="color:#fff;">16 起</strong> <span style="font-size:10px; color:#94a3b8;">(初採17)</span></div>
+                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 西澳 (WA): <strong style="color:#fff;">10 起</strong></div>
+                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 昆州 (QLD): <strong style="color:#fff;">2 起</strong></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Epi-Curve Chart Card -->
+                    <div class="card">
+                        <div class="card-title" style="color: var(--accent-amber); font-size: 16px; margin-bottom: 4px;">
+                            <i class="fa-solid fa-chart-column"></i> 疫情週次增長趨勢 (WEEKLY EPI-CURVE)
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                            以週為單位顯示確診事件新增數 (紅色長條) 與累計總數 (綠色折線)
+                        </div>
+                        <div style="flex: 1; min-height: 240px; position: relative;">
+                            <canvas id="slideEpiChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box green" style="margin-top: 10px; padding: 10px 14px; font-size: 13px;">
+                    <strong><i class="fa-solid fa-circle-info"></i> 趨勢分析：</i></strong> 8 月下旬 (8月W3 - 9月W1) 因野生海鳥群聚繁殖期爆發，新增確診數顯著攀升，目前最新統計已精確涵蓋至 9 月第 1 週。
+                </div>
+            </div>
+
+            <!-- Slide 9: Summary & Takeaways -->
+            <div class="slide" id="slide-9">
+                <div class="slide-header">
+                    <div class="header-tag"><i class="fa-solid fa-flag-checkered"></i> 簡報總結</div>
+                    <div class="header-date">重點回顧與策略建議</div>
+                </div>
+                <h2 class="slide-title"><i class="fa-solid fa-shield-cat" style="color: var(--accent-crimson)"></i> 總結與後續應對重點</h2>
+                <p class="slide-subtitle">澳洲 H5N1 疫情迎來最嚴峻期，須維持三防線協同作戰</p>
+
+                <div class="grid-3">
+                    <div class="card alert-card">
+                        <div class="card-title" style="color: var(--accent-crimson);"><i class="fa-solid fa-paw"></i> 1. 陸生哺乳類防線</div>
+                        <div class="card-desc">
+                            紅狐確診證實病毒已浸潤陸地野生生態系。需提高寵物與野生動物接觸防範，嚴加監控犬貓與其他腐食哺乳類。
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title" style="color: var(--accent-amber);"><i class="fa-solid fa-warehouse"></i> 2. 商業養殖場防禦</div>
+                        <div class="card-desc">
+                            持續保持商業家禽、蛋場與乳牛場「零確診」金身。落實最高等級車輛、人員與水源生物安全門禁。
+                        </div>
+                    </div>
+
+                    <div class="card emerald-card">
+                        <div class="card-title" style="color: var(--accent-emerald);"><i class="fa-solid fa-eye"></i> 3. 生態監控與動態發布</div>
+                        <div class="card-desc">
+                            關注 9-10 月春季繁殖季南極與離島生態變化。結合數位監控儀表板，提供即時、透明的疫情數據通報。
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; text-align: center; display: flex; justify-content: center; gap: 16px;">
+                    <button class="btn-nav" style="width: auto; padding: 0 24px; border-radius: 20px; font-weight: 700;" onclick="goToSlide(1)">
+                        <i class="fa-solid fa-rotate-left" style="margin-right: 8px;"></i> 返回第一頁
+                    </button>
+                    <button class="btn-nav" style="width: auto; padding: 0 24px; border-radius: 20px; font-weight: 700; background: var(--accent-blue);" onclick="toggleFullScreen()">
+                        <i class="fa-solid fa-expand" style="margin-right: 8px;"></i> 全螢幕簡報模式
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation Bar -->
+            <div class="controls-bar">
+                <div class="slide-counter">
+                    SLIDE <span id="currentSlideNum">01</span> / <span id="totalSlideNum">09</span>
+                </div>
+
+                <div class="dots-container" id="dotsContainer"></div>
+
+                <div class="nav-buttons">
+                    <button class="btn-nav" id="btnPrev" onclick="prevSlide()" title="上一頁 (←)"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button class="btn-nav" id="btnNext" onclick="nextSlide()" title="下一頁 (→)"><i class="fa-solid fa-chevron-right"></i></button>
+                    <button class="btn-nav" onclick="toggleFullScreen()" title="全螢幕 (F)"><i class="fa-solid fa-expand"></i></button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const totalSlides = 9;
+        let currentSlide = 1;
+
+        const slideContainer = document.getElementById('slideContainer');
+        const progressBar = document.getElementById('progressBar');
+        const currentSlideNumEl = document.getElementById('currentSlideNum');
+        const totalSlideNumEl = document.getElementById('totalSlideNum');
+        const dotsContainer = document.getElementById('dotsContainer');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+
+        // Init Dots
+        for (let i = 1; i <= totalSlides; i++) {
+            const dot = document.createElement('div');
+            dot.className = `dot ${i === 1 ? 'active' : ''}`;
+            dot.addEventListener('click', () => goToSlide(i));
+            dotsContainer.appendChild(dot);
+        }
+
+        // Auto Scale 16:9 Container to viewport
+        function scaleContainer() {
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const targetWidth = 1280;
+            const targetHeight = 720;
+
+            const scaleX = windowWidth / targetWidth;
+            const scaleY = windowHeight / targetHeight;
+            const scale = Math.min(scaleX, scaleY) * 0.95; // 95% fit
+
+            slideContainer.style.transform = `scale(${scale})`;
+        }
+
+        window.addEventListener('resize', scaleContainer);
+        scaleContainer();
+
+        function updateSlideUI() {
+            // Slides transition
+            for (let i = 1; i <= totalSlides; i++) {
+                const slideEl = document.getElementById(`slide-${i}`);
+                if (!slideEl) continue;
+                
+                slideEl.classList.remove('active', 'prev-slide');
+                if (i === currentSlide) {
+                    slideEl.classList.add('active');
+                } else if (i < currentSlide) {
+                    slideEl.classList.add('prev-slide');
+                }
+            }
+
+            // Progress bar & Counter
+            const progressPercent = (currentSlide / totalSlides) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+            currentSlideNumEl.textContent = currentSlide < 10 ? `0${currentSlide}` : currentSlide;
+
+            // Dots
+            const dots = dotsContainer.querySelectorAll('.dot');
+            dots.forEach((dot, idx) => {
+                if (idx + 1 === currentSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+
+            // Buttons status
+            btnPrev.disabled = currentSlide === 1;
+            btnNext.disabled = currentSlide === totalSlides;
+        }
+
+        function goToSlide(slideNum) {
+            if (slideNum < 1 || slideNum > totalSlides) return;
+            currentSlide = slideNum;
+            updateSlideUI();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateSlideUI();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateSlideUI();
+            }
+        }
+
+        // Keyboard Controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Space' || e.key === 'PageDown') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                prevSlide();
+            } else if (e.key === 'Home') {
+                goToSlide(1);
+            } else if (e.key === 'End') {
+                goToSlide(totalSlides);
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullScreen();
+            }
+        });
+
+        // Full Screen Toggle
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Chart Initialization for Slide 8
+        let slideChartInstance = null;
+        function initSlideEpiChart() {
+            const ctx = document.getElementById('slideEpiChart');
+            if (!ctx || slideChartInstance) return;
+
+            const weekLabels = ['6月W3', '6月W4', '6月W5', '7月W1', '7月W2', '7月W3', '7月W4', '7月W5', '8月W1', '8月W2', '8月W3', '8月W4', '8月W5', '9月W1'];
+            const weeklyConfirmed = [16, 23, 4, 18, 19, 18, 20, 9, 18, 41, 104, 19, 2, 135];
+            let runningSum = 0;
+            const cumulativeData = weeklyConfirmed.map(val => {
+                runningSum += val;
+                return runningSum;
+            });
+
+            slideChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: weekLabels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: '週確診事件',
+                            data: weeklyConfirmed,
+                            backgroundColor: '#ff3b5c',
+                            borderColor: '#ff3b5c',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            yAxisID: 'y'
+                        },
+                        {
+                            type: 'line',
+                            label: '累計事件',
+                            data: cumulativeData,
+                            borderColor: '#00e676',
+                            backgroundColor: '#00e676',
+                            borderWidth: 2.5,
+                            pointRadius: 3,
+                            tension: 0.2,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(255, 255, 255, 0.05)' } },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            ticks: { color: '#ff3b5c', font: { size: 10 } },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            ticks: { color: '#00e676', font: { size: 10 } },
+                            grid: { drawOnChartArea: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#ffffff', font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        window.addEventListener('load', () => {
+            initSlideEpiChart();
+        });
+
+        updateSlideUI();
+    </script>
+</body>
+</html>

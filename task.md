@@ -1,119 +1,18 @@
-# 任務追蹤：澳洲 H5N1 疫情地圖自動更新系統 (已完成)
+# 任務清單：澳洲 H5N1 疫情週報 16:9 Web 簡報與圖表修復
 
-## 待辦事項
-- `[x]` 建立新專案 `AU_H5N1_Daily_Update`
-  - `[x]` 建立專案資料夾與 workflows 目錄
-  - `[x]` 寫入 `h5n1.py`
-  - `[x]` 寫入 `report_template.html`
-  - `[x]` 寫入 `.github/workflows/auto_update.yml`
-  - `[x]` 建立 `README.md` 說明文件
-- `[x]` 執行本地編譯與驗證
-  - `[x]` 執行 `python h5n1.py` 生成 `index.html`
-  - `[x]` 驗證新專案 `index.html` 是否正常
-- `[x]` 升級全自動地理定位與 NSW DPIRD 官網監控
-  - `[x]` 整合 `https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza`
-  - `[x]` 導入 OpenStreetMap Nominatim 地理編碼 API
-  - `[x]` 實作動態地點提取與防重覆演算法
-  - `[x]` 新增最短地緣距離動態計算 (Haversine 公式)
-  - `[x]` 新增自適應動態參考文獻庫 (References)
-  - `[x]` 實作新聞 RSS 交叉確診過濾（全自動 C 方案）
-  - `[x]` 在明細表格與地圖彈窗加上精緻的 `⚠️ 媒體先行` Badge 標籤
-  - `[x]` 根據 7/5 最新官方結果更新 Hawks Nest 為確診 (Confirmed)
-  - `[x]` 根據 6/30 西澳官方結果將 Roses Beach (CASE-005) 更新為官方已確診
-  - `[x]` 新增 7/6 最新確診病例 CASE-008 (Mullaloo Beach) 到資料庫中，標記為官方已確認
-  - `[x]` 指引使用者開啟 GitHub Actions 寫入權限，解決 `git push` 權限阻礙問題
-  - `[x]` 修改 CASE-004 地名為 Dunsborough (Quindalup)，解決與 Gemini 表格的地名落差
-  - `[x]` 新增 CASE-009 (Negative) 維多利亞州沿海地區排除案，補齊東海岸安全排除點
-  - `[x]` 修正 7/10 本土留鳥大突破（SA Robe 案例等 5 例），補齊南澳 PIRSA 官網爬取
-  - `[x]` 升級全澳洲 8 州/領地官方站點聯防爬蟲網絡
-  - `[x]` 修正 DAFF 與 SA PIRSA 的最新正確專區 URL 連結
-  - `[x]` 實作防 Link Rot 新聞 RSS 兜底定位與多段式退避地緣搜尋 (解決 Horrocks Beach 案例)
-  - `[x]` 對齊官方 7/16 最新數據（全澳累計 14 例確診：WA 8例, SA 5例, NSW 1例）
-  - `[x]` 對齊官方 7/17 最新數據（全澳累計 17 例確診：WA 10例, SA 5例, NSW 2例）
-  - `[x]` 修正 `discover_new_cases` 的同地熱點第二案例誤殺過濾 Bug
-  - `[x]` 同步更新 `README.md`、`report_template.html`、`.github/workflows/auto_update.yml`、`walkthrough.md`、`task.md` 的修改時間與說明
-  - `[x]` 對齊官方 7/22 最新數據（全澳累計 17 例確診：WA 10例, SA 5例, NSW 2例）
-  - `[x]` 新增昆士蘭 Noosa Main Beach (CASE-021, Negative) 疑似排除個案
-  - `[x]` 升級動態參考資料庫以支援 QLD 官網動態追加
-  - `[x]` 對齊官方 7/26 最新數據（全澳累計 20 例確診：WA 10例, SA 7例, NSW 2例, QLD 1例）
-  - `[x]` 新增南澳 Semaphore Beach、Robe Marina (第二例) 及昆士蘭 Moreton Island 確診個案
-  - `[x]` 優化 `h5n1.py` 爬蟲模擬真實瀏覽器 (UA 輪換) 與 Timeout 加速防死鎖
-  - `[x]` 對齊官方 7/27 最新疑似病例，新增南澳 Limestone Coast（Southend Jetty, Cape Jaffa, Port MacDonnell）共 7 起疑似大鳳頭燕鷗案例
-  - `[x]` 實作前後端雙重 CORS 代理與瀏覽器端自適應實時同步機制，徹底解決 WAF IP 屏蔽與 CORS 跨域限制
-  - `[x]` 參考美國 USDA APHIS 樣式，改版「巨型 KPI 指標卡片」與「月度堆疊柱狀/折線混合圖表 (Month-Year)」，並支援前端實時同步動態聯動
-  - `[x]` 對齊 DAFF 7/30 下午最新數據（全澳累計 28 例確診：SA 15例, WA 10例, NSW 2例, QLD 1例, VIC 1例）
-  - `[x]` 徹底排查並修復數據重複計算 (Double Counting) Bug（刪除重複 CASE-029，將 CASE-028 修正為 Suspect，使 Confirmed 加總精確對齊為 28 例）
-  - `[x]` 升級「各州分佈細分 (By State)」為動態 JavaScript 渲染，自動反應維州 (VIC 1例) 與南澳 (SA 15例) 的真實動態變化
-  - `[x]` 全面升級爬蟲抗阻擋與雲端代理中繼架構 (整合 Cloudflare Worker 代理、curl_cffi TLS 指紋偽裝與 Playwright 真實無頭瀏覽器，徹底解決 GitHub Actions 機房 IP 封鎖)
-  - `[x]` 對齊 DAFF / PIRSA / 維州農業局 8/1 最新疫情大暴增（全澳累計 53 例確診：SA 39例, WA 10例, NSW 2例, QLD 1例, VIC 1例）
-  - `[x]` 新增 CASE-035 (SA 大鳳頭燕鷗 19 隻確診)、CASE-036 (全澳首例銀鷗/海鷗確診)、CASE-037 (維州西南海岸 6 例疑似)、CASE-038 (南澳 Baudin Rocks 84 隻大規模死亡/生病事件)
-  - `[x]` 解決 GitHub Actions 對 Nominatim API 的 IP 封鎖與 403/429 限制（新增內建 LOCAL_GAZETTEER、Cloudflare 地理編碼代理轉接與州級預設坐標備用）
-  - `[x]` 優化動態地點提取防雜訊過濾器（剔除 health, animal, australian 等非地名單字與換行符號）
-  - `[x]` 升級地圖「鳥類數量密度 Badge 圈圈 (12px ~ 36px) + 雷達水波擴散光圈」與「黃金角度螺旋分散」
-  - `[x]` 重構「 Nestlé Blayney 廠專屬金色 🏭 工廠地標與旋轉防護金圈」，徹底與紅色野鳥疫區劃清界線
-  - `[x]` 移除 GitHub Actions Workflow Telegram 推播步驟，專注於 Gemini Vision AI 視覺自動辨識
-  - `[x]` 導入 `curl_cffi` Chrome TLS 指紋偽裝與 Playwright `--disable-http2` 防護，解決 Akamai/Cloudflare WAF `ERR_HTTP2_PROTOCOL_ERROR` 封鎖
-  - `[x]` 升級 Gemini Vision API 多模型降級（gemini-2.5-flash / gemini-2.0-flash / gemini-1.5-flash-latest）與 HTTP 429 額度重試機制
-  - `[x]` 實作暫存截圖零殘留生命週期管理（記憶體中刪除 + `.gitignore` 雙重防護，徹底消除 Git 倉庫圖片膨脹）
-  - `[x]` 修正爬蟲動態新地點識別案例號碼 `max_id` 安全計算，徹底杜絕 CASE ID 衝突與案例覆蓋 Bug
-  - `[x]` 精確對齊 8/10 下午 1:00 AEST 官方最新權威數據：全澳 231 隻確診 / 55 起事件（SA 163 隻, VIC 53 隻, NSW 4 隻, WA 10 隻, QLD 1 隻）
-  - `[x]` 登錄 8/11 PIRSA 最新通報：南澳 Coorong & Southend 沿海 25 例與袋鼠島 10 例新疑似病例（現存待複驗疑似案例上升至 51 例）
-  - `[x]` 實作「各州確診天花板防護罩 (`enforce_official_state_ceilings`)」，徹底解決新聞個案導致加總不對齊 (如 233 隻) 之問題
-  - `[x]` 全面清理與重編譯 cases.json (61 筆病例，55 起 Confirmed 事件 / 231 隻確診)
-  - `[x]` 解決 8/12 DAFF 官網 HTML 斷行解析 Bug，確保正確辨識全澳 236 隻與維州 58 隻數據
-  - `[x]` 實作「數據庫隻數自動擬合器 (`auto_fill_state_shortfalls`)」，確保 `cases.json` 累加與頂部 Banner、數據看板、地圖、表格及趨勢圖 100% 完美同步為 236 隻
-  - `[x]` 實現 UI 解耦注入 `window.OFFICIAL_STATS`，確保橫幅與看板永遠直接讀取 DAFF 官方權威數字
-  - `[x]` 升級 DAFF 2026-08-12 19:00 AEST 最新「事件導向通報 (Event-based Reporting)」雙軌架構：
-    - `[x]` 完整保留歷史隻數資料庫 `cases.json` (236 隻 / 55 起事件 / 9 陰性排除共 64 筆病歷) 凍結作為 Baseline。
-    - `[x]` 建立獨立事件資料庫 `cases_events.json` 進行 8/12 起最新 151 起 Positive Events 動態追蹤 (EVENT-001 ~ EVENT-151)。
-    - `[x]` 頂部 Banner、KPI 指標卡片與各州細分面板全數轉為「151 起確診事件」與「1,307 起陰性排除事件」對齊（100% 無隻數或 0隻字樣）。
-    - `[x]` 新增「DAFF 2026-08-12 政策改版宣告橫幅」與流行病學改版原因說明。
-    - `[x]` 完全還原原版「疫情週次增長趨勢 (WEEKLY EPI-CURVE)」雙 Y 軸圖表 (圖 A) 與發光圓圈數字地圖 (圖 B)。
-    - `[x]` 新增上下表格「欄位點擊排序 (Click-to-Sort ▲/▼)」與「即時關鍵字搜尋 (Search Filter - 支援 NSW/VIC/SA 等智慧別名)」。
-    - `[x]` 驗證 `index.html`、`live_page.html` 與 `live_page_utf8.html` 三檔案同步生成。
-- `[x]` 對齊 DAFF 2026-08-13 數據結算規範（每日 17:00 AEST 結算）與排程優化
-  - `[x]` 分析 DAFF 免責聲明：每日 17:00 AEST 為官方各州數據結算基準點
-  - `[x]` 調整第一班主抓時間為 `08:00 UTC`（台灣時間 16:00 / 澳洲 AEST 18:00），於結算後 1 小時精準抓取
-  - `[x]` 保留第二班 `23:00 UTC`（台灣時間 07:00 / 澳洲 AEST 09:00）作為早晨覆核、各州官網與澳洲媒體 RSS 雙重保險
-  - `[x]` 導入 **雙引擎 (Dual-Engine) AI 架構**：整合 `Gemini API Google Search Grounding (google_search)` 實現實時連網新聞檢索與報導摘要
-  - `[x]` 更新塔斯馬尼亞州官方專區 URL (`https://nre.tas.gov.au/biosecurity-tasmania/animal-biosecurity/animal-health/poultry-and-pigeons/bird-flu`) 並新增棕賊鷗 (`Brown Skua`) 物種辨識標籤
-  - `[x]` 更新 `.github/workflows/auto_update.yml`
-  - `[x]` 同步更新 `README.md`、`task.md`、`walkthrough.md` 與 `GOVT_SCRAPING_BEST_PRACTICES.md`
-- `[x]` 2026-08-13 Self Audit 與 2026-08-14 全動態 UI 重構
-  - `[x]` 修復 `main()` 中 `len(events_cases) < 151` 條件判斷導致 `fetch_daff_updates()` 永遠被跳過之 Bug
-  - `[x]` 移除廢棄模型 `gemini-2.0-flash`，改為 `gemini-2.5-flash` / `gemini-2.5-flash-lite`
-  - `[x]` 更新 `parse_daff_official_stats()` Fallback 預設值至 DAFF 2026-08-13 最新數字（186 起確診事件 / SA 123 / VIC 48）
-  - `[x]` 實作 `renderDynamicIndicators()` 實現 100% 前端全動態 UI 渲染（徹底消除 151 / 93 / 43 寫死硬編碼殘留）
-  - `[x]` 實作 `auto_reconcile_event_shortfalls()` 事件對齊引擎，確保 `cases_events.json` (187 筆記錄)、趨勢圖綠線、地圖與表格 100% 對齊 186 起
-  - `[x]` 建立雙軌異步地方先行機制 (Dual-Track Time-Lag Handling)，處理各州 (如 TAS) 搶先公佈狀況
-  - `[x]` 實作數據來源透明標示（綠色即時 / 橘色備援狀態橫幅）
-  - `[x]` 2026-08-16 DAFF 236 起確診事件對齊與物種生態/哺乳類 AI 評估引擎升級
-  - `[x]` 對齊 DAFF 新版 `/latest-data#event_data` 專區 236 起確診事件、1,273 起陰性排除與 21,041 筆熱線通報數據
-  - `[x]` 精確對齊 DAFF 官方 Power BI 權威物種數據（大鳳頭燕鷗 178起、銀鷗 28起、巨鸌 18起、太平洋鷗 4起、棕賊鷗 2起、鸕鶿 2起、企鵝 1起、遊隼 3起）
-  - `[x]` 實作 8 大物種生態評估卡片與手機優化垂直捲動容器 (`max-h-[540px] overflow-y-auto`)
-  - `[x]` 實作 `analyze_new_species_with_gemini()` 鳥類與哺乳類（如塔斯馬尼亞惡魔 😈、紅狐狸 🦊、野貓 🐈、狐蝠 🦇 等）Gemini Google Search Grounding 實時新物種 AI 分析引擎
-  - `[x]` 預防性擴充全澳 8 大行政區 (預先寫入 ACT 首都區與 NT 北領地，支援未來自適應辨識與 GPS 定位)
-  - `[x]` 重構前端一鍵快篩列位置（移至地圖與表格之間，體驗更直覺）
-  - `[x]` 將 DAFF 官方連結全面修正定位至 `#event_data` 區塊
-  - `[x]` 驗證全站 Tailwind CSS 手機版 RWD 響應式排版
-  - `[x]` 2026-08-16 DAFF 236 起確診事件標籤淨化與哺乳類動態 AI 警示鏈升級
-  - `[x]` 淨化 `cases_events.json` 消除 237 筆與舊 `CASE-001/002` 雜訊，嚴格鎖定全澳 236 起 DAFF 官方權威事件 (`EVENT-001` ~ `EVENT-236`)
-  - `[x]` 升級 `generate_gemini_grounded_summary()` 中的 Gemini AI 實時追蹤指令，自動抓取澳洲哺乳類動物（海豹、海獅、紅狐狸、野貓等）感染新聞並在頂部「📰 媒體與生態監測風向」區塊發布特報警示
-  - `[x]` 優化 8 大物種卡片滑動 UI 提示標籤 (`已分析 8 大主要物種 ⬇️ 向下滑動查看全表`)
-  - `[x]` 2026-08-18 全面 Deeply Self-Audit 官方 18/08/2026 最新發布之 **Positive events by species** 數據對齊：
-    - `[x]` **對齊 DAFF 官網最新發布 18/08 柱狀圖數據**：確診總事件數 251 起，物種精確起數為 `Greater Crested Tern 189起 (75%)`、`Silver Gull 31起 (12%)`、`Petrel (巨鸌類) 18起 (7%)` (南方 7 + 巨鸌 8 + 北方 2 + 白頭 1)、`Pacific Gull 4起 (2%)`、`Brown Skua 2起`、`Cormorant 2起`、`Little Penguin 1起`、`Peregrine Falcon & Other 4起`
-    - `[x]` **定位並徹底修復 Bug Root Cause 1 (關鍵字比對順序碰撞)**：原系統在比對物種名稱時，`Silver Gull` 比對條件包含 `'海鷗'`，先於 `Pacific Gull (太平洋鷗)` 執行，導致 4 起 `Pacific Gull` 被錯誤計入 `Silver Gull` (使銀鷗變成 35 起、太平洋鷗變成 0 起)。現已將 `Pacific Gull` 判讀優先權調至 `Silver Gull` 之前，徹底解決數據歸類錯誤問題。
-    - `[x]` **定位並徹底修復 Bug Root Cause 2 (官網 Power BI 數據備援寫死值與多餘覆蓋)**：移除 `parse_daff_official_stats()` 中舊版硬編碼 `180` / `29` 備援數據與不適當的覆蓋邏輯，將 DAFF 官方柱狀圖圖表數據直接鎖定為 `189` 與 `31`。
-    - `[x]` **Cases 數據庫完全淨化**：執行 Python 腳本對 `cases_events.json` 251 筆確診個案物種標籤進行統一歸類對齊，使地圖、Donut Chart 圖表、圖例 Grid 與物種風險卡片達到 **100% 完全相同之精確數字**。
-    - `[x]` 執行 `python h5n1.py` 重新編譯產出 `index.html`、`live_page.html` 與 `live_page_utf8.html` 驗證無誤！
-  - `[x]` 2026-08-19 徹底 Self-Audit DAFF 官網「Events by species」數據庫對照 (NSW 病例物種修復與對齊)：
-    - `[x]` **對照 DAFF 官網發布之 Events by species 表格**：全澳 NSW 州共有 5 起確診事件，分別為 Mid-Coast Hawks Nest 2 起 (皆為 Giant Petrel 巨鸌)、Eurobodalla Narooma 1 起 (Greater Crested Tern 大鳳頭燕鷗)、Wentworth Coomealla 1 起 (Greater Crested Tern 大鳳頭燕鷗)、Bega Valley Eden 1 起 (Greater Crested Tern 大鳳頭燕鷗)。
-    - `[x]` **定位並徹底修復 Bug Root Cause**：先前 `cases_events.json` 中 NSW 舊個案全數被預設標註為通用 `野生燕鷗 (大鳳頭燕鷗 / Crested tern)`，導致 Hawks Nest 的巨鸌在網頁上被錯誤顯示為燕鷗。
-    - `[x]` **數據庫與腳本完全淨化對齊**：已將 `cases_events.json` (262 筆事件) 與 `cases.json` 中 NSW 5 起事件之物種、採樣日期 (6/28, 7/11, 8/4, 8/4, 8/11) 與 LGA 完全更正為 DAFF 官方紀錄 (2 起巨鸌 + 3 起大鳳頭燕鷗)，並修正 `report_template.html` 閉合標籤 (`diff = 0`)。
-    - `[x]` **全澳所有州/領地物種全盤 Audit**：全盤排查並對齊 WA (1起棕賊鷗 + 9起巨鸌)、QLD (1起北方巨海燕/巨鸌)、TAS (3起遊隼與其它 + 2起巨鸌 + 1起燕鷗)、SA (128起燕鷗 + 31起銀鷗 + 10起巨鸌 + 1起太平洋鷗) 與 VIC (53起燕鷗 + 7起巨鸌 + 3起太平洋鷗 + 2起棕賊鷗 + 2起鸕鶿 + 1起企鵝 + 1起遊隼 + 1起銀鷗) 的精確物種。
-    - `[x]` 重新執行 `python h5n1.py` 自動編譯最新 `index.html` (DIV diff = 0)、`live_page.html` 與 `live_page_utf8.html`！
-
-
-
-
-
+- [x] 建立與編排 16:9 Web 投影片 `h5n1_weekly_slides.html`
+  - [x] 設計自適應 16:9 CSS 佈局系統與黑暗科技視覺風格
+  - [x] 撰寫 9 頁核心投影片內容與圖表元素
+  - [x] 第 8 頁改版為「全澳疫情數據摘要卡片 + 16:9 每週趨勢圖表 (Weekly Epi-Curve)」
+  - [x] 實現鍵盤控制、頁碼跳轉、全螢幕 mode 與動態過場效果
+- [x] 修復網頁每週趨勢圖表時間軸截斷問題 (`report_template.html` & `index.html`)
+  - [x] 替換寫死的 8月W2 週次標籤，改用 `generateWeekLabels()` 動態解析至 `9月W1`
+  - [x] 重新執行 `python h5n1.py` 自動生成最新 `index.html`
+- [x] 驗證簡報網頁功能與畫面品質
+  - [x] 使用 Playwright 進行網頁多頁截圖驗證
+  - [x] 確保無過載溢出、字體與圖表排版完美
+- [x] 文檔與版本歷史同步
+  - [x] 更新 `README.md`（包含核心功能特點與 v2.5 版本歷史）
+  - [x] 建立 `CHANGELOG.md` 紀錄 v2.5.0 變更明細
+  - [x] 更新 `SOP.md` 規範簡報驗證與文檔同步流程
+  - [x] 更新 `walkthrough.md` 紀錄最新實例截圖與成果

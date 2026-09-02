@@ -29,12 +29,14 @@
   - 參考文獻 URL 套用 `break-all` 強制長網址自然折行，杜絕手機版 X 軸爆開白邊。
 - **0 Errors 檢測**：確保 Playwright / 瀏覽器 Console 達 **0 Console Errors / 0 Warnings**。
 
-#### Step 5: Engine Compilation & Output Build (引擎自動編譯)
+#### Step 5: Engine Compilation & Output Build (引擎自動編譯與簡報生成)
 - 執行 `python h5n1.py` 重新生成 `index.html`、`live_page.html` 與 `live_page_utf8.html`，並確認控制台輸出 `網頁自動編譯成功！`。
+- 驗證 `h5n1_weekly_slides.html` 16:9 Web 簡報網頁佈局與 Chart.js 每週趨勢圖表無異常。
 
 #### Step 6: Documentation Sync (版本與文檔同步)
-- 更新 `README.md` 中的數據結算起數與物種對齊說明。
-- 更新 `task.md` 記錄最新 Self-Audit 完成項目與修改邏輯。
+- 更新 `README.md` 中的數據結算起數、物種對齊說明與版本歷史紀錄。
+- 同步更新 `CHANGELOG.md` 紀錄版本變更與修復細節。
+- 更新 `task.md` 與 `walkthrough.md` 記錄最新稽核完成項目。
 
 #### Step 7: Handover & Git Push File Checklist (檔案更新整理與推送清單) 🚀
 - 整理所有變更檔案明細表，明確劃分「**哪些檔案必須 Git Push 推送至 GitHub**」。
