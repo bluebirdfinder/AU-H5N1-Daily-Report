@@ -786,38 +786,73 @@
             }, 100);
         });
 
-        // 週次標籤解析器
-        function getWeekLabel(dateStr) {
+        // 週次標籤解析器（動態時間軸，徹底告別寫死）
+        function getWeekInfo(dateStr) {
             if (!dateStr) return null;
             const date = new Date(dateStr);
             if (isNaN(date.getTime())) return null;
+            const year = date.getFullYear();
             const month = date.getMonth() + 1;
             const day = date.getDate();
             const weekNum = Math.ceil(day / 7);
-            return `${month}月W${weekNum}`;
+            return { year, month, weekNum, date };
         }
 
-        function generateWeekLabels(events) {
-            const defaultLabels = ['6月W3', '6月W4', '7月W1', '7月W2', '7月W3', '7月W4', '7月W5', '8月W1', '8月W2', '8月W3', '8月W4', '8月W5', '9月W1'];
-            const labelSet = new Set(defaultLabels);
+        function getWeekLabel(dateStr, lang = 'zh') {
+            const info = getWeekInfo(dateStr);
+            if (!info) return null;
+            const monthNamesEn = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            if (lang === 'en') {
+                return `${monthNamesEn[info.month]}-W${info.weekNum}`;
+            }
+            return `${info.month}月W${info.weekNum}`;
+        }
+
+        function generateWeekLabels(events, lang = 'zh') {
+            // 自動計算最早與最晚日期，動態生成連續時間軸週次標籤（從 6月W3 起自動連續遞增至最新日期）
+            let startYear = 2026, startMonth = 6, startWeek = 3;
+            let endYear = 2026, endMonth = 9, endWeek = 1;
+
+            const now = new Date();
+            let maxDate = new Date(now);
+
             if (events && events.length > 0) {
                 events.forEach(c => {
-                    const dateStr = c.notify_date || c.confirm_date || c.found_date;
-                    if (dateStr) {
-                        const w = getWeekLabel(dateStr);
-                        if (w) labelSet.add(w);
+                    const ds = c.notify_date || c.confirm_date || c.found_date;
+                    if (ds) {
+                        const d = new Date(ds);
+                        if (!isNaN(d.getTime()) && d > maxDate) {
+                            maxDate = d;
+                        }
                     }
                 });
             }
-            const labels = Array.from(labelSet);
-            labels.sort((a, b) => {
-                const parseLabel = str => {
-                    const m = str.match(/(\d+)月W(\d+)/);
-                    if (!m) return 0;
-                    return parseInt(m[1]) * 100 + parseInt(m[2]);
-                };
-                return parseLabel(a) - parseLabel(b);
-            });
+
+            endYear = maxDate.getFullYear();
+            endMonth = maxDate.getMonth() + 1;
+            endWeek = Math.ceil(maxDate.getDate() / 7);
+
+            const labels = [];
+            let curY = startYear, curM = startMonth, curW = startWeek;
+
+            while (curY < endYear || (curY === endYear && curM < endMonth) || (curY === endYear && curM === endMonth && curW <= endWeek)) {
+                const monthNamesEn = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const lbl = (lang === 'en') ? `${monthNamesEn[curM]}-W${curW}` : `${curM}月W${curW}`;
+                labels.push(lbl);
+
+                const daysInMonth = new Date(curY, curM, 0).getDate();
+                const maxWeeksInMonth = Math.ceil(daysInMonth / 7);
+
+                curW++;
+                if (curW > maxWeeksInMonth) {
+                    curW = 1;
+                    curM++;
+                    if (curM > 12) {
+                        curM = 1;
+                        curY++;
+                    }
+                }
+            }
             return labels;
         }
 

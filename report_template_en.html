@@ -465,19 +465,73 @@
             }, 100);
         });
 
-        function getWeekLabel(dateStr) {
+        // Week Label Utilities (Dynamic Continuous Timeline)
+        function getWeekInfo(dateStr) {
             if (!dateStr) return null;
             const date = new Date(dateStr);
             if (isNaN(date.getTime())) return null;
+            const year = date.getFullYear();
             const month = date.getMonth() + 1;
             const day = date.getDate();
             const weekNum = Math.ceil(day / 7);
-            return `M${month}-W${weekNum}`;
+            return { year, month, weekNum, date };
         }
 
-        function generateWeekLabels(events) {
-            const defaultLabels = ['Jun-W3', 'Jun-W4', 'Jul-W1', 'Jul-W2', 'Jul-W3', 'Jul-W4', 'Jul-W5', 'Aug-W1', 'Aug-W2', 'Aug-W3', 'Aug-W4', 'Aug-W5', 'Sep-W1'];
-            return defaultLabels;
+        function getWeekLabel(dateStr, lang = 'en') {
+            const info = getWeekInfo(dateStr);
+            if (!info) return null;
+            const monthNamesEn = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            if (lang === 'en') {
+                return `${monthNamesEn[info.month]}-W${info.weekNum}`;
+            }
+            return `${info.month}月W${info.weekNum}`;
+        }
+
+        function generateWeekLabels(events, lang = 'en') {
+            let startYear = 2026, startMonth = 6, startWeek = 3;
+            let endYear = 2026, endMonth = 9, endWeek = 1;
+
+            const now = new Date();
+            let maxDate = new Date(now);
+
+            if (events && events.length > 0) {
+                events.forEach(c => {
+                    const ds = c.notify_date || c.confirm_date || c.found_date;
+                    if (ds) {
+                        const d = new Date(ds);
+                        if (!isNaN(d.getTime()) && d > maxDate) {
+                            maxDate = d;
+                        }
+                    }
+                });
+            }
+
+            endYear = maxDate.getFullYear();
+            endMonth = maxDate.getMonth() + 1;
+            endWeek = Math.ceil(maxDate.getDate() / 7);
+
+            const labels = [];
+            let curY = startYear, curM = startMonth, curW = startWeek;
+
+            while (curY < endYear || (curY === endYear && curM < endMonth) || (curY === endYear && curM === endMonth && curW <= endWeek)) {
+                const monthNamesEn = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const lbl = (lang === 'en') ? `${monthNamesEn[curM]}-W${curW}` : `${curM}月W${curW}`;
+                labels.push(lbl);
+
+                const daysInMonth = new Date(curY, curM, 0).getDate();
+                const maxWeeksInMonth = Math.ceil(daysInMonth / 7);
+
+                curW++;
+                if (curW > maxWeeksInMonth) {
+                    curW = 1;
+                    curM++;
+                    if (curM > 12) {
+                        curM = 1;
+                        curY++;
+                    }
+                }
+            }
+            return labels;
         }
 
         function initEventSection() {
@@ -528,8 +582,16 @@
             const ctx = document.getElementById('eventTrendChart');
             if (!ctx) return;
 
-            const weekLabels = ['Jun-W3', 'Jun-W4', 'Jun-W5', 'Jul-W1', 'Jul-W2', 'Jul-W3', 'Jul-W4', 'Jul-W5', 'Aug-W1', 'Aug-W2', 'Aug-W3', 'Aug-W4', 'Aug-W5', 'Sep-W1'];
-            const weeklyConfirmed = [16, 23, 4, 18, 19, 18, 20, 9, 18, 41, 104, 19, 2, 145];
+            const weekLabels = generateWeekLabels(events, 'en');
+            const weekMap = {};
+            weekLabels.forEach(w => weekMap[w] = 0);
+
+            events.forEach(c => {
+                const w = getWeekLabel(c.notify_date || c.confirm_date || c.found_date, 'en');
+                if (w && weekMap[w] !== undefined) weekMap[w] += 1;
+            });
+
+            const weeklyConfirmed = weekLabels.map(w => weekMap[w]);
             let runningSum = 0;
             const cumulativeData = weeklyConfirmed.map(val => { runningSum += val; return runningSum; });
 
