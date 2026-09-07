@@ -37,6 +37,7 @@ jobs:
         env:
           CF_WORKER_URL: ${{ secrets.CF_WORKER_URL }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          EBIRD_API_KEY: ${{ secrets.EBIRD_API_KEY }}
         run: python h5n1.py
 
       - name: 4b. 同步所有 HTML 輸出 (Sync HTML Outputs)
@@ -49,8 +50,8 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # 將生成的 index.html、數據庫 cases.json、cases_events.json 與同步 HTML 加入暫存區
-          git add index.html cases.json cases_events.json live_page.html live_page_utf8.html
+          # 將生成的 index.html、index_en.html、risk_assessment.html、數據庫 cases.json、cases_events.json、簡報網頁與週報歸檔加入暫存區
+          git add index.html index_en.html live_page_en.html risk_assessment.html cases.json cases_events.json live_page.html live_page_utf8.html h5n1_weekly_slides.html weekly_reports/ README.md CHANGELOG.md bird_data.json ala_bird_data.json
           
           # 只有在內容真正有變更時才執行 commit，避免無意義提交
           if git diff-index --quiet HEAD --; then
