@@ -1061,14 +1061,92 @@
             }
         }
 
-        // Chart Initialization for Slide 8
+        // Chart Initialization for Slide 8 (動態計算時間軸與週次數據)
         let slideChartInstance = null;
+
+        function getSlideWeekInfo(dateStr) {
+            if (!dateStr) return null;
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return null;
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const weekNum = Math.ceil(day / 7);
+            return { year, month, weekNum, date };
+        }
+
+        function getSlideWeekLabel(dateStr) {
+            const info = getSlideWeekInfo(dateStr);
+            if (!info) return null;
+            return `${info.month}月W${info.weekNum}`;
+        }
+
+        function generateSlideWeekLabels(events) {
+            let startYear = 2026, startMonth = 6, startWeek = 3;
+            let endYear = 2026, endMonth = 9, endWeek = 1;
+
+            const now = new Date();
+            let maxDate = new Date(now);
+
+            if (events && events.length > 0) {
+                events.forEach(c => {
+                    const ds = c.notify_date || c.confirm_date || c.found_date;
+                    if (ds) {
+                        const d = new Date(ds);
+                        if (!isNaN(d.getTime()) && d > maxDate) {
+                            maxDate = d;
+                        }
+                    }
+                });
+            }
+
+            endYear = maxDate.getFullYear();
+            endMonth = maxDate.getMonth() + 1;
+            endWeek = Math.ceil(maxDate.getDate() / 7);
+
+            const labels = [];
+            let curY = startYear, curM = startMonth, curW = startWeek;
+
+            while (curY < endYear || (curY === endYear && curM < endMonth) || (curY === endYear && curM === endMonth && curW <= endWeek)) {
+                labels.push(`${curM}月W${curW}`);
+                const daysInMonth = new Date(curY, curM, 0).getDate();
+                const maxWeeksInMonth = Math.ceil(daysInMonth / 7);
+
+                curW++;
+                if (curW > maxWeeksInMonth) {
+                    curW = 1;
+                    curM++;
+                    if (curM > 12) {
+                        curM = 1;
+                        curY++;
+                    }
+                }
+            }
+            return labels;
+        }
+
         function initSlideEpiChart() {
             const ctx = document.getElementById('slideEpiChart');
             if (!ctx || slideChartInstance) return;
 
-            const weekLabels = ['6月W3', '6月W4', '6月W5', '7月W1', '7月W2', '7月W3', '7月W4', '7月W5', '8月W1', '8月W2', '8月W3', '8月W4', '8月W5', '9月W1'];
-            const weeklyConfirmed = [16, 23, 4, 18, 19, 18, 20, 9, 18, 41, 104, 19, 2, 145];
+            const events = (window.H5N1_EVENTS && window.H5N1_EVENTS.length > 0) ? window.H5N1_EVENTS : [];
+            const weekLabels = generateSlideWeekLabels(events);
+
+            const weekMap = {};
+            weekLabels.forEach(w => weekMap[w] = 0);
+
+            if (events.length > 0) {
+                events.forEach(c => {
+                    const w = getSlideWeekLabel(c.notify_date || c.confirm_date || c.found_date);
+                    if (w && weekMap[w] !== undefined) weekMap[w] += 1;
+                });
+            } else {
+                // Fallback demo data if events not yet injected
+                const fallbackMap = { '6月W3': 16, '6月W4': 23, '6月W5': 4, '7月W1': 18, '7月W2': 19, '7月W3': 18, '7月W4': 20, '7月W5': 9, '8月W1': 18, '8月W2': 41, '8月W3': 104, '8月W4': 19, '8月W5': 2, '9月W1': 175 };
+                Object.keys(fallbackMap).forEach(k => { if (weekMap[k] !== undefined) weekMap[k] = fallbackMap[k]; });
+            }
+
+            const weeklyConfirmed = weekLabels.map(w => weekMap[w]);
             let runningSum = 0;
             const cumulativeData = weeklyConfirmed.map(val => {
                 runningSum += val;
