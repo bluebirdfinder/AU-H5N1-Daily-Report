@@ -41,6 +41,9 @@
 
 ---
 
+### v2.8.1 (2026-09-07)
+- 🚀 **GitHub Actions CI/CD 自動化流程修復與 4 大雙語頁面全覆蓋**：修復 `.github/workflows/auto_update.yml` 中 `git add` 因找不到 `live_page_en.html` 導致的 Exit status 128 中斷問題；於 Step 4b 補齊英文 Live 頁面備份，並將 4 大報告頁面、簡報檔 (`slides`) 與歸檔全數納入 CI/CD 自動推送機制。
+
 ### v2.8.0 (2026-09-07)
 - 🦅 **eBird 雙軌 GIS 地圖圖層與實測點位**：於 Leaflet 地圖上直接標註 129 筆亮青色實態觀測點位（`🦅 eBird 實態點位`），Tooltip 支援顯示「📊 模型預估滯留量」與「🦅 eBird 30天周邊 220km 實測目擊數量與筆數」。
 - ⚡ **零 CORS 阻擋靜態打包 (`assets/js/bird_data.js`)**：`h5n1.py` 自動將 eBird 觀測數據同步寫入 JS 檔 (`window.ebirdDataEmbedded`)，徹底解決 Windows 本機直接開啟 HTML (`file://`) 時遭遇的瀏覽器跨域 `fetch` 阻擋。

@@ -2,6 +2,19 @@
 
 所有專案版本更新與重大變更均紀錄於此。
 
+## [v2.8.1] - 2026-09-07
+
+### 🚀 GitHub Actions CI/CD 自動化流程修復與 4 大雙語頁面全覆蓋
+- **修復 Exit code 128 部署中斷問題 (`auto_update.yml`)**：
+  - 修復 Step 5 `git add` 找不到 `live_page_en.html` 導致 fatal error 中斷的問題。
+  - Step 4b 補齊英文版 Live 頁面自動複製備份指令 (`cp index_en.html live_page_en.html`)。
+- **4 大核心決策報告網頁與 Live 頁面全自動同步**：
+  - 完整涵蓋 `index.html` (中文報告主頁)、`index_en.html` (英文報告主頁)、`risk_assessment.html` (中文風險評估) 與 `risk_assessment_en.html` (英文風險評估) 及對應 Live 備份頁。
+- **16:9 簡報投影片與歷史週報歸檔庫自動推送**：
+  - 自動納入 `h5n1_weekly_slides.html` (週報簡報)、`risk_assessment_slides.html` (中文風險評估簡報)、`risk_assessment_slides_en.html` (英文風險評估簡報) 及 `weekly_reports/` 歸檔資料夾，確保前端 Modal 彈窗與簡報連結維持 100% 可用。
+
+---
+
 ## [v2.8.0] - 2026-09-07
 
 ### 🦅 eBird 雙軌 GIS 地圖圖層與實測點位 (`risk_assessment.html` & `risk_assessment_en.html`)
