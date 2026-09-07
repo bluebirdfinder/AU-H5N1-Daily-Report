@@ -44,20 +44,21 @@ jobs:
         run: |
           cp index.html live_page.html
           cp index.html live_page_utf8.html
+          if [ -f index_en.html ]; then cp index_en.html live_page_en.html; fi
 
       - name: 5. 偵測變動並推送到 GitHub (Commit and Push Changes)
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # 將生成的 index.html、index_en.html、risk_assessment.html、數據庫 cases.json、cases_events.json、簡報網頁與週報歸檔加入暫存區
-          git add index.html index_en.html live_page_en.html risk_assessment.html cases.json cases_events.json live_page.html live_page_utf8.html h5n1_weekly_slides.html weekly_reports/ README.md CHANGELOG.md bird_data.json ala_bird_data.json
+          # 將生成的雙語報告 (index & index_en)、風險評估 (risk_assessment & risk_assessment_en)、簡報 (slides) 與數據庫加入暫存區
+          git add index.html index_en.html live_page.html live_page_utf8.html live_page_en.html risk_assessment.html risk_assessment_en.html h5n1_weekly_slides.html risk_assessment_slides.html risk_assessment_slides_en.html cases.json cases_events.json bird_data.json ala_bird_data.json README.md CHANGELOG.md weekly_reports/ 2>/dev/null || true
           
           # 只有在內容真正有變更時才執行 commit，避免無意義提交
           if git diff-index --quiet HEAD --; then
             echo "沒有偵測到 H5N1 最新病例變動，跳過部署。"
           else
-            git commit -m "自動更新：同步最新澳洲 H5N1 疫情數據 (系統時間: $(date +'%Y-%m-%d %H:%M:%S'))"
+            git commit -m "自動更新：同步最新澳洲 H5N1 疫情數據、雙語報告與簡報網頁 (系統時間: $(date +'%Y-%m-%d %H:%M:%S'))"
             git pull --rebase --autostash origin main
             git push origin main
           fi
