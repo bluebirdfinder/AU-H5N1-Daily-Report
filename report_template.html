@@ -120,18 +120,22 @@
                 <h1 class="text-sm sm:text-lg font-bold tracking-tight text-white truncate">Nestlé Purina Blayney •
                     Bio-Security Monitor</h1>
             </div>
-            <div class="flex items-center gap-3">
-                <a href="h5n1_weekly_slides.html" target="_blank"
-                    class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg shadow-md flex items-center gap-1.5 transition">
-                    <span>📺</span> 16:9 週報簡報 (Slides)
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="risk_assessment.html" class="bg-emerald-950 hover:bg-emerald-900 text-emerald-300 text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg border border-emerald-700/60 flex items-center gap-1.5 transition">
+                    <span>⚖️</span> 進口風險評估模型
                 </a>
-                <button onclick="toggleArchiveModal()"
-                    class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
-                    <span>📂</span> 歷次週報歸檔
+                <a href="risk_assessment_slides.html" target="_blank" class="bg-amber-600 hover:bg-amber-500 text-white text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg shadow-md flex items-center gap-1.5 transition">
+                    <span>📊</span> 風險評估 16:9 簡報
+                </a>
+                <a href="h5n1_weekly_slides.html" target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg shadow-md flex items-center gap-1.5 transition">
+                    <span>📺</span> 16:9 週報簡報
+                </a>
+                <a href="index_en.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
+                    <span>🌐</span> English
+                </a>
+                <button onclick="toggleArchiveModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
+                    <span>📂</span> 週報歸檔
                 </button>
-                <div class="text-[11px] sm:text-xs text-slate-400 hidden lg:block">
-                    更新時間: <span class="text-emerald-400 font-semibold"><!-- COMPILE_TIME_PLACEHOLDER --></span>
-                </div>
             </div>
         </div>
     </header>
@@ -312,12 +316,100 @@
                         <span>💡</span> 全澳野生鳥類生態與傳播現況中文摘要說明：
                     </div>
                     <p class="text-slate-300">
-                        全澳 <strong id="species-summary-total-str">236 起 H5N1 確診事件</strong> 主要集中於沿海野生海鳥棲地。其中以高密度群聚繁殖的
+                        全澳 <strong id="species-summary-total-str">456 起 H5N1 確診事件</strong> 主要集中於沿海野生海鳥棲地。其中以高密度群聚繁殖的
                         <strong>大鳳頭燕鷗 (Crested tern)</strong> 與廣泛游動於城鎮港口、廢棄物堆置場與露天餐廳的 <strong>銀鷗/海鷗 (Silver
-                            gull)</strong> 佔據最大感染比例；亞南極遠洋候鳥 <strong>棕賊鷗 (Brown skua)</strong> 為跨洲長途帶毒向量（促成 8/13 塔斯馬尼亞
-                        Rocky Cape 爆發首例）；不具飛行能力的 <strong>小企鵝 (Little penguin)</strong>
+                            gull)</strong> 佔據最大感染比例；亞南極遠洋候鳥 <strong>棕賊鷗 (Brown skua)</strong> 為跨洲長途帶毒向量（促成塔斯馬尼亞
+                        Rocky Cape 爆發）；不具飛行能力的 <strong>小企鵝 (Little penguin)</strong>
                         則受限於近海棲地，內陸傳播風險極低。建議布萊尼廠區持續強化露天飼料倉儲對海鷗等城鎮棲息鳥類之防鳥網與生物安全隔離防線。
                     </p>
+                </div>
+
+                <!-- 🦅 eBird API & ALA 野鳥即時觀測動態看板 -->
+                <div id="ebird-live-widget" class="bg-slate-900/90 p-4 rounded-xl border border-cyan-800/60 text-xs space-y-2 shadow-lg">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+                        <div class="font-bold text-cyan-300 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>🦅 eBird API v2 澳洲全境即時候鳥觀測連動 (Cornell Lab of Ornithology)</span>
+                        </div>
+                        <span id="ebird-last-updated" class="text-[10px] text-slate-400 font-mono">自動即時同步中...</span>
+                    </div>
+                    <div id="ebird-summary-content" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-slate-300 pt-1">
+                        <div class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-400 block text-[10px]">全澳高風險鳥類目擊</span>
+                            <strong id="ebird-total-obs" class="text-cyan-300 text-sm font-mono font-bold">129 筆觀測</strong>
+                        </div>
+                        <div class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-400 block text-[10px]">新州 (NSW) 近期目擊</span>
+                            <strong id="ebird-nsw-obs" class="text-amber-300 text-sm font-mono font-bold">18 筆觀測</strong>
+                        </div>
+                        <div class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-400 block text-[10px]">主要監控高風險科別</span>
+                            <span class="text-slate-200 text-xs font-medium">鷗科 / 燕鷗 / 雁鴨 / 鸕鶿</span>
+                        </div>
+                        <div class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-400 block text-[10px]">無 Key 生態備援 (ALA)</span>
+                            <span class="text-emerald-400 text-xs font-mono font-semibold">Biocache API Active</span>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        fetch('bird_data.json').then(r => r.json()).then(data => {
+                            if (data && data.total_risk_obs_count) {
+                                const totalEl = document.getElementById('ebird-total-obs');
+                                if (totalEl) totalEl.textContent = `${data.total_risk_obs_count} 筆觀測`;
+                                if (data.state_summary && data.state_summary.NSW) {
+                                    const nswEl = document.getElementById('ebird-nsw-obs');
+                                    if (nswEl) nswEl.textContent = `${data.state_summary.NSW.risk_species_obs} 筆觀測`;
+                                }
+                                if (data.fetched_at_taipei) {
+                                    const timeEl = document.getElementById('ebird-last-updated');
+                                    if (timeEl) timeEl.textContent = `即時數據更新: ${data.fetched_at_taipei} (Taipei)`;
+                                }
+                            }
+                        }).catch(() => {});
+                    });
+                </script>
+
+                <!-- 🗓️ 候鳥遷徙回澳洲時間軸（高風險期評估） -->
+                <div class="bg-gradient-to-r from-amber-950/80 via-slate-900 to-slate-900 p-5 rounded-xl border border-amber-500/40 text-xs space-y-3 shadow-lg">
+                    <div class="font-bold text-amber-300 flex items-center gap-2 text-sm">
+                        <span>🗓️</span> 候鳥遷徙回澳洲時間軸與高風險期動態評估 (Migratory Bird Seasonal Risk Timeline)
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-slate-200">
+                        <div class="bg-slate-900/90 p-3.5 rounded-lg border border-amber-500/30 space-y-1.5">
+                            <div class="font-bold text-amber-400 flex items-center gap-1 text-xs">
+                                <span>1. 8 月下旬</span> <span class="bg-amber-500/20 text-amber-300 text-[10px] px-1.5 py-0.5 rounded font-semibold">前鋒期</span>
+                            </div>
+                            <p class="text-[11px] leading-relaxed text-slate-300">
+                                部分成年海鳥（如棕賊鷗、巨鸌等）率先從南極圈、歐亞大陸或西伯利亞抵達澳洲南部沿海與外島。（全澳確診暴增與海獅/海豚感染，正是這波前鋒野鳥所帶來）。
+                            </p>
+                        </div>
+                        <div class="bg-slate-900/90 p-3.5 rounded-lg border border-red-500/40 space-y-1.5">
+                            <div class="font-bold text-red-400 flex items-center gap-1 text-xs">
+                                <span>2. 9 月</span> <span class="bg-red-500/20 text-red-300 text-[10px] px-1.5 py-0.5 rounded font-bold">☠️ 極高風險起點</span>
+                            </div>
+                            <p class="text-[11px] leading-relaxed text-slate-300">
+                                約 200 萬隻、多達 36 種的國際候鳥大部隊正式「登陸」澳洲北部（如西北澳 Roebuck Bay 和昆士蘭卡奔塔利亞灣）。
+                            </p>
+                        </div>
+                        <div class="bg-slate-900/90 p-3.5 rounded-lg border border-red-500/40 space-y-1.5">
+                            <div class="font-bold text-red-400 flex items-center gap-1 text-xs">
+                                <span>3. 10 月</span> <span class="bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold animate-pulse">🔴 全國疫情地雷期</span>
+                            </div>
+                            <p class="text-[11px] leading-relaxed text-slate-300">
+                                兩百萬隻候鳥在北部休息後，自 10 月起向全澳洲內陸溼地、灌木叢及東南沿海（包括 NSW、維州、南澳）大規模分散。
+                            </p>
+                        </div>
+                        <div class="bg-slate-900/90 p-3.5 rounded-lg border border-blue-500/30 space-y-1.5">
+                            <div class="font-bold text-blue-300 flex items-center gap-1 text-xs">
+                                <span>4. 11 月~隔年 2 月</span> <span class="bg-blue-500/20 text-blue-300 text-[10px] px-1.5 py-0.5 rounded font-semibold">高峰停留期</span>
+                            </div>
+                            <p class="text-[11px] leading-relaxed text-slate-300">
+                                候鳥群留在澳洲各地過冬（南半球夏天）覓食，棲息於濕地與農場周邊，直到隔年 3 月才集體北返。
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">

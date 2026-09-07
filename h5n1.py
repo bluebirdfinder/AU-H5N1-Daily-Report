@@ -514,9 +514,9 @@ def call_gemini_api_with_retry(payload, params, headers, timeout=35):
     """
     通用 Gemini API 指數退避重試與 Fallback 模型調用器。
     - 主力模型 (Primary): gemini-2.5-flash
-    - 備援模型 1 (Fallback 1): gemini-2.5-flash-lite
-    - 備援模型 2 (Fallback 2): gemini-2.5-pro
-    已徹底移除所有舊版 gemini-1.5-* 模型。
+    - 備援模型 1 (Fallback 1): gemini-2.0-flash
+    - 備援模型 2 (Fallback 2): gemini-1.5-flash
+    - 備援模型 3 (Fallback 3): gemini-1.5-pro
     針對 503 (High Demand)、429 (Rate Limit) 及連線超時等暫時性錯誤，
     實作 3 次指數退避重試 (2s, 4s, 8s + 隨機 jitter)。
     只有當單一模型 3 次重試均告失敗後，才切換至下一個備援模型。
@@ -526,8 +526,9 @@ def call_gemini_api_with_retry(payload, params, headers, timeout=35):
     
     models = [
         "gemini-2.5-flash",
-        "gemini-2.5-flash-lite",
-        "gemini-2.5-pro"
+        "gemini-2.0-flash",
+        "gemini-1.5-flash",
+        "gemini-1.5-pro"
     ]
     
     for model_index, model_name in enumerate(models, 1):
@@ -573,7 +574,7 @@ def call_gemini_api_with_retry(payload, params, headers, timeout=35):
 def parse_screenshot_with_gemini_vision(screenshot_path):
     """
     使用 Gemini Vision API 讀取官方網站黃底精確數據截圖，自動識別最新 H5N1 確診數字與日期。
-    採用 gemini-2.5-flash (Primary), gemini-2.5-flash-lite (Fallback 1), gemini-2.5-pro (Fallback 2)。
+    採用 gemini-2.5-flash (Primary), gemini-2.0-flash (Fallback 1), gemini-1.5-flash (Fallback 2)。
     實作 3 次指數退避重試與完整的 Logging 追蹤。
     需要在環境變數設定 GEMINI_API_KEY。
     """
@@ -1407,22 +1408,17 @@ def colorize_summary_text(html_text):
 
     return html_text
 
-def generate_dynamic_summary(cases_data, official_stats):
+def generate_dynamic_summary(cases_data, official_stats, lang="zh"):
     """
-    動態產生包含精確數據的官方事實與媒體觀察摘要。
-    【雙引擎架構】媒體摘要優先調用 Gemini Google Search Grounding 實時連網生成。
-    自動調用 colorize_summary_text 進行高對比度關鍵字色彩標示。
+    動態產生包含精確數據的官方事實與媒體觀察摘要 (支援中英文雙語)。
     """
     total_events = official_stats.get("total_events", 186)
     negative_events = official_stats.get("negative_events", 1273)
     hotline_reports = official_stats.get("hotline_reports", 18869)
     evt_by_state = official_stats.get("events_by_state", {})
 
-    daff_link = '<a href="https://www.agriculture.gov.au/campaigns/birdflu/latest-data#event_data" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲聯邦農業部 (DAFF)</a>'
-    
     utc_now = datetime.now(timezone.utc)
     taipei_now = utc_now + timedelta(hours=8)
-    latest_date_str = f"{taipei_now.year} 年 {taipei_now.month} 月 {taipei_now.day} 日"
 
     sa_evt = evt_by_state.get('SA', 166)
     vic_evt = evt_by_state.get('VIC', 53)
@@ -1431,25 +1427,43 @@ def generate_dynamic_summary(cases_data, official_stats):
     tas_evt = evt_by_state.get('TAS', 2)
     qld_evt = evt_by_state.get('QLD', 1)
 
+    if lang == "en":
+        daff_link = '<a href="https://www.agriculture.gov.au/campaigns/birdflu/latest-data#event_data" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">Australian Department of Agriculture, Fisheries and Forestry (DAFF)</a>'
+        latest_date_str = f"September {taipei_now.day}, {taipei_now.year}"
+        
+        official_text = (
+            f"According to the {daff_link} and State Agencies <span class=\"text-amber-400 font-bold\">{latest_date_str} Official Telemetry</span>, Australia has recorded a cumulative total of <span class=\"text-red-400 font-extrabold text-base px-1 bg-red-950/40 rounded border border-red-500/30\">{total_events} Confirmed Positive Events</span> in wild animals/birds, with <span class=\"text-sky-400 font-bold\">{negative_events:,} Negative Exclusions</span> and <span class=\"text-sky-300 font-semibold\">{hotline_reports:,} Hotline Reports</span>. "
+            f"Breakdown by Jurisdiction: <span class=\"text-amber-300 font-semibold\">SA: {sa_evt}</span>, <span class=\"text-amber-300 font-semibold\">VIC: {vic_evt}</span>, <span class=\"text-amber-300 font-semibold\">WA: {wa_evt}</span>, <span class=\"text-amber-300 font-semibold\">NSW: {nsw_evt}</span>, <span class=\"text-amber-300 font-semibold\">TAS: {tas_evt}</span>, <span class=\"text-amber-300 font-semibold\">QLD: {qld_evt}</span>. "
+            f"All commercial poultry, egg, and feed manufacturing operations across Australia maintain <span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">100% Area Freedom Status</span> with zero commercial farm infections."
+        )
+
+        nsw_dpird_link = '<a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">NSW DPIRD</a>'
+        abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">ABC News Australia</a>'
+        media_text = (
+            f"According to {abc_link} and {nsw_dpird_link} reports (<span class=\"text-amber-400 font-bold\">{latest_date_str}</span>), Australia officially operates on an international Event-based Reporting framework with <span class=\"text-red-400 font-bold\">{total_events} Positive Events</span> ({negative_events:,} negative exclusions). The Australian Chief Veterinary Officer re-affirms: <span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">All commercial poultry farms in Australia maintain 100% Zero Infection, with extremely low risk to human health</span>."
+        )
+        return official_text, media_text
+
+    # Traditional Chinese default
+    daff_link = '<a href="https://www.agriculture.gov.au/campaigns/birdflu/latest-data#event_data" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲聯邦農業部 (DAFF)</a>'
+    latest_date_str = f"{taipei_now.year} 年 {taipei_now.month} 月 {taipei_now.day} 日"
+
     official_text = (
         f"依據 {daff_link} 及各州政府 <span class=\"text-amber-400 font-bold\">{latest_date_str} 最新數據</span>，全澳高致病性 H5N1 野生動物確診總數累計為 <span class=\"text-red-400 font-extrabold text-base px-1 bg-red-950/40 rounded border border-red-500/30\">{total_events} 起確診事件 (Positive Events)</span>，陰性排除事件達 <span class=\"text-sky-400 font-bold\">{negative_events:,} 起</span>，民眾與專家通報數達 <span class=\"text-sky-300 font-semibold\">{hotline_reports:,} 筆</span>！"
         f"確診事件分布統計：<span class=\"text-amber-300 font-semibold\">南澳 {sa_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">維州 {vic_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">西澳 {wa_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">新州 {nsw_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">塔州 {tas_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">昆州 {qld_evt} 起</span>。"
         f"全澳商業家禽產業及飼料生產體系 <span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">100% 維持無疫區 (Area Freedom) 狀態</span>，生產鏈安全無虞。"
     )
 
-    # 1. 優先嘗試調用 Gemini API + Google Search Grounding 生成實時新聞摘要
     grounded_media_summary = generate_gemini_grounded_summary(official_stats)
     if grounded_media_summary:
         media_text = grounded_media_summary
     else:
-        # 2. 備援預設模板摘要
         nsw_dpird_link = '<a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">新南威爾斯州政府 (NSW DPIRD)</a>'
         abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a>'
         media_text = (
             f"根據 {abc_link} 與 {nsw_dpird_link} 等媒體 <span class=\"text-amber-400 font-bold\">{latest_date_str} 最新報導</span>，澳洲官方自 8/12 起正式採用國際標準「事件導向 (Event-based Reporting)」統計，全澳累計 <span class=\"text-red-400 font-bold\">{total_events} 起確診事件</span>（陰性排除 <span class=\"text-sky-400 font-semibold\">{negative_events:,} 起</span>）。聯邦首席獸醫官重申：<span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">澳洲所有商業家禽農場維持 100% 零感染，對一般人類健康風險極低</span>。"
         )
 
-    # 套用關鍵字繽紛色彩高亮
     official_colored = colorize_summary_text(official_text)
     media_colored = colorize_summary_text(media_text)
 
@@ -1460,57 +1474,101 @@ SPECIES_CACHE_FILE = "species_cache.json"
 DEFAULT_SPECIES_PROFILES = {
     "silver gull": {
         "name_zh": "銀鷗 (Silver Gull / 海鷗)",
+        "name_en": "Silver Gull (Chroicocephalus novaehollandiae)",
         "icon": "🕊️",
         "migratory_status": "留鳥 / 城鎮近海游動",
+        "migratory_status_en": "Resident / Coastal Scavenger",
         "habit": "雜食性，強烈適應人類城鎮、港口碼頭、廢棄物堆置場與露天餐廳，社會性高度群聚。",
+        "habit_en": "Omnivorous, highly adapted to human urban environments, ports, landfills, and open dining areas. Densely gregarious.",
         "risk_level": "🔴 高風險向量 (High Risk)",
+        "risk_level_en": "🔴 High Risk Vector",
         "risk_color": "red",
-        "risk_note": "極易在野外濕地與人類城鎮間穿梭，最容易將野外病毒攜入城鎮或飼料存放區，為重點監控對象。"
+        "risk_note": "極易在野外濕地與人類城鎮間穿梭，最容易將野外病毒攜入城鎮或飼料存放區，為重點監控對象。",
+        "risk_note_en": "Frequent bridge vector between wild wetlands and urban/feed areas. Primary biosecurity monitoring target."
     },
     "crested tern": {
         "name_zh": "大鳳頭燕鷗 (Crested Tern)",
+        "name_en": "Crested Tern (Thalasseus bergii)",
         "icon": "🪶",
         "migratory_status": "沿海游動性海鳥",
+        "migratory_status_en": "Coastal Nomadic Seabird",
         "habit": "專一食魚，極度偏好在沿海沙洲與外島進行數千隻規模的高密度密集群聚繁殖。",
+        "habit_en": "Piscivorous, nests in dense breeding colonies of thousands on offshore islands and sandbars.",
         "risk_level": "🟠 群聚爆發風險 (Mass Risk)",
+        "risk_level_en": "🟠 Mass Outbreak Risk",
         "risk_color": "amber",
-        "risk_note": "易在沿海棲地引發超級傳播與大規模死亡（南澳與維州海岸主因），但極少深入內陸高地。"
+        "risk_note": "易在沿海棲地引發超級傳播與大規模死亡（南澳與維州海岸主因），但極少深入內陸高地。",
+        "risk_note_en": "Prone to mass mortality events in coastal breeding colonies (SA & VIC coastlines), but rarely strays inland."
     },
     "brown skua": {
         "name_zh": "棕賊鷗 (Brown Skua)",
+        "name_en": "Brown Skua (Stercorarius antarcticus)",
         "icon": "🦅",
         "migratory_status": "亞南極遠洋跨洋候鳥",
+        "migratory_status_en": "Sub-Antarctic Pelagic Migrant",
         "habit": "強悍掠食與腐食性，羽翼極強，可隨南半球西風帶進行數千公里遠洋長途跨洲飛行。",
+        "habit_en": "Aggressive predatory and scavenging pelagic seabird. Capable of long-distance transoceanic flights.",
         "risk_level": "🟡 跨域長途向量 (Carrier)",
+        "risk_level_en": "🟡 Long-Range Carrier",
         "risk_color": "blue",
-        "risk_note": "將南極/亞南極病毒向北帶至澳洲南部島嶼（8/13 塔斯馬尼亞 Rocky Cape 首例即為棕賊鷗）。"
+        "risk_note": "將南極/亞南極病毒向北帶至澳洲南部島嶼（8/13 塔斯馬尼亞 Rocky Cape 首例即為棕賊鷗）。",
+        "risk_note_en": "Carries Antarctic/Sub-Antarctic strains north to southern Australian offshore islands (e.g. Rocky Cape, TAS)."
     },
     "little penguin": {
         "name_zh": "小企鵝 (Little Penguin)",
+        "name_en": "Little Penguin (Eudyptula minor)",
         "icon": "🐧",
         "migratory_status": "沿岸留鳥 / 潛水鳥",
+        "migratory_status_en": "Coastal Resident / Diving Seabird",
         "habit": "棲息於澳洲南部海岸與外島（如菲利普島 Phillip Island），不具飛行能力，夜間歸巢。",
+        "habit_en": "Inhabits southern Australian coastlines and offshore islands (e.g. Phillip Island). Flightless, nocturnal burrower.",
         "risk_level": "🟢 內陸風險極低 (Low Risk)",
+        "risk_level_en": "🟢 Low Inland Risk",
         "risk_color": "emerald",
-        "risk_note": "活動範圍嚴格限制於沿岸近海，無法飛行跨區傳播，主要為受害宿主。"
+        "risk_note": "活動範圍嚴格限制於沿岸近海，無法飛行跨區傳播，主要為受害宿主。",
+        "risk_note_en": "Strictly marine and coastal habitat. Flightless, primary role is susceptible sentinel host."
     },
     "pacific gull": {
         "name_zh": "太平洋鷗 (Pacific Gull)",
+        "name_en": "Pacific Gull (Larus pacificus)",
         "icon": "🦤",
         "migratory_status": "澳洲南部特有留鳥",
+        "migratory_status_en": "Southern AU Endemic Seabird",
         "habit": "大型海鷗，專門棲息於基岩海岸與沙灘，以甲殼類與魚類為食。",
+        "habit_en": "Large endemic gull inhabiting rocky coasts and beaches, feeding on crabs and fish.",
         "risk_level": "🟡 中度沿海風險 (Moderate Risk)",
+        "risk_level_en": "🟡 Moderate Coastal Risk",
         "risk_color": "amber",
-        "risk_note": "活動集中於沿岸棲地，鮮少進入內陸高地。"
+        "risk_note": "活動集中於沿岸棲地，鮮少進入內陸高地。",
+        "risk_note_en": "Confined strictly to coastal shorelines, rarely strays inland."
+    },
+    "giant petrel": {
+        "name_zh": "巨鸌類 (Giant Petrel / 南方巨鸌)",
+        "name_en": "Giant Petrel (Macronectes giganteus)",
+        "icon": "🌊",
+        "migratory_status": "亞南極遠洋候鳥",
+        "migratory_status_en": "Sub-Antarctic Oceanic Migrant",
+        "habit": "大型遠洋掠食海鳥，經常跟隨漁船吃腐肉或於外海巡遊。",
+        "habit_en": "Large pelagic seabird following fishing vessels and scavenging on oceanic waters.",
+        "risk_level": "🟡 中度沿海風險 (Moderate Risk)",
+        "risk_level_en": "🟡 Moderate Coastal Risk",
+        "risk_color": "blue",
+        "risk_note": "長距離沿海巡遊能力強，容易因掠食染病海鳥而帶毒。",
+        "risk_note_en": "High pelagic range, susceptible to carrying virus via scavenging infected seabirds."
     },
     "fur seal": {
         "name_zh": "海獅/海豹 (Fur Seal / Sea Lion)",
+        "name_en": "Australian Fur Seal / Sea Lion",
         "icon": "🦭",
         "migratory_status": "海洋哺乳類 / 沿岸群聚",
+        "migratory_status_en": "Marine Mammal / Colonial Resident",
         "habit": "海洋肉食哺乳動物，棲息於澳洲南部岩岸與島嶼，密集群聚繁殖。",
+        "habit_en": "Carnivorous marine mammal inhabiting southern rocky shores and islands. Densely colonial breeder.",
         "risk_level": "🟠 哺乳類跨種傳播風險 (Mammal Risk)",
+        "risk_level_en": "🟠 Mammalian Spillover Target",
         "risk_color": "purple",
-        "risk_note": "極易與受感染海鳥接觸並發生哺乳類跨種傳播，為生物安全重點警戒標的。"
+        "risk_note": "極易與受感染海鳥接觸並發生哺乳類跨種傳播，為生物安全重點警戒標的。",
+        "risk_note_en": "High susceptibility to avian influenza spillover from infected seabird colonies. Critical sentinel."
     }
 }
 
@@ -1640,13 +1698,12 @@ def get_species_profiles_for_cases(cases_data):
         
     return profiles
 
-def generate_dynamic_species_cards_html(cases_data, official_stats=None):
+def generate_dynamic_species_cards_html(cases_data, official_stats=None, lang="zh"):
     profiles = get_species_profiles_for_cases(cases_data)
     
     stats = official_stats or {}
     total_events = stats.get("total_events", 251)
     sc = stats.get("species_counts", {})
-    print(f"[DEBUG SPECIES CARDS] total_events={total_events}, sc={sc}")
     
     key_mapping = {
         "crested tern": "Crested Tern",
@@ -1713,42 +1770,87 @@ def generate_dynamic_species_cards_html(cases_data, official_stats=None):
         pct = (cnt / calc_total * 100) if calc_total > 0 else 0
         pct_str = f"{pct:.1f}%" if pct < 1 else f"{pct:.0f}%"
         
-        cnt_badge = f'<span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: {cnt} 起 ({pct_str})</span>' if cnt > 0 else ''
-        
-        card_html = f'''                        <div class="bg-slate-900/80 p-4 rounded-xl border {b_border} {b_hover} transition space-y-2.5 shadow-md">
+        if lang == "en":
+            name = p.get("name_en") or p.get("name_zh", "Wildlife")
+            status = p.get("migratory_status_en") or "Resident / Coastal Migrant"
+            habit = p.get("habit_en") or p.get("habit", "")
+            risk = p.get("risk_level_en") or "🟡 Moderate Risk"
+            note = p.get("risk_note_en") or p.get("risk_note", "")
+            cnt_badge = f'<span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF Detections: {cnt} ({pct_str})</span>' if cnt > 0 else ''
+            
+            card_html = f'''                        <div class="bg-slate-900/80 p-4 rounded-xl border {b_border} {b_hover} transition space-y-2.5 shadow-md">
                             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
                                 <span class="font-bold text-white text-sm flex items-center gap-1.5 leading-snug">
-                                    <span>{p.get("icon", "🐾")}</span> {p.get("name_zh", "未知物種")}
+                                    <span>{p.get("icon", "🐾")}</span> {name}
                                 </span>
                                 <span class="{b_bg} {b_text} border {b_ring} text-[10px] px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap shrink-0">
-                                    {p.get("risk_level", "🟡 中度風險")}
+                                    {risk}
                                 </span>
                             </div>
                             <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
-                                <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">遷徙屬性: {p.get("migratory_status", "留鳥 / 游動")}</span>
+                                <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">Status: {status}</span>
                                 {cnt_badge}
                             </div>
                             <p class="text-xs text-slate-300 leading-relaxed">
-                                <strong class="text-blue-300">棲息習性：</strong>{p.get("habit", "")}
+                                <strong class="text-blue-300">Habitats & Ecology: </strong>{habit}
                             </p>
                             <p class="text-xs text-slate-400 leading-relaxed border-t border-slate-800/80 pt-2">
-                                <strong class="text-amber-400">生物安全評估：</strong>{p.get("risk_note", "")}
+                                <strong class="text-amber-400">Bio-Security Assessment: </strong>{note}
+                            </p>
+                        </div>'''
+        else:
+            name = p.get("name_zh", "未知物種")
+            status = p.get("migratory_status", "留鳥 / 游動")
+            habit = p.get("habit", "")
+            risk = p.get("risk_level", "🟡 中度風險")
+            note = p.get("risk_note", "")
+            cnt_badge = f'<span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: {cnt} 起 ({pct_str})</span>' if cnt > 0 else ''
+            
+            card_html = f'''                        <div class="bg-slate-900/80 p-4 rounded-xl border {b_border} {b_hover} transition space-y-2.5 shadow-md">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                                <span class="font-bold text-white text-sm flex items-center gap-1.5 leading-snug">
+                                    <span>{p.get("icon", "🐾")}</span> {name}
+                                </span>
+                                <span class="{b_bg} {b_text} border {b_ring} text-[10px] px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap shrink-0">
+                                    {risk}
+                                </span>
+                            </div>
+                            <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                                <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">遷徙屬性: {status}</span>
+                                {cnt_badge}
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                <strong class="text-blue-300">棲息習性：</strong>{habit}
+                            </p>
+                            <p class="text-xs text-slate-400 leading-relaxed border-t border-slate-800/80 pt-2">
+                                <strong class="text-amber-400">生物安全評估：</strong>{note}
                             </p>
                         </div>'''
         html_cards.append(card_html)
         
     return "\n\n".join(html_cards)
 
-def generate_dynamic_references(cases_data):
-    refs = [
-        '澳洲農業、漁業及林業部 (DAFF) 官方宣傳活動與即時更新：<a href="https://www.agriculture.gov.au/campaigns/birdflu/latest-data#event_data" target="_blank" class="text-blue-400 hover:underline">Department of Agriculture, Fisheries and Forestry - H5 bird flu latest data</a>',
-        '新南威爾斯州政府一次產業及區域發展廳 (NSW DPIRD) 專區即時更新：<a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 hover:underline">NSW DPIRD - Avian influenza updates</a>',
-        '南澳州政府農業、食品及區域部 (PIRSA) 專區即時更新：<a href="https://pir.sa.gov.au/animal-management/animal-health/species/poultry/avian-influenza" target="_blank" class="text-blue-400 hover:underline">PIRSA - Avian influenza updates</a>',
-        '西澳州政府一次產業及區域發展部 (DPIRD WA) 專區即時更新：<a href="https://www.wa.gov.au/organisation/department-of-primary-industries-and-regional-development/avian-influenza" target="_blank" class="text-blue-400 hover:underline">DPIRD WA - Avian influenza updates</a>',
-        '維多利亞州政府農業廳 (Agriculture Victoria) 專區即時更新：<a href="https://agriculture.vic.gov.au/biosecurity/animal-diseases/poultry-diseases/H5N1-avian-influenza-H5-bird-flu" target="_blank" class="text-blue-400 hover:underline">Agriculture Victoria - H5N1 Avian Influenza Updates</a>',
-        '塔斯馬尼亞州政府一次產業、水務及環境部 (Biosecurity Tasmania)：<a href="https://nre.tas.gov.au/biosecurity-tasmania/animal-biosecurity/animal-health/poultry-and-pigeons/bird-flu" target="_blank" class="text-blue-400 hover:underline">Biosecurity Tasmania - Avian Influenza Updates</a>',
-        '昆士蘭州政府一次產業及農業發展專區 (Biosecurity Queensland)：<a href="https://www.business.qld.gov.au/industries/farms-fishing-forestry/agriculture/animal/health-diseases/disorders/avian-influenza" target="_blank" class="text-blue-400 hover:underline">Biosecurity Queensland - Avian influenza updates</a>'
-    ]
+def generate_dynamic_references(cases_data, lang="zh"):
+    if lang == "en":
+        refs = [
+            'Australian Department of Agriculture, Fisheries and Forestry (DAFF) Official Portal: <a href="https://www.agriculture.gov.au/campaigns/birdflu/latest-data#event_data" target="_blank" class="text-blue-400 hover:underline">Department of Agriculture, Fisheries and Forestry - H5 bird flu latest data</a>',
+            'NSW Department of Primary Industries and Regional Development (NSW DPIRD): <a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 hover:underline">NSW DPIRD - Avian influenza updates</a>',
+            'Primary Industries and Regions South Australia (PIRSA): <a href="https://pir.sa.gov.au/animal-management/animal-health/species/poultry/avian-influenza" target="_blank" class="text-blue-400 hover:underline">PIRSA - Avian influenza updates</a>',
+            'Department of Primary Industries and Regional Development WA (DPIRD WA): <a href="https://www.wa.gov.au/organisation/department-of-primary-industries-and-regional-development/avian-influenza" target="_blank" class="text-blue-400 hover:underline">DPIRD WA - Avian influenza updates</a>',
+            'Agriculture Victoria: <a href="https://agriculture.vic.gov.au/biosecurity/animal-diseases/poultry-diseases/H5N1-avian-influenza-H5-bird-flu" target="_blank" class="text-blue-400 hover:underline">Agriculture Victoria - H5N1 Avian Influenza Updates</a>',
+            'Biosecurity Tasmania: <a href="https://nre.tas.gov.au/biosecurity-tasmania/animal-biosecurity/animal-health/poultry-and-pigeons/bird-flu" target="_blank" class="text-blue-400 hover:underline">Biosecurity Tasmania - Avian Influenza Updates</a>',
+            'Biosecurity Queensland: <a href="https://www.business.qld.gov.au/industries/farms-fishing-forestry/agriculture/animal/health-diseases/disorders/avian-influenza" target="_blank" class="text-blue-400 hover:underline">Biosecurity Queensland - Avian influenza updates</a>'
+        ]
+    else:
+        refs = [
+            '澳洲農業、漁業及林業部 (DAFF) 官方宣傳活動與即時更新：<a href="https://www.agriculture.gov.au/campaigns/birdflu/latest-data#event_data" target="_blank" class="text-blue-400 hover:underline">Department of Agriculture, Fisheries and Forestry - H5 bird flu latest data</a>',
+            '新南威爾斯州政府一次產業及區域發展廳 (NSW DPIRD) 專區即時更新：<a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 hover:underline">NSW DPIRD - Avian influenza updates</a>',
+            '南澳州政府農業、食品及區域部 (PIRSA) 專區即時更新：<a href="https://pir.sa.gov.au/animal-management/animal-health/species/poultry/avian-influenza" target="_blank" class="text-blue-400 hover:underline">PIRSA - Avian influenza updates</a>',
+            '西澳州政府一次產業及區域發展部 (DPIRD WA) 專區即時更新：<a href="https://www.wa.gov.au/organisation/department-of-primary-industries-and-regional-development/avian-influenza" target="_blank" class="text-blue-400 hover:underline">DPIRD WA - Avian influenza updates</a>',
+            '維多利亞州政府農業廳 (Agriculture Victoria) 專區即時更新：<a href="https://agriculture.vic.gov.au/biosecurity/animal-diseases/poultry-diseases/H5N1-avian-influenza-H5-bird-flu" target="_blank" class="text-blue-400 hover:underline">Agriculture Victoria - H5N1 Avian Influenza Updates</a>',
+            '塔斯馬尼亞州政府一次產業、水務及環境部 (Biosecurity Tasmania)：<a href="https://nre.tas.gov.au/biosecurity-tasmania/animal-biosecurity/animal-health/poultry-and-pigeons/bird-flu" target="_blank" class="text-blue-400 hover:underline">Biosecurity Tasmania - Avian Influenza Updates</a>',
+            '昆士蘭州政府一次產業及農業發展專區 (Biosecurity Queensland)：<a href="https://www.business.qld.gov.au/industries/farms-fishing-forestry/agriculture/animal/health-diseases/disorders/avian-influenza" target="_blank" class="text-blue-400 hover:underline">Biosecurity Queensland - Avian influenza updates</a>'
+        ]
     
     html_lines = []
     for idx, ref in enumerate(refs, 1):
@@ -1756,7 +1858,7 @@ def generate_dynamic_references(cases_data):
         
     return "\n".join(html_lines)
 
-def generate_dynamic_weekly_archive_html():
+def generate_dynamic_weekly_archive_html(lang="zh"):
     weekly_dir = "weekly_reports"
     os.makedirs(weekly_dir, exist_ok=True)
 
@@ -1764,54 +1866,96 @@ def generate_dynamic_weekly_archive_html():
     files.sort(reverse=True)
 
     card_items = []
-    card_items.append('''
-        <a href="h5n1_weekly_slides.html" target="_blank" class="block bg-blue-950/70 hover:bg-blue-900/80 border border-blue-600/50 p-3 rounded-xl transition shadow-md">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="text-lg">📺</span>
-                    <div>
-                        <div class="text-xs font-bold text-white flex items-center gap-1.5">
-                            本週最新 16:9 簡報投影片 (Latest Slides)
-                            <span class="bg-red-600 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">LATEST</span>
-                        </div>
-                        <div class="text-[11px] text-blue-300 font-mono">h5n1_weekly_slides.html</div>
-                    </div>
-                </div>
-                <span class="text-blue-400 text-xs font-bold">線上開啟簡報 ➔</span>
-            </div>
-        </a>
-    ''')
-
-    for fname in files:
-        date_part = fname.replace("h5n1_weekly_report_", "").replace(".html", "")
-        parts = date_part.split("_")
-        date_label = date_part
-        if len(parts) == 2 and len(parts[0]) == 8 and len(parts[1]) == 8:
-            d1 = f"{parts[0][:4]}/{parts[0][4:6]}/{parts[0][6:]}"
-            d2 = f"{parts[1][:4]}/{parts[1][4:6]}/{parts[1][6:]}"
-            date_label = f"{d1} ~ {d2} 核心疫情一週摘要簡報"
-
-        rel_path = f"weekly_reports/{fname}"
-        card_items.append(f'''
-            <a href="{rel_path}" target="_blank" class="block bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 p-3 rounded-xl transition">
+    if lang == "en":
+        card_items.append('''
+            <a href="h5n1_weekly_slides.html" target="_blank" class="block bg-blue-950/70 hover:bg-blue-900/80 border border-blue-600/50 p-3 rounded-xl transition shadow-md">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="text-lg">📁</span>
+                        <span class="text-lg">📺</span>
                         <div>
-                            <div class="text-xs font-bold text-slate-200">{date_label}</div>
-                            <div class="text-[10px] text-slate-400 font-mono">{fname}</div>
+                            <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                                Latest 16:9 Weekly Slide Deck (Live)
+                                <span class="bg-red-600 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">LATEST</span>
+                            </div>
+                            <div class="text-[11px] text-blue-300 font-mono">h5n1_weekly_slides.html</div>
                         </div>
                     </div>
-                    <span class="text-slate-400 text-xs font-semibold">開啟歷史週報 ➔</span>
+                    <span class="text-blue-400 text-xs font-bold">Open Deck Online ➔</span>
                 </div>
             </a>
         ''')
 
+        for fname in files:
+            date_part = fname.replace("h5n1_weekly_report_", "").replace(".html", "")
+            parts = date_part.split("_")
+            date_label = date_part
+            if len(parts) == 2 and len(parts[0]) == 8 and len(parts[1]) == 8:
+                d1 = f"{parts[0][:4]}/{parts[0][4:6]}/{parts[0][6:]}"
+                d2 = f"{parts[1][:4]}/{parts[1][4:6]}/{parts[1][6:]}"
+                date_label = f"Weekly Executive Report ({d1} ~ {d2})"
+
+            rel_path = f"weekly_reports/{fname}"
+            card_items.append(f'''
+                <a href="{rel_path}" target="_blank" class="block bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 p-3 rounded-xl transition">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">📁</span>
+                            <div>
+                                <div class="text-xs font-bold text-slate-200">{date_label}</div>
+                                <div class="text-[10px] text-slate-400 font-mono">{fname}</div>
+                            </div>
+                        </div>
+                        <span class="text-slate-400 text-xs font-semibold">Open Archive ➔</span>
+                    </div>
+                </a>
+            ''')
+    else:
+        card_items.append('''
+            <a href="h5n1_weekly_slides.html" target="_blank" class="block bg-blue-950/70 hover:bg-blue-900/80 border border-blue-600/50 p-3 rounded-xl transition shadow-md">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">📺</span>
+                        <div>
+                            <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                                本週最新 16:9 簡報投影片 (Latest Slides)
+                                <span class="bg-red-600 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">LATEST</span>
+                            </div>
+                            <div class="text-[11px] text-blue-300 font-mono">h5n1_weekly_slides.html</div>
+                        </div>
+                    </div>
+                    <span class="text-blue-400 text-xs font-bold">線上開啟簡報 ➔</span>
+                </div>
+            </a>
+        ''')
+
+        for fname in files:
+            date_part = fname.replace("h5n1_weekly_report_", "").replace(".html", "")
+            parts = date_part.split("_")
+            date_label = date_part
+            if len(parts) == 2 and len(parts[0]) == 8 and len(parts[1]) == 8:
+                d1 = f"{parts[0][:4]}/{parts[0][4:6]}/{parts[0][6:]}"
+                d2 = f"{parts[1][:4]}/{parts[1][4:6]}/{parts[1][6:]}"
+                date_label = f"{d1} ~ {d2} 核心疫情一週摘要簡報"
+
+            rel_path = f"weekly_reports/{fname}"
+            card_items.append(f'''
+                <a href="{rel_path}" target="_blank" class="block bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 p-3 rounded-xl transition">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">📁</span>
+                            <div>
+                                <div class="text-xs font-bold text-slate-200">{date_label}</div>
+                                <div class="text-[10px] text-slate-400 font-mono">{fname}</div>
+                            </div>
+                        </div>
+                        <span class="text-slate-400 text-xs font-semibold">開啟歷史週報 ➔</span>
+                    </div>
+                </a>
+            ''')
+
     return "\n".join(card_items)
 
 def main():
-    # 【關鍵修復】永遠執行 fetch_daff_updates()，確保每次都從 DAFF 官網抓取最新 official_stats
-    # 舊版錯誤：len(events_cases) < 151 條件成立時才呼叫，cases_events.json 已有 151 筆後就永遠用舊硬編碼數字
     events_cases, official_stats = fetch_daff_updates()
     events_cases = [c for c in events_cases if c.get("id", "").startswith("EVENT-")]
     save_cases_to_json(events_cases, "cases_events.json")
@@ -1821,27 +1965,58 @@ def main():
     historical_cases = load_cases_from_json("cases.json")
     historical_cases.sort(key=lambda x: x.get("notify_date", ""))
     
-    template_path = "report_template.html"
-    output_path = "index.html"
-    
+    # 編譯中文版 report_template.html -> index.html
+    compile_template("report_template.html", "index.html", events_cases, official_stats, historical_cases)
+    for alt_path in ["live_page.html", "live_page_utf8.html"]:
+        try:
+            shutil.copy2("index.html", alt_path)
+        except Exception:
+            pass
+
+    # 編譯英文版 report_template_en.html -> index_en.html
+    if os.path.exists("report_template_en.html"):
+        compile_template("report_template_en.html", "index_en.html", events_cases, official_stats, historical_cases)
+        try:
+            shutil.copy2("index_en.html", "live_page_en.html")
+        except Exception:
+            pass
+        print("英文網頁自動編譯成功！已順利生成 'index_en.html' 與 'live_page_en.html'。")
+
+    print(f"雙語網頁自動編譯成功！已順利生成最新 H5N1 戰略決策報告 'index.html'、'index_en.html'。")
+
+    # 執行候鳥與野鳥數據 API 抓取 (eBird Key 方案 + ALA 免 Key 備援方案)
+    try:
+        fetch_ebird_data()
+    except Exception as e:
+        print(f"[eBird API 執行例外] {e}")
+
+    try:
+        fetch_ala_data()
+    except Exception as e:
+        print(f"[ALA API 執行例外] {e}")
+
+
+def compile_template(template_path, output_path, events_cases, official_stats, historical_cases):
     if not os.path.exists(template_path):
-        print(f"嚴重錯誤：找不到模板檔案 '{template_path}'！")
         return
         
     with open(template_path, "r", encoding="utf-8") as f:
         html_template = f.read()
     
-    official_html, media_html = generate_dynamic_summary(events_cases, official_stats)
+    is_english = "en" in template_path or "en" in output_path
+    lang = "en" if is_english else "zh"
+    
+    official_html, media_html = generate_dynamic_summary(events_cases, official_stats, lang=lang)
     updated_html = html_template.replace("<!-- DYNAMIC_OFFICIAL_SUMMARY_PLACEHOLDER -->", official_html)
     updated_html = updated_html.replace("<!-- DYNAMIC_MEDIA_SUMMARY_PLACEHOLDER -->", media_html)
     
-    refs_html = generate_dynamic_references(events_cases)
+    refs_html = generate_dynamic_references(events_cases, lang=lang)
     updated_html = updated_html.replace("<!-- DYNAMIC_REFERENCES_PLACEHOLDER -->", refs_html)
 
-    species_html = generate_dynamic_species_cards_html(events_cases, official_stats)
+    species_html = generate_dynamic_species_cards_html(events_cases, official_stats, lang=lang)
     updated_html = updated_html.replace("<!-- DYNAMIC_SPECIES_CARDS_PLACEHOLDER -->", species_html)
     
-    archive_html = generate_dynamic_weekly_archive_html()
+    archive_html = generate_dynamic_weekly_archive_html(lang=lang)
     updated_html = updated_html.replace("<!-- DYNAMIC_WEEKLY_ARCHIVE_PLACEHOLDER -->", archive_html)
     
     factory_lat, factory_lon = -33.521027, 149.236425
@@ -1885,24 +2060,16 @@ def main():
     utc_now = datetime.now(timezone.utc)
     taipei_now = utc_now + timedelta(hours=8)
     aest_now = utc_now + timedelta(hours=10)
-    time_string = f"{taipei_now.strftime('%Y-%m-%d %H:%M:%S')} (台北時間) / {aest_now.strftime('%Y-%m-%d %H:%M:%S')} (澳洲 AEST)"
+    time_string = f"{taipei_now.strftime('%Y-%m-%d %H:%M:%S')} (Taipei) / {aest_now.strftime('%Y-%m-%d %H:%M:%S')} (AEST)"
     updated_html = updated_html.replace("<!-- COMPILE_TIME_PLACEHOLDER -->", time_string)
     
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(updated_html)
 
-    for alt_path in ["live_page.html", "live_page_utf8.html"]:
-        try:
-            with open(alt_path, "w", encoding="utf-8") as f:
-                f.write(updated_html)
-        except Exception:
-            pass
-        
-    print(f"網頁自動編譯成功！已順利生成最新 H5N1 戰略決策報告 '{output_path}'、'live_page.html' 與 'live_page_utf8.html'。")
-
     # 每週一自動每週簡報對齊與歸檔
     try:
         sync_weekly_slides(official_stats, events_cases)
+        sync_risk_assessment_weekly(official_stats, events_cases)
     except Exception as e:
         print(f"[週報歸檔警告] 自動歸檔失敗: {e}")
 
@@ -1915,10 +2082,12 @@ def sync_weekly_slides(official_stats, events_cases):
     os.makedirs(weekly_dir, exist_ok=True)
 
     today = datetime.now()
-    # 每週一 (weekday == 0) 或本機執行時自動對齊與備份
-    start_dt = today - timedelta(days=7)
-    start_str = start_dt.strftime("%Y%m%d")
-    end_str = today.strftime("%Y%m%d")
+    # 以週別 (Monday) 為歸檔基準，確保同一週內多次執行只會覆蓋更新當週週報，避免每日產生相差1天的測試檔
+    monday = today - timedelta(days=today.weekday())
+    prev_monday = monday - timedelta(days=7)
+    start_str = prev_monday.strftime("%Y%m%d")
+    end_str = monday.strftime("%Y%m%d")
+
     archive_filename = f"h5n1_weekly_report_{start_str}_{end_str}.html"
     archive_path = os.path.join(weekly_dir, archive_filename)
 
@@ -1930,5 +2099,387 @@ def sync_weekly_slides(official_stats, events_cases):
 
     print(f"[週報自動歸檔] 已成功將每週簡報自動更新並歸檔存檔至: {archive_path}")
 
+def generate_dynamic_risk_archive_html(lang="zh"):
+    weekly_dir = "weekly_reports"
+    os.makedirs(weekly_dir, exist_ok=True)
+
+    if lang == "en":
+        files = [f for f in os.listdir(weekly_dir) if f.startswith("risk_assessment_weekly_en_") and f.endswith(".html")]
+    else:
+        files = [f for f in os.listdir(weekly_dir) if f.startswith("risk_assessment_weekly_") and not f.startswith("risk_assessment_weekly_en_") and f.endswith(".html")]
+    files.sort(reverse=True)
+
+    card_items = []
+    if lang == "en":
+        card_items.append('''
+            <a href="risk_assessment_slides_en.html" target="_blank" class="block bg-cyan-950/70 hover:bg-cyan-900/80 border border-cyan-600/50 p-3 rounded-xl transition shadow-md">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">📊</span>
+                        <div>
+                            <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                                Latest 16:9 Risk Assessment Slide Deck (Live)
+                                <span class="bg-red-600 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">LATEST</span>
+                            </div>
+                            <div class="text-[11px] text-cyan-300 font-mono">risk_assessment_slides_en.html</div>
+                        </div>
+                    </div>
+                    <span class="text-cyan-400 text-xs font-bold">Open Deck Online ➔</span>
+                </div>
+            </a>
+        ''')
+
+        for fname in files:
+            date_part = fname.replace("risk_assessment_weekly_en_", "").replace(".html", "")
+            parts = date_part.split("_")
+            date_label = date_part
+            if len(parts) == 2 and len(parts[0]) == 8 and len(parts[1]) == 8:
+                d1 = f"{parts[0][:4]}/{parts[0][4:6]}/{parts[0][6:]}"
+                d2 = f"{parts[1][:4]}/{parts[1][4:6]}/{parts[1][6:]}"
+                date_label = f"Quantitative Risk Assessment Deck ({d1} ~ {d2})"
+
+            rel_path = f"weekly_reports/{fname}"
+            card_items.append(f'''
+                <a href="{rel_path}" target="_blank" class="block bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 p-3 rounded-xl transition">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">📁</span>
+                            <div>
+                                <div class="text-xs font-bold text-slate-200">{date_label}</div>
+                                <div class="text-[10px] text-slate-400 font-mono">{fname}</div>
+                            </div>
+                        </div>
+                        <span class="text-slate-400 text-xs font-semibold">Open Archive ➔</span>
+                    </div>
+                </a>
+            ''')
+    else:
+        card_items.append('''
+            <a href="risk_assessment_slides.html" target="_blank" class="block bg-amber-950/70 hover:bg-amber-900/80 border border-amber-600/50 p-3 rounded-xl transition shadow-md">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">📊</span>
+                        <div>
+                            <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                                本週最新 16:9 風險評估簡報 (繁體中文)
+                                <span class="bg-red-600 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">LATEST</span>
+                            </div>
+                            <div class="text-[11px] text-amber-300 font-mono">risk_assessment_slides.html</div>
+                        </div>
+                    </div>
+                    <span class="text-amber-400 text-xs font-bold">線上開啟簡報 ➔</span>
+                </div>
+            </a>
+        ''')
+
+        for fname in files:
+            date_part = fname.replace("risk_assessment_weekly_", "").replace(".html", "")
+            parts = date_part.split("_")
+            date_label = date_part
+            if len(parts) == 2 and len(parts[0]) == 8 and len(parts[1]) == 8:
+                d1 = f"{parts[0][:4]}/{parts[0][4:6]}/{parts[0][6:]}"
+                d2 = f"{parts[1][:4]}/{parts[1][4:6]}/{parts[1][6:]}"
+                date_label = f"{d1} ~ {d2} 定量風險評估週報簡報"
+
+            rel_path = f"weekly_reports/{fname}"
+            card_items.append(f'''
+                <a href="{rel_path}" target="_blank" class="block bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 p-3 rounded-xl transition">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">📁</span>
+                            <div>
+                                <div class="text-xs font-bold text-slate-200">{date_label}</div>
+                                <div class="text-[10px] text-slate-400 font-mono">{fname}</div>
+                            </div>
+                        </div>
+                        <span class="text-slate-400 text-xs font-semibold">開啟歷史簡報 ➔</span>
+                    </div>
+                </a>
+            ''')
+
+    return "\n".join(card_items)
+
+def sync_risk_assessment_weekly(official_stats, events_cases):
+    """
+    風險評估簡報每週自動歸檔與數據動態連動
+    """
+    weekly_dir = "weekly_reports"
+    os.makedirs(weekly_dir, exist_ok=True)
+
+    today = datetime.now()
+    # 以週別 (Monday) 為歸檔基準，確保同一週內多次執行只會覆蓋更新當週週報，避免每日產生相差1天的測試檔
+    monday = today - timedelta(days=today.weekday())
+    prev_monday = monday - timedelta(days=7)
+    start_str = prev_monday.strftime("%Y%m%d")
+    end_str = monday.strftime("%Y%m%d")
+
+    # 1. 歸檔中文風險評估簡報
+    zh_slides = "risk_assessment_slides.html"
+    if os.path.exists(zh_slides):
+        archive_zh = os.path.join(weekly_dir, f"risk_assessment_weekly_{start_str}_{end_str}.html")
+        with open(zh_slides, "r", encoding="utf-8") as f:
+            content = f.read()
+        with open(archive_zh, "w", encoding="utf-8") as f:
+            f.write(content)
+        print(f"[風險評估簡報自動歸檔] 已成功存檔中文週報: {archive_zh}")
+
+    # 2. 歸檔英文風險評估簡報
+    en_slides = "risk_assessment_slides_en.html"
+    if os.path.exists(en_slides):
+        archive_en = os.path.join(weekly_dir, f"risk_assessment_weekly_en_{start_str}_{end_str}.html")
+        with open(en_slides, "r", encoding="utf-8") as f:
+            content = f.read()
+        with open(archive_en, "w", encoding="utf-8") as f:
+            f.write(content)
+        print(f"[風險評估簡報自動歸檔] 已成功存檔英文週報: {archive_en}")
+
+    # 3. 動態更新 risk_assessment.html 中歸檔 Modal
+    if os.path.exists("risk_assessment.html"):
+        zh_archive_html = generate_dynamic_risk_archive_html(lang="zh")
+        with open("risk_assessment.html", "r", encoding="utf-8") as f:
+            ra_content = f.read()
+        if "<!-- DYNAMIC_RISK_ARCHIVE_ZH_PLACEHOLDER -->" in ra_content:
+            ra_content = re.sub(
+                r'<!-- DYNAMIC_RISK_ARCHIVE_ZH_PLACEHOLDER -->.*?<!-- END_DYNAMIC_RISK_ARCHIVE_ZH_PLACEHOLDER -->',
+                f'<!-- DYNAMIC_RISK_ARCHIVE_ZH_PLACEHOLDER -->\n{zh_archive_html}\n<!-- END_DYNAMIC_RISK_ARCHIVE_ZH_PLACEHOLDER -->',
+                ra_content,
+                flags=re.DOTALL
+            )
+            with open("risk_assessment.html", "w", encoding="utf-8") as f:
+                f.write(ra_content)
+
+    # 4. 動態更新 risk_assessment_en.html 中歸檔 Modal
+    if os.path.exists("risk_assessment_en.html"):
+        en_archive_html = generate_dynamic_risk_archive_html(lang="en")
+        with open("risk_assessment_en.html", "r", encoding="utf-8") as f:
+            ra_en_content = f.read()
+        if "<!-- DYNAMIC_RISK_ARCHIVE_EN_PLACEHOLDER -->" in ra_en_content:
+            ra_en_content = re.sub(
+                r'<!-- DYNAMIC_RISK_ARCHIVE_EN_PLACEHOLDER -->.*?<!-- END_DYNAMIC_RISK_ARCHIVE_EN_PLACEHOLDER -->',
+                f'<!-- DYNAMIC_RISK_ARCHIVE_EN_PLACEHOLDER -->\n{en_archive_html}\n<!-- END_DYNAMIC_RISK_ARCHIVE_EN_PLACEHOLDER -->',
+                ra_en_content,
+                flags=re.DOTALL
+            )
+            with open("risk_assessment_en.html", "w", encoding="utf-8") as f:
+                f.write(ra_en_content)
+
+
+# ==================== eBird API 候鳥監測整合模組 ====================
+
+def fetch_ebird_data():
+    """
+    【安全方案 C】從 eBird API v2 抓取澳洲各州近期野鳥觀測數據。
+    API Key 完全透過 GitHub Secret (EBIRD_API_KEY) 注入，不寫死於程式碼中。
+    輸出: bird_data.json (供前端 HTML 讀取，Key 永不曝光)
+
+    抓取範圍：
+    - NSW (新南威爾斯州): regionCode=AU-NSW, 野水鳥與候鳥熱點觀測
+    - SA (南澳州):       regionCode=AU-SA
+    - WA (西澳州):       regionCode=AU-WA
+    - VIC (維多利亞州):  regionCode=AU-VIC
+    - QLD (昆士蘭州):    regionCode=AU-QLD
+    - TAS (塔斯馬尼亞):  regionCode=AU-TAS
+    """
+    ebird_key = os.environ.get("EBIRD_API_KEY", "").strip()
+    if not ebird_key:
+        print("[eBird API] 未設定 EBIRD_API_KEY 環境變數，跳過候鳥數據抓取。")
+        return
+
+    print("[eBird API] 開始抓取澳洲各州候鳥觀測數據...")
+
+    base_url = "https://api.ebird.org/v2/data/obs"
+    headers = {"X-eBirdApiToken": ebird_key}
+
+    # 目標物種關鍵字 (與 H5N1 高風險遷徙候鳥相關)
+    HIGH_RISK_SPECIES_KEYWORDS = [
+        "tern", "gull", "petrel", "skua", "shearwater", "godwit", "stint",
+        "sandpiper", "plover", "dotterel", "snipe", "tattler", "knot",
+        "turnstone", "whimbrel", "curlew", "stilt", "avocet", "ibis",
+        "spoonbill", "heron", "egret", "cormorant", "pelican", "duck",
+        "teal", "shoveler", "widgeon", "pintail", "garganey",
+    ]
+
+    # 各州 eBird regionCode 對應
+    STATE_REGIONS = {
+        "NSW": "AU-NSW",
+        "SA":  "AU-SA",
+        "WA":  "AU-WA",
+        "VIC": "AU-VIC",
+        "QLD": "AU-QLD",
+        "TAS": "AU-TAS",
+    }
+
+    all_obs = []
+    state_summary = {}
+
+    for state, region_code in STATE_REGIONS.items():
+        try:
+            import time as _time
+            _time.sleep(0.5)  # 尊重 API rate limit
+
+            url = f"{base_url}/{region_code}/recent"
+            params = {
+                "back": 30,          # 近 30 天觀測
+                "maxResults": 100,   # 每州最多 100 筆
+                "includeProvisional": "true",
+            }
+            resp = requests.get(url, headers=headers, params=params, timeout=10, verify=False)
+
+            if resp.status_code == 200:
+                obs_list = resp.json()
+                print(f"[eBird {state}] 獲取 {len(obs_list)} 筆觀測記錄")
+
+                # 過濾高風險候鳥物種
+                risk_obs = []
+                for obs in obs_list:
+                    common_name = obs.get("comName", "").lower()
+                    if any(kw in common_name for kw in HIGH_RISK_SPECIES_KEYWORDS):
+                        risk_obs.append({
+                            "state": state,
+                            "speciesCode": obs.get("speciesCode", ""),
+                            "comName": obs.get("comName", ""),
+                            "sciName": obs.get("sciName", ""),
+                            "locName": obs.get("locName", ""),
+                            "obsDt": obs.get("obsDt", ""),
+                            "howMany": obs.get("howMany", 0),
+                            "lat": obs.get("lat"),
+                            "lng": obs.get("lng"),
+                            "obsValid": obs.get("obsValid", True),
+                            "obsReviewed": obs.get("obsReviewed", False),
+                            "locationPrivate": obs.get("locationPrivate", False),
+                        })
+
+                all_obs.extend(risk_obs)
+                state_summary[state] = {
+                    "total_obs": len(obs_list),
+                    "risk_species_obs": len(risk_obs),
+                    "region_code": region_code,
+                }
+            elif resp.status_code == 401:
+                print(f"[eBird {state}] API Key 認證失敗 (HTTP 401)，請確認 EBIRD_API_KEY 正確")
+                return
+            else:
+                print(f"[eBird {state}] 回傳 HTTP {resp.status_code}，跳過此州")
+                state_summary[state] = {"total_obs": 0, "risk_species_obs": 0, "region_code": region_code}
+
+        except Exception as e:
+            print(f"[eBird {state}] 抓取例外: {str(e)[:80]}")
+            state_summary[state] = {"total_obs": 0, "risk_species_obs": 0, "region_code": region_code}
+
+    # 組裝輸出 JSON（不含 API Key）
+    utc_now = datetime.now(timezone.utc)
+    taipei_now = utc_now + timedelta(hours=8)
+
+    bird_data = {
+        "fetched_at_utc": utc_now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "fetched_at_taipei": taipei_now.strftime("%Y-%m-%d %H:%M:%S"),
+        "source": "eBird API v2 (Cornell Lab of Ornithology)",
+        "query_back_days": 30,
+        "state_summary": state_summary,
+        "high_risk_observations": all_obs,
+        "total_risk_obs_count": len(all_obs),
+    }
+
+    try:
+        with open("bird_data.json", "w", encoding="utf-8") as f:
+            json.dump(bird_data, f, ensure_ascii=False, indent=2)
+        print(f"[eBird API] ✅ 成功寫入 bird_data.json ({len(all_obs)} 筆高風險候鳥觀測記錄)")
+
+        # 同時寫入 assets/js/bird_data.js 供前端 HTML 免 fetch 載入 (避開 file:// 原生 CORS 阻擋)
+        os.makedirs("assets/js", exist_ok=True)
+        with open("assets/js/bird_data.js", "w", encoding="utf-8") as f_js:
+            f_js.write("window.ebirdDataEmbedded = " + json.dumps(bird_data, ensure_ascii=False, indent=2) + ";\n")
+        print(f"[eBird API] ✅ 成功同步寫入 assets/js/bird_data.js (免 fetch 零阻擋通道)")
+    except Exception as e:
+        print(f"[eBird API] 寫入 bird_data.json/js 失敗: {str(e)[:80]}")
+
+
+# ==================== ALA API (Atlas of Living Australia) 免 Key 候鳥數據備援模組 ====================
+
+def fetch_ala_data():
+    """
+    從 Atlas of Living Australia (ALA) API 抓取澳洲近期高風險野鳥與候鳥目擊數據 (無需 API Key 備援方案)。
+    數據包含 Birdata, iNaturalist AU, 澳洲博物館等 35,000+ 個生態調查點。
+    輸出: ala_bird_data.json (供前端讀取)
+    """
+    print("[ALA API] 開始抓取 Atlas of Living Australia 野鳥數據 (免 Key 備援)...")
+    url = "https://biocache.ala.org.au/ws/occurrences/search"
+    
+    # 涵蓋水鳥、海鳥、雁鴨科、鷗科、鷸鴴科等 H5N1 高風險鳥類科別
+    family_fq = (
+        "family:Anatidae OR family:Laridae OR family:Scolopacidae OR "
+        "family:Charadriidae OR family:Procellariidae OR family:Pelecanidae OR "
+        "family:Ardeidae OR family:Sulidae OR family:Podicipedidae"
+    )
+    
+    params = {
+        "q": "country:Australia",
+        "fq": family_fq,
+        "pageSize": 150,
+        "sort": "eventDate",
+        "dir": "desc"
+    }
+
+    try:
+        resp = requests.get(url, params=params, timeout=12, verify=False)
+        if resp.status_code != 200:
+            print(f"[ALA API] 回傳 HTTP {resp.status_code}，跳過 ALA 數據處理")
+            return
+
+        data = resp.json()
+        total_records = data.get("totalRecords", 0)
+        occurrences = data.get("occurrences", [])
+        print(f"[ALA API] 獲取 {len(occurrences)} 筆最新觀測紀錄 (總資料量: {total_records})")
+
+        processed_obs = []
+        state_counts = {}
+
+        for occ in occurrences:
+            event_ts = occ.get("eventDate")
+            obs_date_str = ""
+            if event_ts:
+                try:
+                    dt = datetime.fromtimestamp(event_ts / 1000.0, tz=timezone.utc)
+                    obs_date_str = dt.strftime("%Y-%m-%d %H:%M UTC")
+                except Exception:
+                    obs_date_str = str(event_ts)
+
+            state = occ.get("stateProvince", "Unknown")
+            state_counts[state] = state_counts.get(state, 0) + 1
+
+            processed_obs.append({
+                "commonName": occ.get("vernacularName", "") or occ.get("raw_vernacularName", ""),
+                "scientificName": occ.get("scientificName", "") or occ.get("raw_scientificName", ""),
+                "lat": occ.get("decimalLatitude"),
+                "lng": occ.get("decimalLongitude"),
+                "obsDate": obs_date_str,
+                "state": state,
+                "dataResource": occ.get("dataResourceName", "ALA"),
+                "individualCount": occ.get("individualCount", 1) or 1
+            })
+
+        utc_now = datetime.now(timezone.utc)
+        taipei_now = utc_now + timedelta(hours=8)
+
+        ala_json = {
+            "fetched_at_utc": utc_now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "fetched_at_taipei": taipei_now.strftime("%Y-%m-%d %H:%M:%S"),
+            "source": "Atlas of Living Australia (Biocache API)",
+            "total_matched_in_ala": total_records,
+            "sample_records_count": len(processed_obs),
+            "state_counts": state_counts,
+            "observations": processed_obs
+        }
+
+        with open("ala_bird_data.json", "w", encoding="utf-8") as f:
+            json.dump(ala_json, f, ensure_ascii=False, indent=2)
+        print(f"[ALA API] ✅ 成功寫入 ala_bird_data.json ({len(processed_obs)} 筆紀錄)")
+
+    except Exception as e:
+        print(f"[ALA API] 抓取例外: {str(e)[:100]}")
+
+
 if __name__ == "__main__":
     main()
+
+
