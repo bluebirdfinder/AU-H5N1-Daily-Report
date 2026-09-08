@@ -7,6 +7,11 @@
     <title>Nestlé Purina Blayney • H5N1 Pet Food Quantitative Risk Assessment 16:9 Executive Deck</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Embedded Datasets for Zero-CORS file:// loading -->
+    <script src="assets/js/bird_data.js"></script>
+    <script src="assets/js/gbif_bird_data.js"></script>
+    <script src="assets/js/movebank_tracks.js"></script>
+    <script src="assets/js/cases_events.js"></script>
     <!-- Chart.js CDN (Cloudflare Enterprise Whitelist CDN) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
@@ -60,7 +65,7 @@
             height: 100%;
             flex-direction: column;
             justify-content: space-between;
-            padding: 2.25rem 2.75rem;
+            padding: 1.25rem 2rem;
             animation: fadeIn 0.35s ease-out forwards;
         }
 
@@ -84,38 +89,44 @@
         }
     </style>
     <script src="assets/js/purina_auth.js"></script>
+    <script src="assets/js/movebank_tracks.js"></script>
 </head>
 
 <body class="select-none">
 
     <!-- Top Floating Header Bar -->
-    <header class="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-6 py-3 flex items-center justify-between text-xs">
-        <div class="flex items-center gap-3">
-            <span class="bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold px-2.5 py-0.5 rounded-full font-mono">
-                16:9 EXECUTIVE PRESENTATION
-            </span>
-            <h1 class="text-sm font-bold text-white tracking-wide truncate">
+    <header class="fixed top-0 left-0 right-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 py-2.5 flex flex-col md:flex-row items-start md:items-center justify-between gap-2.5 text-xs">
+        <div class="flex flex-col gap-1 min-w-0 w-full md:w-auto">
+            <div class="flex items-center gap-2 flex-wrap">
+                <span class="bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold px-2 py-0.5 rounded-full font-mono text-[10px] tracking-wider uppercase whitespace-nowrap">
+                    16:9 EXECUTIVE PRESENTATION
+                </span>
+                <span class="bg-cyan-950 text-cyan-300 border border-cyan-700/50 font-bold px-2.5 py-0.5 rounded-full font-mono text-[11px] whitespace-nowrap">
+                    <i class="fa-solid fa-calendar-days mr-1 text-cyan-400"></i> 2026.08.31 – 2026.09.07 (Weekly Cycle)
+                </span>
+            </div>
+            <h1 class="text-xs sm:text-sm font-bold text-white tracking-wide leading-snug break-words sm:whitespace-nowrap">
                 Nestlé Purina Blayney • H5N1 Quantitative Risk Assessment & Sourcing Protection Deck
             </h1>
         </div>
-        <div class="flex items-center gap-3">
-            <a href="risk_assessment_slides.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+        <div class="flex items-center gap-2 shrink-0 overflow-x-auto max-w-full pb-0.5 sm:pb-0 scrollbar-none w-full md:w-auto">
+            <a href="risk_assessment_slides.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5 whitespace-nowrap text-xs">
                 🌐 繁中簡報
             </a>
-            <a href="risk_assessment_en.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
-                <i class="fa-solid fa-gauge-high text-cyan-400"></i> Risk Control Dashboard
+            <a href="risk_assessment_en.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5 whitespace-nowrap text-xs">
+                <i class="fa-solid fa-gauge-high text-cyan-400"></i> Risk Dashboard
             </a>
-            <a href="index_en.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+            <a href="index_en.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5 whitespace-nowrap text-xs">
                 <i class="fa-solid fa-house text-emerald-400"></i> Outbreak Overview
             </a>
-            <button onclick="toggleFullscreen()" class="bg-cyan-950 hover:bg-cyan-900 text-cyan-300 font-semibold px-3 py-1.5 rounded-lg border border-cyan-700/60 transition flex items-center gap-1.5">
+            <button onclick="toggleFullscreen()" class="bg-cyan-950 hover:bg-cyan-900 text-cyan-300 font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-cyan-700/60 transition flex items-center gap-1.5 whitespace-nowrap text-xs">
                 <i class="fa-solid fa-expand"></i> Fullscreen (F)
             </button>
         </div>
     </header>
 
     <!-- Main 16:9 Slide Viewport Container -->
-    <main class="slide-container pt-12">
+    <main class="slide-container pt-16">
         <div class="slide-aspect-box">
 
             <!-- SLIDE 1: Executive Summary & Current Quantitative Risk Index -->
@@ -130,9 +141,9 @@
                             Australia H5N1 Avian Influenza Border Risk Assessment for Nestlé Pet Food Imports
                         </h2>
                     </div>
-                    <div class="bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-1.5 rounded-xl text-right">
+                    <div class="bg-amber-500/10 border border-amber-500/30 px-3.5 py-1.5 rounded-xl text-right">
                         <span class="text-[10px] text-slate-400 block font-mono uppercase">Current Risk Score (R_total)</span>
-                        <span class="text-3xl font-black text-emerald-400 font-mono">28 <span class="text-xs text-slate-400 font-normal">/ 100</span></span>
+                        <span class="text-3xl font-black text-amber-400 font-mono">37 <span class="text-xs text-slate-400 font-normal">/ 100</span></span>
                     </div>
                 </div>
 
@@ -140,11 +151,11 @@
                 <div class="grid grid-cols-12 gap-3.5 my-auto items-stretch">
                     <div class="col-span-10 grid grid-cols-4 gap-3">
                     <!-- KPI 1 -->
-                    <div class="glass-card p-4 space-y-2 border-l-4 border-emerald-500">
+                    <div class="glass-card p-4 space-y-2 border-l-4 border-amber-500">
                         <div class="text-[11px] text-slate-400 font-bold uppercase">Current Risk Tier</div>
-                        <div class="text-2xl font-black text-emerald-400">🟢 Low Risk Tier</div>
+                        <div class="text-2xl font-black text-amber-400">🟡 Medium (Buffer)</div>
                         <p class="text-[11px] text-slate-300 leading-relaxed">
-                            Risk score 28 (&lt; 30). Commercial farms maintain 0 infections; normal purchasing & sea freight dispatch proceed.
+                            Risk score 37 (30~59), Sept 2M bird arrival phase (70 pts). 0 commercial infections; active monitoring buffer.
                         </p>
                     </div>
 
@@ -160,9 +171,9 @@
                     <!-- KPI 3 -->
                     <div class="glass-card p-4 space-y-2 border-l-4 border-blue-500">
                         <div class="text-[11px] text-slate-400 font-bold uppercase">NSW Wild Bird Confirmed Cases</div>
-                        <div class="text-2xl font-black text-white font-mono">17 Events</div>
+                        <div class="text-2xl font-black text-white font-mono">22 Events</div>
                         <p class="text-[11px] text-slate-300 leading-relaxed">
-                            Confined to coastal pelagic seabirds (Crested Terns/Silver Gulls); 0 impact on inland farms or Blayney plant.
+                            Includes Sydney Northern Beaches & Port Kembla cases; 0 impact on inland farms or Blayney plant.
                         </p>
                     </div>
 
@@ -325,70 +336,145 @@
 
             <!-- SLIDE 4: Avian Migration Pelagic GIS & 3-Layer Data Fusion Model -->
             <div class="slide-content" id="slide-4">
-                <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+                <div class="flex justify-between items-start border-b border-slate-800 pb-1.5 mb-1.5 shrink-0">
                     <div>
-                        <div class="text-xs font-bold text-cyan-400 font-mono tracking-wider uppercase mb-1">
+                        <div class="text-[11px] font-bold text-cyan-400 font-mono tracking-wider uppercase">
                             SLIDE 4 / 7 • BIOTRACKING GIS & PELAGIC MODEL
                         </div>
-                        <h2 class="text-2xl font-black text-white tracking-tight">
+                        <h2 class="text-xl lg:text-2xl font-black text-white tracking-tight">
                             Avian Migration Dynamic GIS Biotracking & Multi-Source Environmental Model
                         </h2>
                     </div>
-                    <span class="bg-cyan-950 text-cyan-300 border border-cyan-700/50 px-3 py-1 rounded-full text-xs font-mono">
+                    <span class="bg-cyan-950 text-cyan-300 border border-cyan-700/50 px-2.5 py-0.5 rounded-full text-xs font-mono">
                         GIS Biotracking
                     </span>
                 </div>
 
-                <div class="grid grid-cols-12 gap-4 my-auto h-[68%]">
+                <!-- High-Contrast Dynamic Ecological HUD Metrics Bar -->
+                <div class="grid grid-cols-4 gap-2 bg-slate-900/90 p-1.5 rounded-xl border border-slate-700/80 text-xs font-mono mb-1.5 shadow-md shrink-0">
+                    <div class="bg-slate-950/80 p-1.5 rounded-lg border border-slate-800 space-y-0.5">
+                        <span class="text-slate-400 font-bold block text-[9px] uppercase">🗓️ Migration Phase</span>
+                        <strong class="text-amber-300 text-xs font-black block">Sep • Arrival Wave (~25%)</strong>
+                        <span class="text-[9px] text-slate-400 font-sans">Sep–Nov main flocks arrive</span>
+                    </div>
+                    <div class="bg-slate-950/80 p-1.5 rounded-lg border border-amber-500/40 space-y-0.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-amber-300 font-bold text-[9px] uppercase">📊 Model Estimated</span>
+                            <span class="text-[8px] bg-amber-950 text-amber-300 px-1 rounded font-mono">ESTIMATED</span>
+                        </div>
+                        <strong class="text-amber-200 text-xs font-black block">~500k Birds <span class="text-[9px] text-slate-400 font-normal">(2M Peak)</span></strong>
+                        <div class="text-[9px] text-slate-400 flex justify-between font-sans">
+                            <span>NSW Model Est:</span>
+                            <strong class="text-amber-300 font-mono">~60,000</strong>
+                        </div>
+                    </div>
+                    <div class="bg-slate-950/80 p-1.5 rounded-lg border border-cyan-500/50 space-y-0.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-cyan-300 font-bold text-[9px] uppercase">🦅 Field Sighted Actual</span>
+                            <span class="text-[8px] bg-cyan-950 text-cyan-300 px-1 rounded font-mono">LIVE ACTUAL</span>
+                        </div>
+                        <strong id="slide-actual-au-count-top" class="text-cyan-200 text-xs font-black block">1,407 Birds <span class="text-[9px] text-slate-400 font-normal">(129 Hotspots)</span></strong>
+                        <div class="text-[9px] text-slate-400 flex justify-between font-sans">
+                            <span>NSW Jurisdiction:</span>
+                            <strong id="slide-actual-nsw-count-top" class="text-cyan-300 font-mono">286 Birds (18 sites)</strong>
+                        </div>
+                    </div>
+                    <div class="bg-slate-950/80 p-1.5 rounded-lg border border-emerald-500/40 space-y-0.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-300 font-bold text-[9px] uppercase">🛡️ NSW Poultry Threat</span>
+                            <span class="text-[8px] bg-emerald-950 text-emerald-300 px-1 rounded font-mono">0 CASES DEFENSE</span>
+                        </div>
+                        <strong class="text-emerald-300 text-xs font-black block">🟡 Coastal Buffer (L2/4)</strong>
+                        <span class="text-[9px] text-slate-400 font-sans">0 Commercial Farm Cases AU</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2.5 flex-1 min-h-0">
                     <!-- Left: Interactive GIS Map -->
-                    <div class="col-span-8 relative rounded-xl overflow-hidden border border-slate-800 shadow-inner h-full">
+                    <div class="col-span-8 relative rounded-xl overflow-hidden border border-slate-800 shadow-inner h-full min-h-[220px]">
                         <div id="slide-gis-map-en" class="w-full h-full bg-slate-950"></div>
-                        <div class="absolute bottom-2 right-2 bg-slate-900/90 backdrop-blur-md p-2.5 rounded-lg border border-slate-700 text-[10px] space-y-1 z-[1000]">
-                            <div class="font-bold text-white border-b border-slate-800 pb-0.5">Route Legend</div>
-                            <div class="text-red-400">━ Sub-Antarctic Westerlies Route (H5N1 B3.2)</div>
-                            <div class="text-amber-400">━ EAAF Flyway Corridor</div>
-                            <div class="text-cyan-400">━ NSW Inland Penetration Vector (Hawkesbury)</div>
-                            <div class="text-blue-400">● Nestlé Purina Blayney Plant</div>
+                        
+                        <!-- Consolidated Sleek Left HUD & Legend Panel (Zero East-Coast Obstruction) -->
+                        <div class="absolute top-2 left-2 bg-slate-950/90 backdrop-blur-md p-2 rounded-lg border border-cyan-500/50 text-xs space-y-1.5 z-[1000] shadow-2xl w-[195px] font-sans">
+                            <!-- 1. Bird Feed HUD -->
+                            <div class="border-b border-slate-800/80 pb-1">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-1 font-bold text-cyan-300 text-[10px]">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                        <span>🦅 Migratory Feed</span>
+                                    </div>
+                                    <span class="text-[7.5px] bg-cyan-950 text-cyan-300 px-1 py-0.2 rounded border border-cyan-700/50 font-mono">LIVE</span>
+                                </div>
+                            </div>
+                            <div class="bg-slate-900/80 p-1.5 rounded border border-amber-500/30 text-[9px] space-y-0.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-amber-300 font-bold">📊 Model Est:</span>
+                                    <strong class="text-amber-200 font-mono font-bold">~500k Birds</strong>
+                                </div>
+                                <div class="flex items-center justify-between text-slate-400 text-[8px]">
+                                    <span>├ NSW Model:</span>
+                                    <span class="text-amber-300 font-mono font-bold">~60,000</span>
+                                </div>
+                            </div>
+                            <div class="bg-slate-900/80 p-1.5 rounded border border-cyan-500/40 text-[9px] space-y-0.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-cyan-300 font-bold">🦅 Field Actual:</span>
+                                    <strong id="slide-map-hud-actual-au" class="text-cyan-200 font-mono font-bold">1,407</strong>
+                                </div>
+                                <div class="flex items-center justify-between text-slate-400 text-[8px]">
+                                    <span>├ NSW Actual:</span>
+                                    <strong id="slide-map-hud-actual-nsw" class="text-cyan-300 font-mono font-bold">286 (18 sites)</strong>
+                                </div>
+                            </div>
+
+                            <!-- 2. Integrated Route Legend -->
+                            <div class="pt-0.5 border-t border-slate-800/80 text-[8.5px] space-y-0.5 leading-tight text-slate-300">
+                                <div class="font-bold text-slate-200 text-[8.5px] mb-0.5">🗺️ Route Legend</div>
+                                <div class="text-red-400 flex items-center gap-1">━ <span>Westerlies (H5N1)</span></div>
+                                <div class="text-amber-400 flex items-center gap-1">━ <span>EAAF Corridor</span></div>
+                                <div class="text-cyan-400 flex items-center gap-1">━ <span>NSW Inland Vector</span></div>
+                                <div class="text-blue-400 flex items-center gap-1">● <span>Nestlé Blayney Plant</span></div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Right: 3-Layer Science Citations & Migratory Illustration -->
-                    <div class="col-span-4 space-y-2 text-xs">
-                        <div class="glass-card p-2.5 flex items-center gap-3 border-l-4 border-cyan-500">
-                            <img src="assets/illustrations/migratory_cartoon.jpg" class="w-12 h-12 object-cover rounded-lg border border-cyan-700/60 shadow shrink-0" alt="Migratory Birds">
-                            <div class="text-[10px] text-slate-300 leading-tight">
-                                <strong class="text-cyan-300 block text-[11px] mb-0.5">International Migratory Arc</strong>
-                                2M migratory birds fly annually across East Asian flyway into Australia.
+                    <div class="col-span-4 space-y-1.5 text-xs flex flex-col justify-between overflow-y-auto pr-0.5">
+                        <div class="glass-card p-1.5 flex items-center gap-2 border-l-4 border-cyan-500">
+                            <img src="assets/illustrations/migratory_cartoon.jpg" class="w-9 h-9 object-cover rounded-lg border border-cyan-700/60 shadow shrink-0" alt="Migratory Birds">
+                            <div class="text-[9.5px] text-slate-300 leading-tight">
+                                <strong class="text-cyan-300 block text-[10px] mb-0.5">Migratory Arc (Model vs Actual)</strong>
+                                2M birds projected annually (current Sep wave ~500k, NSW ~60k); eBird live actual deduplicated at 1,407 birds (NSW: 286).
                             </div>
                         </div>
-                        <div class="glass-card p-3 space-y-1 border-l-4 border-cyan-500">
-                            <div class="font-bold text-cyan-300 text-[11px] flex items-center gap-1">
+                        <div class="glass-card p-1.5 space-y-0.5 border-l-4 border-cyan-500">
+                            <div class="font-bold text-cyan-300 text-[9.5px] flex items-center gap-1">
                                 <i class="fa-solid fa-wind"></i> 1. Atmospheric Thermals (Science 2021)
                             </div>
-                            <p class="text-slate-300 text-[10px] leading-relaxed">
+                            <p class="text-slate-300 text-[8.5px] leading-tight">
                                 Thermal gradient creates thermal updrafts; pelagic seabirds surf Westerly winds to reach southern Australia.
                             </p>
                         </div>
-                        <div class="glass-card p-3 space-y-1 border-l-4 border-amber-500">
-                            <div class="font-bold text-amber-300 text-[11px] flex items-center gap-1">
+                        <div class="glass-card p-1.5 space-y-0.5 border-l-4 border-amber-500">
+                            <div class="font-bold text-amber-300 text-[9.5px] flex items-center gap-1">
                                 <i class="fa-solid fa-temperature-arrow-up"></i> 2. SST Cold Upwelling (Global Ecology 2025)
                             </div>
-                            <p class="text-slate-300 text-[10px] leading-relaxed">
-                                Cold upwelling brings nutrient-dense forage, driving high-density seabird aggregation at coastal shoals (super-spreading nodes).
+                            <p class="text-slate-300 text-[8.5px] leading-tight">
+                                Cold upwelling brings nutrient-dense forage, driving high-density seabird aggregation at coastal shoals.
                             </p>
                         </div>
-                        <div class="glass-card p-3 space-y-1 border-l-4 border-emerald-500">
-                            <div class="font-bold text-emerald-300 text-[11px] flex items-center gap-1">
+                        <div class="glass-card p-1.5 space-y-0.5 border-l-4 border-emerald-500">
+                            <div class="font-bold text-emerald-300 text-[9.5px] flex items-center gap-1">
                                 <i class="fa-solid fa-bolt"></i> 3. Energetic Maximization (Science Adv 2026)
                             </div>
-                            <p class="text-slate-300 text-[10px] leading-relaxed">
+                            <p class="text-slate-300 text-[8.5px] leading-tight">
                                 High inland temperatures force coastal gulls into inland estuaries for freshwater, triggering reassortment risks.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 text-[11px] text-slate-400">
+                <div class="bg-slate-900/80 p-1.5 rounded-lg border border-slate-800 text-[9px] text-slate-400 mt-1 shrink-0">
                     📡 Empirical Baseline Note: Migratory bird counts (AU 2.2M peak / NSW 600k) are grounded in BirdLife Australia (Birdata 35,000+ surveys) and NSW DPE Ramsar capacity models.
                 </div>
             </div>
@@ -416,7 +502,7 @@
                             <canvas id="slideRadarChartEn"></canvas>
                         </div>
                         <div class="text-[11px] text-slate-400 text-center font-mono">
-                            Current Weighted Score: <strong class="text-emerald-400 text-sm">28 / 100 (LOW RISK SAFE)</strong>
+                            Current Weighted Score: <strong class="text-amber-400 text-sm">37 / 100 (MODERATE RISK BUFFER)</strong>
                         </div>
                     </div>
 
@@ -727,6 +813,79 @@
             L.polyline([[-33.8, 151.2], [-33.6, 150.8], [-33.521, 149.236]], {
                 color: '#06b6d4', weight: 2
             }).addTo(slideGisMapInstance);
+
+            // Render Movebank live flight lines if available
+            if (typeof window.movebankTracksEmbedded !== 'undefined' && window.movebankTracksEmbedded.studies) {
+                window.movebankTracksEmbedded.studies.forEach(study => {
+                    const pts = study.trackPoints || [];
+                    if (pts.length < 2) return;
+                    L.polyline(pts.map(p => [p.lat, p.lng]), {
+                        color: study.color || '#f97316',
+                        weight: 2,
+                        opacity: 0.85,
+                        dashArray: '4, 4'
+                    }).addTo(slideGisMapInstance).bindTooltip(`🛰️ Movebank: <b>${study.species}</b>`, { sticky: true });
+                });
+            }
+
+            // Render eBird live bird observations on map & sync HUD numbers
+            let liveTotalBirds = 1407;
+            let liveTotalLocs = 129;
+            let liveNswBirds = 286;
+            let liveNswLocs = 18;
+
+            if (typeof window.ebirdDataEmbedded !== 'undefined' && window.ebirdDataEmbedded.high_risk_observations) {
+                const obs = window.ebirdDataEmbedded.high_risk_observations;
+                liveTotalLocs = obs.length;
+                let sumBirds = 0;
+                let nswBirds = 0;
+                let nswLocs = 0;
+
+                obs.forEach(o => {
+                    const count = parseInt(o.howMany) || 1;
+                    sumBirds += count;
+                    const isNsw = (o.subnational1Code === 'AU-NSW' || (o.lat >= -37.5 && o.lat <= -28.1 && o.lng >= 141.0 && o.lng <= 153.6));
+                    if (isNsw) {
+                        nswBirds += count;
+                        nswLocs++;
+                    }
+
+                    if (o.lat && o.lng) {
+                        const markerColor = isNsw ? '#38bdf8' : '#06b6d4';
+                        L.circleMarker([o.lat, o.lng], {
+                            radius: Math.min(10, Math.max(3.5, Math.sqrt(count) * 1.8)),
+                            fillColor: markerColor,
+                            color: '#ffffff',
+                            weight: 1,
+                            opacity: 0.9,
+                            fillOpacity: 0.75
+                        }).addTo(slideGisMapInstance).bindPopup(`
+                            <div style="font-size:11px; line-height:1.4; color:#0f172a;">
+                                <strong style="color:#0284c7; font-size:12px;">🦅 ${o.comName || 'High-Risk Avian Species'}</strong><br/>
+                                📍 <strong>Location:</strong> ${o.locName || 'Australian Wetland'}<br/>
+                                🔢 <strong>Count:</strong> <b style="color:#e11d48;">${count} birds</b><br/>
+                                🗓️ <strong>Date:</strong> ${o.obsDt || 'Recent observation'}<br/>
+                                <span style="font-size:9px; color:#64748b;">Source: eBird API v2 Live Avian Network</span>
+                            </div>
+                        `);
+                    }
+                });
+
+                if (sumBirds > 0) liveTotalBirds = sumBirds;
+                if (nswBirds > 0) liveNswBirds = nswBirds;
+                if (nswLocs > 0) liveNswLocs = nswLocs;
+            }
+
+            // Sync slide HUD elements
+            const topAuEl = document.getElementById('slide-actual-au-count-top');
+            const topNswEl = document.getElementById('slide-actual-nsw-count-top');
+            const mapAuEl = document.getElementById('slide-map-hud-actual-au');
+            const mapNswEl = document.getElementById('slide-map-hud-actual-nsw');
+
+            if (topAuEl) topAuEl.innerHTML = `${liveTotalBirds.toLocaleString()} Birds <span class="text-[10px] text-slate-400 font-normal">(${liveTotalLocs} Hotspots)</span>`;
+            if (topNswEl) topNswEl.textContent = `${liveNswBirds.toLocaleString()} Birds (${liveNswLocs} sites)`;
+            if (mapAuEl) mapAuEl.textContent = `${liveTotalBirds.toLocaleString()} (${liveTotalLocs} sites)`;
+            if (mapNswEl) mapNswEl.textContent = `${liveNswBirds.toLocaleString()} (${liveNswLocs} sites)`;
         }
 
         // Slide 5 Radar Chart Init
@@ -740,11 +899,11 @@
                     labels: ['Policy & Housing', 'Migratory Season', 'Vector Dynamics', 'Viral Life Cycle', 'NSW Wild Events'],
                     datasets: [{
                         label: 'Current Risk Score',
-                        data: [20, 40, 30, 35, 15],
-                        backgroundColor: 'rgba(16, 185, 129, 0.25)',
-                        borderColor: '#10b981',
+                        data: [20, 70, 30, 35, 35],
+                        backgroundColor: 'rgba(245, 158, 11, 0.25)',
+                        borderColor: '#f59e0b',
                         borderWidth: 2,
-                        pointBackgroundColor: '#10b981'
+                        pointBackgroundColor: '#f59e0b'
                     }]
                 },
                 options: {
