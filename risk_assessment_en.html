@@ -7,14 +7,14 @@
     <title>Nestlé Purina Australia Pet Food Import H5N1 Quantitative Risk Model</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN (Cloudflare Enterprise Whitelist CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
     <!-- FontAwesome icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Leaflet GIS Map CSS & JS CDN -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet GIS Map CSS & JS CDN (Cloudflare Enterprise Whitelist CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
     <style>
         body {
@@ -174,23 +174,23 @@
         <!-- KPI Summary Cards Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             <!-- Card 1: Quantitative Risk Index -->
-            <div class="glass-card p-5 space-y-3 border-l-4 border-emerald-500">
+            <div class="glass-card p-5 space-y-3 border-l-4 border-amber-500">
                 <div class="flex items-center justify-between text-xs text-slate-400 font-bold uppercase tracking-wider">
                     <span>Quantitative Risk Index</span>
-                    <i class="fa-solid fa-gauge-high text-emerald-400"></i>
+                    <i class="fa-solid fa-gauge-high text-amber-400"></i>
                 </div>
                 <div class="flex items-baseline gap-2">
-                    <span id="kpi-risk-score" class="text-4xl font-black text-emerald-400 font-mono">28</span>
+                    <span id="kpi-risk-score" class="text-4xl font-black text-amber-400 font-mono">37</span>
                     <span class="text-xs text-slate-400 font-mono">/ 100</span>
                 </div>
                 <div class="flex items-center justify-between gap-2 text-xs">
-                    <span id="kpi-risk-badge" class="bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded-full border border-emerald-500/40 text-[11px] whitespace-nowrap">
-                        🟢 LOW RISK (SAFE)
+                    <span id="kpi-risk-badge" class="bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded-full border border-amber-500/40 text-[11px] whitespace-nowrap">
+                        🟡 MODERATE RISK
                     </span>
-                    <span class="text-[11px] text-slate-400 whitespace-nowrap">Imports Active</span>
+                    <span class="text-[11px] text-slate-400 whitespace-nowrap">Buffer Stock & Active Watch</span>
                 </div>
                 <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                    <div id="kpi-risk-bar" class="gauge-bar-fill h-full bg-emerald-500" style="width: 28%;"></div>
+                    <div id="kpi-risk-bar" class="gauge-bar-fill h-full bg-amber-500" style="width: 37%;"></div>
                 </div>
             </div>
 
@@ -202,13 +202,13 @@
                 </div>
                 <div class="flex items-baseline gap-2">
                     <span class="text-4xl font-black text-cyan-400 font-mono">100%</span>
-                    <span class="text-xs text-cyan-400 font-bold">AREA FREEDOM</span>
+                    <span class="text-xs text-cyan-400 font-bold">Safe</span>
                 </div>
                 <p class="text-xs text-slate-300">
-                    All commercial poultry, egg farms, & dairy cattle across Australia maintain <strong class="text-white">0 infections</strong>.
+                    All commercial poultry & egg farms across Australia maintain <strong class="text-white">0 infections</strong>.
                 </p>
                 <div class="text-[11px] text-emerald-400 flex items-center gap-1 font-semibold">
-                    <i class="fa-solid fa-circle-check"></i> TW APHIA Epidemic Ban NOT Triggered
+                    <i class="fa-solid fa-circle-check"></i> Zero TW APHIA Commercial Ban
                 </div>
             </div>
 
@@ -238,46 +238,47 @@
                 </div>
                 <div class="flex items-baseline gap-2">
                     <span id="kpi-ban-prob" class="text-4xl font-black text-amber-400 font-mono">&lt; 5%</span>
-                    <span class="text-xs text-amber-400 font-bold">EXTREMELY LOW</span>
+                    <span class="text-xs text-amber-400 font-bold">Extremely Low</span>
                 </div>
                 <p class="text-xs text-slate-300">
-                    Based on current 0 commercial farm outbreak prediction in NSW.
+                    Forecast based on current 0 commercial infections in NSW.
                 </p>
                 <div class="text-[11px] text-slate-400">
-                    Benchmarked against historical APHIA precedent actions
+                    Benchmark against TW APHIA precedents
                 </div>
             </div>
         </div>
 
-        <!-- Interactive Risk Simulator & Radar Chart Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
-            <!-- Left: Radar Chart & Current Scores (5 cols) -->
-            <div class="lg:col-span-5 glass-card p-6 space-y-6 flex flex-col justify-between">
+        <!-- Middle: 5 Dimensions Radar + Sensitivity Controller (5:7 Grid) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left: Dynamic Radar Chart & Dimension Score Cards (5 cols) -->
+            <div class="lg:col-span-5 glass-card p-6 flex flex-col justify-between space-y-4">
                 <div>
                     <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                         <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-chart-pie text-cyan-400"></i> 5-Dimension Radar Chart
+                            <i class="fa-solid fa-chart-pie text-cyan-400"></i> 5 Dimensions Quantitative Risk Radar
                         </h3>
-                        <span class="text-xs font-mono text-slate-400">Weighted Radar</span>
+                        <span class="text-xs font-mono text-cyan-400 bg-cyan-950 px-2.5 py-0.5 rounded border border-cyan-800">5-Dim Model</span>
                     </div>
                     <p class="text-xs text-slate-400 mt-2">
-                        Scores closer to the center indicate lower risk and higher safety; scores further toward the outer ring represent concentrated risk.
+                        Dynamic weighting of 5 risk dimensions: Policy (25%), Season (20%), Vector (20%), Virology (15%), NSW Events (20%).
                     </p>
                 </div>
 
-                <div class="h-[280px] w-full relative flex items-center justify-center">
+                <!-- Radar Canvas -->
+                <div class="h-[250px] w-full relative flex items-center justify-center">
                     <canvas id="riskRadarChart"></canvas>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2 text-xs font-mono border-t border-slate-800 pt-4">
+                <!-- 5 Dimension Score Values Breakdown -->
+                <div class="grid grid-cols-2 gap-2 text-xs font-mono">
                     <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
                         <span class="text-slate-400 block text-[10px]">1. Housing Policy (25%)</span>
                         <strong id="score-val-1" class="text-emerald-400 text-sm">20 / 100</strong>
                     </div>
                     <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
                         <span class="text-slate-400 block text-[10px]">2. Migratory Season (20%)</span>
-                        <strong id="score-val-2" class="text-amber-400 text-sm">40 / 100</strong>
+                        <strong id="score-val-2" class="text-amber-400 text-sm">70 / 100</strong>
                     </div>
                     <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
                         <span class="text-slate-400 block text-[10px]">3. Vector Transmission (20%)</span>
@@ -289,7 +290,7 @@
                     </div>
                     <div class="col-span-2 bg-slate-900/80 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
                         <span class="text-slate-400 block text-[10px]">5. NSW Wild Cases (20%)</span>
-                        <strong id="score-val-5" class="text-emerald-400 text-sm">15 / 100</strong>
+                        <strong id="score-val-5" class="text-amber-400 text-sm">35 / 100</strong>
                     </div>
                 </div>
             </div>
@@ -351,11 +352,11 @@
                             <label class="font-bold text-slate-200 flex items-center gap-1.5">
                                 <span>🗓️ 3. Migratory Season Phase</span>
                             </label>
-                            <span id="ctrl-val-migratory" class="font-mono text-amber-400 font-bold">Late August (Vanguard Arrival, Score 40)</span>
+                            <span id="ctrl-val-migratory" class="font-mono text-amber-400 font-bold">September (2M Birds Landed, Score 70)</span>
                         </div>
                         <select id="select-migratory" onchange="recalculateRisk()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500 font-sans">
-                            <option value="40" selected>Late August: Vanguard seabirds arriving at southern coast (Current, Score 40)</option>
-                            <option value="70">September: 2M international migratory birds land at Gulf of Carpentaria (Score 70)</option>
+                            <option value="40">Late August: Vanguard seabirds arriving at southern coast (Score 40)</option>
+                            <option value="70" selected>September: 2M international migratory birds land at Gulf of Carpentaria (Current, Score 70)</option>
                             <option value="90">October: Migratory flocks disperse into NSW/VIC inland wetlands (Peak Danger, Score 90)</option>
                             <option value="60">Nov~Feb: Southern summer wetland overwintering period (Score 60)</option>
                             <option value="20">March~July: All migratory birds northbound return (Low Risk Safe Period, Score 20)</option>
@@ -368,11 +369,11 @@
                             <label class="font-bold text-slate-200 flex items-center gap-1.5">
                                 <span>🗺️ 4. NSW Statewide Wild Bird Cases & Spread Trend</span>
                             </label>
-                            <span id="ctrl-val-nsw-events" class="font-mono text-emerald-400 font-bold">Sporadic Coastal Cases (Current 17 events, Score 15)</span>
+                            <span id="ctrl-val-nsw-events" class="font-mono text-amber-400 font-bold">Moderate Increase (Current 22 events, Score 35)</span>
                         </div>
                         <select id="select-nsw-events" onchange="recalculateRisk()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500 font-sans">
-                            <option value="15" selected>🟢 NSW Sporadic Coastal Wild Bird Cases (Current 17 events, Score 15)</option>
-                            <option value="35">🟡 NSW Wild Bird Cases Moderate Increase (20 ~ 50 events, Score 35)</option>
+                            <option value="15">🟢 NSW Sporadic Coastal Wild Bird Cases (< 20 events, Score 15)</option>
+                            <option value="35" selected>🟡 NSW Wild Bird Cases Moderate Increase (20 ~ 50 events, Current 22 events, Score 35)</option>
                             <option value="60">🟠 NSW Wild Bird Cases Rapid Surge (> 50 events & spreading inland, Score 60)</option>
                             <option value="90">🔴 NSW Wild Bird Mass Mortality Outbreak (> 100 events, Score 90)</option>
                         </select>
@@ -1808,14 +1809,14 @@
                     ],
                     datasets: [{
                         label: 'Quantitative Risk Score',
-                        data: [20, 40, 30, 35, 15],
-                        backgroundColor: 'rgba(16, 185, 129, 0.25)',
-                        borderColor: '#10b981',
+                        data: [20, 70, 30, 35, 35],
+                        backgroundColor: 'rgba(245, 158, 11, 0.25)',
+                        borderColor: '#f59e0b',
                         borderWidth: 2,
-                        pointBackgroundColor: '#10b981',
+                        pointBackgroundColor: '#f59e0b',
                         pointBorderColor: '#fff',
                         pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: '#10b981'
+                        pointHoverBorderColor: '#f59e0b'
                     }]
                 },
                 options: {
@@ -1937,9 +1938,9 @@
 
         function resetSimulator() {
             document.getElementById('select-housing').value = '20';
-            document.getElementById('select-migratory').value = '40';
+            document.getElementById('select-migratory').value = '70';
             document.getElementById('select-vector').value = '30';
-            document.getElementById('select-nsw-events').value = '15';
+            document.getElementById('select-nsw-events').value = '35';
             setCommercialFarmStatus(0);
         }
     

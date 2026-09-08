@@ -8,12 +8,11 @@
     <title>2026年澳洲 H5N1 禽流感風險與 Purina Blayney 廠供應鏈因應策略報告</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Leaflet CSS for maps -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Leaflet CSS & JS (Cloudflare Enterprise Whitelist CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <!-- Chart.js CDN (Cloudflare Enterprise Whitelist CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap"
         rel="stylesheet">
@@ -176,13 +175,7 @@
                                 <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider mb-1">📰
                                     媒體與生態監測風向 (MEDIA & ECOLOGY WATCH)</span>
                                 <div class="text-slate-200 text-sm leading-relaxed">
-                                    <p>澳洲H5N1禽流感疫情持續受到密切監測。截至2026年9月8日，全國已有484起野生動物確診H5禽流感事件，所有州別（除北領地和澳洲首都領地）均受影響。</p>
-
-<p>在鳥類確診方面，塔斯馬尼亞州自8月以來錄得29起事件，包括最近在斯特拉漢（Strahan）發現的<span class="text-rose-300 font-extrabold bg-rose-950/60 px-1 py-0.5 rounded border border-rose-700/50">銀鷗</span>、國王島（King Island）附近的黑臉鸕鶿以及西北部布里頓沼澤（Britton's Swamp）的遊隼。 維多利亞州目前有<span class="text-red-400 font-extrabold text-base">150起確診事件</span>，已要求高風險沿海及南部地區的家禽農場實施禽隻室內飼養措施至9月18日。 南澳州仍是疫情重災區，累計271起事件，並發生了大規模野鳥死亡事件，最近確診案例包括黑臉鸕鶿與<span class="text-amber-300 font-extrabold bg-amber-950/60 px-1 py-0.5 rounded border border-amber-700/50">大鳳頭燕鷗</span>。 新南威爾斯州則首次在雪梨北部海灘（Warriewood）的<span class="text-amber-300 font-extrabold bg-amber-950/60 px-1 py-0.5 rounded border border-amber-700/50">大鳳頭燕鷗</span>中確認H5N1案例，另外在臥龍崗（Port Kembla）和科夫斯港（Coffs Harbour）也發現了新的確診。</p>
-
-<p><strong>⚠️ <span class="text-fuchsia-300 font-bold">哺乳類</span>監測：據報導，南澳州已出現少數野生哺乳動物染病案例，包括確診的<a href='https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHP1eXd88rM0s0BSV5AotzEkkAy_-sl-7HUUhWKiOgJi_xksQY3cIFiOAGPN6qLmqBQLtHh9qoZHX5oa_qDQ9XCyv-FrmTjxk3eFI8L9II8-jeq34CctQeP1_nwjsLxEfL6IEW3K7AxQZ4r1IVIe49TF9vFha0HBcqc84Cu24qkV3q44DvsDUPmireeAev5gbBdgDc26vlJTw'>長鼻毛皮<span class="text-fuchsia-300 font-bold">海豹</span></a>、<a href='https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFxWOLgcLUxDwD4HNNH1oKSXfY8OrMx3vct1-9PVjbx4VHKnmsZ9VCISOYT9Ka0qA4Cf6mLgQXf93BUqWgv3PPNaMfjFxoczFl5a7hZqk9fiUf90qdqH9Mh5WP4OrSBMOA3LWA_u7Du-wuGlo_8_zEeGHlbEq_D01EyZrHKXUq8ThmMrQaK4C4KsiXlOmrqA13CUTDZpVWFIN0Tm5KmhzIdZg=='>海豚</a>，以及都會區阿得雷德（Adelaide）一隻<a href='https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF3ysBkdmwBktxyd-9WJXB973Fqon790nIElRqrxI-_PKG1Rpy8y6aDhTiPwsred48ktHlCRVlpJtJV3VQkSlgFeV-VlwqueYxgNGf6bknpdGUmKiEhy-gxwx-DdlF81F429z5FxgXuRoy3bzVE0uqDdJMa6moUDczBxuymUk3rBSHZR-ASAfHtP-RzV4nTo1yPBCRoeh5Prl58MTsKbuwTljacsInwibrcwUV3OKiBUF7zkct5CuuRqEEJXPnZxWrx9x7kDQeokQ=='>紅狐狸</a>的疑似案例。 截至目前為止，哺乳動物樣本的基因檢測尚未顯示病毒更容易感染哺乳動物的跡象。 尚未發現<span class="text-fuchsia-300 font-bold">塔斯馬尼亞惡魔</span>或狐蝠的感染或大規模死亡報導。</strong></p>
-
-<p>全澳商業家禽農場依然維持<span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">100%無疫區</span>狀態，<span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">生產鏈安全無虞</span>。 公眾健康風險持續極低，且尚未有澳洲人類感染H5禽流感的案例。</p>
+                                    根據 <a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a> 與 <a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">新南威爾斯州政府 (NSW DPIRD)</a> 等媒體 <span class="text-amber-400 font-bold">2026 年 9 月 8 日 最新報導</span>，澳洲官方自 8/12 起正式採用國際標準「事件導向 (Event-based Reporting)」統計，全澳累計 <span class="text-red-400 font-bold"><span class="text-red-400 font-extrabold text-base">484 起確診事件</span></span>（陰性排除 <span class="text-sky-400 font-semibold">2,450 起</span>）。聯邦首席獸醫官重申：<span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40">澳洲所有商業家禽農場維持 <span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">100% 零感染</span>，<span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">對一般人類健康風險極低</span></span>。
                                 </div>
                             </div>
                         </div>
@@ -8725,7 +8718,7 @@
     "Falcon & Other": 5
   },
   "source": "live",
-  "scrape_time": "2026-09-08 04:05 UTC"
+  "scrape_time": "2026-09-08 04:32 UTC"
 };
 
         const factoryLat = -33.521027;

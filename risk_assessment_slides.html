@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nestlé Purina Blayney • H5N1 寵物食品進口定量風險評估 16:9 高階簡報</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN (Cloudflare Enterprise Whitelist CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet GIS Map CSS & JS CDN (Cloudflare Enterprise Whitelist CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: #070a12;
+            color: #f1f5f9;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .slide-aspect-box {
+            width: 100%;
+            max-width: 1366px;
+            aspect-ratio: 16 / 9;
+            max-height: 92vh;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.25rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 0.85rem;
+        }
+
+        .slide-content {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2.25rem 2.75rem;
+            animation: fadeIn 0.35s ease-out forwards;
+        }
+
+        .slide-content.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px) scale(0.995);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .progress-bar-fill {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+    <script src="assets/js/purina_auth.js"></script>
+</head>
+
+<body class="select-none">
+
+    <!-- Top Floating Header Bar -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-6 py-3 flex items-center justify-between text-xs">
+        <div class="flex items-center gap-3">
+            <span class="bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold px-2.5 py-0.5 rounded-full font-mono">
+                16:9 EXECUTIVE PRESENTATION
+            </span>
+            <h1 class="text-sm font-bold text-white tracking-wide">
+                Nestlé Purina Blayney • H5N1 定量風險評估與採購避險高階簡報
+            </h1>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="risk_assessment_slides_en.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+                🌐 EN Slides 英文簡報
+            </a>
+            <a href="risk_assessment.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-gauge-high text-cyan-400"></i> 返回風控儀表板
+            </a>
+            <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-house text-emerald-400"></i> 疫情首頁
+            </a>
+            <button onclick="toggleFullscreen()" class="bg-cyan-950 hover:bg-cyan-900 text-cyan-300 font-semibold px-3 py-1.5 rounded-lg border border-cyan-700/60 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-expand"></i> 全螢幕 (F)
+            </button>
+        </div>
+    </header>
+
+    <!-- Main 16:9 Slide Viewport Container -->
+    <main class="slide-container pt-12">
+        <div class="slide-aspect-box">
+
+            <!-- SLIDE 1: Executive Summary & Current Quantitative Risk Index -->
+            <div class="slide-content active" id="slide-1">
+                <!-- Slide Header -->
+                <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+                    <div>
+                        <div class="text-xs font-bold text-cyan-400 font-mono tracking-wider uppercase mb-1">
+                            SLIDE 1 / 7 • EXECUTIVE RISK OVERVIEW
+                        </div>
+                        <h2 class="text-2xl font-black text-white tracking-tight">
+                            澳洲 H5N1 禽流感對 Nestlé 寵物食品進口邊境風險評估總覽
+                        </h2>
+                    </div>
+                    <div class="bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-1.5 rounded-xl text-right">
+                        <span class="text-[10px] text-slate-400 block font-mono uppercase">當前總風險指數 (R_total)</span>
+                        <span class="text-3xl font-black text-emerald-400 font-mono">28 <span class="text-xs text-slate-400 font-normal">/ 100</span></span>
+                    </div>
+                </div>
+
+                <!-- Slide Body: 4 KPI Cards + Officer Spot Illustration -->
+                <div class="grid grid-cols-12 gap-3.5 my-auto items-stretch">
+                    <div class="col-span-10 grid grid-cols-4 gap-3">
+                    <!-- KPI 1 -->
+                    <div class="glass-card p-4 space-y-2 border-l-4 border-emerald-500">
+                        <div class="text-[11px] text-slate-400 font-bold uppercase">當前風險階層</div>
+                        <div class="text-2xl font-black text-emerald-400">🟢 低風險區</div>
+                        <p class="text-[11px] text-slate-300 leading-relaxed">
+                            風險指數 28 分 (< 30)，商業禽場保持 0 宗感染，可正常安排採購下單與海運出貨。
+                        </p>
+                    </div>
+
+                    <!-- KPI 2 -->
+                    <div class="glass-card p-4 space-y-2 border-l-4 border-cyan-500">
+                        <div class="text-[11px] text-slate-400 font-bold uppercase">全澳商業家禽/蛋場狀態</div>
+                        <div class="text-2xl font-black text-cyan-400 font-mono">100% 安全</div>
+                        <p class="text-[11px] text-slate-300 leading-relaxed">
+                            全澳洲商業家禽、蛋場與乳牛場維持 <strong class="text-white">0 宗感染</strong>，符合 WOAH 清潔宣告。
+                        </p>
+                    </div>
+
+                    <!-- KPI 3 -->
+                    <div class="glass-card p-4 space-y-2 border-l-4 border-blue-500">
+                        <div class="text-[11px] text-slate-400 font-bold uppercase">NSW 全州野鳥確診事件</div>
+                        <div class="text-2xl font-black text-white font-mono">17 起事件</div>
+                        <p class="text-[11px] text-slate-300 leading-relaxed">
+                            皆局限於沿海野生海鳥（鳳頭燕鷗/銀鷗），內陸養殖舍與 Blayney 廠區零波及。
+                        </p>
+                    </div>
+
+                    <!-- KPI 4 -->
+                    <div class="glass-card p-4 space-y-2 border-l-4 border-amber-500">
+                        <div class="text-[11px] text-slate-400 font-bold uppercase">TW APHIA 邊境禁令機率</div>
+                        <div class="text-2xl font-black text-amber-400 font-mono">&lt; 5% 極低</div>
+                        <p class="text-[11px] text-slate-300 leading-relaxed">
+                            基於防檢署宣告慣例，商業家禽 0 感染未觸發行政區劃（NSW）邊境禁令。
+                        </p>
+                    </div>
+                    </div>
+                    <!-- Biosecurity Officer Spotlight -->
+                    <div class="col-span-2 glass-card p-3 flex flex-col items-center justify-center text-center space-y-1.5 border-t-2 border-emerald-500 bg-emerald-950/20">
+                        <img src="assets/illustrations/officer_cartoon.jpg" class="w-20 h-20 object-cover rounded-xl border border-emerald-500/40 shadow-md shadow-emerald-950/40" alt="Biosecurity Officer">
+                        <strong class="text-[11px] text-white block">澳洲官方檢疫把關</strong>
+                        <span class="text-[9px] text-emerald-400 font-mono">100% Area Freedom</span>
+                    </div>
+                </div>
+
+                <!-- Slide Footer Banner -->
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                    <div class="flex items-center gap-2 text-slate-300">
+                        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                        <span><strong>Nestlé Purina Blayney 廠結論：</strong> 當前風險極低，無須暫緩下單。建議維持正常採購並即時連網監控 NSW 商業家禽狀態。</span>
+                    </div>
+                    <span class="text-slate-500 font-mono text-[11px]">Quantitative Risk Engine v2.7</span>
+                </div>
+            </div>
+
+            <!-- SLIDE 2: TW APHIA Regulatory Baseline & Product Scope -->
+            <div class="slide-content" id="slide-2">
+                <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+                    <div>
+                        <div class="text-xs font-bold text-cyan-400 font-mono tracking-wider uppercase mb-1">
+                            SLIDE 2 / 7 • REGULATORY & PRODUCT SCOPE
+                        </div>
+                        <h2 class="text-2xl font-black text-white tracking-tight">
+                            台灣防檢署 (TW APHIA) 邊境法規與 Blayney 兩大產品安全驗證
+                        </h2>
+                    </div>
+                    <span class="bg-cyan-950 text-cyan-300 border border-cyan-700/50 px-3 py-1 rounded-full text-xs font-mono">
+                        APHIA Policy Calibration
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-5 my-auto">
+                    <!-- Left: APHIA State-Level Policy Logic -->
+                    <div class="glass-card p-5 space-y-3 border-l-4 border-amber-500">
+                        <h3 class="font-bold text-white text-base flex items-center gap-2">
+                            <i class="fa-solid fa-building-shield text-amber-400"></i> 1. 防檢署「州層級 (State-Level)」宣告機制
+                        </h3>
+                        <ul class="text-xs text-slate-300 space-y-2 list-disc pl-4 leading-relaxed">
+                            <li><strong>行政區劃管制原則：</strong>台灣防檢署以全州 (NSW) 為最小疫區宣告單位。若 NSW 商業禽場確診，全州所有寵物食品廠均適用封鎖。</li>
+                            <li><strong>廠地緣距離非限制關鍵：</strong>工廠距確診點公里數不影響邊境條例，評估核心在於 <strong class="text-amber-300">NSW 全州商業家禽 0 宗感染狀態</strong>。</li>
+                            <li><strong>工廠註冊現況：</strong>Blayney 廠尚未向台灣申請個別註冊（申請耗時 > 2 年）。因此目前全數依賴「全州清冊自由 (Area Freedom)」通關。</li>
+                        </ul>
+                    </div>
+
+                    <!-- Right: Product Scope Sterilization Safety -->
+                    <div class="glass-card p-5 space-y-3 border-l-4 border-emerald-500">
+                        <h3 class="font-bold text-white text-base flex items-center gap-2">
+                            <i class="fa-solid fa-cans-to-can text-emerald-400"></i> 2. Purina Blayney 廠兩大進口品項與滅菌安全
+                        </h3>
+                        <div class="space-y-3 text-xs">
+                            <div class="bg-slate-900/90 p-3 rounded-lg border border-slate-800">
+                                <div class="flex items-center gap-3">
+                                    <img src="assets/illustrations/retort_can_cartoon.jpg" class="w-16 h-16 object-cover rounded-lg border border-cyan-700/60 shadow shrink-0" alt="Retort Can">
+                                    <div>
+                                        <div class="font-bold text-emerald-300 flex items-center gap-1.5 mb-0.5">
+                                            <i class="fa-solid fa-prescription-bottle"></i> 罐頭濕糧 (Canned Pet Food) — 100% 絕對安全
+                                        </div>
+                                        <p class="text-slate-300 text-[11px] leading-relaxed">
+                                            經歷 121°C 以上高溫高壓商業滅菌（Retort Sterilization）超 30 分鐘，禽流感病毒 (熱敏感，70°C 秒殺) 徹底去活化，具完全防禦力。
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-slate-900/90 p-3 rounded-lg border border-slate-800">
+                                <div class="font-bold text-cyan-300 flex items-center gap-1.5 mb-1">
+                                    <i class="fa-solid fa-cubes-stacked"></i> 擠壓乾糧 (Extruded Dry Food) — 高溫加工安全
+                                </div>
+                                <p class="text-slate-300 text-[11px] leading-relaxed">
+                                    經雙螺桿擠壓機 (Extruder) > 110°C 高溫高壓蒸煮與烘乾，病毒風險極低。僅需控管包裝後段之環境交叉污染。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 text-xs text-slate-400">
+                    💡 <strong>決策依據：</strong>只要 NSW 保持商業家禽 0 感染，罐頭與乾糧均可憑澳洲官方健康證明書 (Health Certificate) 順利通關。
+                </div>
+            </div>
+
+            <!-- SLIDE 3: CSIRO ACDP WGS Sequencing & Evolutionary Reassortment Model -->
+            <div class="slide-content" id="slide-3">
+                <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+                    <div>
+                        <div class="text-xs font-bold text-cyan-400 font-mono tracking-wider uppercase mb-1">
+                            SLIDE 3 / 7 • GENOMIC SEQUENCING & EVOLUTION
+                        </div>
+                        <h2 class="text-2xl font-black text-white tracking-tight">
+                            CSIRO ACDP 全基因組定序：全澳 100% H5N1 B3.2 (舊 H7 已根除)
+                        </h2>
+                    </div>
+                    <span class="bg-blue-950 text-blue-300 border border-blue-700/50 px-3 py-1 rounded-full text-xs font-mono">
+                        CSIRO WGS Genotype B3.2
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 my-auto text-xs">
+                    <!-- Card 1 -->
+                    <div class="glass-card p-4 space-y-2 border-t-4 border-cyan-500">
+                        <div class="font-bold text-cyan-300 text-sm flex items-center gap-1.5">
+                            <i class="fa-solid fa-dna"></i> 1. Genotype B3.2 專一基因型
+                        </div>
+                        <p class="text-slate-300 leading-relaxed text-[11px]">
+                            起源於南美洲跨越南大洋擴散至亞南極島嶼 (赫德島 Heard Island)，已高度適應遠洋海鳥與海洋哺乳動物 (海豹/海獅)。<strong>非美國乳牛爆發之 B3.13 基因型</strong>。
+                        </p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="glass-card p-4 space-y-2 border-t-4 border-emerald-500">
+                        <div class="font-bold text-emerald-300 text-sm flex items-center gap-1.5">
+                            <i class="fa-solid fa-wind"></i> 2. 6~7 次獨立西風帶輸入
+                        </div>
+                        <p class="text-slate-300 leading-relaxed text-[11px]">
+                            順著強勁亞南極西風帶與寒流由巨鸌、賊鷗分批帶入西澳、南澳與東岸，序列高度同源。舊有本土 H7 病毒株已於 2025 年初由 WOAH/DAFF 宣告全數消除。
+                        </p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="glass-card p-4 space-y-2 border-t-4 border-amber-500">
+                        <div class="font-bold text-amber-300 text-sm flex items-center gap-1.5">
+                            <i class="fa-solid fa-code-branch"></i> 3. 基因重組演化條件機率
+                        </div>
+                        <p class="text-slate-300 leading-relaxed text-[11px]">
+                            近 3~6 個月在海鳥群中產生高傳染性新重組株機率為 <strong>15%~25% (低度)</strong>；僅當病毒於 12~24 個月穿透至內陸淡水雁鴨時，重組機率升至 75%~85%。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Evolutionary Formula Box -->
+                <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between gap-4 text-xs">
+                    <div class="space-y-1.5 flex-1">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-calculator text-blue-400"></i> 新型高致病重組株產生機率公式 (Novel HPAI Risk)
+                        </span>
+                        <span class="font-mono text-cyan-300 text-[11px]">f_bridge (銀鷗/䴉類) × P_co-infection</span>
+                    </div>
+                    <div class="bg-slate-950 p-2 rounded-lg font-mono text-cyan-300 text-[11px] border border-slate-800">
+                        P_novel_HPAI = P_intro × P_spillover(waterfowl) × P_co-infection(LPAI_local) × P_fitness_selection
+                    </div>
+                    </div>
+                    <img src="assets/illustrations/virus_cartoon.jpg" class="w-16 h-16 object-cover rounded-xl border border-slate-700 shadow-md shrink-0" alt="H5N1 Virion">
+                </div>
+            </div>
+
+            <!-- SLIDE 4: Avian Migration Pelagic GIS & 3-Layer Data Fusion Model -->
+            <div class="slide-content" id="slide-4">
+                <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+                    <div>
+                        <div class="text-xs font-bold text-cyan-400 font-mono tracking-wider uppercase mb-1">
+                            SLIDE 4 / 7 • BIOTRACKING GIS & PELAGIC MODEL
+                        </div>
+                        <h2 class="text-2xl font-black text-white tracking-tight">
+                            澳洲候鳥遷徙動態 GIS 地圖與多源環境預測模型
+                        </h2>
+                    </div>
+                    <span class="bg-cyan-950 text-cyan-300 border border-cyan-700/50 px-3 py-1 rounded-full text-xs font-mono">
+                        GIS Biotracking
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-12 gap-4 my-auto h-[68%]">
+                    <!-- Left: Interactive GIS Map -->
+                    <div class="col-span-8 relative rounded-xl overflow-hidden border border-slate-800 shadow-inner h-full">
+                        <div id="slide-gis-map" class="w-full h-full bg-slate-950"></div>
+                        <div class="absolute bottom-2 right-2 bg-slate-900/90 backdrop-blur-md p-2.5 rounded-lg border border-slate-700 text-[10px] space-y-1 z-[1000]">
+                            <div class="font-bold text-white border-b border-slate-800 pb-0.5">航線圖例</div>
+                            <div class="text-red-400">━ 亞南極西風帶海鳥航線 (H5N1 B3.2)</div>
+                            <div class="text-amber-400">━ EAAF 東亞-澳大利亞水鳥廊道</div>
+                            <div class="text-cyan-400">━ NSW 內陸生態穿透向量 (Hawkesbury)</div>
+                            <div class="text-blue-400">● Nestlé Purina Blayney 工廠</div>
+                        </div>
+                    </div>
+
+                    <!-- Right: 3-Layer Science Citations & Migratory Illustration -->
+                    <div class="col-span-4 space-y-2 text-xs">
+                        <div class="glass-card p-2.5 flex items-center gap-3 border-l-4 border-cyan-500">
+                            <img src="assets/illustrations/migratory_cartoon.jpg" class="w-12 h-12 object-cover rounded-lg border border-cyan-700/60 shadow shrink-0" alt="Migratory Birds">
+                            <div class="text-[10px] text-slate-300 leading-tight">
+                                <strong class="text-cyan-300 block text-[11px] mb-0.5">跨國候鳥動態軌道</strong>
+                                每年 9~10 月 200 萬隻國際候鳥自東亞遷徙廊道南下抵達澳洲。
+                            </div>
+                        </div>
+                        <div class="glass-card p-3 space-y-1 border-l-4 border-cyan-500">
+                            <div class="font-bold text-cyan-300 text-[11px] flex items-center gap-1">
+                                <i class="fa-solid fa-wind"></i> 1. 上升熱氣流 (Science 2021)
+                            </div>
+                            <p class="text-slate-300 text-[10px] leading-relaxed">
+                                海面溫差產生強烈上升氣流，遠洋海鳥順著亞南極西風帶「滑翔衝浪」抵達澳洲南部。
+                            </p>
+                        </div>
+                        <div class="glass-card p-3 space-y-1 border-l-4 border-amber-500">
+                            <div class="font-bold text-amber-300 text-[11px] flex items-center gap-1">
+                                <i class="fa-solid fa-temperature-arrow-up"></i> 2. SST 湧升流 (Global Ecology 2025)
+                            </div>
+                            <p class="text-slate-300 text-[10px] leading-relaxed">
+                                冷水湧升流帶來豐富魚蝦，驅動燕鷗與海鷗在特定沿海沙洲高密度聚集，形成超級傳播點。
+                            </p>
+                        </div>
+                        <div class="glass-card p-3 space-y-1 border-l-4 border-emerald-500">
+                            <div class="font-bold text-emerald-300 text-[11px] flex items-center gap-1">
+                                <i class="fa-solid fa-bolt"></i> 3. 能量帳本最大化 (Science Adv 2026)
+                            </div>
+                            <p class="text-slate-300 text-[10px] leading-relaxed">
+                                內陸乾旱高溫時，沿海海鷗被迫深入內陸河口尋求淡水，引發基因重組風險。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 text-[11px] text-slate-400">
+                    📡 數據推估來源註記：候鳥滯留量（全澳 220 萬峰值 / NSW 60 萬隻）引述 BirdLife Australia (Birdata 35,000+ 筆普查) 與 NSW DPE Ramsar 濕地乘載力推算。
+                </div>
+            </div>
+
+            <!-- SLIDE 5: 5-Dimension Quantitative Risk Simulator Engine -->
+            <div class="slide-content" id="slide-5">
+                <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+                    <div>
+                        <div class="text-xs font-bold text-cyan-400 font-mono tracking-wider uppercase mb-1">
+                            SLIDE 5 / 7 • QUANTITATIVE RISK SIMULATOR
+                        </div>
+                        <h2 class="text-2xl font-black text-white tracking-tight">
+                            定量評估模型 5 大維度權重與敏感度控制台
+                        </h2>
+                    </div>
+                    <span class="bg-emerald-950 text-emerald-300 border border-emerald-700/50 px-3 py-1 rounded-full text-xs font-mono">
+                        R_total = Σ (w_i × S_i)
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-12 gap-5 my-auto">
+                    <!-- Left: Radar Chart -->
+                    <div class="col-span-5 glass-card p-4 flex flex-col justify-between items-center">
+                        <div class="w-full h-[220px]">
+                            <canvas id="slideRadarChart"></canvas>
+                        </div>
+                        <div class="text-[11px] text-slate-400 text-center font-mono">
+                            當前加權總得分：<strong class="text-emerald-400 text-sm">28 / 100 (低風險 SAFE)</strong>
+                        </div>
+                    </div>
+
+                    <!-- Right: 5 Dimensions Rationale Grid -->
+                    <div class="col-span-7 grid grid-cols-2 gap-3 text-xs">
+                        <div class="glass-card p-2.5 space-y-1 border-t-2 border-emerald-500 flex items-start gap-2.5">
+                            <img src="assets/illustrations/farm_cartoon.jpg" class="w-11 h-11 object-cover rounded-lg border border-emerald-600/60 shrink-0 mt-0.5 shadow" alt="Biosecure Farm">
+                            <div>
+                                <div class="font-bold text-white text-[11px]">1. 政策與物理隔離 (25%)</div>
+                                <p class="text-slate-300 text-[10px] leading-tight">官方強制圈養令與物理防鳥網，阻絕野生海鳥接觸達 85% 以上。</p>
+                            </div>
+                        </div>
+                        <div class="glass-card p-2.5 space-y-1 border-t-2 border-amber-500 flex items-start gap-2.5">
+                            <img src="assets/illustrations/migratory_cartoon.jpg" class="w-11 h-11 object-cover rounded-lg border border-amber-600/60 shrink-0 mt-0.5 shadow" alt="Migratory">
+                            <div>
+                                <div class="font-bold text-white text-[11px]">2. 候鳥季節 (20%)</div>
+                                <p class="text-slate-300 text-[10px] leading-tight">10 月大部隊向南方濕地分散為高危期，隔年 3 月北返後快速收斂。</p>
+                            </div>
+                        </div>
+                        <div class="glass-card p-2.5 space-y-1 border-t-2 border-purple-500 flex items-start gap-2.5">
+                            <img src="assets/illustrations/mammal_vector_cartoon.jpg" class="w-11 h-11 object-cover rounded-lg border border-purple-600/60 shrink-0 mt-0.5 shadow" alt="Mammal Vector">
+                            <div>
+                                <div class="font-bold text-white text-[11px]">3. 向量媒介 (20%)</div>
+                                <p class="text-slate-300 text-[10px] leading-tight">紅狐/野猫具夜間侵入習性，為突破防護網之跨物種媒介。</p>
+                            </div>
+                        </div>
+                        <div class="glass-card p-2.5 space-y-1 border-t-2 border-blue-500 flex items-start gap-2.5">
+                            <img src="assets/illustrations/virus_cartoon.jpg" class="w-11 h-11 object-cover rounded-lg border border-blue-600/60 shrink-0 mt-0.5 shadow" alt="Virus">
+                            <div>
+                                <div class="font-bold text-white text-[11px]">4. 病毒株學 (15%)</div>
+                                <p class="text-slate-300 text-[10px] leading-tight">H5N1 潛伏期短 (1-3天)、致死高，有利於農場 24h 內撲殺止血。</p>
+                            </div>
+                        </div>
+                        <div class="col-span-2 glass-card p-2.5 space-y-1 border-t-2 border-cyan-500 flex items-start gap-2.5">
+                            <img src="assets/illustrations/nsw_radar_cartoon.jpg" class="w-11 h-11 object-cover rounded-lg border border-cyan-600/60 shrink-0 mt-0.5 shadow" alt="NSW Surveillance">
+                            <div>
+                                <div class="font-bold text-white text-[11px]">5. NSW 野鳥疫情與擴散趨勢 (20%)</div>
+                                <p class="text-slate-300 text-[10px] leading-tight">防檢署以全州宣告。監控全州野鳥個案數與向內陸擴散趨勢（當前 17 起沿海個案）。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 text-xs text-slate-400 flex justify-between items-center">
+                    <span>算式：總風險指數 = 0.25 × 政策隔離 + 0.20 × 候鳥季節 + 0.20 × 跨物種向量 + 0.15 × 病毒株學 + 0.20 × NSW 野鳥疫情</span>
+                    <span class="text-cyan-400 font-mono">Weighted Sensitivity Engine</span>
+                </div>
+            </div>
+
+            <!-- SLIDE 6: Birdata (BirdLife Australia) Avian Density Dynamics -->
+            <div class="slide-content" id="slide-6">
+                <div class="flex justify-between items-start border-b border-slate-800 pb-2">
+                    <div>
+                        <div class="text-xs font-bold text-cyan-400 font-mono tracking-wider uppercase mb-1">
+                            SLIDE 6 / 7 • 2-YEAR EPIDEMIC &amp; MIGRATION TIMELINE
+                        </div>
+                        <h2 class="text-xl font-black text-white tracking-tight">
+                            澳洲 H5N1 疫情走勢與野鳥遷徙滯留 2 年推演時間軸 (2026.06 – 2028.06)
+                        </h2>
+                        <p class="text-[11px] text-slate-400 mt-0.5">雙 Y 軸同步對照「野鳥確診事件數走勢 (左軸)」與「跨國候鳥在澳滯留數量 (右軸)」，完整涵蓋 2 個年度遷徙循環</p>
+                    </div>
+                </div>
+
+                <!-- 4 milestone cards -->
+                <div class="grid grid-cols-4 gap-2 mt-2 mb-1 text-[10px]">
+                    <div class="glass-card p-2 border-l-2 border-red-500">
+                        <div class="text-red-400 font-bold text-[11px]">🔴 2026 候鳥高峰地雷期</div>
+                        <div class="text-slate-200 font-semibold">2026 年 10 月 ~ 11 月</div>
+                        <div class="text-slate-400">220 萬隻大部隊深入內陸濕地，全澳病毒載量最高峰。</div>
+                    </div>
+                    <div class="glass-card p-2 border-l-2 border-emerald-500">
+                        <div class="text-emerald-400 font-bold text-[11px]">🟢 2027 最佳採購避險視窗</div>
+                        <div class="text-slate-200 font-semibold">2027 年 3 月 ~ 7 月</div>
+                        <div class="text-slate-400">候鳥集體北返西伯利亞，野鳥疫情急速降溫至安全低谷。</div>
+                    </div>
+                    <div class="glass-card p-2 border-l-2 border-red-500">
+                        <div class="text-red-400 font-bold text-[11px]">🔴 2027 次年度候鳥回歸期</div>
+                        <div class="text-slate-200 font-semibold">2027 年 9 月 ~ 11 月</div>
+                        <div class="text-slate-400">次年度國際候鳥再度抵達，迎來第 2 輪季節性外溢考驗。</div>
+                    </div>
+                    <div class="glass-card p-2 border-l-2 border-emerald-500">
+                        <div class="text-emerald-400 font-bold text-[11px]">🟢 2028 次年度安全窗口</div>
+                        <div class="text-slate-200 font-semibold">2028 年 3 月 ~ 6 月</div>
+                        <div class="text-slate-400">次年度候鳥再度北返，供應鏈恢復穩定採購排程。</div>
+                    </div>
+                </div>
+
+                <!-- Timeline Chart -->
+                <div class="glass-card p-3" style="height: 52%;">
+                    <canvas id="slideTimelineChart"></canvas>
+                </div>
+
+                <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800 text-[10px] text-slate-400 flex gap-4 flex-wrap">
+                    <span>— 確診 (官方實際累計，止於9月)</span>
+                    <span>- - 確診 (流行病學推演，10月起)</span>
+                    <span>— 候鳥 (實地觀測滯留，止於9月)</span>
+                    <span>- - 候鳥 (季節模型推估，10月起)</span>
+                    <span class="text-amber-400">⚠ 實測數據繪製至 2026.09；未來月份為預測回歸，兩者平滑銜接</span>
+                </div>
+            </div>
+
+            <!-- SLIDE 7: Nestlé Purina Blayney Sourcing & Action Plan -->
+            <div class="slide-content" id="slide-7">
+                <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+                    <div>
+                        <div class="text-xs font-bold text-cyan-400 font-mono tracking-wider uppercase mb-1">
+                            SLIDE 7 / 7 • ACTION PLAN & DECISION MATRIX
+                        </div>
+                        <h2 class="text-2xl font-black text-white tracking-tight">
+                            Nestlé Purina 供應鏈進口決策門檻與應對 SOP
+                        </h2>
+                    </div>
+                    <span class="bg-emerald-950 text-emerald-300 border border-emerald-700/50 px-3 py-1 rounded-full text-xs font-mono">
+                        SOP Action Matrix
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 my-auto text-xs">
+                    <!-- Zone 1: Green -->
+                    <div class="glass-card p-4 space-y-3 border-t-4 border-emerald-500 bg-emerald-950/20">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <img src="assets/illustrations/officer_cartoon.jpg" class="w-7 h-7 object-cover rounded-full border border-emerald-400 shrink-0" alt="Officer">
+                                <span class="bg-emerald-500 text-slate-950 text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase">🟢 低風險區</span>
+                            </div>
+                            <span class="font-mono text-emerald-400 font-bold">Score &lt; 30 (當前: 28)</span>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">正常下單與海運出貨</h3>
+                        <ul class="text-slate-300 space-y-1.5 list-disc pl-4 text-[11px] leading-relaxed">
+                            <li><strong>商業禽場：</strong>維持 0 宗商業確診。</li>
+                            <li><strong>採購動作：</strong>正常安排 Blayney 廠訂單生產與海運 shipping。</li>
+                            <li><strong>通關：</strong>憑澳洲官方衛生證明書正常放行。</li>
+                        </ul>
+                    </div>
+
+                    <!-- Zone 2: Yellow -->
+                    <div class="glass-card p-4 space-y-3 border-t-4 border-amber-500 bg-amber-950/20">
+                        <div class="flex items-center justify-between"><div class="flex items-center gap-2"><img src="assets/illustrations/migratory_cartoon.jpg" class="w-7 h-7 object-cover rounded-full border border-amber-400 shrink-0" alt="Migratory"><span class="bg-amber-500 text-slate-950 text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase">🟡 中風險區</span></div>
+                            <span class="font-mono text-amber-400 font-bold">Score 30 ~ 59</span>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">建立 6~8 週安全庫存緩衝</h3>
+                        <ul class="text-slate-300 space-y-1.5 list-disc pl-4 text-[11px] leading-relaxed">
+                            <li><strong>商業禽場：</strong>野鳥進入 10 月高峰或外州出現確診。</li>
+                            <li><strong>採購動作：</strong>建立台灣本地 6~8 週 Buffer 庫存。</li>
+                            <li><strong>檢驗：</strong>要求 Blayney 廠提供批次高溫滅菌證明。</li>
+                        </ul>
+                    </div>
+
+                    <!-- Zone 3: Red -->
+                    <div class="glass-card p-4 space-y-3 border-t-4 border-red-500 bg-red-950/20">
+                        <div class="flex items-center justify-between"><div class="flex items-center gap-2"><img src="assets/illustrations/virus_cartoon.jpg" class="w-7 h-7 object-cover rounded-full border border-red-500 shrink-0" alt="Virus"><span class="bg-red-600 text-white text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase">🔴 高風險警示</span></div>
+                            <span class="font-mono text-red-400 font-bold">Score ≥ 60</span>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">暫緩訂單並啟動替代廠源</h3>
+                        <ul class="text-slate-300 space-y-1.5 list-disc pl-4 text-[11px] leading-relaxed">
+                            <li><strong>商業禽場：</strong>NSW 商業家禽爆發確診。</li>
+                            <li><strong>採購動作：</strong>立即暫緩新增 Blayney 採購訂單。</li>
+                            <li><strong>應變：</strong>啟動泰國/歐洲替代廠源供應 SOP。</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                    <div class="flex items-center gap-2 text-slate-200">
+                        <i class="fa-solid fa-flag-checkered text-emerald-400"></i>
+                        <span><strong>最終決策建議：</strong> 目前指標處於 <strong class="text-emerald-400">🟢 28 分低風險區</strong>，建議維持正常下單，並每週自動對齊 DAFF 數據。</span>
+                    </div>
+                    <span class="text-slate-500 font-mono text-[11px]">Nestlé Purina Supply Chain Decision</span>
+                </div>
+            </div>
+
+            <!-- Slide Bottom Navigation & Controls Footer -->
+            <footer class="mt-auto border-t border-slate-800/80 bg-slate-950/60 px-6 py-3 flex items-center justify-between text-xs">
+                <!-- Left: Previous Button -->
+                <button onclick="prevSlide()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-4 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-2">
+                    <i class="fa-solid fa-chevron-left"></i> 上一頁 (←)
+                </button>
+
+                <!-- Center: Slide Counter Indicator Dots -->
+                <div class="flex items-center gap-2">
+                    <span id="slide-num-text" class="font-mono text-slate-400 font-bold mr-2">Slide 1 / 7</span>
+                    <div class="flex gap-1.5">
+                        <button onclick="goToSlide(1)" class="w-2.5 h-2.5 rounded-full bg-cyan-400 transition" id="dot-1"></button>
+                        <button onclick="goToSlide(2)" class="w-2.5 h-2.5 rounded-full bg-slate-700 transition" id="dot-2"></button>
+                        <button onclick="goToSlide(3)" class="w-2.5 h-2.5 rounded-full bg-slate-700 transition" id="dot-3"></button>
+                        <button onclick="goToSlide(4)" class="w-2.5 h-2.5 rounded-full bg-slate-700 transition" id="dot-4"></button>
+                        <button onclick="goToSlide(5)" class="w-2.5 h-2.5 rounded-full bg-slate-700 transition" id="dot-5"></button>
+                        <button onclick="goToSlide(6)" class="w-2.5 h-2.5 rounded-full bg-slate-700 transition" id="dot-6"></button>
+                        <button onclick="goToSlide(7)" class="w-2.5 h-2.5 rounded-full bg-slate-700 transition" id="dot-7"></button>
+                    </div>
+                </div>
+
+                <!-- Right: Next Button -->
+                <button onclick="nextSlide()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-4 py-1.5 rounded-lg transition flex items-center gap-2 shadow-lg shadow-cyan-600/20">
+                    下一頁 (→) <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </footer>
+
+            <!-- Bottom Progress Line -->
+            <div class="w-full bg-slate-800 h-1">
+                <div id="progress-line" class="progress-bar-fill h-full bg-cyan-500" style="width: 14.28%;"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JavaScript Presentation Controller -->
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 7;
+        let slideGisMapInstance = null;
+        let slideRadarChartInstance = null;
+        let birdataChartInstance = null;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                prevSlide();
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullscreen();
+            }
+        });
+
+        function goToSlide(n) {
+            if (n < 1 || n > totalSlides) return;
+
+            document.getElementById(`slide-${currentSlide}`).classList.remove('active');
+            document.getElementById(`dot-${currentSlide}`).className = 'w-2.5 h-2.5 rounded-full bg-slate-700 transition';
+
+            currentSlide = n;
+
+            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+            document.getElementById(`dot-${currentSlide}`).className = 'w-2.5 h-2.5 rounded-full bg-cyan-400 transition';
+
+            document.getElementById('slide-num-text').textContent = `Slide ${currentSlide} / ${totalSlides}`;
+            document.getElementById('progress-line').style.width = `${(currentSlide / totalSlides) * 100}%`;
+
+            // Trigger Map / Chart Renders on specific slides
+            if (currentSlide === 4 && !slideGisMapInstance) {
+                setTimeout(initSlideGisMap, 150);
+            }
+            if (currentSlide === 5 && !slideRadarChartInstance) {
+                setTimeout(initSlideRadarChart, 150);
+            }
+            if (currentSlide === 6 && !birdataChartInstance) {
+                setTimeout(initBirdataChart, 150);
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                goToSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                goToSlide(currentSlide - 1);
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`無法切換全螢幕: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Slide 4 GIS Map Init
+        function initSlideGisMap() {
+            const container = document.getElementById('slide-gis-map');
+            if (!container || slideGisMapInstance) return;
+
+            slideGisMapInstance = L.map('slide-gis-map').setView([-32.0, 140.0], 4);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 16,
+                attribution: '&copy; Esri, HERE, Garmin, USGS, NGA'
+            }).addTo(slideGisMapInstance);
+
+            setTimeout(() => slideGisMapInstance.invalidateSize(), 300);
+
+            // Plant Marker
+            L.marker([-33.521, 149.236], {
+                icon: L.divIcon({
+                    className: 'custom-icon',
+                    html: '<div style="background:#3b82f6; width:18px; height:18px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 10px #3b82f6;"></div>',
+                    iconSize: [18, 18],
+                    iconAnchor: [9, 9]
+                })
+            }).addTo(slideGisMapInstance).bindPopup('Nestlé Purina Blayney Plant');
+
+            // Routes
+            L.polyline([[-50, 75], [-43, 105], [-38.5, 138], [-38.3, 144.5], [-34.5, 151.2]], {
+                color: '#ef4444', weight: 2.5, dashArray: '6, 6'
+            }).addTo(slideGisMapInstance);
+
+            L.polyline([[-12, 148], [-27, 153.5], [-32.8, 151.8], [-33.8, 151.2]], {
+                color: '#f59e0b', weight: 2.5, dashArray: '5, 5'
+            }).addTo(slideGisMapInstance);
+
+            L.polyline([[-33.8, 151.2], [-33.6, 150.8], [-33.521, 149.236]], {
+                color: '#06b6d4', weight: 2
+            }).addTo(slideGisMapInstance);
+        }
+
+        // Slide 5 Radar Chart Init
+        function initSlideRadarChart() {
+            const ctx = document.getElementById('slideRadarChart');
+            if (!ctx || slideRadarChartInstance) return;
+
+            slideRadarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['政策隔離', '候鳥季節', '向量媒介', '病毒株學', 'NSW 野鳥疫情'],
+                    datasets: [{
+                        label: '當前風險分數',
+                        data: [20, 40, 30, 35, 15],
+                        backgroundColor: 'rgba(16, 185, 129, 0.25)',
+                        borderColor: '#10b981',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: '#94a3b8', font: { size: 10, weight: 'bold' } },
+                            ticks: { display: false, min: 0, max: 100 }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // Slide 6 Timeline Chart (2026.06–2028.06, Actual vs Projected)
+        function initBirdataChart() {
+            const ctx = document.getElementById('slideTimelineChart');
+            if (!ctx || birdataChartInstance) return;
+
+            const labels = [
+                '2026.06','2026.07','2026.08','2026.09 (現況)',
+                '2026.10','2026.11','2026.12',
+                '2027.01','2027.02','2027.03','2027.04','2027.05','2027.06','2027.07',
+                '2027.08','2027.09','2027.10','2027.11','2027.12',
+                '2028.01','2028.02','2028.03','2028.04','2028.05','2028.06'
+            ];
+
+            birdataChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: '全澳確診 (官方實際累計)',
+                            data: [3, 28, 200, 456, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+                            borderColor: '#fbbf24', backgroundColor: 'rgba(251,191,36,0.15)',
+                            borderWidth: 2.5, pointRadius: 3, tension: 0.35, yAxisID: 'y'
+                        },
+                        {
+                            label: '全澳確診 (流行病學推演)',
+                            data: [null, null, null, 456, 590, 740, 820, 870, 840, 780, 700, 640, 610, 600, 660, 800, 970, 1100, 1180, 1210, 1180, 1150, 1190, 1210, 1230],
+                            borderColor: '#f97316', backgroundColor: 'transparent',
+                            borderWidth: 2, borderDash: [6, 4], pointRadius: 2.5, tension: 0.35, yAxisID: 'y'
+                        },
+                        {
+                            label: '全澳候鳥 (實地普查觀測)',
+                            data: [8, 8, 25, 180, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+                            borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,0.1)',
+                            borderWidth: 2.5, pointRadius: 3, tension: 0.35, yAxisID: 'y1'
+                        },
+                        {
+                            label: '全澳候鳥 (季節模型推估)',
+                            data: [null, null, null, 180, 220, 210, 170, 130, 80, 25, 10, 8, 8, 8, 35, 180, 220, 210, 170, 130, 80, 25, 10, 8, 8],
+                            borderColor: '#38bdf8', backgroundColor: 'transparent',
+                            borderWidth: 2, borderDash: [5, 4], pointRadius: 2.5, tension: 0.35, yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: { color: '#94a3b8', font: { size: 9 }, boxWidth: 14, padding: 8 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.04)' },
+                            ticks: { color: '#64748b', font: { size: 8 }, maxRotation: 40 }
+                        },
+                        y: {
+                            type: 'linear', position: 'left',
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#fbbf24', font: { size: 9 } },
+                            title: { display: true, text: '禽流感確診案件數 (起數)', color: '#fbbf24', font: { size: 9 } }
+                        },
+                        y1: {
+                            type: 'linear', position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: '#06b6d4', font: { size: 9 } },
+                            title: { display: true, text: '候鳥在澳滯留量 (萬隻)', color: '#06b6d4', font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

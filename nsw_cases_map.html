@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>NSW H5N1 確診 11 起案例與 Nestlé Blayney 廠地理分布圖</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet CSS & JS (Cloudflare Enterprise Whitelist CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'Noto Sans TC', sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 16px; }
+        #nswMap { height: 700px; width: 100%; border-radius: 12px; border: 1.5px solid #334155; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5); }
+        
+        /* 精緻小巧工廠 Icon (不遮擋地圖) */
+        .small-factory-pin {
+            background: #eab308;
+            color: #0f172a;
+            font-size: 16px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 12px rgba(234, 179, 8, 0.9), 0 2px 6px rgba(0,0,0,0.6);
+            cursor: pointer;
+        }
+
+        /* 11 起確診事件獨立編號 Badge */
+        .case-number-badge {
+            background-color: #ef4444;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 12px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="max-w-7xl mx-auto space-y-4">
+        <!-- 簡潔頂部資訊欄 -->
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="bg-red-600 text-white text-[11px] font-black px-2 py-0.5 rounded-full uppercase">NSW 11 起案例精確定位圖</span>
+                    <span class="text-xs text-amber-400 font-mono font-bold">DAFF 24/08/2026 官方對齊</span>
+                </div>
+                <h1 class="text-xl font-bold text-white tracking-tight">新南威爾斯州 (NSW) 全部 11 起確診事件與 Nestlé Blayney 廠空間分布</h1>
+                <p class="text-xs text-slate-300 mt-0.5">
+                    註：同地點多起案例已進行微幅環狀放射分散，確保 <strong class="text-red-400">1 ~ 11 號所有個案標籤皆獨立清晰可見</strong>。
+                </p>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+                <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> 🏭 Blayney 工廠</div>
+                <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span> 🔴 確診事件 (共 11 起)</div>
+            </div>
+        </div>
+
+        <!-- 地圖容器 -->
+        <div id="nswMap"></div>
+
+        <!-- 11 起案例詳細對照清單 -->
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 space-y-3">
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>📌</span> NSW 11 起確診事件圖示編號對照清單
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 text-xs font-mono">
+
+                <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-red-400">#1</span>
+                        <span class="text-slate-300 font-sans ml-1">Nest)</span>
+                        <div class="text-[10px] text-amber-300 font-sans truncate">(南方巨鸌 (2026-06-28)</div>
+                    </div>
+                    <span class="text-[11px] text-emerald-400 font-bold shrink-0">290km</span>
+                </div>
+                <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-red-400">#2</span>
+                        <span class="text-slate-300 font-sans ml-1">第二例)</span>
+                        <div class="text-[10px] text-amber-300 font-sans truncate">(南方巨鸌 (2026-07-11)</div>
+                    </div>
+                    <span class="text-[11px] text-emerald-400 font-bold shrink-0">290km</span>
+                </div>
+                <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-red-400">#3</span>
+                        <span class="text-slate-300 font-sans ml-1">(Narooma)</span>
+                        <div class="text-[10px] text-amber-300 font-sans truncate">(大鳳頭燕鷗 (2026-08-04)</div>
+                    </div>
+                    <span class="text-[11px] text-emerald-400 font-bold shrink-0">311km</span>
+                </div>
+                <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-red-400">#4</span>
+                        <span class="text-slate-300 font-sans ml-1">(Coomealla)</span>
+                        <div class="text-[10px] text-amber-300 font-sans truncate">(大鳳頭燕鷗 (2026-08-04)</div>
+                    </div>
+                    <span class="text-[11px] text-emerald-400 font-bold shrink-0">668km</span>
+                </div>
+                <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-red-400">#5</span>
+                        <span class="text-slate-300 font-sans ml-1">(Eden)</span>
+                        <div class="text-[10px] text-amber-300 font-sans truncate">(大鳳頭燕鷗 (2026-08-11)</div>
+                    </div>
+                    <span class="text-[11px] text-emerald-400 font-bold shrink-0">399km</span>
+                </div>
+                <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-red-400">#6</span>
+                        <span class="text-slate-300 font-sans ml-1">1)</span>
+                        <div class="text-[10px] text-amber-300 font-sans truncate">(大鳳頭燕鷗 (2026-08-20)</div>
+                    </div>
+                    <span class="text-[11px] text-emerald-400 font-bold shrink-0">173km</span>
+                </div>
+                <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-red-400">#10</span>
+                        <span class="text-slate-300 font-sans ml-1">1)</span>
+                        <div class="text-[10px] text-amber-300 font-sans truncate">(大鳳頭燕鷗 (2026-08-21)</div>
+                    </div>
+                    <span class="text-[11px] text-emerald-400 font-bold shrink-0">173km</span>
+                </div>
+                <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-red-400">#7</span>
+                        <span class="text-slate-300 font-sans ml-1">2)</span>
+                        <div class="text-[10px] text-amber-300 font-sans truncate">(大鳳頭燕鷗 (2026-08-20)</div>
+                    </div>
+                    <span class="text-[11px] text-emerald-400 font-bold shrink-0">164km</span>
+                </div>
+                <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-red-400">#11</span>
+                        <span class="text-slate-300 font-sans ml-1">2)</span>
+                        <div class="text-[10px] text-amber-300 font-sans truncate">(大鳳頭燕鷗 (2026-08-21)</div>
+                    </div>
+                    <span class="text-[11px] text-emerald-400 font-bold shrink-0">164km</span>
+                </div>
+                <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-red-400">#8</span>
+                        <span class="text-slate-300 font-sans ml-1">3)</span>
+                        <div class="text-[10px] text-amber-300 font-sans truncate">(大鳳頭燕鷗 (2026-08-20)</div>
+                    </div>
+                    <span class="text-[11px] text-emerald-400 font-bold shrink-0">157km</span>
+                </div>
+                <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-red-400">#9</span>
+                        <span class="text-slate-300 font-sans ml-1">4)</span>
+                        <div class="text-[10px] text-amber-300 font-sans truncate">(大鳳頭燕鷗 (2026-08-20)</div>
+                    </div>
+                    <span class="text-[11px] text-emerald-400 font-bold shrink-0">152km</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const factoryLat = -33.521027;
+        const factoryLng = 149.236425;
+        const casesData = [{"index": 1, "orig_lat": -32.6658, "orig_lng": 152.1793, "lat": -32.6658, "lng": 152.2333, "date": "2026-06-28", "location": "新南威爾斯州 Mid-Coast (Hawks Nest)", "species": "野生巨鸌 (南方巨鸌 / Petrel)", "distance": 290}, {"index": 2, "orig_lat": -32.6658, "orig_lng": 152.1793, "lat": -32.6658, "lng": 152.1253, "date": "2026-07-11", "location": "新南威爾斯州 Mid-Coast (Hawks Nest - 第二例)", "species": "野生巨鸌 (南方巨鸌 / Petrel)", "distance": 290}, {"index": 3, "orig_lat": -36.2167, "orig_lng": 150.1333, "lat": -36.2167, "lng": 150.1333, "date": "2026-08-04", "location": "新南威爾斯州 Eurobodalla (Narooma)", "species": "野生燕鷗 (大鳳頭燕鷗 / Crested tern)", "distance": 311}, {"index": 4, "orig_lat": -34.0833, "orig_lng": 142.0333, "lat": -34.0833, "lng": 142.0333, "date": "2026-08-04", "location": "新南威爾斯州 Wentworth (Coomealla)", "species": "野生燕鷗 (大鳳頭燕鷗 / Crested tern)", "distance": 668}, {"index": 5, "orig_lat": -37.0667, "orig_lng": 149.9, "lat": -37.0667, "lng": 149.9, "date": "2026-08-11", "location": "新南威爾斯州 Bega Valley (Eden)", "species": "野生燕鷗 (大鳳頭燕鷗 / Crested tern)", "distance": 399}, {"index": 6, "orig_lat": -34.3188, "orig_lng": 150.8493, "lat": -34.3188, "lng": 150.9033, "date": "2026-08-20", "location": "NSW 官方最新通報區域 (個案 1)", "species": "野生燕鷗 (大鳳頭燕鷗 / Crested tern)", "distance": 173}, {"index": 10, "orig_lat": -34.3188, "orig_lng": 150.8493, "lat": -34.3188, "lng": 150.7953, "date": "2026-08-21", "location": "NSW 官方最新通報區域 (個案 1)", "species": "野生燕鷗 (大鳳頭燕鷗 / Crested tern)", "distance": 173}, {"index": 7, "orig_lat": -34.1388, "orig_lng": 150.8493, "lat": -34.1388, "lng": 150.9033, "date": "2026-08-20", "location": "NSW 官方最新通報區域 (個案 2)", "species": "野生燕鷗 (大鳳頭燕鷗 / Crested tern)", "distance": 164}, {"index": 11, "orig_lat": -34.1388, "orig_lng": 150.8493, "lat": -34.1388, "lng": 150.7953, "date": "2026-08-21", "location": "NSW 官方最新通報區域 (個案 2)", "species": "野生燕鷗 (大鳳頭燕鷗 / Crested tern)", "distance": 164}, {"index": 8, "orig_lat": -33.9588, "orig_lng": 150.8493, "lat": -33.9588, "lng": 150.8493, "date": "2026-08-20", "location": "NSW 官方最新通報區域 (個案 3)", "species": "野生燕鷗 (大鳳頭燕鷗 / Crested tern)", "distance": 157}, {"index": 9, "orig_lat": -33.7788, "orig_lng": 150.8493, "lat": -33.7788, "lng": 150.8493, "date": "2026-08-20", "location": "NSW 官方最新通報區域 (個案 4)", "species": "野生燕鷗 (大鳳頭燕鷗 / Crested tern)", "distance": 152}];
+
+        const map = L.map('nswMap').setView([-34.5, 147.5], 6);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        // 小巧精緻工廠小圖案 (不遮擋地圖)
+        const factoryIcon = L.divIcon({
+            className: 'custom-factory-pin',
+            html: '<div class="small-factory-pin" title="Nestlé Purina Blayney 廠">🏭</div>',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
+        });
+
+        L.marker([factoryLat, factoryLng], { icon: factoryIcon, zIndexOffset: 2000 }).addTo(map)
+            .bindPopup('<strong style="color:#eab308;">🏭 Nestlé Purina Blayney 廠</strong><br>GPS: -33.5332, 149.2524<br>海拔 860 米 (內陸高地)');
+
+        // 獨立繪製全部 11 個個案標籤
+        casesData.forEach(c => {
+            const markerIcon = L.divIcon({
+                className: 'custom-case-pin',
+                html: `<div class="case-number-badge" title="個案 #${c.index}">${c.index}</div>`,
+                iconSize: [26, 26],
+                iconAnchor: [13, 13]
+            });
+
+            L.marker([c.lat, c.lng], { icon: markerIcon }).addTo(map).bindPopup(`
+                <div style="color:#0f172a; font-size:12px; line-height:1.5;">
+                    <strong style="color:#ef4444;">NSW EVENT #${c.index}</strong><br>
+                    <strong>位置:</strong> ${c.location}<br>
+                    <strong>物種:</strong> ${c.species}<br>
+                    <strong>日期:</strong> ${c.date}<br>
+                    <strong>距 Blayney 廠:</strong> ${c.distance} 公里
+                </div>
+            `);
+
+            // 同地點分散引線 (若是同地點個案，畫一條極淡細線回原始座標)
+            if (c.orig_lat !== c.lat || c.orig_lng !== c.lng) {
+                L.polyline([[c.orig_lat, c.orig_lng], [c.lat, c.lng]], {
+                    color: '#ef4444',
+                    weight: 1,
+                    opacity: 0.5
+                }).addTo(map);
+            }
+        });
+
+        // 自動調整鏡頭包含 Blayney 工廠與全部 11 個點位
+        const points = [[factoryLat, factoryLng], ...casesData.map(c => [c.lat, c.lng])];
+        map.fitBounds(points, { padding: [40, 40] });
+    </script>
+</body>
+</html>

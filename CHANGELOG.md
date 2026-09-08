@@ -2,6 +2,25 @@
 
 所有專案版本更新與重大變更均紀錄於此。
 
+## [v2.9.1] - 2026-09-08
+
+### 🛡️ 企業資安白名單 CDN 全面替換 (Enterprise Whitelist CDN Compliance)
+- **全面移除 `cdn.jsdelivr.net` 與 `unpkg.com`**：
+  - 將全專案所有 HTML 範本與頁面（主頁、英文主頁、風險評估模型、16:9 簡報投影片）引用的 `Chart.js` 與 `Leaflet` 圖資庫，全數切換至 **Cloudflare Enterprise CDN (`cdnjs.cloudflare.com`)**。
+  - 徹底解決雀巢企業內網與 Windows Defender / IT 管理員彈出「`為了保護您，您的 IT 系統管理員不允許您存取 cdn.jsdelivr.net 的內容`」之資安阻擋提示，保障所有同仁在公司電腦與內網環境中順暢載入圖表。
+
+### ⚖️ 風險評估模擬器預設值與雷達圖現況校正 (Risk Simulator Default Alignment)
+- **下拉選單與初始權重校正 (`risk_assessment.html` & `risk_assessment_en.html`)**：
+  - **維度 4 (NSW 疫情)**：修正預設選項為 `🟡 NSW 野鳥確診溫和增加 (20 ~ 50 起, 當前現況 22 起, 得分 35)`。
+  - **維度 3 (候鳥季節)**：修正預設選項為 `9 月：200 萬隻國際候鳥登陸 (當前現況, 得分 70)`。
+  - **重設機制 (`resetSimulator()`)**：點擊「重設為當前現況」時精確回復至 9月 (70分) 與 NSW 22起 (35分)。
+  - **雷達圖與指標分數**：雙語模型初始數據點對齊為 `[20, 70, 30, 35, 35]`，綜合風險評分精準對齊為 **37 分 (🟡 中風險緩衝)**。
+
+### 📺 16:9 雙語高階風險評估簡報 (Risk Assessment Slides) 正式納入部署
+- 中文版 [risk_assessment_slides.html](file:///c:/Users/TWLaiAl/OneDrive%20-%20NESTLE/Nestle/Antigravity/AU_H5N1_Daily_Update/risk_assessment_slides.html) 與英文版 [risk_assessment_slides_en.html](file:///c:/Users/TWLaiAl/OneDrive%20-%20NESTLE/Nestle/Antigravity/AU_H5N1_Daily_Update/risk_assessment_slides_en.html) 具備完整 16:9 幻燈片切換、動態雷達圖、雙軸預測圖與資安白名單 CDN，並由 `h5n1.py` 於每週一自動歸檔至 `weekly_reports/`。
+
+---
+
 ## [v2.9.0] - 2026-09-08
 
 ### 🚨 NSW 確診激增至 22 起 · 病毒首度攻入雪梨都會圈 (Sydney Metro Breach)

@@ -1,6 +1,19 @@
 # 任務清單與進度記錄 (Task Progress Record)
 
-## 🟢 今日已完成重點 (2026-09-08 Completed - v2.9.0)
+## 🟢 今日已完成重點 (2026-09-08 Completed - v2.9.1 & v2.9.0)
+- [x] **🛡️ 企業資安白名單 CDN 全面替換 (Enterprise Whitelist CDN)**
+  - [x] 全專案移除 `cdn.jsdelivr.net` 與 `unpkg.com`，全數替換為 `cdnjs.cloudflare.com`。
+  - [x] 徹底解決雀巢企業內網與 Windows Defender IT 阻擋彈窗。
+
+- [x] **⚖️ 定量風險模型現況校正 (`risk_assessment.html` & `risk_assessment_en.html`)**
+  - [x] 維度 4 (NSW 疫情) 下拉選單預設校正為 `🟡 NSW 野鳥確診溫和增加 (20 ~ 50 起, 當前現況 22 起, 得分 35)`。
+  - [x] 維度 3 (候鳥季節) 下拉選單預設校正為 `9 月：200 萬隻國際候鳥登陸 (當前現況, 得分 70)`。
+  - [x] 雷達圖初始數據點對齊為 `[20, 70, 30, 35, 35]`，綜合評分對齊為 **37 分 (🟡 中風險緩衝)**。
+  - [x] 重設模擬器 (`resetSimulator()`) 邏輯精準還原為當前現況。
+
+- [x] **📺 16:9 雙語高階風險評估簡報 (`risk_assessment_slides.html` & `risk_assessment_slides_en.html`)**
+  - [x] 具備 16:9 全螢幕投影、動態雷達圖、雙軸預測圖與資安白名單 CDN，並由 `h5n1.py` 於每週一自動歸檔至 `weekly_reports/`。
+
 - [x] **🚨 NSW 確診激增至 22 起 · 攻入雪梨都會圈與瀕危物種數據更新 (`cases_events.json` & `h5n1.py`)**
   - [x] 納入雪梨北灘沃里伍德 (Warriewood, Northern Beaches Sydney) 與肯布拉港 (Port Kembla) 大鳳頭燕鷗首例確診點位。
   - [x] 納入科夫斯港 (Coffs Harbour) 全新南威爾斯州首例受脅瀕危留鳥「赫頓鸌 / 雪兒水鳥 (Hutton's Shearwater)」。
@@ -11,10 +24,6 @@
   - [x] 於中英文主頁 (`index.html` & `index_en.html`) 嵌入 4 欄式政策雷達看板（VIC 圈養令延長至 9/18 vs NSW 自願指引、阿德萊德紅狐都會警戒、Taronga Zoo 疫苗臨床試驗、BioResponse NSW App）。
   - [x] 擴充 `DEFAULT_SPECIES_PROFILES` 納入「赫頓鸌 (Hutton's Shearwater)」與「野生紅狐 (Red Fox)」生態屬性與風險指引。
   - [x] 病例明細表新增「🚨 新州 / 雪梨北灘 (NSW 22起)」與「🌊 赫頓鸌 / 瀕危留鳥 (科夫斯港)」一鍵快篩按鈕。
-
-- [x] **⚖️ 定量風險模型同步 (`risk_assessment.html` & `risk_assessment_en.html`)**
-  - [x] NSW 野生動物事件同步更新至 **22 起**。
-  - [x] 重申 Blayney 廠與太平洋沿海突破點存在 >200km 距離與藍山山脈天然屏障，商業原料供應鏈維持安全。
 
 - [x] **📚 專案文檔與 SOP 同步**
   - [x] 更新 `README.md`、`CHANGELOG.md`、`GOVT_SCRAPING_BEST_PRACTICES.md`、`SOP.md`、`task.md`、`walkthrough.md`。

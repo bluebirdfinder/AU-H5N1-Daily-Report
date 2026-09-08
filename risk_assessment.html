@@ -7,14 +7,14 @@
     <title>Nestlé Purina 澳洲寵物食品進口 H5N1 定量風險評估模型 (Quantitative Risk Model)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js CDN (Cloudflare Enterprise Whitelist CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
     <!-- FontAwesome icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Leaflet GIS Map CSS & JS CDN -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet GIS Map CSS & JS CDN (Cloudflare Enterprise Whitelist CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
     <style>
         body {
@@ -174,23 +174,23 @@
         <!-- KPI Summary Cards Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             <!-- Card 1: Quantitative Risk Index -->
-            <div class="glass-card p-5 space-y-3 border-l-4 border-emerald-500">
+            <div class="glass-card p-5 space-y-3 border-l-4 border-amber-500">
                 <div class="flex items-center justify-between text-xs text-slate-400 font-bold uppercase tracking-wider">
                     <span>當前定量風險指數</span>
-                    <i class="fa-solid fa-gauge-high text-emerald-400"></i>
+                    <i class="fa-solid fa-gauge-high text-amber-400"></i>
                 </div>
                 <div class="flex items-baseline gap-2">
-                    <span id="kpi-risk-score" class="text-4xl font-black text-emerald-400 font-mono">28</span>
+                    <span id="kpi-risk-score" class="text-4xl font-black text-amber-400 font-mono">37</span>
                     <span class="text-xs text-slate-400 font-mono">/ 100</span>
                 </div>
                 <div class="flex items-center justify-between text-xs">
-                    <span id="kpi-risk-badge" class="bg-emerald-500/20 text-emerald-300 font-bold px-2.5 py-0.5 rounded-full border border-emerald-500/40">
-                        🟢 低風險區 (SAFE)
+                    <span id="kpi-risk-badge" class="bg-amber-500/20 text-amber-300 font-bold px-2.5 py-0.5 rounded-full border border-amber-500/40">
+                        🟡 中低警戒區 (MODERATE)
                     </span>
-                    <span class="text-[11px] text-slate-400">可安排進口下單</span>
+                    <span class="text-[11px] text-slate-400">維持安全庫存與密切監控</span>
                 </div>
                 <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                    <div id="kpi-risk-bar" class="gauge-bar-fill h-full bg-emerald-500" style="width: 28%;"></div>
+                    <div id="kpi-risk-bar" class="gauge-bar-fill h-full bg-amber-500" style="width: 37%;"></div>
                 </div>
             </div>
 
@@ -277,7 +277,7 @@
                     </div>
                     <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
                         <span class="text-slate-400 block text-[10px]">2. 候鳥季節 (20%)</span>
-                        <strong id="score-val-2" class="text-amber-400 text-sm">40 / 100</strong>
+                        <strong id="score-val-2" class="text-amber-400 text-sm">70 / 100</strong>
                     </div>
                     <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
                         <span class="text-slate-400 block text-[10px]">3. 向量媒介 (20%)</span>
@@ -289,7 +289,7 @@
                     </div>
                     <div class="col-span-2 bg-slate-900/80 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
                         <span class="text-slate-400 block text-[10px]">5. NSW 野鳥疫情 (20%)</span>
-                        <strong id="score-val-5" class="text-emerald-400 text-sm">15 / 100</strong>
+                        <strong id="score-val-5" class="text-amber-400 text-sm">35 / 100</strong>
                     </div>
                 </div>
             </div>
@@ -351,11 +351,11 @@
                             <label class="font-bold text-slate-200 flex items-center gap-1.5">
                                 <span>🗓️ 3. 候鳥遷徙季節階段 (Seasonal Phase)</span>
                             </label>
-                            <span id="ctrl-val-migratory" class="font-mono text-amber-400 font-bold">8月下旬 (前鋒期, 得分 40)</span>
+                            <span id="ctrl-val-migratory" class="font-mono text-amber-400 font-bold">9月 (登陸期 200萬隻, 得分 70)</span>
                         </div>
                         <select id="select-migratory" onchange="recalculateRisk()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500 font-sans">
-                            <option value="40" selected>8月下旬：前鋒海鳥抵達南部沿海 (當前現況, 得分 40)</option>
-                            <option value="70">9 月：200 萬隻國際候鳥登陸北部卡奔塔利亞灣 (得分 70)</option>
+                            <option value="40">8月下旬：前鋒海鳥抵達南部沿海 (得分 40)</option>
+                            <option value="70" selected>9 月：200 萬隻國際候鳥登陸北部卡奔塔利亞灣 (當前現況, 得分 70)</option>
                             <option value="90">10 月：候鳥大部隊向 NSW/VIC 內陸濕地大規模分散 (最高危地雷期, 得分 90)</option>
                             <option value="60">11 月~隔年2 月：南方夏日濕地過冬停留期 (得分 60)</option>
                             <option value="20">3 月~7 月：候鳥全數集體北返 (低風險安全期, 得分 20)</option>
@@ -368,11 +368,11 @@
                             <label class="font-bold text-slate-200 flex items-center gap-1.5">
                                 <span>🗺️ 4. NSW 全州野鳥確診事件數與擴散趨勢</span>
                             </label>
-                            <span id="ctrl-val-nsw-events" class="font-mono text-emerald-400 font-bold">零星沿海野鳥確診 (當前現況 17 起, 得分 15)</span>
+                            <span id="ctrl-val-nsw-events" class="font-mono text-amber-400 font-bold">野鳥確診溫和增加 (當前現況 22 起, 得分 35)</span>
                         </div>
                         <select id="select-nsw-events" onchange="recalculateRisk()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500 font-sans">
-                            <option value="15" selected>🟢 NSW 零星沿海野鳥確診 (當前現況 17 起, 得分 15)</option>
-                            <option value="35">🟡 NSW 野鳥確診溫和增加 (20 ~ 50 起, 得分 35)</option>
+                            <option value="15">🟢 NSW 零星沿海野鳥確診 (< 20 起, 得分 15)</option>
+                            <option value="35" selected>🟡 NSW 野鳥確診溫和增加 (20 ~ 50 起, 當前現況 22 起, 得分 35)</option>
                             <option value="60">🟠 NSW 野鳥確診快速竄升 (> 50 起且向內陸濕地擴散, 得分 60)</option>
                             <option value="90">🔴 NSW 野鳥爆發大規模群聚死亡 (> 100 起, 得分 90)</option>
                         </select>
@@ -488,7 +488,7 @@
                         <span class="bg-cyan-950 text-cyan-300 border border-cyan-700/50 text-[11px] font-mono px-2 py-0.5 rounded font-bold">權重 20%</span>
                     </div>
                     <p class="text-xs text-slate-300 leading-relaxed">
-                        • <strong>核心指標：</strong>NSW 全州野鳥確診事件數（當前 17 起）與向內陸濕地擴散趨勢。<br>
+                        • <strong>核心指標：</strong>NSW 全州野鳥確診事件數（當前 22 起）與向內陸濕地擴散趨勢。<br>
                         • <strong>科學依據：</strong>台灣防檢署 (TW APHIA) 以全州（State）行政區劃進行疫區宣告。若 NSW 境內野鳥個案急速增加並向內陸濕地擴散，將大增商業家禽場被感染與全州遭邊境禁令之風險。
                     </p>
                 </div>
@@ -1360,7 +1360,7 @@
                     <div style="font-family:sans-serif; min-width: 250px; line-height: 1.5; padding: 2px;">
                         <strong style="color:#38bdf8; font-size:14px; font-weight:800; display:block; margin-bottom:4px;">📍 新南威爾斯州 (NSW 轄區管轄界線)</strong>
                         <div style="font-size:11px; color:#f1f5f9; margin-bottom:3px;">• 台灣防檢署 (TW APHIA) 州級監控管制區</div>
-                        <div style="font-size:11px; color:#fbbf24; font-weight:bold; margin-bottom:3px;">• 當前野鳥確診事件: 17 起 (局限於沿海海鳥)</div>
+                        <div style="font-size:11px; color:#fbbf24; font-weight:bold; margin-bottom:3px;">• 當前野鳥確診事件: 22 起 (含雪梨北灘與肯布拉港)</div>
                         <div style="font-size:11px; color:#34d399; font-weight:bold; margin-bottom:4px;">• 商業家禽禽舍: 0 感染 (100% 絕對安全)</div>
                         <div style="font-size:10px; color:#94a3b8; border-top:1px solid rgba(255,255,255,0.15); padding-top:4px;">
                             💡 只要商業家禽維持 0 感染，全州寵物食品享 Area Freedom 清潔宣告
@@ -1819,14 +1819,14 @@
                     ],
                     datasets: [{
                         label: '當前定量風險分數',
-                        data: [20, 40, 30, 35, 15],
-                        backgroundColor: 'rgba(16, 185, 129, 0.25)',
-                        borderColor: '#10b981',
+                        data: [20, 70, 30, 35, 35],
+                        backgroundColor: 'rgba(245, 158, 11, 0.25)',
+                        borderColor: '#f59e0b',
                         borderWidth: 2,
-                        pointBackgroundColor: '#10b981',
+                        pointBackgroundColor: '#f59e0b',
                         pointBorderColor: '#fff',
                         pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: '#10b981'
+                        pointHoverBorderColor: '#f59e0b'
                     }]
                 },
                 options: {
@@ -1948,9 +1948,9 @@
 
         function resetSimulator() {
             document.getElementById('select-housing').value = '20';
-            document.getElementById('select-migratory').value = '40';
+            document.getElementById('select-migratory').value = '70';
             document.getElementById('select-vector').value = '30';
-            document.getElementById('select-nsw-events').value = '15';
+            document.getElementById('select-nsw-events').value = '35';
             setCommercialFarmStatus(0);
         }
     
@@ -2020,7 +2020,7 @@
                         </li>
                         <li>
                             <strong class="text-white">CSIRO 澳洲疾病預防中心 (ACDP) & 農業部 (DAFF)：</strong>
-                            全澳野鳥確診事件真實通報數（當前 456 起，NSW 17 起皆局限於沿海燕鷗/銀鷗），全澳商業禽舍維持 <strong class="text-emerald-300">0 宗感染</strong>。
+                            全澳野鳥確診事件真實通報數（當前 484 起，NSW 22 起含雪梨北灘與肯布拉港），全澳商業禽舍維持 <strong class="text-emerald-300">0 宗感染</strong>。
                         </li>
                     </ul>
                 </div>
@@ -2066,7 +2066,7 @@
                     <ul class="list-disc pl-5 space-y-1.5 text-slate-300 text-[11px]">
                         <li>
                             <strong class="text-amber-300">歷史確診數據段 (2026.06 ~ 2026.09)：</strong>
-                            引述 DAFF/CSIRO 實際通報（全澳 456 起，NSW 17 起），真實反映首波亞南極海鳥登陸時之沿海確診。
+                            引述 DAFF/CSIRO 實際通報（全澳 484 起，NSW 22 起），真實反映首波亞南極海鳥登陸時之沿海確診。
                         </li>
                         <li>
                             <strong class="text-cyan-300">雙波峰推演數據段 (2026.10 ~ 2028.06)：</strong>

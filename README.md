@@ -48,6 +48,14 @@
 
 ---
 
+### v2.9.1 (2026-09-08)
+- 🛡️ **企業資安白名單 CDN 全面替換 (Enterprise Whitelist CDN Compliance)**：
+  - 全面將 `Chart.js` 與 `Leaflet` 圖資庫替換為 **Cloudflare Enterprise CDN (`cdnjs.cloudflare.com`)**，徹底杜絕雀巢公司電腦與 Windows Defender 彈出 `cdn.jsdelivr.net` / `unpkg.com` 之 IT 阻擋警示。
+- ⚖️ **風險評估模擬器預設值與雷達圖校正 (`risk_assessment.html` & `risk_assessment_en.html`)**：
+  - NSW 野鳥確診事件下拉選單校正為「`🟡 NSW 野鳥確診溫和增加 (20 ~ 50 起, 當前現況 22 起, 得分 35)`」，候鳥季節階段校正為「`9 月 (200 萬隻登陸, 得分 70)`」，雷達圖初始分數對齊為 **37 分 (🟡 中風險緩衝)**。
+- 📺 **16:9 雙語風險評估簡報 (`risk_assessment_slides.html` & `risk_assessment_slides_en.html`) 正式納入部署**：
+  - 完整支援 16:9 簡報投影、中英文雙向切換、動態雷達圖互動與每週一自動歸檔至 `weekly_reports/`。
+
 ### v2.9.0 (2026-09-08)
 - 🚨 **NSW 確診激增至 22 起 · 病毒首度攻入雪梨都會圈 (Sydney Metro Breach)**：
   - 納入雪梨北灘沃里伍德 (Warriewood, Northern Beaches Sydney) 與肯布拉港 (Port Kembla) 大鳳頭燕鷗首例確診點位。
