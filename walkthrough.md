@@ -1,29 +1,29 @@
-# H5N1 全澳政策雷達、雪梨北灘突破、資安白名單 CDN 與風險簡報上線 (v2.9.1)
+# H5N1 風控核心準則確立、候鳥雙軌數據重構、16:9 簡報與地圖一體化升級 (v2.9.5)
 
-已成功完成 **企業資安白名單 CDN 全面替換 (移除 jsDelivr/unpkg 杜絕 IT 警示)**、**風險評估模擬器預設值校正 (9月登陸 70分 / NSW 22起 35分 / 總分 37分)**、**16:9 雙語風險評估簡報 (risk_assessment_slides.html / _en.html)**、**全澳政策雷達看板**、**雪梨北灘 (Warriewood) 案例更新** 與 **全專案文檔同步 (README / CHANGELOG / SOP / Best Practices / Task)**！
+已成功完成 **確立 NSW 商業禽舍「零感染 (Area Freedom)」為唯一生死防線**、**候鳥雙軌數據（模型推估 vs 現場實測）架構重構**、**2 年推演時間軸數據解耦與 DAFF 498 起事件對齊**、**16:9 簡報 Slide 4 候鳥數據補齊與全地圖左側一體化極簡面板 (Zero East-Coast Obstruction)**、**RWD 換頁按鈕溢出修復** 與 **全專案文檔同步 (README / CHANGELOG / SOP / Task / Walkthrough)**！
 
 ---
 
-## 🌟 最新完成重點 (v2.9.1 - 2026-09-08)
+## 🌟 最新完成重點 (v2.9.5 - 2026-09-08)
 
-1. **🛡️ 企業資安白名單 CDN 全面替換 (Enterprise Whitelist CDN)**
-   - 全面將 `Chart.js` 與 `Leaflet` 圖資庫切換為 **Cloudflare Enterprise CDN (`cdnjs.cloudflare.com`)**。
-   - 徹底杜絕雀巢企業內網與 Windows Defender / IT 管理員彈出 `cdn.jsdelivr.net` / `unpkg.com` 之阻擋提示。
+1. **🚨 確立最高指導原則：NSW 商業家禽場「零感染 (Area Freedom)」為唯一生死防線 (`AGENTS.md` / `AGENT.md`)**
+   - 確立台灣檢疫法規以 NSW 全轄區為宣告單位，嚴禁以距離 Blayney 工廠公里數模糊焦點。
+   - 風險評估全面聚焦於「逼近 NSW 州界之動態」與「NSW 野鳥外溢至商業家禽場之風險」。
 
-2. **⚖️ 定量風險模型現況校正 (`risk_assessment.html` & `risk_assessment_en.html`)**
-   - 下拉選單預設對齊當前現況：**9 月（200萬隻候鳥登陸，得分 70）**、**NSW 22 起野鳥確診（得分 35）**。
-   - 雷達圖多維度初始分數對齊為 `[20, 70, 30, 35, 35]`，綜合評分為 **37 分 (🟡 中風險緩衝)**。
-   - 重設模擬器 (`resetSimulator()`) 邏輯精準還原為當前現況。
+2. **🦅 雙軌候鳥數據架構（推估總數 vs 現場實測總數）與 4 大候鳥源判讀指南**
+   - 清楚分離「📊 歷史季節模型【推估總數】(~50 萬隻先鋒 / NSW: ~6 萬隻)」與「🦅 現場實測【實際總數】(1,407 隻去重實測 / NSW: 286 隻)」。
+   - 全專案 HTML 嵌入 `💡 4 大候鳥數據源判讀指南` 互動式 Modal 彈窗。
 
-3. **📺 16:9 雙語風險評估簡報 (`risk_assessment_slides.html` & `risk_assessment_slides_en.html`)**
-   - 正式納入 GitHub Actions 部署與每週一自動歸檔隊列。
+3. **📊 2 年推演時間軸圖表重構（確診案件與候鳥數據全面解耦）**
+   - 確診案件即時對齊 DAFF 官方 498 起（NSW 22 起），推演曲線自 2026.10 起順暢銜接至 2028.06。
+   - 候鳥數據分離「實地觀測統計 (18 萬隻)」與「季節模型推估 (50 萬隻先鋒至 220 萬隻峰值)」。
 
-4. **🚨 NSW 確診激增至 22 起 · 攻入雪梨都會圈與瀕危物種更新 (`cases_events.json` & `h5n1.py`)**
-   - **雪梨北灘 Warriewood**：`-33.6875, 151.3069`（大鳳頭燕鷗，雪梨大都會區首宗確診）。
-   - **肯布拉港 Port Kembla**：`-34.4811, 150.9067`（大鳳頭燕鷗）。
-   - **科夫斯港 Coffs Harbour**：`-30.2963, 153.1141`（赫頓鸌 / 雪兒水鳥，新州首例受脅瀕危留鳥）。
-   - **肖爾黑文 Shoalhaven**：`-34.8833, 150.6000`（第 3 起海鳥群聚）。
-   - 全澳累計確診事件升至 **484 起** (SA 271, VIC 150, TAS 29, NSW 22, WA 10, QLD 2)，商業家禽與蛋場維持 100% 零感染。
+4. **📺 16:9 簡報 Slide 4 候鳥數據補齊與全地圖「左側一體化極簡面板 (All-on-Left Compact HUD & Legend)」**
+   - Slide 4 頂部補齊 4 欄式生態 HUD 數據條；地圖浮動視窗與圖例整合至左上角（195px），徹底釋放 NSW、VIC、TAS、珊瑚海與塔斯曼海航線視野（100% 乾淨無遮擋）。
+   - 修復 1366×768 筆電解析度下底部換頁按鈕溢出問題，全螢幕與多解析度自適應常駐顯示。
+
+5. **🌐 風險評估主網頁地圖同步升級**
+   - `risk_assessment.html` 與 `risk_assessment_en.html` 同步升級為左側一體化風控 HUD 與圖例面板。
 
 ---
 
@@ -33,7 +33,8 @@
 
 ```bash
 git add -A
-git commit -m "feat(v2.9.1): enterprise cdn whitelist compliance, risk assessment slides release, nsw 22 cases sync and docs update"
+git commit -m "feat(v2.9.5): nsw zero-cases core principle, dual-track migratory metrics, timeline decoupling, slide4 left-panel hud and full doc sync"
 git push origin main
 ```
+
 

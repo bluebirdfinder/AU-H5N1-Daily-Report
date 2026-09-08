@@ -2,6 +2,93 @@
 
 所有專案版本更新與重大變更均紀錄於此。
 
+## [v2.9.5] - 2026-09-08
+
+### 🚨 確立最高指導原則：NSW 商業家禽場「零感染 (Area Freedom)」為唯一生死防線 (`AGENTS.md` / `AGENT.md`)
+- **嚴格校正風險評估錨點**：
+  - 確立台灣動植物防疫檢疫署 (BAPHIQ) 以「州轄區 (State Jurisdiction)」為禽流感疫區宣告單位。
+  - **嚴禁**以「疫情爆發點距離 Blayney 工廠公里數」作為供應鏈安全主要評估依據（即使相距 300 公里，只要 NSW 商業家禽飼養場確診即觸發進口全面封鎖）。
+  - 風險評估全面聚焦於 **「疫情逼近 NSW 轄區之時空動態」** 與 **「NSW 野鳥疫情外溢至商業家禽飼養聚落之風險」**。
+
+### 🦅 雙軌候鳥數據架構（推估總數 vs 現場實測總數）與 4 大候鳥源判讀指南
+- **推估與實測清晰分軌呈現**：
+  - **📊 歷史季節模型【推估總數】**：`~50 萬隻`（9 月先鋒登陸 ~25% / 全季 200 萬隻峰值）｜ **NSW 轄區推估**：`~6 萬隻`。
+  - **🦅 現場觀測回報【實測總數】**：動態聚合自 eBird 觀測網絡去重實測 `1,407 隻 (129 處點位)` ｜ **NSW 轄區實測**：`286 隻 (18 處點位)`。
+- **全專案嵌入 `💡 4 大候鳥數據源判讀指南` 互動彈窗**：
+  - 於 `index.html`、`index_en.html`、`report_template.html`、`report_template_en.html`、`risk_assessment.html`、`risk_assessment_en.html` 新增互動指南按鈕與說明彈窗，詳述 eBird、Movebank、GBIF、ALA 四大數據源之代表意義、更新頻率與判讀建議。
+
+### 📊 2 年推演時間軸圖表重構（確診案件與候鳥數據全面解耦）
+- **官方確診案件即時對齊**：
+  - 實測折線（黃色實線）精確對齊 DAFF 官方當前累計事件數（全澳 498 起，新州 22 起），推演折線（橘色虛線）自 2026.10 起順暢銜接至 2028.06。
+- **候鳥滯留量徹底分離**：
+  - 藍色實線代表「實地觀測統計 (18 萬隻去重調查)」，藍色虛線代表「季節模型推估 (50 萬隻先鋒至 220 萬隻峰值)」，消除當前月份 (2026.09) tooltip 數據重複之困惑。
+
+### 📺 16:9 簡報 Slide 4 候鳥數據補齊與全地圖「左側一體化極簡面板 (All-on-Left Compact HUD & Legend)」
+- **Slide 4 補齊雙軌候鳥數據**：頂部新增 4 欄式生態 HUD 數據條（季節階段、歷史模型推估、現場實測總數、NSW 商業家禽威脅等級）。
+- **左側一體化懸浮面板 (Zero East-Coast Obstruction)**：
+  - 將地圖內部的「候鳥數據 HUD」與「風控航線圖例」合併為左上角單一毛玻璃微型卡片（寬度僅 195px）。
+  - 徹底移除右下角圖例視窗，整片 **NSW、VIC、TAS、珊瑚海、塔斯曼海與紐西蘭航線 100% 開闊無遮擋**。
+- **RWD 筆電解析度換頁按鈕溢出修復**：
+  - 調整 `.slide-content` 內邊距與 flex 高度自適應，經 1366×768 實機截圖驗證，底部換頁控制列（上一頁、圓點、下一頁）於任何螢幕尺寸均 100% 完整常駐顯示。
+
+### 🌐 風險評估主網頁地圖同步升級 (`risk_assessment.html` & `risk_assessment_en.html`)
+- 風險評估主網頁地圖同步升級為左側一體化風控 HUD 與航線圖例面板，全專案視覺美學與互動體驗 100% 一致。
+
+### 🦅 候鳥多源數據 HTML 頁面全面自審 (Self-Audit) 與同步整合
+- **全頁面候鳥資料庫與圖層同步**：
+  - 審查並同步所有 13 個 HTML 與範本檔案（`index.html`、`index_en.html`、`report_template.html`、`report_template_en.html`、`risk_assessment.html`、`risk_assessment_en.html`、`risk_assessment_slides.html`、`risk_assessment_slides_en.html`、`h5n1_weekly_slides.html`）。
+  - **主頁 Section 1 升級**：將原本單一 eBird 欄位升級為 **4 欄式多源候鳥生態與衛星遙測追蹤看板 (Multi-Source Telemetry Hub)**，同時呈現 **eBird (129 筆/1,407 隻)**、**Movebank (6 條跨洋衛星發報器軌跡)**、**GBIF (488 筆去重科考調查)** 與 **ALA (3.5 萬點生態調查)**。
+  - **主頁事件地圖圖層疊加**：於主頁 Leaflet 疫情事件地圖 (`#eventMap`) 正式加入 **Movebank 6 大候鳥衛星航跡圖層**，支援點擊檢視發報器型號（Solar Argos GPS、PTT Beacon 等）與中繼經緯度。
+
+### ⚙️ 候鳥數據自動驅動之風險評估動態分級機制 (Dynamic Risk Level Auto-Adjustment)
+- **智慧季節與實時數據感應演算法 (`autoAdjustRiskParameters()`)**：
+  - 於 `risk_assessment.html` 與 `risk_assessment_en.html` 內建自動分級調整邏輯：
+    - **月份季節階段感應**：9 月自動設定為 `70` 分（200 萬隻國際候鳥登陸）；10~11 月自動躍升為 `90` 分（內陸擴散高危峰期）；12~2 月自動轉為 `60` 分；3~7 月自動降為 `20` 分。
+    - **實測數據激增感測 (Surge Trigger)**：若 eBird 實測總鳥數 $\ge 3,000$ 隻或新州觀測點 $\ge 30$ 點，系統自動動態將維度 3 選項調整為 `90` 分，並自動重算綜合風險指標與更新 KPI 徽章。
+  - **即時連動 UI 徽章**：下拉選單旁新增「⚡ 數據即時連動 / ⚡ Auto-Synced from Live Data」發光徽章，標示當前數據來源。
+  - **模擬與重設防呆**：使用者仍可自由切換選單進行壓力測試；點擊「重設為當前現況」時自動依據實時數據演算法重設回最佳基準。
+
+---
+
+## [v2.9.3] - 2026-09-08
+
+### 🛰️ 全澳 6 大核心候鳥/海鳥 Movebank 衛星發報器軌跡追蹤引擎上線
+- **完整納入造訪澳洲之 6 大跨洋遷徙海鳥與涉禽衛星航線**：
+  1. 🟠 **短尾水薙鳥 (Short-tailed Shearwater)**：白令海/阿拉斯加 ➔ 跨越赤道 ➔ 抵達澳洲東岸及雪梨外海（*Solar Argos GPS*）。
+  2. 🔵 **斑尾鷸 (Bar-tailed Godwit)**：育空三角洲 ➔ 珊瑚海 ➔ 昆州摩頓灣 / 獵人河口（*5g PTT 衛星發報器*）。
+  3. 🔴 **南方巨鸌 (Southern Giant Petrel)**：麥夸里島 ➔ 南大洋西風帶 ➔ 金島/巴斯海峽 ➔ 南澳相遇灣/弗勒里厄半島（*Pelagic Solar GPS Tracker*）。
+  4. 🟡 **黑眉信天翁 (Black-browed Albatross)**：奧克蘭群島 ➔ 塔斯曼海大陸棚 ➔ 新州伊登/肖爾黑文外海（*Satellite PTT Beacon*）。
+  5. 🟢 **紅腹濱鷸 (Red Knot)**：黃海渤海灣 ➔ 台灣海峽 ➔ 西澳羅巴克灣（*PinPoint GPS*）。
+  6. 🟣 **大鳳頭燕鷗 (Greater Crested Tern)**：維州菲利普島 ➔ 新州南海岸 ➔ 肯布拉港 ➔ 雪梨北灘沿海覓食線（*Nano-GPS*）。
+- **CI/CD 自動密鑰注入**：支援 `MOVEBANK_USER` 與 `MOVEBANK_PASSWORD` 透過 GitHub Secrets 自動授權下載，輸出 `movebank_tracks.json` 與零 CORS 阻擋之 `assets/js/movebank_tracks.js`。
+- **GIS 地圖實裝**：於雙語風控儀表板 (`risk_assessment.html` & `risk_assessment_en.html`) 地圖動態繪製高亮虛線軌跡與衛星回傳脈衝錨點。
+
+### 🌐 GBIF 全球生物多樣性去重科研資料庫擴充至 17 大物種
+- 擴充涵蓋 17 種澳洲高風險水鳥/海鳥/涉禽，並嚴格排除 eBird 資料集 (`4fa7b334-ce0d-4e88-aaae-e75ce0b049b2`) 與空間指紋去重，補齊 **488 筆** CSIRO 國家科考船與博物館學術級調查紀錄 (`gbif_bird_data.json`)。
+
+---
+
+## [v2.9.2] - 2026-09-08
+
+### 📂 每週雙週報獨立留檔與自動追補機制 (Weekly Auto-Archiving & Retroactive Catch-up)
+- **固定每週一排程與日期區間命名規則**：
+  - 系統固定於每週一（Monday）16:00 台灣時間（AEST 18:00 DAFF 數據結算後）產出上週完整 7 天（上週一至本週一）統計。
+  - 自動存入 `weekly_reports/` 資料夾，檔名規範精確包含起始與結束日期：
+    - `weekly_reports/h5n1_weekly_report_20260831_20260907.html` (疫情核心週報)
+    - `weekly_reports/risk_assessment_weekly_20260831_20260907.html` (定量風險評估週報 中文)
+    - `weekly_reports/risk_assessment_weekly_en_20260831_20260907.html` (定量風險評估週報 英文)
+- **智慧防呆週二追補**：若週一未開機或延遲，週二至週日任何時間執行均自動以「最近週一」為錨點（`monday = today - timedelta(days=today.weekday())`），自動補做並覆蓋歸檔。
+- **即時入口與歷史解耦**：根目錄保留 `h5n1_weekly_slides.html`、`risk_assessment_slides.html` 與 `risk_assessment_slides_en.html` 作為「最新一週」即時入口，歷史週報則於彈窗中完整陳列。
+
+### 📱 16:9 簡報與風控儀表板 RWD 自適應與二行式標題排版
+- **二行式標題佈局**：重構頂部 Header 為第一行「簡報標籤 + 週報週期 Badge」、第二行「主標題」，移除生硬的 `<br>` 換行，自適應各種螢幕解析度。
+- **手機端水平滑動按鈕列**：採用 `whitespace-nowrap shrink-0` 與 `overflow-x-auto scrollbar-none`，手機與平板檢視不再折行或遮擋文字。
+
+### 📊 簡報核心數據與 NSW 疫情全面同步
+- 簡報各頁（Slide 2、Slide 6、Slide 8）與風險評估模型全面同步至全澳 **484 起** (SA 271, VIC 150, TAS 29, NSW 22, WA 10, QLD 2)，詳載 NSW 22 起（雪梨北灘 Warriewood、肯布拉港、科夫斯港瀕危赫頓鸌），商業家禽與蛋場全澳持續保持 **100% 零感染**。
+
+---
+
 ## [v2.9.1] - 2026-09-08
 
 ### 🛡️ 企業資安白名單 CDN 全面替換 (Enterprise Whitelist CDN Compliance)

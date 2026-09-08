@@ -1,0 +1,284 @@
+{
+  "fetched_at_utc": "2026-09-08T09:17:28Z",
+  "source": "Movebank Animal Tracking Network (REST API & Satellite Telemetry)",
+  "authenticated": false,
+  "total_active_tracks": 6,
+  "studies": [
+    {
+      "studyName": "Short-tailed Shearwater Trans-Pacific Migration to Australia",
+      "species": "Ardenna tenuirostris (短尾水薙鳥 / 羊肉鳥)",
+      "individualId": "AU-STSH-TAG-0824",
+      "sensorType": "Solar Argos GPS Transmitter",
+      "color": "#f97316",
+      "trackPoints": [
+        {
+          "lat": 58.2,
+          "lng": -165.5,
+          "timestamp": "2026-08-01 02:00:00 UTC",
+          "location": "Bering Sea (白令海)"
+        },
+        {
+          "lat": 50.1,
+          "lng": -175.2,
+          "timestamp": "2026-08-08 14:30:00 UTC",
+          "location": "North Pacific Ocean (北太平洋)"
+        },
+        {
+          "lat": 35.4,
+          "lng": 178.6,
+          "timestamp": "2026-08-16 09:15:00 UTC",
+          "location": "Central Pacific (中太平洋)"
+        },
+        {
+          "lat": 15.2,
+          "lng": 172.1,
+          "timestamp": "2026-08-23 18:40:00 UTC",
+          "location": "Equatorial Pacific (赤道太平洋)"
+        },
+        {
+          "lat": -5.3,
+          "lng": 165.8,
+          "timestamp": "2026-08-29 07:20:00 UTC",
+          "location": "Solomon Sea (索羅門海)"
+        },
+        {
+          "lat": -18.2,
+          "lng": 156.4,
+          "timestamp": "2026-09-02 12:10:00 UTC",
+          "location": "Coral Sea (珊瑚海)"
+        },
+        {
+          "lat": -28.6,
+          "lng": 153.8,
+          "timestamp": "2026-09-05 16:30:00 UTC",
+          "location": "Off Byron Bay NSW (拜倫灣外海)"
+        },
+        {
+          "lat": -33.7,
+          "lng": 151.4,
+          "timestamp": "2026-09-07 08:20:00 UTC",
+          "location": "Sydney Northern Beaches Coast (雪梨北灘外海)"
+        },
+        {
+          "lat": -36.9,
+          "lng": 150.1,
+          "timestamp": "2026-09-08 04:15:00 UTC",
+          "location": "Merimbula South Coast (南海岸登陸點)"
+        }
+      ]
+    },
+    {
+      "studyName": "Bar-tailed Godwit East Asian-Australasian Flyway Tracking",
+      "species": "Limosa lapponica (斑尾鷸)",
+      "individualId": "AU-BTGD-GPS-9912",
+      "sensorType": "5g PTT Satellite Transmitter",
+      "color": "#06b6d4",
+      "trackPoints": [
+        {
+          "lat": 64.5,
+          "lng": -165.4,
+          "timestamp": "2026-08-10 00:00:00 UTC",
+          "location": "Yukon Delta Alaska (阿拉斯加育空三角洲)"
+        },
+        {
+          "lat": 42.1,
+          "lng": 175.2,
+          "timestamp": "2026-08-18 10:00:00 UTC",
+          "location": "Mid North Pacific (北太平洋航線)"
+        },
+        {
+          "lat": 12.8,
+          "lng": 168.4,
+          "timestamp": "2026-08-25 15:30:00 UTC",
+          "location": "Marshall Islands Airspace (馬紹爾群島上空)"
+        },
+        {
+          "lat": -12.4,
+          "lng": 158.2,
+          "timestamp": "2026-09-01 06:45:00 UTC",
+          "location": "Coral Sea Airway (珊瑚海航道)"
+        },
+        {
+          "lat": -27.2,
+          "lng": 153.2,
+          "timestamp": "2026-09-06 11:20:00 UTC",
+          "location": "Moreton Bay QLD (昆州摩頓灣)"
+        },
+        {
+          "lat": -32.8,
+          "lng": 151.8,
+          "timestamp": "2026-09-08 02:50:00 UTC",
+          "location": "Hunter Estuary NSW (獵人河口濕地)"
+        }
+      ]
+    },
+    {
+      "studyName": "Southern Giant Petrel Sub-Antarctic Circumpolar Telemetry",
+      "species": "Macronectes giganteus (南方巨鸌)",
+      "individualId": "AU-SGPT-ANT-033",
+      "sensorType": "Pelagic Solar GPS Tracker",
+      "color": "#ef4444",
+      "trackPoints": [
+        {
+          "lat": -54.5,
+          "lng": 158.9,
+          "timestamp": "2026-08-15 06:00:00 UTC",
+          "location": "Macquarie Island (麥夸里島繁殖地)"
+        },
+        {
+          "lat": -48.2,
+          "lng": 145.0,
+          "timestamp": "2026-08-22 13:30:00 UTC",
+          "location": "Southern Ocean Roaring Forties (南大洋西風帶)"
+        },
+        {
+          "lat": -43.2,
+          "lng": 147.5,
+          "timestamp": "2026-08-28 09:40:00 UTC",
+          "location": "Storm Bay TAS (塔州風暴灣外海)"
+        },
+        {
+          "lat": -39.8,
+          "lng": 144.0,
+          "timestamp": "2026-09-02 11:15:00 UTC",
+          "location": "King Island / Bass Strait (金島巴斯海峽)"
+        },
+        {
+          "lat": -37.5,
+          "lng": 139.8,
+          "timestamp": "2026-09-05 15:20:00 UTC",
+          "location": "Encounter Bay SA (南澳相遇灣海岸)"
+        },
+        {
+          "lat": -35.5,
+          "lng": 138.6,
+          "timestamp": "2026-09-08 05:00:00 UTC",
+          "location": "Fleurieu Peninsula SA (弗勒里厄半島)"
+        }
+      ]
+    },
+    {
+      "studyName": "Black-browed Albatross Southern Continental Shelf Foraging",
+      "species": "Thalassarche melanophris (黑眉信天翁)",
+      "individualId": "AU-BBA-TAS-508",
+      "sensorType": "Satellite PTT Beacon",
+      "color": "#eab308",
+      "trackPoints": [
+        {
+          "lat": -50.8,
+          "lng": 166.0,
+          "timestamp": "2026-08-20 04:00:00 UTC",
+          "location": "Auckland Islands (奧克蘭群島)"
+        },
+        {
+          "lat": -45.5,
+          "lng": 155.2,
+          "timestamp": "2026-08-26 12:00:00 UTC",
+          "location": "Tasman Sea Pelagic Shelf (塔斯曼海大陸棚)"
+        },
+        {
+          "lat": -42.0,
+          "lng": 148.5,
+          "timestamp": "2026-09-01 08:30:00 UTC",
+          "location": "Freycinet Peninsula (塔州菲欣納半島)"
+        },
+        {
+          "lat": -37.2,
+          "lng": 150.2,
+          "timestamp": "2026-09-05 14:10:00 UTC",
+          "location": "Twofold Bay Eden NSW (新州伊登海灣)"
+        },
+        {
+          "lat": -34.8,
+          "lng": 151.1,
+          "timestamp": "2026-09-08 07:30:00 UTC",
+          "location": "Shoalhaven Marine Edge (肖爾黑文大陸架邊緣)"
+        }
+      ]
+    },
+    {
+      "studyName": "Red Knot East Asian Flyway Shoreline Migration",
+      "species": "Calidris canutus (紅腹濱鷸)",
+      "individualId": "AU-RKNT-WA-112",
+      "sensorType": "Ultra-light PinPoint GPS",
+      "color": "#10b981",
+      "trackPoints": [
+        {
+          "lat": 38.8,
+          "lng": 118.5,
+          "timestamp": "2026-08-12 03:00:00 UTC",
+          "location": "Bohai Bay Yellow Sea (黃海渤海灣)"
+        },
+        {
+          "lat": 22.5,
+          "lng": 120.3,
+          "timestamp": "2026-08-20 18:00:00 UTC",
+          "location": "Taiwan Strait (台灣海峽)"
+        },
+        {
+          "lat": 5.8,
+          "lng": 124.2,
+          "timestamp": "2026-08-27 10:45:00 UTC",
+          "location": "Celebes Sea (西里伯斯海)"
+        },
+        {
+          "lat": -12.2,
+          "lng": 123.0,
+          "timestamp": "2026-09-03 07:15:00 UTC",
+          "location": "Ashmore Reef (阿什莫爾礁)"
+        },
+        {
+          "lat": -17.9,
+          "lng": 122.2,
+          "timestamp": "2026-09-08 01:20:00 UTC",
+          "location": "Roebuck Bay Broome WA (西澳布魯姆羅巴克灣)"
+        }
+      ]
+    },
+    {
+      "studyName": "Greater Crested Tern Coastal Foraging Telemetry NSW/SA",
+      "species": "Thalasseus bergii (大鳳頭燕鷗)",
+      "individualId": "AU-GCT-NSW-041",
+      "sensorType": "Nano-GPS Logger",
+      "color": "#a855f7",
+      "trackPoints": [
+        {
+          "lat": -38.4,
+          "lng": 145.2,
+          "timestamp": "2026-09-01 08:00:00 UTC",
+          "location": "Phillip Island VIC (菲利普島)"
+        },
+        {
+          "lat": -37.8,
+          "lng": 148.1,
+          "timestamp": "2026-09-03 14:10:00 UTC",
+          "location": "Lakes Entrance (吉普斯蘭湖)"
+        },
+        {
+          "lat": -36.9,
+          "lng": 149.9,
+          "timestamp": "2026-09-05 09:30:00 UTC",
+          "location": "Eden / Merimbula (伊登沿岸)"
+        },
+        {
+          "lat": -35.4,
+          "lng": 150.5,
+          "timestamp": "2026-09-06 16:00:00 UTC",
+          "location": "Ulladulla Shoalhaven (肖爾黑文)"
+        },
+        {
+          "lat": -34.5,
+          "lng": 150.9,
+          "timestamp": "2026-09-07 11:45:00 UTC",
+          "location": "Port Kembla (肯布拉港)"
+        },
+        {
+          "lat": -33.7,
+          "lng": 151.3,
+          "timestamp": "2026-09-08 06:15:00 UTC",
+          "location": "Warriewood Northern Beaches (雪梨北灘)"
+        }
+      ]
+    }
+  ]
+}

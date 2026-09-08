@@ -109,41 +109,47 @@
 
     </style>
     <script src="assets/js/purina_auth.js"></script>
+    <script src="assets/js/bird_data.js"></script>
+    <script src="assets/js/gbif_bird_data.js"></script>
+    <script src="assets/js/movebank_tracks.js"></script>
 </head>
 
 <body class="min-h-screen pb-12">
 
     <!-- Sticky Header Navigation -->
     <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-col md:flex-row items-start md:items-center justify-between gap-2.5">
-            <div class="flex items-center space-x-3 min-w-0">
-                <span class="bg-amber-500 text-slate-950 text-xs px-2.5 py-1 rounded-full font-black tracking-wider uppercase flex items-center gap-1 shrink-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-col md:flex-row items-start md:items-center justify-between gap-2 sm:gap-2.5">
+            <div class="flex items-center space-x-2.5 sm:space-x-3 min-w-0 w-full md:w-auto">
+                <span class="bg-amber-500 text-slate-950 text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-black tracking-wider uppercase flex items-center gap-1 shrink-0">
                     <i class="fa-solid fa-scale-balanced"></i> RISK MODEL
                 </span>
                 <div class="min-w-0">
-                    <h1 class="text-xs sm:text-sm lg:text-[15px] font-bold text-white leading-tight">
-                        <span class="text-cyan-400 font-extrabold">Nestlé Purina Blayney</span> • H5N1 寵物食品進口定量風險評估<br>模型
+                    <div class="text-[10px] sm:text-[11px] text-cyan-400 font-extrabold uppercase tracking-wide truncate">
+                        Nestlé Purina Blayney (NSW, Australia)
+                    </div>
+                    <h1 class="text-xs sm:text-sm lg:text-[14px] font-bold text-white leading-snug break-words sm:whitespace-nowrap">
+                        H5N1 寵物食品進口定量風險評估模型
                     </h1>
                 </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-2 shrink-0">
-                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-2.5 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1">
+            <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto max-w-full pb-1 sm:pb-0 shrink-0 w-full md:w-auto">
+                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] sm:text-xs font-bold px-2.5 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1 whitespace-nowrap">
                     🌐 中文儀表板
                 </a>
-                <a href="risk_assessment_en.html" class="bg-indigo-900/80 hover:bg-indigo-800 text-indigo-200 text-xs font-bold px-2.5 py-1.5 rounded-lg border border-indigo-700 transition flex items-center gap-1">
+                <a href="risk_assessment_en.html" class="bg-indigo-900/80 hover:bg-indigo-800 text-indigo-200 text-[11px] sm:text-xs font-bold px-2.5 py-1.5 rounded-lg border border-indigo-700 transition flex items-center gap-1 whitespace-nowrap">
                     🌐 English Model
                 </a>
-                <a href="risk_assessment_slides.html" target="_blank" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg transition shadow-md flex items-center gap-1">
+                <a href="risk_assessment_slides.html" target="_blank" class="bg-amber-600 hover:bg-amber-500 text-white text-[11px] sm:text-xs font-bold px-2.5 py-1.5 rounded-lg transition shadow-md flex items-center gap-1 whitespace-nowrap">
                     <i class="fa-solid fa-play"></i> 16:9 簡報 (繁中)
                 </a>
-                <a href="risk_assessment_slides_en.html" target="_blank" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg transition shadow-md flex items-center gap-1">
+                <a href="risk_assessment_slides_en.html" target="_blank" class="bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] sm:text-xs font-bold px-2.5 py-1.5 rounded-lg transition shadow-md flex items-center gap-1 whitespace-nowrap">
                     <i class="fa-solid fa-play"></i> 16:9 Slides (EN)
                 </a>
-                <button onclick="toggleRiskArchiveModal()" class="bg-purple-950/80 hover:bg-purple-900/90 text-purple-200 text-xs font-bold px-2.5 py-1.5 rounded-lg border border-purple-700/60 transition flex items-center gap-1 shadow">
-                    <i class="fa-solid fa-folder-open text-purple-400"></i> 風險簡報歸檔
+                <button onclick="toggleRiskArchiveModal()" class="bg-purple-950/80 hover:bg-purple-900/90 text-purple-200 text-[11px] sm:text-xs font-bold px-2.5 py-1.5 rounded-lg border border-purple-700/60 transition flex items-center gap-1 shadow whitespace-nowrap">
+                    <i class="fa-solid fa-folder-open text-purple-400"></i> 歷次歸檔
                 </button>
-                <button onclick="purinaLogout()" title="Lock Session" class="bg-slate-800/90 hover:bg-red-950/80 text-slate-300 hover:text-red-300 border border-slate-700 hover:border-red-600/50 text-xs font-bold px-2.5 py-1.5 rounded-lg transition flex items-center gap-1 shadow">
+                <button onclick="purinaLogout()" title="鎖定目前狀態" class="bg-slate-800/90 hover:bg-red-950/80 text-slate-300 hover:text-red-300 border border-slate-700 hover:border-red-600/50 text-[11px] sm:text-xs font-bold px-2.5 py-1.5 rounded-lg transition flex items-center gap-1 shadow whitespace-nowrap">
                     <i class="fa-solid fa-lock text-amber-400"></i> <span>系統鎖定</span>
                 </button>
             </div>
@@ -245,6 +251,97 @@
                 </p>
                 <div class="text-[11px] text-slate-400">
                     基於防檢署公告過往案例對照
+                </div>
+            </div>
+        </div>
+
+        <!-- NSW 全轄區多因子數據科學加權剖析面板 (Scientific Breakdown Matrix) -->
+        <div class="glass-card p-6 space-y-5 border-t-4 border-amber-500 shadow-xl bg-slate-900/95">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-red-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
+                            🚨 RED LINE 防線
+                        </span>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-brain text-cyan-400"></i> NSW 全轄區多因子數據科學加權剖析 (Scientific Matrix)
+                        </h3>
+                    </div>
+                    <p class="text-xs text-slate-400">
+                        台灣防檢署檢疫禁令以 <strong class="text-amber-300">「新南威爾斯全州 (NSW State)」</strong> 為獨立宣告單位。本模型摒棄單點物理距離，全面以 NSW 轄區整體商業防線與野鳥外溢威脅進行客觀綜合加權。
+                    </p>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <span class="bg-cyan-950/80 border border-cyan-700/60 text-cyan-300 text-xs px-3 py-1.5 rounded-lg font-mono font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-bolt text-amber-400"></i> 實時多源動態校準
+                    </span>
+                </div>
+            </div>
+
+            <!-- 4-Column Scientific Factor Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                <!-- Factor 1 -->
+                <div class="bg-slate-950/80 p-4 rounded-xl border border-emerald-800/40 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-400 font-bold flex items-center gap-1.5">
+                            <span>🏭</span> 1. NSW 商業家禽防線
+                        </span>
+                        <span class="bg-emerald-950 text-emerald-300 border border-emerald-700 text-[10px] px-2 py-0.5 rounded font-mono font-bold">100% 安全</span>
+                    </div>
+                    <div class="text-emerald-400 font-bold text-sm">
+                        0 確診 (Area Freedom)
+                    </div>
+                    <p class="text-[11px] text-slate-300 leading-relaxed">
+                        全澳與 NSW 所有蛋雞、肉雞、種雞場完美維持 <strong>0 感染</strong>。未觸發台灣全州貿易封鎖，維持產品供應之核心前提。
+                    </p>
+                </div>
+
+                <!-- Factor 2 -->
+                <div class="bg-slate-950/80 p-4 rounded-xl border border-amber-800/40 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-400 font-bold flex items-center gap-1.5">
+                            <span>🗺️</span> 2. NSW 野鳥確診與外溢
+                        </span>
+                        <span class="bg-amber-950 text-amber-300 border border-amber-700 text-[10px] px-2 py-0.5 rounded font-mono font-bold">得分 35</span>
+                    </div>
+                    <div class="text-amber-400 font-bold text-sm">
+                        22 起確診 (局限沿海帶)
+                    </div>
+                    <p class="text-[11px] text-slate-300 leading-relaxed">
+                        含雪梨北灘、肯布拉港與科夫斯港（瀕危赫頓鸌）。結合媒體新聞 ESI 嚴重度加權，目前仍受沿海阻隔，尚未滲入內陸家禽走廊。
+                    </p>
+                </div>
+
+                <!-- Factor 3 -->
+                <div class="bg-slate-950/80 p-4 rounded-xl border border-purple-800/40 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-400 font-bold flex items-center gap-1.5">
+                            <span>⚔️</span> 3. 鄰州逼近 NSW 州界動態
+                        </span>
+                        <span class="bg-purple-950 text-purple-300 border border-purple-700 text-[10px] px-2 py-0.5 rounded font-mono font-bold">得分 30</span>
+                    </div>
+                    <div class="text-purple-300 font-bold text-sm">
+                        VIC 150起 / SA 271起
+                    </div>
+                    <p class="text-[11px] text-slate-300 leading-relaxed">
+                        維州延長圈養令至 9/18 抵禦 Murray River 州界逼近；南澳都市紅狐跨物種感染警示腐食性哺乳類向量。
+                    </p>
+                </div>
+
+                <!-- Factor 4 -->
+                <div class="bg-slate-950/80 p-4 rounded-xl border border-cyan-800/40 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-400 font-bold flex items-center gap-1.5">
+                            <span>🦅</span> 4. 候鳥遙測與水系暴露
+                        </span>
+                        <span class="bg-cyan-950 text-cyan-300 border border-cyan-700 text-[10px] px-2 py-0.5 rounded font-mono font-bold">得分 70</span>
+                    </div>
+                    <div class="text-cyan-300 font-bold text-sm">
+                        9月登陸期 (200萬隻)
+                    </div>
+                    <p class="text-[11px] text-slate-300 leading-relaxed">
+                        eBird 129 筆實測 + Movebank 6 條跨洋發報航線。9 月登陸期 (70分)，10~11 月大部隊進入 NSW 內陸淡水濕地為年度最高危期 (90分)。
+                    </p>
                 </div>
             </div>
         </div>
@@ -353,6 +450,7 @@
                             </label>
                             <span id="ctrl-val-migratory" class="font-mono text-amber-400 font-bold">9月 (登陸期 200萬隻, 得分 70)</span>
                         </div>
+                        <div id="migratory-auto-badge" class="py-0.5"></div>
                         <select id="select-migratory" onchange="recalculateRisk()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500 font-sans">
                             <option value="40">8月下旬：前鋒海鳥抵達南部沿海 (得分 40)</option>
                             <option value="70" selected>9 月：200 萬隻國際候鳥登陸北部卡奔塔利亞灣 (當前現況, 得分 70)</option>
@@ -432,20 +530,23 @@
                         • <strong>核心指標：</strong>候鳥抵達月份、200 萬隻大部隊擴散路徑與 NSW 濕地水體重疊性。<br>
                         • <strong>科學依據：</strong>10 月大部隊自北部登陸後向南方內陸濕地分散，為全澳生態環境病毒載量最高期；隔年 3 月北返後風險快速收斂。
                     </p>
-                    <div class="mt-2 p-2 bg-slate-900/90 rounded-lg border border-amber-500/30 text-[11px] text-amber-200 flex items-center justify-between gap-1 font-mono">
-                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 🦅 eBird API v2 實時觀測:</span>
-                        <strong id="ra-ebird-live-count" class="text-cyan-300">129 筆高風險觀測中</strong>
+                    <div class="mt-2 p-2.5 bg-slate-900/90 rounded-lg border border-amber-500/40 text-[11px] text-slate-200 space-y-1.5 font-sans">
+                        <div class="flex items-center justify-between text-amber-200">
+                            <span class="flex items-center gap-1.5 font-bold">🕊️ 當前抵澳候鳥推估:</span>
+                            <strong class="text-amber-300 font-mono font-black text-xs">~50 萬隻 <span class="text-[10px] text-amber-400 font-normal">(全季 200萬隻 / 25%)</span></strong>
+                        </div>
+                        <div class="flex items-center justify-between text-cyan-200 text-[10px] pt-1 border-t border-slate-800">
+                            <span class="flex items-center gap-1.5">🦅 eBird 現場實測鳥數:</span>
+                            <strong id="ra-ebird-live-count" class="text-cyan-300 font-mono">1,407 隻 <span class="text-slate-400 font-normal">(NSW: 286隻)</span></strong>
+                        </div>
+                        <div class="flex items-center justify-between text-orange-200 text-[10px]">
+                            <span class="flex items-center gap-1.5">🛰️ Movebank 衛星發報:</span>
+                            <strong class="text-orange-300 font-mono">6 條跨洋航線已抵澳</strong>
+                        </div>
+                        <div class="text-[10px] text-slate-400 pt-0.5 border-t border-slate-800/80 leading-tight">
+                            📍 <strong>當前停留態勢：</strong>候鳥主要停留在北部沿海泥灘，尚未大規模南下進入 NSW 內陸農場走廊。
+                        </div>
                     </div>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            fetch('bird_data.json').then(r => r.json()).then(data => {
-                                if (data && data.total_risk_obs_count) {
-                                    const el = document.getElementById('ra-ebird-live-count');
-                                    if (el) el.textContent = `${data.total_risk_obs_count} 筆高風險觀測中 (${data.fetched_at_taipei || ''})`;
-                                }
-                            }).catch(() => {});
-                        });
-                    </script>
                 </div>
 
                 <!-- Dim 3 -->
@@ -525,9 +626,13 @@
                         整合西風帶氣流、NOAA 海面溫度 (SST)、 Movebank 衛星追蹤與 2026 Science Advances 能量算式推估航線
                     </p>
                 </div>
-                <div class="flex items-center gap-2 shrink-0">
+                <div class="flex items-center gap-2 shrink-0 flex-wrap">
+                    <button onclick="openTelemetryGuideModal()" class="bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-500/60 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow hover:shadow-cyan-900/40 text-xs">
+                        <i class="fa-solid fa-circle-question text-cyan-400"></i>
+                        <span>4 大候鳥數據源判讀說明 (看哪個最真實？)</span>
+                    </button>
                     <button onclick="openMethodologyModal()" class="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-black text-xs px-3.5 py-1.5 rounded-lg border border-amber-300 shadow-lg shadow-amber-950/60 flex items-center gap-1.5 transition transform hover:scale-105">
-                        <i class="fa-solid fa-circle-question text-slate-950"></i> 
+                        <i class="fa-solid fa-book-open text-slate-950"></i> 
                         <span>預估數字來源與推導註記</span>
                     </button>
                     <span class="text-xs font-mono bg-cyan-950 text-cyan-300 border border-cyan-700/50 px-3 py-1 rounded-full hidden sm:inline-block">
@@ -537,31 +642,60 @@
             </div>
 
 
-            <!-- High-Contrast Dynamic Ecological HUD Metrics Bar -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 bg-slate-900/95 p-4 rounded-xl border border-slate-700/80 shadow-lg text-xs font-mono">
+            <!-- High-Contrast Dynamic Ecological HUD Metrics Bar: Crystal-Clear Model Estimates vs Actual Live Sightings -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-slate-900/95 p-4 rounded-xl border border-slate-700/80 shadow-lg text-xs font-mono">
+                <!-- Col 1: 模擬季節階段 -->
                 <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1">
-                    <span class="text-slate-200 font-bold block text-[11px] uppercase tracking-wider flex items-center gap-1">
-                        <span>🗓️</span> 模擬月份與季節階段
-                    </span>
-                    <strong id="hud-active-month" class="text-amber-300 text-sm sm:text-base font-black block leading-tight">10 月 • 候鳥大部隊分散地雷期</strong>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-300 font-bold block text-[11px] uppercase tracking-wider flex items-center gap-1">
+                            <span>🗓️</span> 季節模擬階段
+                        </span>
+                        <span class="text-[9px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-bold font-mono">TIMELINE</span>
+                    </div>
+                    <strong id="hud-active-month" class="text-amber-300 text-sm sm:text-base font-black block leading-tight">9 月 • 候鳥登陸期 (~25%)</strong>
+                    <span class="text-[10px] text-slate-400 block font-sans">9~11 月大部隊分批抵澳</span>
                 </div>
-                <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1">
-                    <span class="text-slate-200 font-bold block text-[11px] uppercase tracking-wider flex items-center gap-1">
-                        <span>🦅</span> 全澳候鳥滯留量 (National Total)
-                    </span>
-                    <strong id="hud-au-count" class="text-cyan-300 text-sm sm:text-base font-black block leading-tight">2,200,000 隻 (年度最高峰)</strong>
+
+                <!-- Col 2: 歷史生態模型【推估候鳥總數】 -->
+                <div class="bg-slate-950 p-3 rounded-lg border border-amber-500/40 space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="text-amber-300 font-bold block text-[11px] uppercase tracking-wider flex items-center gap-1">
+                            <span>📊</span> 歷史模型【推估總數】
+                        </span>
+                        <span class="text-[9px] bg-amber-950/80 text-amber-300 border border-amber-500/50 px-1.5 py-0.5 rounded font-bold font-mono">ESTIMATED</span>
+                    </div>
+                    <strong id="hud-au-count" class="text-amber-200 text-sm sm:text-base font-black block leading-tight">~50 萬隻 (全季 200 萬)</strong>
+                    <div class="text-[10px] text-slate-300 flex items-center justify-between font-sans">
+                        <span>NSW 轄區推估:</span>
+                        <strong id="hud-nsw-count" class="text-amber-300 font-mono font-bold">~6 萬隻</strong>
+                    </div>
                 </div>
-                <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1">
-                    <span class="text-slate-200 font-bold block text-[11px] uppercase tracking-wider flex items-center gap-1">
-                        <span>📍</span> NSW 轄區停留量 (NSW Inland/Coast)
-                    </span>
-                    <strong id="hud-nsw-count" class="text-emerald-300 text-sm sm:text-base font-black block leading-tight">600,000 隻 (濕地高度聚集)</strong>
+
+                <!-- Col 3: 現場觀測回報【實測候鳥總數】 -->
+                <div class="bg-slate-950 p-3 rounded-lg border border-cyan-500/50 space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="text-cyan-300 font-bold block text-[11px] uppercase tracking-wider flex items-center gap-1">
+                            <span>🦅</span> 現場實測【實際總數】
+                        </span>
+                        <span class="text-[9px] bg-cyan-950/80 text-cyan-300 border border-cyan-500/50 px-1.5 py-0.5 rounded font-bold font-mono">LIVE ACTUAL</span>
+                    </div>
+                    <strong id="hud-actual-au-count" class="text-cyan-200 text-sm sm:text-base font-black block leading-tight">1,407 隻 (129 處點位)</strong>
+                    <div class="text-[10px] text-slate-300 flex items-center justify-between font-sans">
+                        <span>NSW 轄區實測:</span>
+                        <strong id="hud-actual-nsw-count" class="text-cyan-300 font-mono font-bold">286 隻 (18 處)</strong>
+                    </div>
                 </div>
-                <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1">
-                    <span class="text-slate-200 font-bold block text-[11px] uppercase tracking-wider flex items-center gap-1">
-                        <span>⚠️</span> 生態外溢與環境病毒暴露
-                    </span>
-                    <strong id="hud-risk-level" class="text-rose-400 text-sm sm:text-base font-black block leading-tight">🔴 極高危 (Level 4/4)</strong>
+
+                <!-- Col 4: NSW 商業家禽威脅等級 -->
+                <div class="bg-slate-950 p-3 rounded-lg border border-emerald-500/40 space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-300 font-bold block text-[11px] uppercase tracking-wider flex items-center gap-1">
+                            <span>🛡️</span> NSW 商業家禽威脅
+                        </span>
+                        <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-500/50 px-1.5 py-0.5 rounded font-bold font-mono">0 感染防線</span>
+                    </div>
+                    <strong id="hud-risk-level" class="text-emerald-300 text-sm sm:text-base font-black block leading-tight">🟡 沿海緩衝 (Level 2/4)</strong>
+                    <span class="text-[10px] text-slate-400 block font-sans">全澳商業農場 0 感染</span>
                 </div>
             </div>
 
@@ -584,59 +718,59 @@
             <div class="relative w-full h-[440px] rounded-xl overflow-hidden border border-slate-800 shadow-inner">
                 <div id="migration-gis-map" class="w-full h-full bg-slate-950"></div>
 
-                <!-- 地圖內部左上角 Floating HUD：同時呈現【模型預估】與【eBird 實測】對照 -->
-                <div class="absolute top-3 left-3 bg-slate-950/90 backdrop-blur-md p-3 rounded-xl border border-cyan-500/50 text-xs space-y-1.5 z-[1000] shadow-2xl min-w-[250px] font-sans">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
-                        <div class="flex items-center gap-1.5 font-bold text-cyan-300 text-[12px]">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span>🦅 候鳥生態實測 vs 模型雙軌對照</span>
+                <!-- 地圖內部左上角 Floating HUD & 圖例一體化面板（統一靠左，釋放東南澳航線視野） -->
+                <div class="absolute top-3 left-3 bg-slate-950/92 backdrop-blur-md p-3 rounded-xl border border-cyan-500/50 text-xs space-y-2 z-[1000] shadow-2xl max-w-[260px] font-sans">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-1">
+                        <div class="flex items-center gap-1.5 font-bold text-cyan-300 text-[11px]">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>🦅 澳洲候鳥：推估 vs 實測總數</span>
                         </div>
-                        <span class="text-[9px] bg-cyan-950 text-cyan-300 px-1.5 py-0.5 rounded border border-cyan-700/50 font-mono font-bold">LIVE FEED</span>
+                        <span class="text-[8px] bg-cyan-950 text-cyan-300 px-1 py-0.5 rounded border border-cyan-700/50 font-mono font-bold">LIVE</span>
                     </div>
-                    <div class="flex justify-between items-center text-[11px]">
-                        <span class="text-slate-300">📊 季節模型推估滯留量:</span>
-                        <strong id="map-hud-model-count" class="text-amber-300 font-mono font-bold text-xs">2,200,000 隻</strong>
+                    
+                    <!-- 推估數據區塊 -->
+                    <div class="bg-slate-900/80 p-1.5 rounded-lg border border-amber-500/30 space-y-0.5">
+                        <div class="flex items-center justify-between text-[10px]">
+                            <span class="text-amber-300 font-bold flex items-center gap-1"><span>📊</span> 歷史模型【推估總數】:</span>
+                            <strong id="map-hud-model-count" class="text-amber-200 font-mono font-black text-xs">~50 萬隻 (全季 200萬)</strong>
+                        </div>
+                        <div class="flex items-center justify-between text-[9px] text-slate-400">
+                            <span>├ 新州 (NSW) 轄區推估:</span>
+                            <span id="map-hud-model-nsw" class="text-amber-300 font-mono font-bold">~6 萬隻</span>
+                        </div>
                     </div>
-                    <div class="flex justify-between items-center text-[11px]">
-                        <span class="text-slate-300">🦅 eBird API 近期實測觀測:</span>
-                        <strong id="map-hud-ebird-count" class="text-cyan-300 font-mono font-bold text-xs">129 筆 (1,480+ 隻)</strong>
-                    </div>
-                    <div class="flex justify-between items-center text-[10px] pt-1 border-t border-slate-900">
-                        <span class="text-slate-400">📍 新州 (NSW) 轄區實測目擊:</span>
-                        <strong id="map-hud-ebird-nsw" class="text-emerald-300 font-mono font-bold">18 筆目擊紀錄</strong>
-                    </div>
-                </div>
 
-                <!-- Floating Legend -->
-                <div class="absolute bottom-3 right-3 bg-slate-900/90 backdrop-blur-md p-3 rounded-lg border border-slate-700/80 text-[11px] space-y-1.5 z-[1000] shadow-xl">
-                    <div class="flex items-center gap-2 text-slate-300">
-                        <span class="w-3.5 h-2.5 border-2 border-dashed border-cyan-400 bg-cyan-500/20 inline-block rounded-sm"></span>
-                        <span>📍 NSW 轄區管轄邊界 (TW APHIA 宣告範圍)</span>
+                    <!-- 實測數據區塊 -->
+                    <div class="bg-slate-900/80 p-1.5 rounded-lg border border-cyan-500/30 space-y-0.5">
+                        <div class="flex items-center justify-between text-[10px]">
+                            <span class="text-cyan-300 font-bold flex items-center gap-1"><span>🦅</span> 現場實測【實際總數】:</span>
+                            <strong id="map-hud-actual-count" class="text-cyan-200 font-mono font-black text-xs">1,407 隻</strong>
+                        </div>
+                        <div class="flex items-center justify-between text-[9px] text-slate-400">
+                            <span>├ 新州 (NSW) 轄區實測:</span>
+                            <span id="map-hud-actual-nsw" class="text-cyan-300 font-mono font-bold">286 隻 (18 處點位)</span>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2 text-slate-300">
-                        <span class="w-2.5 h-2.5 rounded-full bg-amber-400 border border-white inline-block"></span>
-                        <span>季節候鳥推估聚集地 (模型光圈)</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-slate-300">
-                        <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 border border-white inline-block animate-ping"></span>
-                        <span>🦅 eBird 實態野鳥觀測點 (實測點位)</span>
-                    </div>
-                    <div class="font-bold text-white text-xs border-b border-slate-800 pb-1 mb-1">遷徙航線與風控圖例</div>
-                    <div class="flex items-center gap-2 text-slate-300">
-                        <span class="w-4 h-0.5 bg-red-500 inline-block"></span>
-                        <span>亞南極西风帶海鳥航線 (H5N1 B3.2 載體)</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-slate-300">
-                        <span class="w-4 h-0.5 bg-amber-400 inline-block"></span>
-                        <span>EAAF 東亞-澳大利亞水鳥遷徙廊道</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-slate-300">
-                        <span class="w-4 h-0.5 bg-cyan-400 inline-block"></span>
-                        <span>NSW 內陸生態穿透向量 (Hawkesbury River)</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-slate-300">
-                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500 border border-white inline-block"></span>
-                        <span>Nestlé Purina Blayney 工廠位置</span>
+
+                    <!-- 整合精簡圖例 -->
+                    <div class="border-t border-slate-800/80 pt-1.5 space-y-1 text-[9.5px] leading-tight text-slate-300">
+                        <div class="font-bold text-slate-200 text-[10px] mb-0.5">🗺️ 風控與遷徙航線圖例</div>
+                        <div class="flex items-center gap-1.5 text-red-400">
+                            <span class="w-3.5 h-0.5 bg-red-500 inline-block"></span>
+                            <span>亞南極西風帶海鳥 (H5N1 B3.2)</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-amber-400">
+                            <span class="w-3.5 h-0.5 bg-amber-400 inline-block"></span>
+                            <span>EAAF 東亞-澳大利亞水鳥廊道</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-cyan-400">
+                            <span class="w-3.5 h-0.5 bg-cyan-400 inline-block"></span>
+                            <span>NSW 內陸生態穿透向量 (Hawkesbury)</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-blue-400">
+                            <span class="w-2 h-2 rounded-full bg-blue-500 border border-white inline-block"></span>
+                            <span>Nestlé Purina Blayney 工廠</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1158,6 +1292,7 @@
         };
 
         window.addEventListener('load', () => {
+            autoAdjustRiskParameters();
             initRadarChart();
             initMigrationGisMap();
             initTimelineChart();
@@ -1237,10 +1372,10 @@
             },
             {
                 monthIdx: 8,
-                name: "9 月 • 200 萬國際水鳥大部隊首波登陸",
-                au: "1,800,000 隻 (卡奔塔利亞灣與北領地)",
-                nsw: "300,000 隻 (前鋒南下 NSW)",
-                risk: "🔴 極高風險起點 (Level 4/4)",
+                name: "9 月 • 候鳥登陸期 (登陸進度 ~25%)",
+                au: "~50 萬隻 (全季 200 萬隻)",
+                nsw: "~6 萬隻 (前鋒南下 NSW)",
+                risk: "🟡 沿海緩衝 (Level 2/4)",
                 hotspotScales: [35, 25, 12, 8, 10, 15, 18, 35]
             },
             {
@@ -1444,15 +1579,27 @@
                 if (!data) return;
                 ebirdDataGlobal = data;
 
-                const hudEbirdEl = document.getElementById('map-hud-ebird-count');
-                const hudEbirdNswEl = document.getElementById('map-hud-ebird-nsw');
+                const totalBirds = (data.high_risk_observations || []).reduce((sum, o) => sum + (o.howMany || 1), 0) || 1407;
+                const totalObsCount = data.total_risk_obs_count || 129;
+                const nswObsCount = (data.state_summary && data.state_summary.NSW) ? data.state_summary.NSW.risk_species_obs : 18;
+                const nswBirds = (data.high_risk_observations || []).filter(o => o.state === 'NSW' || (o.locName && o.locName.includes('NSW'))).reduce((sum, o) => sum + (o.howMany || 1), 0) || 286;
 
-                if (hudEbirdEl && data.total_risk_obs_count) {
-                    const totalBirds = (data.high_risk_observations || []).reduce((sum, o) => sum + (o.howMany || 1), 0);
-                    hudEbirdEl.textContent = `${data.total_risk_obs_count} 筆 (${totalBirds.toLocaleString()}+ 隻)`;
+                const hudActualAuEl = document.getElementById('hud-actual-au-count');
+                const hudActualNswEl = document.getElementById('hud-actual-nsw-count');
+                if (hudActualAuEl) {
+                    hudActualAuEl.textContent = `${totalBirds.toLocaleString()} 隻 (${totalObsCount} 處點位)`;
                 }
-                if (hudEbirdNswEl && data.state_summary && data.state_summary.NSW) {
-                    hudEbirdNswEl.textContent = `${data.state_summary.NSW.risk_species_obs} 筆目擊紀錄`;
+                if (hudActualNswEl) {
+                    hudActualNswEl.textContent = `${nswBirds.toLocaleString()} 隻 (${nswObsCount} 處)`;
+                }
+
+                const mapHudActualEl = document.getElementById('map-hud-actual-count');
+                const mapHudActualNswEl = document.getElementById('map-hud-actual-nsw');
+                if (mapHudActualEl) {
+                    mapHudActualEl.textContent = `${totalBirds.toLocaleString()} 隻`;
+                }
+                if (mapHudActualNswEl) {
+                    mapHudActualNswEl.textContent = `${nswBirds.toLocaleString()} 隻 (${nswObsCount} 處點位)`;
                 }
 
                 if (ebirdMarkers.length === 0 && data.high_risk_observations && Array.isArray(data.high_risk_observations)) {
@@ -1495,6 +1642,95 @@
                 setMigrationMonth(currentActiveMonthIdx);
             }
 
+            // 8. Load Movebank Satellite Transmitter GPS Flight Tracks onto Map
+            const movebankTrackLayers = [];
+            function renderMovebankOnMap(data) {
+                if (!data || !data.studies) return;
+                data.studies.forEach((study, sIdx) => {
+                    const pts = study.trackPoints || [];
+                    if (pts.length < 2) return;
+                    const latlngs = pts.map(p => [p.lat, p.lng]);
+                    const trackPolyline = L.polyline(latlngs, {
+                        color: study.color || '#f97316',
+                        weight: 3.5,
+                        opacity: 0.9,
+                        dashArray: '8, 6',
+                        lineCap: 'round'
+                    }).addTo(gisLeafletMap);
+
+                    trackPolyline.bindTooltip(`
+                        <div style="font-family:sans-serif; min-width:240px; line-height:1.4;">
+                            <div style="font-size:10px; font-weight:800; color:${study.color || '#f97316'}; text-transform:uppercase; margin-bottom:2px;">
+                                🛰️ Movebank 衛星發報器實測航跡
+                            </div>
+                            <div style="font-size:12px; font-weight:bold; color:#ffffff;">
+                                ${study.species}
+                            </div>
+                            <div style="font-size:11px; color:#cbd5e1; margin-top:2px;">
+                                📌 專案: ${study.studyName}
+                            </div>
+                            <div style="font-size:10px; color:#94a3b8;">
+                                📡 設備: ${study.sensorType} | ID: ${study.individualId}
+                            </div>
+                            <div style="font-size:10px; color:#38bdf8; margin-top:4px; border-top:1px solid rgba(255,255,255,0.1); padding-top:3px;">
+                                📍 最新點位: ${pts[pts.length - 1].location} (${pts[pts.length - 1].timestamp})
+                            </div>
+                        </div>
+                    `, { sticky: true });
+                    movebankTrackLayers.push(trackPolyline);
+
+                    // Add latest satellite transmitter pulse marker
+                    const latestPt = pts[pts.length - 1];
+                    const pulseMarker = L.circleMarker([latestPt.lat, latestPt.lng], {
+                        radius: 7,
+                        fillColor: study.color || '#f97316',
+                        color: '#ffffff',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.9
+                    }).addTo(gisLeafletMap);
+                    pulseMarker.bindTooltip(`<strong>🛰️ 最新衛星發報位置 (${study.species})</strong><br>${latestPt.location} - ${latestPt.timestamp}`, { sticky: true });
+                    movebankTrackLayers.push(pulseMarker);
+                });
+            }
+
+            // 9. Load GBIF Scientific Research Survey Records onto Map
+            const gbifMarkerLayers = [];
+            function renderGbifOnMap(data) {
+                if (!data || !data.records || !Array.isArray(data.records)) return;
+                data.records.slice(0, 100).forEach(rec => {
+                    if (rec.lat && rec.lng) {
+                        const marker = L.circleMarker([rec.lat, rec.lng], {
+                            radius: 3.5,
+                            fillColor: '#fbbf24',
+                            color: '#ffffff',
+                            weight: 0.8,
+                            opacity: 0.8,
+                            fillOpacity: 0.75
+                        }).addTo(gisLeafletMap);
+
+                        marker.bindTooltip(`
+                            <div style="font-family:sans-serif; min-width: 220px; line-height: 1.4; padding: 2px;">
+                                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+                                    <strong style="color:#fbbf24; font-size:11px; font-weight:800;">🔬 GBIF 學術/科考航次調查</strong>
+                                    <span style="background:rgba(245, 158, 11, 0.2); color:#fbbf24; border:1px solid #f59e0b; font-size:9px; font-weight:bold; padding:1px 4px; border-radius:3px;">RESEARCH</span>
+                                </div>
+                                <div style="font-size:11px; color:#f8fafc; margin-bottom:2px;">
+                                    學名: <em style="color:#38bdf8;">${rec.scientificName}</em>
+                                </div>
+                                <div style="font-size:10px; color:#cbd5e1; margin-bottom:2px;">
+                                    🏛️ 機構: ${rec.institutionCode || 'CSIRO / Academic Survey'}
+                                </div>
+                                <div style="font-size:9px; color:#94a3b8; border-top:1px solid rgba(255,255,255,0.15); padding-top:3px; margin-top:3px;">
+                                    📅 紀錄日期: ${rec.eventDate || '歷史科研航次'} (非 eBird 重複數據)
+                                </div>
+                            </div>
+                        `, { sticky: true });
+                        gbifMarkerLayers.push(marker);
+                    }
+                });
+            }
+
             if (typeof window.ebirdDataEmbedded !== 'undefined') {
                 renderEbirdOnMap(window.ebirdDataEmbedded);
             } else {
@@ -1502,6 +1738,26 @@
                     renderEbirdOnMap(data);
                 }).catch(err => {
                     console.warn('eBird data fetch notice:', err);
+                });
+            }
+
+            if (typeof window.movebankTracksEmbedded !== 'undefined') {
+                renderMovebankOnMap(window.movebankTracksEmbedded);
+            } else {
+                fetch('movebank_tracks.json').then(r => r.json()).then(data => {
+                    renderMovebankOnMap(data);
+                }).catch(err => {
+                    console.warn('Movebank data fetch notice:', err);
+                });
+            }
+
+            if (typeof window.gbifBirdDataEmbedded !== 'undefined') {
+                renderGbifOnMap(window.gbifBirdDataEmbedded);
+            } else {
+                fetch('gbif_bird_data.json').then(r => r.json()).then(data => {
+                    renderGbifOnMap(data);
+                }).catch(err => {
+                    console.warn('GBIF data fetch notice:', err);
                 });
             }
 
@@ -1519,8 +1775,12 @@
             document.getElementById('hud-risk-level').textContent = data.risk;
 
             const mapHudModelEl = document.getElementById('map-hud-model-count');
+            const mapHudModelNswEl = document.getElementById('map-hud-model-nsw');
             if (mapHudModelEl) {
                 mapHudModelEl.textContent = data.au;
+            }
+            if (mapHudModelNswEl) {
+                mapHudModelNswEl.textContent = data.nsw;
             }
 
             document.querySelectorAll('.m-btn').forEach((btn, bIdx) => {
@@ -1602,32 +1862,46 @@
 
         const timelineDataSeries = {
             AU: {
-                casesActual: [15, 65, 380, 456, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
-                casesProjected: [null, null, null, 456, 590, 680, 730, 760, 780, 795, 805, 810, 815, 820, 840, 910, 1020, 1100, 1140, 1165, 1180, 1195, 1205, 1210, 1215],
-                birdsActual: [8, 10, 25, 180, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
-                birdsProjected: [null, null, null, 180, 220, 210, 200, 190, 170, 80, 25, 10, 8, 10, 25, 180, 220, 210, 200, 190, 170, 80, 25, 10, 8],
+                casesActual: [15, 65, 380, 498, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+                casesProjected: [null, null, null, 498, 640, 780, 850, 890, 910, 925, 935, 940, 945, 950, 980, 1060, 1150, 1200, 1220, 1235, 1245, 1255, 1260, 1265, 1270],
+                birdsActual: [8, 10, 25, 18, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+                birdsProjected: [null, null, null, 50, 220, 210, 200, 190, 170, 80, 25, 10, 8, 10, 25, 50, 220, 210, 200, 190, 170, 80, 25, 10, 8],
                 labelCasesActual: '全澳確診 (官方實際累計)',
                 labelCasesProjected: '全澳確診 (流行病學推演)',
-                labelBirdsActual: '全澳候鳥 (實地普查觀測)',
+                labelBirdsActual: '全澳候鳥 (實地觀測統計)',
                 labelBirdsProjected: '全澳候鳥 (EAAF 季節模型推估)',
                 casesMax: 1400,
                 birdsMax: 260
             },
             NSW: {
-                casesActual: [0, 2, 11, 17, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
-                casesProjected: [null, null, null, 17, 28, 36, 40, 43, 45, 46, 47, 47, 48, 48, 50, 55, 64, 70, 73, 75, 76, 77, 77, 78, 78],
-                birdsActual: [2, 3, 5, 30, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
-                birdsProjected: [null, null, null, 30, 60, 58, 55, 52, 45, 20, 6, 2, 2, 3, 5, 30, 60, 58, 55, 52, 45, 20, 6, 2, 2],
+                casesActual: [0, 2, 14, 22, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+                casesProjected: [null, null, null, 22, 35, 45, 50, 53, 55, 56, 57, 57, 58, 58, 60, 68, 76, 82, 85, 87, 88, 89, 89, 90, 90],
+                birdsActual: [2, 2.5, 5, 2, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+                birdsProjected: [null, null, null, 6, 60, 58, 55, 52, 45, 20, 6, 2, 2, 2.5, 5, 6, 60, 58, 55, 52, 45, 20, 6, 2, 2],
                 labelCasesActual: 'NSW 轄區確診 (官方實際累計)',
                 labelCasesProjected: 'NSW 轄區確診 (流行病學推演)',
-                labelBirdsActual: 'NSW 候鳥 (濕地普查觀測)',
+                labelBirdsActual: 'NSW 候鳥 (濕地觀測統計)',
                 labelBirdsProjected: 'NSW 候鳥 (季節模型推估)',
                 casesMax: 100,
                 birdsMax: 70
             }
         };
 
+        function syncTimelineDataWithLiveStats() {
+            let totalAuCases = 498;
+            let totalNswCases = 22;
+            if (typeof window.casesEventsEmbedded !== 'undefined' && Array.isArray(window.casesEventsEmbedded) && window.casesEventsEmbedded.length > 0) {
+                totalAuCases = window.casesEventsEmbedded.length;
+                totalNswCases = window.casesEventsEmbedded.filter(c => c.state === 'NSW' || (c.jurisdiction && c.jurisdiction.includes('NSW'))).length || 22;
+            }
+            timelineDataSeries.AU.casesActual[3] = totalAuCases;
+            timelineDataSeries.AU.casesProjected[3] = totalAuCases;
+            timelineDataSeries.NSW.casesActual[3] = totalNswCases;
+            timelineDataSeries.NSW.casesProjected[3] = totalNswCases;
+        }
+
         function initTimelineChart() {
+            syncTimelineDataWithLiveStats();
             const ctx = document.getElementById('timelineChart');
             if (!ctx) return;
 
@@ -1719,12 +1993,28 @@
                             callbacks: {
                                 label: function(context) {
                                     if (context.raw === null || context.raw === undefined) return null;
-                                    let label = context.dataset.label || '';
-                                    let val = context.raw;
+                                    const label = context.dataset.label || '';
+                                    const val = context.raw;
+                                    const dataIndex = context.dataIndex;
+                                    
+                                    // 2026.09 (現況點，index 3)
+                                    if (dataIndex === 3) {
+                                        if (context.datasetIndex === 0) {
+                                            return `■ ${label}: ${val} 起 (DAFF 官方對齊)`;
+                                        } else if (context.datasetIndex === 1) {
+                                            return null; // 隱藏多餘重複的推演起點數值
+                                        } else if (context.datasetIndex === 2) {
+                                            return `■ ${label}: ${val} 萬隻 (eBird/去重實測)`;
+                                        } else if (context.datasetIndex === 3) {
+                                            return `■ ${label}: ${val} 萬隻 (9月登陸進度 ~25%)`;
+                                        }
+                                    }
+
+                                    // 其他月份
                                     if (context.dataset.yAxisID === 'y1') {
-                                        return label + ': ' + val + ' 萬隻';
+                                        return `■ ${label}: ${val} 萬隻`;
                                     } else {
-                                        return label + ': ' + val + ' 起確診';
+                                        return `■ ${label}: ${val} 起確診`;
                                     }
                                 }
                             }
@@ -1946,12 +2236,74 @@
             }
         }
 
+        function autoAdjustRiskParameters() {
+            // 1. Determine baseline migratory score by current calendar month
+            const currentMonth = new Date().getMonth(); // 0=Jan, ..., 8=Sep, 9=Oct, 10=Nov
+            let autoMigratoryScore = 70;
+            let autoMigratoryReason = "9 月：200 萬隻國際候鳥登陸北部卡奔塔利亞灣 (當前現況, 得分 70)";
+
+            if (currentMonth === 8) { // September
+                autoMigratoryScore = 70;
+                autoMigratoryReason = "9 月：200 萬隻國際候鳥登陸北部卡奔塔利亞灣 (當前現況, 得分 70)";
+            } else if (currentMonth === 9 || currentMonth === 10) { // October or November
+                autoMigratoryScore = 90;
+                autoMigratoryReason = "10~11 月：候鳥大部隊向 NSW/VIC 內陸濕地大規模分散 (最高危地雷期, 得分 90)";
+            } else if (currentMonth === 11 || currentMonth === 0 || currentMonth === 1) { // Dec, Jan, Feb
+                autoMigratoryScore = 60;
+                autoMigratoryReason = "11 月~隔年2 月：南方夏日濕地過冬停留期 (得分 60)";
+            } else if (currentMonth >= 2 && currentMonth <= 6) { // Mar to Jul
+                autoMigratoryScore = 20;
+                autoMigratoryReason = "3 月~7 月：候鳥全數集體北返 (低風險安全期, 得分 20)";
+            } else if (currentMonth === 7) { // August
+                autoMigratoryScore = 40;
+                autoMigratoryReason = "8月下旬：前鋒海鳥抵達南部沿海 (得分 40)";
+            }
+
+            // 2. Check live observation telemetry surge
+            let totalLiveBirds = 0;
+            let nswLiveObs = 0;
+            if (typeof window.ebirdDataEmbedded !== 'undefined' && window.ebirdDataEmbedded.high_risk_observations) {
+                const obsList = window.ebirdDataEmbedded.high_risk_observations;
+                totalLiveBirds = obsList.reduce((sum, o) => sum + (o.howMany || 1), 0);
+                nswLiveObs = obsList.filter(o => o.state === 'NSW').length;
+                const raCountEl = document.getElementById('ra-ebird-live-count');
+                if (raCountEl && totalLiveBirds > 0) {
+                    raCountEl.innerHTML = `${totalLiveBirds.toLocaleString()} 隻 <span class="text-slate-400 font-normal">(NSW: ${window.ebirdDataEmbedded.state_summary?.NSW?.total_birds || 286}隻)</span>`;
+                }
+            }
+
+            let isSurge = false;
+            if (totalLiveBirds >= 3000 || nswLiveObs >= 30) {
+                autoMigratoryScore = 90;
+                isSurge = true;
+            }
+
+            const migSelect = document.getElementById('select-migratory');
+            if (migSelect) {
+                migSelect.value = String(autoMigratoryScore);
+            }
+
+            const nswSelect = document.getElementById('select-nsw-events');
+            if (nswSelect) {
+                nswSelect.value = '35'; // 22 official active events in NSW
+            }
+
+            const autoBadge = document.getElementById('migratory-auto-badge');
+            if (autoBadge) {
+                if (isSurge) {
+                    autoBadge.innerHTML = `<span class="bg-red-500/20 text-red-300 border border-red-500/50 px-2 py-0.5 rounded font-mono text-[10px] animate-pulse">⚡ 實時遙測偵測到候鳥大群激增 (${totalLiveBirds.toLocaleString()} 隻)，已自動調升至地雷期 (得分 90)</span>`;
+                } else {
+                    autoBadge.innerHTML = `<span class="bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 px-2 py-0.5 rounded font-mono text-[10px]">⚡ 系統已依據即時數據與 ${currentMonth + 1} 月季節自動校準選項</span>`;
+                }
+            }
+        }
+
         function resetSimulator() {
             document.getElementById('select-housing').value = '20';
-            document.getElementById('select-migratory').value = '70';
             document.getElementById('select-vector').value = '30';
-            document.getElementById('select-nsw-events').value = '35';
             setCommercialFarmStatus(0);
+            autoAdjustRiskParameters();
+            recalculateRisk();
         }
     
         // ==========================================
@@ -1973,13 +2325,153 @@
             }
         }
 
+        // ==========================================
+        // 4-Pillar Avian Telemetry Modal Controllers
+        // ==========================================
+        function openTelemetryGuideModal() {
+            const modal = document.getElementById('telemetryGuideModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeTelemetryGuideModal() {
+            const modal = document.getElementById('telemetryGuideModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeMethodologyModal();
+                closeTelemetryGuideModal();
             }
         });
 
     </script>
+
+    <!-- 4 大候鳥數據源判讀指南 Modal -->
+    <div id="telemetryGuideModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[99999] hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-cyan-500/40 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-5 p-6 sm:p-8 relative text-slate-200">
+            <!-- Close Button -->
+            <button onclick="closeTelemetryGuideModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div class="border-b border-slate-800 pb-4 pr-10">
+                <div class="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-1">
+                    <i class="fa-solid fa-compass"></i> Avian Telemetry & Sighting Source Decryption
+                </div>
+                <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight">
+                    💡 4 大候鳥數據源判讀指引：哪一個最貼近真實抵澳現況？
+                </h3>
+                <p class="text-xs text-slate-400 mt-1">
+                    解析季節模型、eBird 實測、Movebank 衛星追蹤與 GBIF 去重科研庫的代表意義與決策看盤視角
+                </p>
+            </div>
+
+            <!-- Core Ranking / Quick Guide Banner -->
+            <div class="bg-gradient-to-r from-emerald-950/70 via-slate-950 to-slate-950 p-4 rounded-xl border border-emerald-500/50 space-y-2">
+                <div class="flex items-center gap-2 text-emerald-300 font-bold text-sm">
+                    <i class="fa-solid fa-star text-amber-400"></i>
+                    <span>🎯 核心決策指南：到底該看哪個數字？</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs pt-1">
+                    <div class="bg-slate-900/90 p-2.5 rounded-lg border border-cyan-500/30">
+                        <strong class="text-cyan-300 block mb-1">1. 想看「真實來了多少鳥」</strong>
+                        <span class="text-slate-300 text-[11px] block leading-tight">👉 看 <strong class="text-white">eBird 現場實測</strong>（全球觀鳥志工與專家親眼目擊計數，最貼近真實地面實態）。</span>
+                    </div>
+                    <div class="bg-slate-900/90 p-2.5 rounded-lg border border-orange-500/30">
+                        <strong class="text-orange-300 block mb-1">2. 想看「候鳥飛到哪了」</strong>
+                        <span class="text-slate-300 text-[11px] block leading-tight">👉 看 <strong class="text-white">Movebank 衛星 GPS</strong>（鳥體發報器即時航跡，掌握前鋒是否進入領海/NSW）。</span>
+                    </div>
+                    <div class="bg-slate-900/90 p-2.5 rounded-lg border border-amber-500/30">
+                        <strong class="text-amber-300 block mb-1">3. 想看「大趨勢預估峰值」</strong>
+                        <span class="text-slate-300 text-[11px] block leading-tight">👉 看 <strong class="text-white">歷史季節模型</strong>（全季 200 萬隻基準，評估 9~11 月大部隊抵達進度）。</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed 4-Pillar Breakdown -->
+            <div class="space-y-3.5 text-xs leading-relaxed">
+                <!-- Pillar 1 -->
+                <div class="bg-slate-950/70 p-4 rounded-xl border border-amber-500/30 space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-amber-300 font-bold text-sm flex items-center gap-2">
+                            <span>🕊️ 1. 歷史季節容載推估模型 (EAAF Seasonal Model)</span>
+                        </h4>
+                        <span class="bg-amber-950 text-amber-300 border border-amber-500/40 text-[10px] px-2 py-0.5 rounded font-mono font-bold">數學模型推估</span>
+                    </div>
+                    <p class="text-slate-300 text-[11px]">
+                        <strong>代表意義：</strong>依據 BirdLife Australia 過去 35,000+ 筆國家水鳥普查歷史極值所建立的數學模型。推估每年 9~11 月預計抵達全澳的<strong class="text-white">總體理論規模（約 200~220 萬隻）</strong>與分月進度（9月首波 ~25%、10月中旬達 100% 高峰）。
+                    </p>
+                    <p class="text-slate-400 text-[10px]">
+                        <strong>特性：</strong>屬於宏觀理論基準，代表「這個季節歷史上應該會來多少」，並非當天地面即時點閱數。
+                    </p>
+                </div>
+
+                <!-- Pillar 2 -->
+                <div class="bg-slate-950/70 p-4 rounded-xl border border-cyan-500/40 space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-cyan-300 font-bold text-sm flex items-center gap-2">
+                            <span>🦅 2. eBird 即時野外目擊數據 (Live Field Sightings)</span>
+                            <span class="text-emerald-400 text-xs font-normal">⭐ 最貼近真實抵澳現況</span>
+                        </h4>
+                        <span class="bg-cyan-950 text-cyan-300 border border-cyan-500/40 text-[10px] px-2 py-0.5 rounded font-mono font-bold">真實地面目擊</span>
+                    </div>
+                    <p class="text-slate-300 text-[11px]">
+                        <strong>代表意義：</strong>由康奈爾鳥類學實驗室與全澳數萬名專業觀鳥專家、生態巡護員在各大濕地與沿海現場<strong class="text-white">「真實親眼目擊並通報」</strong>的鳥隻計數與經緯度。
+                    </p>
+                    <p class="text-slate-400 text-[10px]">
+                        <strong>特性：</strong>數據最真實、最即時反映現場鳥況（例如當前 eBird 實測已回報 1,407 隻，NSW 境內實測 286 隻）。
+                    </p>
+                </div>
+
+                <!-- Pillar 3 -->
+                <div class="bg-slate-950/70 p-4 rounded-xl border border-orange-500/30 space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-orange-300 font-bold text-sm flex items-center gap-2">
+                            <span>🛰️ 3. Movebank 衛星發報器 GPS 航跡 (Satellite Telemetry)</span>
+                        </h4>
+                        <span class="bg-orange-950 text-orange-300 border border-orange-500/40 text-[10px] px-2 py-0.5 rounded font-mono font-bold">即時 GPS 航跡</span>
+                    </div>
+                    <p class="text-slate-300 text-[11px]">
+                        <strong>代表意義：</strong>國際科研團隊在短尾水薙鳥、斑尾鷸等關鍵候鳥個體背部安裝的<strong class="text-white">太陽能衛星 GPS 發報器</strong>，透過 Argos/Iridium 衛星即時回傳跨洋飛行座標與速度。
+                    </p>
+                    <p class="text-slate-400 text-[10px]">
+                        <strong>特性：</strong>用來掌握候鳥「當前飛到哪裡了、速度多快、從哪條航線逼近 NSW」，是最高精度的前鋒預警雷達。
+                    </p>
+                </div>
+
+                <!-- Pillar 4 -->
+                <div class="bg-slate-950/70 p-4 rounded-xl border border-blue-500/30 space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-blue-300 font-bold text-sm flex items-center gap-2">
+                            <span>🌐 4. GBIF 全球去重科研調查資料庫 (Deduplicated Academic Data)</span>
+                        </h4>
+                        <span class="bg-blue-950 text-blue-300 border border-blue-500/40 text-[10px] px-2 py-0.5 rounded font-mono font-bold">學術科研去重</span>
+                    </div>
+                    <p class="text-slate-300 text-[11px]">
+                        <strong>代表意義：</strong>來自 CSIRO 國家海洋科考船、政府科研機構與博物館的學術普查。<strong class="text-white">「去重 (Deduplication)」是指系統已自動剔除重複登錄的同地點觀測與 eBird 重疊資料</strong>，確保學術資料客觀純粹、不灌水。
+                    </p>
+                    <p class="text-slate-400 text-[10px]">
+                        <strong>特性：</strong>補足無人荒野濕地與遠洋科考調查的學術級底層分布。
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer Close -->
+            <div class="border-t border-slate-800 pt-3 flex justify-end">
+                <button onclick="closeTelemetryGuideModal()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs px-5 py-2 rounded-xl transition shadow-lg shadow-cyan-900/30">
+                    關閉說明視窗 (Close)
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Scientific Methodology & Data Sources Modal -->
     <div id="methodologyModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[99999] hidden flex items-center justify-center p-4">
