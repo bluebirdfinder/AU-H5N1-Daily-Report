@@ -1,4 +1,4 @@
-{
+window.gbifBirdDataEmbedded = {
   "fetched_at_utc": "2026-09-08T10:15:24Z",
   "fetched_at_taipei": "2026-09-08 18:15:24",
   "source": "GBIF Global Biodiversity Information Facility (Excluding eBird duplicates)",
@@ -5374,4 +5374,4 @@
       "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
     }
   ]
-}
+};

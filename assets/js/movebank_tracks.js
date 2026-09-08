@@ -1,4 +1,4 @@
-{
+window.movebankTracksEmbedded = {
   "fetched_at_utc": "2026-09-08T10:15:24Z",
   "source": "Movebank Animal Tracking Network (REST API & Satellite Telemetry)",
   "authenticated": false,
@@ -281,4 +281,4 @@
       ]
     }
   ]
-}
+};
