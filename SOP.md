@@ -28,9 +28,9 @@
 - 驗證 `h5n1_weekly_slides.html` 16:9 Web 簡報網頁佈局、Chart.js 每週趨勢圖表及 Gemini AIGrounding 新聞情報無異常。
 
 #### Step 6: Documentation Sync (版本與文檔同步)
-- 更新 `README.md` 中的數據結算起數 (484 起)、eBird 雙軌 GIS 地圖圖層、零 CORS 阻擋靜態包 (`assets/js/bird_data.js`)、當前月份動態對齊與版本歷史記錄 (v2.8.0)。
+- 更新 `README.md` 中的數據結算起數 (484 起)、NSW 雪梨北灘首例/科夫斯港瀕危物種、政策雷達模組 (Policy Radar)、eBird 雙軌 GIS 地圖圖層與版本歷史記錄 (v2.9.0)。
 - 同步更新 `CHANGELOG.md` 紀錄版本變更與修復細節。
-- 更新 `task.md` 與 `walkthrough.md` 記錄最新稽核與改版驗證項目。
+- 更新 `GOVT_SCRAPING_BEST_PRACTICES.md`、`task.md` 與 `walkthrough.md` 記錄最新稽核與改版驗證項目。
 
 #### Step 7: Handover & Git Push File Checklist (檔案更新整理與推送清單) 🚀
 - 整理所有變更檔案明細表，明確劃分「**哪些檔案必須 Git Push 推送至 GitHub**」。

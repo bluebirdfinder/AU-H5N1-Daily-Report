@@ -2,11 +2,39 @@
 
 所有專案版本更新與重大變更均紀錄於此。
 
+## [v2.9.0] - 2026-09-08
+
+### 🚨 NSW 確診激增至 22 起 · 病毒首度攻入雪梨都會圈 (Sydney Metro Breach)
+- **精確點位與物種資料庫全面更新 (`cases_events.json` & `h5n1.py`)**：
+  - **雪梨北灘 (Warriewood, Northern Beaches Sydney)**：確診大鳳頭燕鷗 (Greater Crested Tern)，為雪梨大都會區首宗確診。
+  - **肯布拉港 (Port Kembla, Wollongong)**：大鳳頭燕鷗確診。
+  - **科夫斯港 (Coffs Harbour, Mid North Coast)**：新州首度檢出受脅瀕危留鳥物種「赫頓鸌 / 雪兒水鳥 (Hutton's Shearwater)」。
+  - **南海岸肖爾黑文 (Shoalhaven)**：確認第 3 起海鳥群聚感染事件。
+  - 全澳累計確診事件升至 **484 起** (SA 271, VIC 150, TAS 29, NSW 22, WA 10, QLD 2)，商業家禽與蛋場全澳持續保持 **100% 零感染**。
+
+### 🛡️ 全澳防疫政策、疫苗試驗與都會生物安全應變雷達 (Policy Radar Module)
+- **新增政策雷達卡片 (`report_template.html`, `report_template_en.html`, `index.html`, `index_en.html`)**：
+  1. **各州圈養令對比**：維州 (VIC) 強制室內禁閉令 (Control Order) 延長 28 天至 2026/09/18；新州 (NSW) DPIRD 維持自願性質彈性建議。
+  2. **都會紅狐染疫警戒**：阿德萊德都市紅狐染疫引發「全澳都會生物安全 Rethink Moment」（垃圾桶上鎖、廚餘管理、防範接觸後院兔寵/犬貓）。
+  3. **NSW 塔隆加動物園 (Taronga Zoo) 疫苗試驗**：啟動瀕危/受脅鳥類 H5 疫苗試驗以收集抗體免疫數據。
+  4. **BioResponse NSW 前線 App**：新州強制全州野外巡查員安裝專用應變 App，提供 24hr 動物疾病緊急專線 (1800 675 888)。
+
+### 🦅 物種生態庫擴充與一鍵快篩強化
+- **新增物種生態檔案**：於 `DEFAULT_SPECIES_PROFILES` 納入「赫頓鸌 (Hutton's Shearwater)」與「野生紅狐 (Red Fox)」。
+- **一鍵快篩升級**：支援「🚨 新州 / 雪梨北灘 (NSW 22起)」、「🌊 赫頓鸌 / 瀕危留鳥 (科夫斯港)」等直觀篩選按鈕。
+
+### ⚖️ 定量風險模型同步 (`risk_assessment.html` & `risk_assessment_en.html`)
+- 更新 NSW 確診野生動物事件指標至 **22 起**。
+- 地緣評估結論維持穩固：雪梨北灘與肯布拉港病例皆屬太平洋沿岸海灘，與內陸 Central West 高地之 Nestlé Purina Blayney 廠隔著藍山山脈天然屏障（直線距離 > 200 公里），商業原料供應鏈維持安全。
+
+---
+
 ## [v2.8.1] - 2026-09-07
 
 ### 🚀 GitHub Actions CI/CD 自動化流程修復與 4 大雙語頁面全覆蓋
-- **修復 Exit code 128 部署中斷問題 (`auto_update.yml`)**：
-  - 修復 Step 5 `git add` 找不到 `live_page_en.html` 導致 fatal error 中斷的問題。
+- **全面升級 `git add -A` 與 `git diff --cached` 提交機制 (`auto_update.yml`)**：
+  - 改採 `git add -A` 自動暫存所有更新與新增檔案，徹底避免因個別檔名不存在導致 `git add` 中斷或暫存區為空 (`no changes added to commit`, exit code 1) 的問題。
+  - 改以 `git diff --cached --quiet` 嚴謹檢測暫存區實質異動，有變動才執行 commit，杜絕空提交報錯。
   - Step 4b 補齊英文版 Live 頁面自動複製備份指令 (`cp index_en.html live_page_en.html`)。
 - **4 大核心決策報告網頁與 Live 頁面全自動同步**：
   - 完整涵蓋 `index.html` (中文報告主頁)、`index_en.html` (英文報告主頁)、`risk_assessment.html` (中文風險評估) 與 `risk_assessment_en.html` (英文風險評估) 及對應 Live 備份頁。

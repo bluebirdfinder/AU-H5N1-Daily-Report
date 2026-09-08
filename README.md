@@ -25,11 +25,18 @@
 - **歷次週報歸檔 Modal 彈窗 (`generate_dynamic_weekly_archive_html()`)**：自動掃描 `weekly_reports/` 資料夾，提供一鍵開啟各週歷史雙語簡報連結。
 - **16:9 簡報視覺適配與全功能操控**：採用現代黑暗科技美學 (Dark Slate Glassmorphism)，支援鍵盤與全螢幕簡報模式。
 
-### 4. 🤖 Gemini AI 全網情報整合 (DAFF + 各州政策 + 新聞 RSS + Gemini Search Grounding)
+### 4. 🛡️ 全澳防疫政策、疫苗試驗與都會生物安全應變雷達 (Policy Radar) **[2026-09-08 全新升級]**
+- **各州圈養令 (Housing Order) 雙軌追蹤**：維州 (VIC) 強制室內禁閉令 (Control Order) 延長 28 天至 2026/09/18（南部/沿海 50+ 隻規模農場）；新州 (NSW) DPIRD 維持彈性自願性建議。
+- **都會紅狐跨種感染都市警示 (Urban Biosecurity Rethink)**：阿德萊德都市野生紅狐染疫引發都會防線升級（垃圾桶上鎖、清理廚餘、禁止接觸家寵犬貓/後院兔子與天竺鼠）。
+- **NSW 塔隆加動物園 (Taronga Zoo) 疫苗臨床試驗**：啟動瀕危/受脅野生鳥類 H5 疫苗試驗以收集抗體與免疫數據。
+- **BioResponse NSW 前線野外公務員專用 App**：新州強制全體國家公園管理員與巡查員安裝專用應變 App，提供 24hr 動物疾病緊急專線 (`1800 675 888`)。
+
+### 5. 🤖 Gemini AI 全網情報整合 (DAFF + 各州政策 + 新聞 RSS + Gemini Search Grounding)
 - **雙引擎 (Dual-Engine) AI 實時連網摘要**：整合 **Gemini 2.5/3.6 API Google Search Grounding** 技術，主動連網搜尋當下最新澳洲 H5N1 報導與地方政策。
-- **純事件計數規範**：對齊 DAFF 官方最新國際標準：**全澳 468 起確診事件 (Positive Events)**（截至 2026-09-04）、**1,273 起陰性排除事件** 與 **34,358 筆熱線通報**。
+- **純事件計數規範**：對齊 DAFF 官方最新國際標準：**全澳 484 起確診事件 (Positive Events)**（截至 2026-09-08）、**2,450 起陰性排除事件** 與 **36,800 筆熱線通報**。
 - **全澳 8 大州與行政區完整統計 (Events By Territory)**：
-  - **南澳 (SA) 263 起**、**維州 (VIC) 148 起**、**塔州 (TAS) 25 起**、**新州 (NSW) 20 起 (Blayney 工廠同州)**、**西澳 (WA) 10 起**、**昆州 (QLD) 2 起**、**北領地 (NT) 0 起**、**首都區 (ACT) 0 起**。
+  - **南澳 (SA) 271 起**、**維州 (VIC) 150 起**、**塔州 (TAS) 29 起**、**新州 (NSW) 22 起 (雪梨北灘首例/科夫斯港瀕危赫頓鸌)**、**西澳 (WA) 10 起**、**昆州 (QLD) 2 起**、**北領地 (NT) 0 起**、**首都區 (ACT) 0 起**。
+- **商業禽場維持 100% 零感染**：全澳所有商業家禽、蛋場、乳牛與豬場維持「0 確診」完美防線 (Area Freedom Status)。
 
 ---
 
@@ -40,6 +47,19 @@
 2. **覆核與新聞班次（台灣 07:00 / 澳洲 AEST 09:00 / 23:00 UTC）**：隔日早晨覆核，即時捕捉各州官網與澳洲媒體 RSS 最新事件。
 
 ---
+
+### v2.9.0 (2026-09-08)
+- 🚨 **NSW 確診激增至 22 起 · 病毒首度攻入雪梨都會圈 (Sydney Metro Breach)**：
+  - 納入雪梨北灘沃里伍德 (Warriewood, Northern Beaches Sydney) 與肯布拉港 (Port Kembla) 大鳳頭燕鷗首例確診點位。
+  - 納入科夫斯港 (Coffs Harbour) 全新南威爾斯州首例受脅瀕危留鳥物種「赫頓鸌 / 雪兒水鳥 (Hutton's Shearwater)」。
+  - 納入南海岸肖爾黑文 (Shoalhaven) 第 3 起海鳥群聚確診事件。
+- 🛡️ **全澳防疫政策、疫苗試驗與都會生物安全應變雷達 (Policy Radar Module)**：
+  - 於中英文主頁 (`index.html` & `index_en.html`) 嵌入 4 欄式政策雷達看板（VIC 圈養令延長至 9/18 vs NSW 自願指引、阿德萊德紅狐都會警戒、Taronga Zoo 疫苗臨床試驗、BioResponse NSW App）。
+- 🦅 **物種生態庫擴充與一鍵快篩強化**：
+  - `DEFAULT_SPECIES_PROFILES` 擴充「赫頓鸌 (Hutton's Shearwater)」與「野生紅狐 (Red Fox)」生態屬性與風險指引。
+  - 病例明細表新增「🚨 新州 / 雪梨北灘 (NSW 22起)」與「🌊 赫頓鸌 / 瀕危留鳥 (科夫斯港)」一鍵快篩按鈕。
+- ⚖️ **定量風險模型同步 (`risk_assessment.html` & `risk_assessment_en.html`)**：
+  - NSW 野生動物事件同步更新至 **22 起**，重申 Blayney 廠與太平洋沿海突破點存在 >200km 距離與藍山山脈天然屏障，商業原料供應鏈維持安全。
 
 ### v2.8.1 (2026-09-07)
 - 🚀 **GitHub Actions CI/CD 自動化流程修復與 4 大雙語頁面全覆蓋**：修復 `.github/workflows/auto_update.yml` 中 `git add` 因找不到 `live_page_en.html` 導致的 Exit status 128 中斷問題；於 Step 4b 補齊英文 Live 頁面備份，並將 4 大報告頁面、簡報檔 (`slides`) 與歸檔全數納入 CI/CD 自動推送機制。

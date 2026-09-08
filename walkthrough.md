@@ -1,28 +1,32 @@
-# H5N1 定量風險評估、eBird 雙軌 GIS 數據整合與 CI/CD 修復 (v2.8.1)
+# H5N1 全澳政策雷達、雪梨北灘突破與瀕危物種數據更新 (v2.9.0)
 
-已成功修復 **GitHub Actions CI/CD 自動化流程 (Exit status 128)**、完成 **eBird 雙軌 GIS 地圖圖層**、**零 CORS 阻擋靜態 JS 打包**、**當前月份動態對齊**、**英文版 eBird 看板同步**、**週報簡報歸檔解耦** 與 **全澳 484 起 DAFF 數據對齊**！
-
----
-
-## 🌟 最新修復與完成重點 (v2.8.1 - 2026-09-07)
-
-1. **🚀 GitHub Actions CI/CD 自動化流程修復 (`.github/workflows/auto_update.yml`)**
-   - 修復 Step 5 `git add` 因找不到 `live_page_en.html` 導致 Exit code 128 報錯中斷的問題。
-   - 於 Step 4b 加入英文版 Live 頁面自動複製備份指令 (`cp index_en.html live_page_en.html`)。
-   - 完整將 4 大報告網頁 (`index.html`, `index_en.html`, `risk_assessment.html`, `risk_assessment_en.html`)、簡報檔 (`h5n1_weekly_slides.html`, `risk_assessment_slides.html`, `risk_assessment_slides_en.html`) 與 `weekly_reports/` 歸檔全數納入自動化追蹤。
-
-2. **🦅 eBird 雙軌 GIS 地圖圖層與實測點位 (`risk_assessment.html` & `risk_assessment_en.html`)**
-   - **實態野鳥觀測點位圖層 (`🦅 eBird 實態點位`)**：在 Leaflet 地圖上繪製全澳 129 筆亮青色脈衝圓圈點位，點擊或懸停可完整查閱物種 (`comName`)、地點 (`locName`)、實際目擊數量 (`howMany` 隻) 與觀測時間 (`obsDt`)。
-   - **地圖節點 Tooltip 雙軌比對 (Model Projected vs eBird Observed)**：大候鳥停歇光圈（如莫頓灣 Moreton Bay、獵人河口 Hunter Estuary 等）懸停 Tooltip 同時呈現「📊 模型預估滯留量」與「🦅 eBird 30天周邊 220km 實測目擊數量與筆數」。
-
-3. **⚡ 免 fetch 零 CORS 阻擋靜態打包 (`assets/js/bird_data.js`)**
-   - `h5n1.py` 自動將 eBird 數據打包寫入 `assets/js/bird_data.js` (`window.ebirdDataEmbedded`)，徹底解決 Windows 本機檔案直接點開 (`file://`) 時瀏覽器跨域 `fetch` 阻擋造成的「載入中...」現象。
+已成功完成 **全澳防疫政策與都會生物安全雷達 (Policy Radar Module)**、**雪梨北灘 (Warriewood) 與科夫斯港瀕危赫頓鸌案例更新**、**NSW 確診事件激增至 22 起對齊**、**物種生態庫擴充 (赫頓鸌 & 野生紅狐)**、**雙語一鍵快篩升級** 與 **全專案文檔同步 (README / CHANGELOG / SOP / Best Practices / Task)**！
 
 ---
 
-## 📸 實體驗證畫面
+## 🌟 最新完成重點 (v2.9.0 - 2026-09-08)
 
-![GIS Dual-Track HUD & eBird Layer Screenshot](media_eab05364-982f-464b-8688-d4885a34aaff_1788748991863)
+1. **🚨 NSW 確診激增至 22 起 · 攻入雪梨都會圈與瀕危物種更新 (`cases_events.json` & `h5n1.py`)**
+   - **雪梨北灘 Warriewood**：`-33.6875, 151.3069`（大鳳頭燕鷗，雪梨大都會區首宗確診）。
+   - **肯布拉港 Port Kembla**：`-34.4811, 150.9067`（大鳳頭燕鷗）。
+   - **科夫斯港 Coffs Harbour**：`-30.2963, 153.1141`（赫頓鸌 / 雪兒水鳥，新州首例受脅瀕危留鳥）。
+   - **肖爾黑文 Shoalhaven**：`-34.8833, 150.6000`（第 3 起海鳥群聚）。
+   - 全澳累計確診事件升至 **484 起** (SA 271, VIC 150, TAS 29, NSW 22, WA 10, QLD 2)，商業家禽與蛋場維持 100% 零感染。
+
+2. **🛡️ 全澳防疫政策、疫苗試驗與都會生物安全應變雷達 (Policy Radar Module)**
+   - 於中英文主頁 (`index.html` & `index_en.html`) 嵌入 4 欄式政策看板：
+     1. **各州圈養令對比**：維州 (VIC) 強制室內禁閉令延長 28 天至 2026/09/18；新州 (NSW) 維持自願彈性建議。
+     2. **都會紅狐染疫警戒 (Urban Rethink)**：阿德萊德都市紅狐染疫引發都會防線升級（垃圾桶鎖緊、廚餘管理、防範接觸後院兔寵/犬貓）。
+     3. **Taronga Zoo 疫苗臨床試驗**：雪梨塔隆加動物園針對受脅鳥類啟動 H5 疫苗試驗以收集免疫數據。
+     4. **BioResponse NSW 前線 App**：新州強制全體野外巡查員安裝專用應變 App，提供 24hr 動物疾病緊急專線 (`1800 675 888`)。
+
+3. **🦅 生態庫擴充與一鍵快篩強化**
+   - 物種生態檔案擴充「赫頓鸌 (Hutton's Shearwater)」與「野生紅狐 (Red Fox)」。
+   - 病例明細表新增「🚨 新州 / 雪梨北灘 (NSW 22起)」與「🌊 赫頓鸌 / 瀕危留鳥 (科夫斯港)」一鍵快篩按鈕。
+
+4. **⚖️ 定量風險模型同步 (`risk_assessment.html` & `risk_assessment_en.html`)**
+   - NSW 野生動物事件指標同步更新至 **22 起**。
+   - 重申 Blayney 廠地緣評估：突破點皆為太平洋沿岸海灘，與內陸 Blayney 廠直線距離 >200km 且有藍山天然地形屏障，商業原料供應鏈維持安全。
 
 ---
 
@@ -31,7 +35,8 @@
 請複製以下 Terminal 指令進行專案 Git 提交與推送：
 
 ```bash
-git add .github/workflows/auto_update.yml live_page_en.html README.md CHANGELOG.md SOP.md task.md walkthrough.md
-git commit -m "fix(ci): repair GitHub Actions workflow Exit code 128 error & sync live_page_en and documentation for v2.8.1 release"
+git add README.md CHANGELOG.md GOVT_SCRAPING_BEST_PRACTICES.md SOP.md task.md walkthrough.md report_template.html report_template_en.html index.html index_en.html live_page.html live_page_en.html live_page_utf8.html risk_assessment.html risk_assessment_en.html cases_events.json h5n1.py
+git commit -m "feat(policy-radar): add National Policy Radar & Sydney metro breach (NSW 22 cases) data and sync documentation for v2.9.0 release"
 git push origin main
 ```
+

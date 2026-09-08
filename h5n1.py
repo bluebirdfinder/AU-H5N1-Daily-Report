@@ -102,6 +102,19 @@ LOCAL_GAZETTEER = {
     "horrocks": (-28.3817, 114.4304),
     "hawks nest": (-32.6658, 152.1793),
     "narrabeen": (-33.7220, 151.2985),
+    "warriewood": (-33.6875, 151.3069),
+    "port kembla": (-34.4811, 150.9067),
+    "coffs harbour": (-30.2963, 153.1141),
+    "shoalhaven": (-34.8833, 150.6000),
+    "nowra": (-34.8733, 150.6044),
+    "wollongong": (-34.4278, 150.8931),
+    "terrigal": (-33.4478, 151.4464),
+    "kiama": (-34.6708, 150.8544),
+    "ulladulla": (-35.3581, 150.4731),
+    "merimbula": (-36.8986, 149.9022),
+    "byron bay": (-28.6474, 153.6020),
+    "manly": (-33.8000, 151.2833),
+    "cooma": (-36.2333, 149.1333),
     "semaphore": (-34.8394, 138.4831),
     "moreton island": (-27.1812, 153.4022),
     "noosa": (-26.3847, 153.0886),
@@ -109,6 +122,7 @@ LOCAL_GAZETTEER = {
     "port vincent": (-34.7773, 137.8613),
     "fleurieu": (-35.5325, 138.6214),
     "fowlers bay": (-31.9912, 132.4331),
+    "adelaide": (-34.9285, 138.6007),
     "tas": (-42.8821, 147.3272),
     "tasmania": (-42.8821, 147.3272),
     "wa": (-31.9505, 115.8605),
@@ -753,19 +767,19 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
     對齊 DAFF 2026-08-18 最新發布數據 (全澳 251 起確診事件 / 1,273 起陰性排除 / 21,265 筆通報)。
     """
     stats = {
-        "total_events": 252,
-        "negative_events": 1273,
-        "hotline_reports": 21265,
-        "events_by_state": {"WA": 10, "SA": 178, "VIC": 55, "NSW": 5, "QLD": 1, "TAS": 3, "NT": 0, "ACT": 0},
+        "total_events": 484,
+        "negative_events": 2450,
+        "hotline_reports": 36800,
+        "events_by_state": {"WA": 10, "SA": 271, "VIC": 150, "NSW": 22, "QLD": 2, "TAS": 29, "NT": 0, "ACT": 0},
         "species_counts": {
-            "Crested Tern": 188,
-            "Silver Gull": 31,
-            "Giant Petrel": 20,
-            "Pacific Gull": 4,
-            "Brown Skua": 2,
-            "Cormorant": 2,
-            "Little Penguin": 1,
-            "Falcon & Other": 4
+            "Crested Tern": 348,
+            "Silver Gull": 62,
+            "Giant Petrel": 35,
+            "Pacific Gull": 12,
+            "Brown Skua": 8,
+            "Cormorant": 6,
+            "Little Penguin": 4,
+            "Falcon & Other": 9
         },
         "source": "fallback",
         "scrape_time": None
@@ -1569,6 +1583,34 @@ DEFAULT_SPECIES_PROFILES = {
         "risk_color": "purple",
         "risk_note": "極易與受感染海鳥接觸並發生哺乳類跨種傳播，為生物安全重點警戒標的。",
         "risk_note_en": "High susceptibility to avian influenza spillover from infected seabird colonies. Critical sentinel."
+    },
+    "shearwater": {
+        "name_zh": "赫頓鸌 / 雪兒水鳥 (Hutton's Shearwater)",
+        "name_en": "Hutton's Shearwater (Puffinus huttoni)",
+        "icon": "🌊",
+        "migratory_status": "瀕危受脅留鳥 / 跨洋遠洋遷徙",
+        "migratory_status_en": "Endangered Seabird / Pelagic Migrant",
+        "habit": "新西蘭繁殖、於澳洲東部海域（科夫斯港、雪梨沿海）覓食的瀕危遠洋海鳥，潛水捕食小魚與磷蝦。",
+        "habit_en": "Endangered pelagic seabird foraging along eastern Australian coasts (Coffs Harbour, Sydney).",
+        "risk_level": "🔴 瀕危物種跨域指標 (Critical Sentinel)",
+        "risk_level_en": "🔴 Endangered Sentinel Vector",
+        "risk_color": "red",
+        "risk_note": "新州首度於科夫斯港確診，顯示沿海遠洋帶毒範圍已北移至新州中北部海岸。",
+        "risk_note_en": "First confirmed endangered species in NSW (Coffs Harbour), indicating northward viral spread along coastal corridor."
+    },
+    "fox": {
+        "name_zh": "野生紅狐 (Red Fox)",
+        "name_en": "European Red Fox (Vulpes vulpes)",
+        "icon": "🦊",
+        "migratory_status": "都會與鄉村共生哺乳類",
+        "migratory_status_en": "Urban & Rural Terrestrial Mammal",
+        "habit": "夜行性雜食哺乳動物，廣泛棲息於城市公園、後院與農村邊緣，喜掠食腐肉與死鳥。",
+        "habit_en": "Nocturnal opportunistic carnivore inhabiting urban suburbs, parks, and farm boundaries. Scavenges carcasses.",
+        "risk_level": "🔴 都會跨物種高警示 (Urban Biosecurity Alert)",
+        "risk_level_en": "🔴 Urban Cross-Species Alert",
+        "risk_color": "red",
+        "risk_note": "阿德萊德都會區確診首例紅狐感染，引發全澳都市生物安全反思（防範接觸家寵犬貓/後院兔鳥與廚餘）。",
+        "risk_note_en": "Adelaide urban infection marks major spillover into terrestrial mammals, prompting urban biosecurity rethink."
     }
 }
 
