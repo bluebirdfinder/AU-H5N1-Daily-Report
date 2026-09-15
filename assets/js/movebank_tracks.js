@@ -1,5 +1,5 @@
 window.movebankTracksEmbedded = {
-  "fetched_at_utc": "2026-09-15T01:04:54Z",
+  "fetched_at_utc": "2026-09-15T13:02:38Z",
   "source": "Movebank Animal Tracking Network (REST API & Satellite Telemetry)",
   "authenticated": false,
   "total_active_tracks": 6,
