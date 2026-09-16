@@ -2744,12 +2744,39 @@ def fetch_movebank_live_tracks(mb_user, mb_pass):
         reader = csv.DictReader(io.StringIO(text))
         return [{(k or "").strip().lower().replace("-", "_"): (v or "").strip() for k, v in row.items()} for row in reader]
 
-    resp = requests.get(BASE_URL, params={"entity_type": "study"}, auth=(mb_user, mb_pass), timeout=20, verify=False)
-    resp.raise_for_status()
-    if "," not in resp.text.split("\n", 1)[0]:
-        raise ValueError(f"study 清單回傳非預期格式 (前 120 字: {resp.text[:120]!r})")
+    def _looks_like_csv(text):
+        return "," in text.split("\n", 1)[0]
 
-    studies = _parse_csv(resp.text)
+    def _movebank_get(params, timeout, label):
+        """
+        Movebank 對大部分公開 study 要求先「同意授權條款」才能真的下載事件資料：
+        第一次請求若該 study 需要同意授權，回應本文就是授權條款全文（非 CSV），
+        依官方協定，把這段回應本文原封不動算出 MD5，帶著 license-md5=<hash> 參數
+        重新送出同一個請求，伺服器驗證雜湊值match後才會放行真正的 CSV 資料。
+        回傳 (text, accepted_license: bool)；若兩輪都拿不到 CSV，text 為 None。
+        """
+        import hashlib
+        resp = requests.get(BASE_URL, params=params, auth=(mb_user, mb_pass), timeout=timeout, verify=False)
+        if resp.status_code == 200 and _looks_like_csv(resp.text):
+            return resp.text, False
+        if resp.status_code in (200, 403) and resp.text.strip():
+            license_md5 = hashlib.md5(resp.text.encode("utf-8")).hexdigest()
+            retry_params = dict(params)
+            retry_params["license-md5"] = license_md5
+            resp2 = requests.get(BASE_URL, params=retry_params, auth=(mb_user, mb_pass), timeout=timeout, verify=False)
+            if resp2.status_code == 200 and _looks_like_csv(resp2.text):
+                print(f"[Movebank {label}] 自動同意授權條款後成功取得資料 (license-md5 已接受)")
+                return resp2.text, True
+            print(f"[Movebank {label}] 同意授權條款後仍無法取得 CSV (HTTP {resp2.status_code}, 前 100 字: {resp2.text[:100]!r})")
+            return None, False
+        print(f"[Movebank {label}] 回傳非預期格式 (HTTP {resp.status_code}, 前 100 字: {resp.text[:100]!r})")
+        return None, False
+
+    resp_text, _ = _movebank_get({"entity_type": "study"}, 20, "study 清單")
+    if resp_text is None:
+        raise ValueError("study 清單回傳非預期格式或需要授權條款")
+
+    studies = _parse_csv(resp_text)
 
     # 2026-09-16 修正 (第一輪)：Movebank 帳號預設就能「看到」全平台公開 study 的中繼資料
     # （本帳號實測一次可見 2059 / 8769 個），絕大多數跟本專案的高風險澳洲海鳥無關（第一次真實
@@ -2802,10 +2829,9 @@ def fetch_movebank_live_tracks(mb_user, mb_pass):
 
         species_by_individual = {}
         try:
-            indiv_resp = requests.get(BASE_URL, params={"entity_type": "individual", "study_id": study_id},
-                                       auth=(mb_user, mb_pass), timeout=20, verify=False)
-            if indiv_resp.status_code == 200 and "," in indiv_resp.text.split("\n", 1)[0]:
-                for row in _parse_csv(indiv_resp.text):
+            indiv_text, _ = _movebank_get({"entity_type": "individual", "study_id": study_id}, 20, f"{study_name} 個體")
+            if indiv_text:
+                for row in _parse_csv(indiv_text):
                     key = row.get("local_identifier") or row.get("id")
                     if key:
                         species_by_individual[key] = row.get("taxon_canonical_name", "")
@@ -2813,20 +2839,18 @@ def fetch_movebank_live_tracks(mb_user, mb_pass):
             print(f"[Movebank {study_name}] 個體物種資料抓取失敗 (不影響航跡本身): {str(e)[:80]}")
 
         try:
-            ev_resp = requests.get(
-                BASE_URL,
-                params={"entity_type": "event", "study_id": study_id, "timestamp_start": since},
-                auth=(mb_user, mb_pass), timeout=25, verify=False
+            ev_text, _ = _movebank_get(
+                {"entity_type": "event", "study_id": study_id, "timestamp_start": since}, 25, study_name
             )
         except Exception as e:
             print(f"[Movebank {study_name}] 事件資料連線例外: {str(e)[:80]}")
             continue
 
-        if ev_resp.status_code != 200 or "," not in ev_resp.text.split("\n", 1)[0]:
-            print(f"[Movebank {study_name}] 無法取得事件資料 (HTTP {ev_resp.status_code})，可能需另外同意授權條款或近 30 天無回傳，跳過此 study")
+        if ev_text is None:
+            print(f"[Movebank {study_name}] 無法取得事件資料（含自動同意授權條款嘗試），可能近 30 天無回傳，跳過此 study")
             continue
 
-        events = _parse_csv(ev_resp.text)
+        events = _parse_csv(ev_text)
         by_individual = {}
         for e in events:
             lat, lng, ts = e.get("location_lat"), e.get("location_long"), e.get("timestamp")
