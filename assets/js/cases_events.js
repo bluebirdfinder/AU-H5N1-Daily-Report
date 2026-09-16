@@ -1,8 +1,8 @@
 window.casesEventsEmbedded = {
-  "generated_at_utc": "2026-09-16T00:53:00Z",
-  "total_events": 542,
+  "generated_at_utc": "2026-09-16T08:57:14Z",
+  "total_events": 541,
   "negative_events": 2450,
-  "hotline_reports": 44354,
+  "hotline_reports": 36800,
   "events_by_state": {
     "WA": 10,
     "SA": 295,
@@ -23,6 +23,5 @@ window.casesEventsEmbedded = {
     "Little Penguin": 1,
     "Falcon & Other": 5
   },
-  "source": "live",
-  "scrape_time": "2026-09-16 00:53 UTC"
+  "source": "cases_json"
 };
