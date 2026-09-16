@@ -29,14 +29,15 @@
 6. **`report_template.html` 補上 `#ebird-total-obs`（首頁候鳥總數大字）的 JS 綁定**：以前完全沒有綁定，永遠顯示編譯當下的靜態文字。
 7. **候鳥資料新鮮度警示**：`bird_data.json` 的 `fetched_at_utc` 超過 2 天沒更新時，兩個頁面都會顯示「⚠️ 資料已 N 天未更新」，不再讓使用者誤以為數字是即時的。
 8. **雜項一致性修正**：Decision Zone Matrix 的「當前現況」註記改成動態貼到真正對應的分數區間卡片上（含 `isCommercialFarmInfected` 觸發時強制標在紅色區）；「商業禽場爆發 (+75分)」按鈕文字改成「強制封頂 100分」以符合 `recalculateRisk()` 的實際邏輯；Card 2（商業家禽與蛋場狀態）改成會跟著模擬器的商業禽場爆發開關變色，不再永遠顯示綠色安全；移除 `report_template.html`/`_en.html` 對 `gbif_bird_data.js`（193KB）的死重量載入（該頁從未讀取它）；ZH 版工廠地緣距離卡片補上 `MIN_DISTANCE_PLACEHOLDER`（EN 版本來就有，ZH 版之前漏掉，永遠顯示寫死的「215 公里」與具體卻可能過期的地名）。
+9. **`call_gemini_api_with_retry()` 備援模型清單全滅**：真實環境 GitHub Actions log 證實 `gemini-2.0-flash`/`gemini-1.5-flash`/`gemini-1.5-pro` 三個備援模型全部回 404「no longer available」，主力模型 `gemini-2.5-flash` 只要一遇到暫時性逾時就沒有真正能用的備援，導致 Gemini 摘要與 Vision OCR 靜默失敗（有靜態文字兜底，網頁不會壞，但功能早已停擺沒人發現）。已改為 `gemini-2.5-flash` → `gemini-2.5-flash-lite` → `gemini-2.5-pro`（專案自己在 v9.0 就驗證過可用的 2.5 系列）。
 
 驗證方式：以 Node Playwright（`file://` 直接開檔）逐一讀取上述 DOM 元素文字並比對 `cases_events.json`/`bird_data.json` 重新算出的 ground truth，確認一致；另外用 `setCommercialFarmStatus(1)` 模擬商業禽場破口情境，確認 Card 2、Decision Zone badge、風險分數三處連動正確。
 
 ### 尚未修復，需要人工決定或無法在此環境驗證
 
-1. **`EBIRD_API_KEY` 這個 GitHub Secret 狀態未知**：`bird_data.json` 的 `fetched_at_utc` 截至稽核當下仍停在 `2026-09-04`。`fetch_ebird_data()` 在金鑰缺失/失效時只會印一行 log 靜默跳過，不會讓 workflow 失敗。只有能進 repo Settings → Secrets 的人能確認，Claude 看不到 secret 本身。
-2. **`ala_bird_data.json` 從未產生過**：`fetch_ala_data()` 用裸 `requests.get()`，沒有像 `smart_fetch_url()` 對 DAFF 那樣的 curl_cffi/Playwright 降級鏈，疑似被 `biocache.ala.org.au` 擋掉。GBIF、Movebank 是正常每日更新的，不受影響。
-3. **⚠️ `assets/js/purina_auth.js` 的「機密存取」密碼門完全是裝飾性的，不是真的資安控制**：這支檔案在前端硬編碼了明碼密碼清單，且驗證邏輯只是在頁面上蓋一層視覺遮罩（overlay），**底層 DOM 內容從頭到尾都完整存在，沒有被移除或加密**——稽核時用 Playwright 直接讀 DOM 就拿到全部風險評估數字，完全不需要通過這個「密碼驗證」。如果這個 repo 是公開的（README 提到部署在 `bluebirdfinder.github.io`），任何人打開瀏覽器開發者工具、`view-source`、或直接 `curl` 都能看到頁面宣稱的「商業機密與未公開流行病學遙測數據」，密碼門形同虛設。這不是這次稽核要修的範圍，但強烈建議與使用者確認：真的需要保密就不能只靠純前端密碼門，要嘛改成真正需要驗證的私有網站/伺服器，要嘛就不要在頁面文字宣稱「機密」造成錯誤的保密期待。
+1. **`EBIRD_API_KEY` 這個 GitHub Secret 從未設定過（已確認，非推測）**：從 GitHub Actions 真實 log 證實 `[eBird API] 未設定 EBIRD_API_KEY 環境變數，跳過候鳥數據抓取`；且 `bird_data.json` 的 git 紀錄只有一筆 `2026-09-07` 的「Add files via upload」（人工手動上傳，非 bot commit），內容 `fetched_at_utc` 是 `2026-09-04`。代表這份資料從未透過 GitHub Actions 自動抓過，是本地手動跑一次後上傳的快照。需擁有 repo 權限者至 Settings → Secrets and variables → Actions 新增這個 Secret，才能讓自動化真正串起來。
+2. **`ala_bird_data.json` 從未產生過（已確認根因）**：真實環境 log 證實 `biocache.ala.org.au` 直接回傳 **HTTP 403**（不是連不上，是主動拒絕），`fetch_ala_data()` 用裸 `requests.get()`，沒有像 `smart_fetch_url()` 對 DAFF 那樣的 curl_cffi/Playwright 降級鏈。GBIF、Movebank 是正常每日更新的，真實環境已驗證 GBIF 成功寫入 488 筆記錄，不受影響。
+3. **⚠️ `assets/js/purina_auth.js` 的「機密存取」密碼門完全是裝飾性的，不是真的資安控制（repo 已確認是 public）**：查過 `api.github.com/repos/bluebirdfinder/AU-H5N1-Daily-Report`，`private: false`——不是「如果公開」，是確定公開。這支檔案在前端硬編碼了明碼密碼清單，且驗證邏輯只是在頁面上蓋一層視覺遮罩（overlay），**底層 DOM 內容從頭到尾都完整存在，沒有被移除或加密**——稽核時用 Playwright 直接讀 DOM 就拿到全部風險評估數字，完全不需要通過這個「密碼驗證」；密碼本身也進了 git 歷史，就算之後改掉，舊 commit 仍查得到。任何人打開瀏覽器開發者工具、`view-source`、或直接 `curl` 都能看到頁面宣稱的「商業機密與未公開流行病學遙測數據」，密碼門形同虛設，而且「每月換密碼」這種做法對這個漏洞沒有實質幫助（擋的是「按驗證鈕」這個動作，不是「拿到資料」這件事）。這不是程式碼稽核要修的範圍，是商業/架構決策：要嘛不再宣稱「機密」，要嘛認真做私有網站/伺服器端驗證，使用者已知悉、留待內部討論後再處理。
 
 **教訓**：往後任何「這個數字對不對」的問題，先用 `python3` 對 `cases_events.json` / `bird_data.json` 重新算一次 ground truth，不要只看 HTML 顯示的字。畫面好看 ≠ 數字是活的；有 `id` 也不代表真的有 JS 在寫它，要親自 grep 確認賦值那一行存在。
 

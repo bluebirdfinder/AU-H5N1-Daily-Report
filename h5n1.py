@@ -528,21 +528,23 @@ def call_gemini_api_with_retry(payload, params, headers, timeout=35):
     """
     通用 Gemini API 指數退避重試與 Fallback 模型調用器。
     - 主力模型 (Primary): gemini-2.5-flash
-    - 備援模型 1 (Fallback 1): gemini-2.0-flash
-    - 備援模型 2 (Fallback 2): gemini-1.5-flash
-    - 備援模型 3 (Fallback 3): gemini-1.5-pro
+    - 備援模型 1 (Fallback 1): gemini-2.5-flash-lite
+    - 備援模型 2 (Fallback 2): gemini-2.5-pro
+    2026-09-16 稽核：舊清單裡的 gemini-2.0-flash / gemini-1.5-flash / gemini-1.5-pro
+    在真實環境已全數回傳 404「no longer available」，導致主力模型一遇到暫時性逾時，
+    後面備援全滅，直接摧毀 Gemini 摘要與截圖 OCR 功能（有靜態文字兜底所以網頁不會壞，
+    但「即時 AI 摘要」形同虛設卻沒人發現）。改用專案自己在 v9.0 就已驗證可用的 2.5 系列。
     針對 503 (High Demand)、429 (Rate Limit) 及連線超時等暫時性錯誤，
     實作 3 次指數退避重試 (2s, 4s, 8s + 隨機 jitter)。
     只有當單一模型 3 次重試均告失敗後，才切換至下一個備援模型。
     """
     import time
     import random
-    
+
     models = [
         "gemini-2.5-flash",
-        "gemini-2.0-flash",
-        "gemini-1.5-flash",
-        "gemini-1.5-pro"
+        "gemini-2.5-flash-lite",
+        "gemini-2.5-pro"
     ]
     
     for model_index, model_name in enumerate(models, 1):
@@ -588,7 +590,7 @@ def call_gemini_api_with_retry(payload, params, headers, timeout=35):
 def parse_screenshot_with_gemini_vision(screenshot_path):
     """
     使用 Gemini Vision API 讀取官方網站黃底精確數據截圖，自動識別最新 H5N1 確診數字與日期。
-    採用 gemini-2.5-flash (Primary), gemini-2.0-flash (Fallback 1), gemini-1.5-flash (Fallback 2)。
+    採用 gemini-2.5-flash (Primary), gemini-2.5-flash-lite (Fallback 1), gemini-2.5-pro (Fallback 2)。
     實作 3 次指數退避重試與完整的 Logging 追蹤。
     需要在環境變數設定 GEMINI_API_KEY。
     """

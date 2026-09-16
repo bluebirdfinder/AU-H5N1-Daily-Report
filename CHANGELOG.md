@@ -23,13 +23,20 @@
 ### 🧹 雜項一致性修正
 - Decision Zone Matrix「當前現況」註記改為動態貼到真正對應的分數區間（含商業禽場破口時強制標紅）；商業禽場模擬按鈕文字「+75分」改為與程式邏輯一致的「強制封頂 100分」；Card 2（商業家禽狀態）改為隨模擬器連動變色，不再永遠顯示安全；移除 `index.html`/`_en.html` 對未使用的 `gbif_bird_data.js`（193KB）之載入；中文版工廠地緣距離卡片補上英文版原本就有的 `MIN_DISTANCE_PLACEHOLDER` 動態綁定。
 
+### 🤖 修復 Gemini API 備援模型清單全滅問題
+- **根因**：真實環境 GitHub Actions log 證實 `call_gemini_api_with_retry()` 的備援模型清單（`gemini-2.0-flash` / `gemini-1.5-flash` / `gemini-1.5-pro`）已全數回傳 HTTP 404「no longer available」。主力模型 `gemini-2.5-flash` 一遇到暫時性逾時就會切到這三個死模型，等於備援機制形同虛設——首頁「媒體與生態監測風向」AI 即時摘要與 DAFF 截圖 Gemini Vision OCR 因此長期靜默失敗（有靜態文字兜底，網頁不會壞，但沒人發現 AI 摘要早就沒在跑了）。
+- **修復**：備援清單改為專案自己在 v9.0 就已驗證可用的 2.5 系列（`gemini-2.5-flash` → `gemini-2.5-flash-lite` → `gemini-2.5-pro`），移除已下架的 1.x/2.0 型號。
+
+### 🕵️ 釐清候鳥數字「651 隻」的真實來源
+- 稽核確認 `bird_data.json` 的 git 紀錄只有一筆 commit（`2026-09-07`，作者本人，訊息為 GitHub 網頁版「Add files via upload」），內容的 `fetched_at_utc` 是 `2026-09-04`。代表這份資料**從未透過 GitHub Actions 自動抓取過**，是本地手動執行一次 `fetch_ebird_data()` 後手動上傳進 repo；`EBIRD_API_KEY` 這個 GitHub Secret 從頭到尾沒有被設定，所以往後每次排程執行都默默跳過，此一次性快照就此凍結至今。
+
 ### 📚 新增專案稽核記憶
 - 新增 `CLAUDE.md`：記錄核心規則、本輪稽核發現的資料完整性陷阱清單，供未來所有 Claude 工作階段讀取。
 - 新增 `.claude/skills/h5n1-data-audit/`：封裝「核對頁面數字 / 候鳥資料是否過期」的標準稽核流程。
 
 ### ⚠️ 已知但本輪未修復（需人工確認或涉及外部環境）
-- `EBIRD_API_KEY` GitHub Secret 狀態未知，`bird_data.json` 截至本次稽核仍停在 2026-09-04；需擁有 repo 權限者至 Settings → Secrets 確認。
-- `ala_bird_data.json` 從未成功產生過（`fetch_ala_data()` 缺乏抗封鎖降級鏈，疑似被 ALA 網站擋下）。GBIF、Movebank 兩源正常。
+- `EBIRD_API_KEY` GitHub Secret 從未設定過（見上方根因說明）；需擁有 repo 權限者至 Settings → Secrets and variables → Actions 新增。
+- `ala_bird_data.json` 從未成功產生過，真實環境 log 證實是 `biocache.ala.org.au` 直接回傳 HTTP 403（`fetch_ala_data()` 缺乏像 `smart_fetch_url()` 那樣的抗封鎖降級鏈）。GBIF、Movebank 兩源正常，真實環境已驗證 GBIF 成功寫入 488 筆記錄。
 - `assets/js/purina_auth.js` 的存取密碼門為純前端裝飾（明碼密碼 + 視覺遮罩，底層 DOM 內容未被移除），無法提供頁面文字宣稱的「機密」保護等級，建議另行評估是否需要真正的伺服器端驗證。
 
 ## [v2.9.5] - 2026-09-08

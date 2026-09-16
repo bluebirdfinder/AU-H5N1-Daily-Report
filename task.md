@@ -7,7 +7,10 @@
 - [x] **修復 `risk_assessment.html` 初始化鏈連鎖失敗風險**：Playwright 實測驗證，改為逐步獨立 try/catch。
 - [x] **修正多處內部矛盾**：Decision Zone 分數註記、商業禽場按鈕文字與邏輯不符、Card 2 未隨模擬器連動。
 - [x] **新增 `CLAUDE.md` 與 `.claude/skills/h5n1-data-audit/`**，記錄稽核發現與標準稽核流程。
-- [ ] **待辦（需人工處理）**：確認 `EBIRD_API_KEY` GitHub Secret 狀態；修復 `ala_bird_data.json` 抓取降級鏈；評估 `purina_auth.js` 密碼門是否需要真正的伺服器端驗證。
+- [x] **修復 Gemini API 備援模型清單全滅問題**：真實環境 log 證實 `gemini-2.0-flash`/`gemini-1.5-flash`/`gemini-1.5-pro` 全部 404，已改用 `gemini-2.5-flash-lite`/`gemini-2.5-pro`。
+- [x] **確認 `EBIRD_API_KEY` 從未設定過**：真實 log + git 紀錄證實，`bird_data.json` 是 2026-09-07 人工上傳的一次性快照，從未經過 GitHub Actions 自動抓取。
+- [x] **確認 `ala_bird_data.json` 失敗根因**：真實環境 log 證實 `biocache.ala.org.au` 回傳 HTTP 403。
+- [ ] **待辦（需人工處理）**：去 GitHub Settings 新增 `EBIRD_API_KEY` Secret 並手動觸發一次 workflow 驗證；評估 `purina_auth.js` 密碼門是否需要真正的伺服器端驗證（repo 已確認 public，密碼門目前無實質保護效果）。
 
 ## 🟢 歷史已完成重點 (2026-09-08 Completed - v2.9.5 & v2.9.4 & v2.9.3 & v2.9.2)
 - [x] **🚨 確立最高指導原則：NSW 商業家禽場「零感染 (Area Freedom)」為唯一生死防線 (`AGENTS.md` / `AGENT.md`)**
