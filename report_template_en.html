@@ -323,13 +323,30 @@
                         <div class="bg-slate-950/80 p-3.5 rounded-xl border border-orange-800/60 space-y-1">
                             <span class="text-slate-400 block text-[10px] font-bold">🛰️ 3. Movebank GPS Beacons</span>
                             <div class="flex items-baseline gap-1.5">
-                                <strong class="text-orange-400 text-base font-mono font-black">6 Flight Corridors</strong>
-                                <span class="text-[10px] text-orange-400 font-bold">Live GPS</span>
+                                <strong id="movebank-track-count" class="text-orange-400 text-base font-mono font-black">6 Flight Corridors</strong>
+                                <span id="movebank-live-badge" class="text-[10px] text-orange-400 font-bold">Live GPS</span>
                             </div>
                             <span class="text-[11px] text-slate-300 block leading-tight">
                                 Solar Argos GPS tracking: Short-tailed Shearwaters & Bar-tailed Godwits crossing equator into AU waters.
                             </span>
                         </div>
+                        <script>
+                            (function () {
+                                var d = window.movebankTracksEmbedded;
+                                if (!d) return;
+                                var countEl = document.getElementById('movebank-track-count');
+                                var badgeEl = document.getElementById('movebank-live-badge');
+                                if (countEl) countEl.textContent = (d.total_active_tracks || 6) + ' Flight Corridors';
+                                if (badgeEl) {
+                                    if (d.is_live_data) {
+                                        badgeEl.textContent = 'Live GPS';
+                                    } else {
+                                        badgeEl.textContent = '⚠️ Sample Data';
+                                        badgeEl.className = 'text-[10px] text-amber-400 font-bold';
+                                    }
+                                }
+                            })();
+                        </script>
 
                         <!-- Card 4: NSW Farm Threat Stage -->
                         <div class="bg-slate-950/80 p-3.5 rounded-xl border border-emerald-800/60 space-y-1">

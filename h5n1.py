@@ -2725,17 +2725,132 @@ def fetch_gbif_data():
 
 # ==================== Movebank 衛星發報器軌跡追蹤整合模組 ====================
 
+def fetch_movebank_live_tracks(mb_user, mb_pass):
+    """
+    真正呼叫 Movebank REST API (direct-read service) 抓取帳號有權限存取的 study 之
+    近 30 天真實 GPS/Argos 衛星發報器事件資料，組成與 AUSTRALIAN_STUDY_TRACKS 相容的結構。
+
+    2026-09-16 新增：先前的 fetch_movebank_data() 只檢查帳密是否存在，卻從未真的呼叫過
+    Movebank API，永遠輸出寫死的示範航線（時間戳停在 2026-09-08，卻標示「即時連線」）。
+    這支函式才是真正的 API 呼叫；任何一步失敗（認證失敗、無可讀取 study、API 格式不符、
+    需要另外同意授權條款等）都會拋出例外，由呼叫端安全退回範例資料，不會讓網頁掛掉。
+    """
+    import csv
+    import io
+
+    BASE_URL = "https://www.movebank.org/movebank/service/direct-read"
+    STUDY_COLORS = ["#f97316", "#06b6d4", "#ef4444", "#eab308", "#10b981", "#a855f7", "#ec4899", "#3b82f6"]
+
+    def _parse_csv(text):
+        reader = csv.DictReader(io.StringIO(text))
+        return [{(k or "").strip().lower().replace("-", "_"): (v or "").strip() for k, v in row.items()} for row in reader]
+
+    resp = requests.get(BASE_URL, params={"entity_type": "study"}, auth=(mb_user, mb_pass), timeout=20, verify=False)
+    resp.raise_for_status()
+    if "," not in resp.text.split("\n", 1)[0]:
+        raise ValueError(f"study 清單回傳非預期格式 (前 120 字: {resp.text[:120]!r})")
+
+    studies = _parse_csv(resp.text)
+    accessible = [s for s in studies if s.get("i_can_see_data", "").lower() == "true"]
+    print(f"[Movebank API] 帳號可讀取 {len(accessible)} / {len(studies)} 個 study")
+    if not accessible:
+        raise ValueError("帳號名下沒有任何可讀取資料的 study")
+
+    since = (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y%m%d000000000")
+    live_studies = []
+
+    for study in accessible[:6]:
+        study_id = study.get("id")
+        study_name = study.get("name") or f"Movebank Study {study_id}"
+        if not study_id:
+            continue
+
+        species_by_individual = {}
+        try:
+            indiv_resp = requests.get(BASE_URL, params={"entity_type": "individual", "study_id": study_id},
+                                       auth=(mb_user, mb_pass), timeout=20, verify=False)
+            if indiv_resp.status_code == 200 and "," in indiv_resp.text.split("\n", 1)[0]:
+                for row in _parse_csv(indiv_resp.text):
+                    key = row.get("local_identifier") or row.get("id")
+                    if key:
+                        species_by_individual[key] = row.get("taxon_canonical_name", "")
+        except Exception as e:
+            print(f"[Movebank {study_name}] 個體物種資料抓取失敗 (不影響航跡本身): {str(e)[:80]}")
+
+        try:
+            ev_resp = requests.get(
+                BASE_URL,
+                params={"entity_type": "event", "study_id": study_id, "timestamp_start": since},
+                auth=(mb_user, mb_pass), timeout=25, verify=False
+            )
+        except Exception as e:
+            print(f"[Movebank {study_name}] 事件資料連線例外: {str(e)[:80]}")
+            continue
+
+        if ev_resp.status_code != 200 or "," not in ev_resp.text.split("\n", 1)[0]:
+            print(f"[Movebank {study_name}] 無法取得事件資料 (HTTP {ev_resp.status_code})，可能需另外同意授權條款或近 30 天無回傳，跳過此 study")
+            continue
+
+        events = _parse_csv(ev_resp.text)
+        by_individual = {}
+        for e in events:
+            lat, lng, ts = e.get("location_lat"), e.get("location_long"), e.get("timestamp")
+            indiv = e.get("individual_local_identifier") or e.get("tag_local_identifier") or "unknown"
+            if not (lat and lng and ts):
+                continue
+            try:
+                lat_f, lng_f = float(lat), float(lng)
+            except ValueError:
+                continue
+            by_individual.setdefault(indiv, []).append({
+                "lat": lat_f, "lng": lng_f, "timestamp": ts,
+                "location": f"{lat_f:.2f}, {lng_f:.2f}"
+            })
+
+        for indiv_id, pts in by_individual.items():
+            pts.sort(key=lambda p: p["timestamp"])
+            pts = pts[-50:]
+            if len(pts) < 2:
+                continue
+            live_studies.append({
+                "studyName": study_name,
+                "species": species_by_individual.get(indiv_id) or "Unidentified species",
+                "individualId": indiv_id,
+                "sensorType": "Satellite/GPS Tag",
+                "color": STUDY_COLORS[len(live_studies) % len(STUDY_COLORS)],
+                "trackPoints": pts
+            })
+        print(f"[Movebank {study_name}] 解析出 {len(by_individual)} 個個體，{sum(1 for s in live_studies if s['studyName'] == study_name)} 條有效航跡")
+
+    if not live_studies:
+        raise ValueError("所有可讀取 study 均無有效近期航跡資料")
+
+    return live_studies
+
+
 def fetch_movebank_data():
     """
     從 Movebank REST API (https://www.movebank.org/movebank/service/direct-read)
     抓取澳洲高風險候鳥背負 GPS 衛星發報器的即時與歷史飛行航線軌跡。
     金鑰透過 GitHub Secret (MOVEBANK_USER, MOVEBANK_PASSWORD) 安全注入。
+    真正的 API 呼叫在 fetch_movebank_live_tracks()；任何一步失敗都安全退回本函式內建的
+    6 大代表性研究航線範例資料，並在輸出 JSON 的 is_live_data 欄位誠實標註來源，不再讓
+    示範資料被誤認為即時連線。
     輸出: movebank_tracks.json 與 assets/js/movebank_tracks.js
     """
     mb_user = os.environ.get("MOVEBANK_USER") or os.environ.get("mbus", "")
     mb_pass = os.environ.get("MOVEBANK_PASSWORD") or os.environ.get("mbpw", "")
 
     print(f"[Movebank API] 啟動衛星發報器航跡引擎 (帳號認證狀態: {'已設定' if mb_user else '未設定，使用研究級備援航線'})...")
+
+    live_studies = None
+    if mb_user and mb_pass:
+        try:
+            live_studies = fetch_movebank_live_tracks(mb_user, mb_pass)
+            print(f"[Movebank API] ✅ 真實 API 抓取成功，取得 {len(live_studies)} 條即時航跡")
+        except Exception as e:
+            print(f"[Movebank API] 真實資料抓取失敗，改用研究級備援航線: {str(e)[:150]}")
+            live_studies = None
 
     # 內建澳洲 6 大高風險跨國遷徙與遠洋海鳥衛星追蹤代表性航線 (以科學論文公開 GPS Telemetry 航跡為基準)
     AUSTRALIAN_STUDY_TRACKS = [
@@ -2832,12 +2947,16 @@ def fetch_movebank_data():
         }
     ]
 
+    is_live = live_studies is not None
+    final_studies = live_studies if is_live else AUSTRALIAN_STUDY_TRACKS
+
     tracks_data = {
         "fetched_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "source": "Movebank Animal Tracking Network (REST API & Satellite Telemetry)",
+        "source": "Movebank Animal Tracking Network (REST API 即時抓取)" if is_live else "Movebank 研究級備援航線範例資料 (非即時)",
         "authenticated": bool(mb_user and mb_pass),
-        "total_active_tracks": len(AUSTRALIAN_STUDY_TRACKS),
-        "studies": AUSTRALIAN_STUDY_TRACKS
+        "is_live_data": is_live,
+        "total_active_tracks": len(final_studies),
+        "studies": final_studies
     }
 
     try:
@@ -2847,7 +2966,8 @@ def fetch_movebank_data():
         os.makedirs("assets/js", exist_ok=True)
         with open("assets/js/movebank_tracks.js", "w", encoding="utf-8") as f_js:
             f_js.write("window.movebankTracksEmbedded = " + json.dumps(tracks_data, ensure_ascii=False, indent=2) + ";\n")
-        print(f"[Movebank API] ✅ 成功寫入 movebank_tracks.json 與 assets/js/movebank_tracks.js (共 {len(AUSTRALIAN_STUDY_TRACKS)} 條高精度衛星遷徙飛行軌跡)")
+        label = "即時 API 資料" if is_live else "備援範例資料"
+        print(f"[Movebank API] ✅ 成功寫入 movebank_tracks.json 與 assets/js/movebank_tracks.js (共 {len(final_studies)} 條航跡，來源: {label})")
     except Exception as e:
         print(f"[Movebank API] 寫入檔案失敗: {e}")
 

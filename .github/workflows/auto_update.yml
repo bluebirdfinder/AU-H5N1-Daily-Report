@@ -38,6 +38,8 @@ jobs:
           CF_WORKER_URL: ${{ secrets.CF_WORKER_URL }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           EBIRD_API_KEY: ${{ secrets.EBIRD_API_KEY }}
+          MOVEBANK_USER: ${{ secrets.MOVEBANK_USER }}
+          MOVEBANK_PASSWORD: ${{ secrets.MOVEBANK_PASSWORD }}
         run: python h5n1.py
 
       - name: 4b. 同步所有 HTML 輸出 (Sync HTML Outputs)

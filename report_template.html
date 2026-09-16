@@ -378,13 +378,30 @@
                         <div class="bg-slate-950/80 p-3.5 rounded-xl border border-orange-800/60 space-y-1">
                             <span class="text-slate-400 block text-[10px] font-bold">🛰️ 3. Movebank 衛星 GPS 追蹤</span>
                             <div class="flex items-baseline gap-1.5">
-                                <strong class="text-orange-400 text-base font-mono font-black">6 條跨洋航線</strong>
-                                <span class="text-[10px] text-orange-400 font-bold">即時連線</span>
+                                <strong id="movebank-track-count" class="text-orange-400 text-base font-mono font-black">6 條跨洋航線</strong>
+                                <span id="movebank-live-badge" class="text-[10px] text-orange-400 font-bold">即時連線</span>
                             </div>
                             <span class="text-[11px] text-slate-300 block leading-tight">
                                 太陽能衛星發報器追蹤，短尾水薙鳥、斑尾鷸等已跨越赤道進入澳洲領海與沿海。
                             </span>
                         </div>
+                        <script>
+                            (function () {
+                                var d = window.movebankTracksEmbedded;
+                                if (!d) return;
+                                var countEl = document.getElementById('movebank-track-count');
+                                var badgeEl = document.getElementById('movebank-live-badge');
+                                if (countEl) countEl.textContent = (d.total_active_tracks || 6) + ' 條跨洋航線';
+                                if (badgeEl) {
+                                    if (d.is_live_data) {
+                                        badgeEl.textContent = '即時連線';
+                                    } else {
+                                        badgeEl.textContent = '⚠️ 範例資料';
+                                        badgeEl.className = 'text-[10px] text-amber-400 font-bold';
+                                    }
+                                }
+                            })();
+                        </script>
 
                         <!-- Card 4: NSW Farm Threat Stage -->
                         <div class="bg-slate-950/80 p-3.5 rounded-xl border border-emerald-800/60 space-y-1">

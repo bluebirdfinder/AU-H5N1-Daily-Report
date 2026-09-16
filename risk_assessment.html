@@ -542,7 +542,7 @@
                         </div>
                         <div class="flex items-center justify-between text-orange-200 text-[10px]">
                             <span class="flex items-center gap-1.5">🛰️ Movebank 衛星發報:</span>
-                            <strong class="text-orange-300 font-mono">6 條跨洋航線已抵澳</strong>
+                            <strong id="movebank-corridor-status" class="text-orange-300 font-mono">6 條跨洋航線已抵澳</strong>
                         </div>
                         <div class="text-[10px] text-slate-400 pt-0.5 border-t border-slate-800/80 leading-tight">
                             📍 <strong>當前停留態勢：</strong>候鳥主要停留在北部沿海泥灘，尚未大規模南下進入 NSW 內陸農場走廊。
@@ -2318,6 +2318,14 @@
                         freshnessEl.classList.remove('hidden');
                     }
                 }
+            }
+
+            const mbEl = document.getElementById('movebank-corridor-status');
+            if (mbEl && window.movebankTracksEmbedded) {
+                const mb = window.movebankTracksEmbedded;
+                const count = mb.total_active_tracks || 6;
+                mbEl.textContent = mb.is_live_data ? `${count} 條跨洋航線已抵澳 (即時)` : `${count} 條跨洋航線已抵澳 (⚠️ 範例資料)`;
+                if (!mb.is_live_data) mbEl.className = 'text-amber-400 font-mono';
             }
 
             let isSurge = false;

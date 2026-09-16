@@ -543,7 +543,7 @@
                         </div>
                         <div class="flex items-center justify-between text-orange-200 text-[10px]">
                             <span class="flex items-center gap-1.5">🛰️ Movebank Satellite:</span>
-                            <strong class="text-orange-300 font-mono">6 Oceanic Routes Landed</strong>
+                            <strong id="movebank-corridor-status" class="text-orange-300 font-mono">6 Oceanic Routes Landed</strong>
                         </div>
                         <div class="text-[10px] text-slate-400 pt-0.5 border-t border-slate-800/80 leading-tight">
                             📍 <strong>Current Staging Status:</strong> Flocks primarily staging in northern coastal mudflats; not yet dispersing inland to NSW poultry sheds.
@@ -2315,6 +2315,14 @@
                         freshnessEl.classList.remove('hidden');
                     }
                 }
+            }
+
+            const mbEl = document.getElementById('movebank-corridor-status');
+            if (mbEl && window.movebankTracksEmbedded) {
+                const mb = window.movebankTracksEmbedded;
+                const count = mb.total_active_tracks || 6;
+                mbEl.textContent = mb.is_live_data ? `${count} Oceanic Routes Landed (Live)` : `${count} Oceanic Routes Landed (⚠️ Sample Data)`;
+                if (!mb.is_live_data) mbEl.className = 'text-amber-400 font-mono';
             }
 
             let isSurge = false;
