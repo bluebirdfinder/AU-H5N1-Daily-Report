@@ -406,6 +406,10 @@ def playwright_fetch_url(url, html_content=None, screenshot_path=None, timeout=3
     比照 hpai_monitor_github 精確模式：顯式等待 #state_stats / .callout 區塊，隱藏置頂選單列 (Sticky Header)，
     優先擷取黃底純數據統計區塊 (.callout)。
     若傳入 html_content，優先使用 page.set_content() 瞬間完成本地渲染，100% 避免 GitHub Actions 網路逾時與 WAF 阻擋！
+
+    2026-09-16 修復：原本無論成功與否都 return html_content（呼叫時未傳入 html_content 的一般導航情境下永遠是 None），
+    導致 smart_fetch_url() 的第 3 段「真實瀏覽器」防線對一般網址一直是死的、從未真正生效過，只有靠 page.content()
+    存到本地變數 fetched_html 才是真正抓到的內容。現在改為 return fetched_html。
     """
     try:
         from playwright.sync_api import sync_playwright
@@ -512,9 +516,9 @@ def playwright_fetch_url(url, html_content=None, screenshot_path=None, timeout=3
                     print(f"[Playwright 截圖警告] 截圖擷取失敗: {str(ss_e)[:100]}")
 
             browser.close()
-            if html_content:
-                print(f"[Playwright 成功] 完成抓取: {url} ({len(html_content)} chars)")
-            return html_content
+            if fetched_html:
+                print(f"[Playwright 成功] 完成抓取: {url} ({len(fetched_html)} chars)")
+            return fetched_html
     except ImportError:
         print("[Playwright 未安裝] 跳過 Playwright 方案")
         return None
@@ -2535,17 +2539,21 @@ def fetch_ala_data():
     從 Atlas of Living Australia (ALA) API 抓取澳洲近期高風險野鳥與候鳥目擊數據 (無需 API Key 備援方案)。
     數據包含 Birdata, iNaturalist AU, 澳洲博物館等 35,000+ 個生態調查點。
     輸出: ala_bird_data.json (供前端讀取)
+
+    2026-09-16 修復：biocache.ala.org.au 對裸 requests.get() 直接回 HTTP 403（主動拒絕，非連不上）。
+    改用 smart_fetch_url() 走跟 DAFF 同一條 curl_cffi Chrome 指紋擬真 → CF Worker 代理 → 真實 Playwright
+    瀏覽器 → 純 requests 的四段降級鏈，繞過裸 requests 容易被 WAF 識別阻擋的問題。
     """
     print("[ALA API] 開始抓取 Atlas of Living Australia 野鳥數據 (免 Key 備援)...")
-    url = "https://biocache.ala.org.au/ws/occurrences/search"
-    
+    base_url = "https://biocache.ala.org.au/ws/occurrences/search"
+
     # 涵蓋水鳥、海鳥、雁鴨科、鷗科、鷸鴴科等 H5N1 高風險鳥類科別
     family_fq = (
         "family:Anatidae OR family:Laridae OR family:Scolopacidae OR "
         "family:Charadriidae OR family:Procellariidae OR family:Pelecanidae OR "
         "family:Ardeidae OR family:Sulidae OR family:Podicipedidae"
     )
-    
+
     params = {
         "q": "country:Australia",
         "fq": family_fq,
@@ -2555,12 +2563,25 @@ def fetch_ala_data():
     }
 
     try:
-        resp = requests.get(url, params=params, timeout=12, verify=False)
-        if resp.status_code != 200:
-            print(f"[ALA API] 回傳 HTTP {resp.status_code}，跳過 ALA 數據處理")
+        import urllib.parse
+        import html as html_module
+        url = f"{base_url}?{urllib.parse.urlencode(params)}"
+        raw_text = smart_fetch_url(url, headers={"Accept": "application/json"}, timeout=12)
+        if not raw_text:
+            print("[ALA API] 四段降級鏈全部失敗，跳過 ALA 數據處理")
             return
 
-        data = resp.json()
+        # Playwright 直接導向 API 網址時，Chrome 會把純 JSON 包一層 <html><body><pre>...</pre></body></html>，
+        # 這裡先嘗試直接解析，失敗再嘗試剝掉 <pre> 外殼。
+        try:
+            data = json.loads(raw_text)
+        except json.JSONDecodeError:
+            pre_match = re.search(r"<pre[^>]*>(.*?)</pre>", raw_text, re.DOTALL)
+            if not pre_match:
+                print("[ALA API] 回應內容無法解析為 JSON，跳過 ALA 數據處理")
+                return
+            data = json.loads(html_module.unescape(pre_match.group(1)))
+
         total_records = data.get("totalRecords", 0)
         occurrences = data.get("occurrences", [])
         print(f"[ALA API] 獲取 {len(occurrences)} 筆最新觀測紀錄 (總資料量: {total_records})")
