@@ -1,283 +1,316 @@
 window.movebankTracksEmbedded = {
-  "fetched_at_utc": "2026-09-16T12:36:00Z",
-  "source": "Movebank 研究級備援航線範例資料 (非即時)",
+  "fetched_at_utc": "2026-09-16T12:41:52Z",
+  "source": "Movebank Animal Tracking Network (REST API 即時抓取)",
   "authenticated": true,
-  "is_live_data": false,
-  "total_active_tracks": 6,
+  "is_live_data": true,
+  "total_active_tracks": 1,
   "studies": [
     {
-      "studyName": "Short-tailed Shearwater Trans-Pacific Migration to Australia",
-      "species": "Ardenna tenuirostris (短尾水薙鳥 / 羊肉鳥)",
-      "individualId": "AU-STSH-TAG-0824",
-      "sensorType": "Solar Argos GPS Transmitter",
+      "studyName": "DELTATRACK - Herring gulls (Larus argentatus, Laridae) and lesser black-backed gulls (Larus fuscus, Laridae) breeding at Neeltje Jans (Netherlands)",
+      "species": "Unidentified species",
+      "individualId": "unknown",
+      "sensorType": "Satellite/GPS Tag",
       "color": "#f97316",
       "trackPoints": [
         {
-          "lat": 58.2,
-          "lng": -165.5,
-          "timestamp": "2026-08-01 02:00:00 UTC",
-          "location": "Bering Sea (白令海)"
+          "lat": 40.67349624633789,
+          "lng": -3.761396646499634,
+          "timestamp": "2026-09-16 06:42:11.000",
+          "location": "40.67, -3.76"
         },
         {
-          "lat": 50.1,
-          "lng": -175.2,
-          "timestamp": "2026-08-08 14:30:00 UTC",
-          "location": "North Pacific Ocean (北太平洋)"
+          "lat": 50.949249267578125,
+          "lng": 3.356729984283447,
+          "timestamp": "2026-09-16 06:42:15.000",
+          "location": "50.95, 3.36"
         },
         {
-          "lat": 35.4,
-          "lng": 178.6,
-          "timestamp": "2026-08-16 09:15:00 UTC",
-          "location": "Central Pacific (中太平洋)"
+          "lat": 50.23368835449219,
+          "lng": 2.951651573181152,
+          "timestamp": "2026-09-16 06:45:14.000",
+          "location": "50.23, 2.95"
         },
         {
-          "lat": 15.2,
-          "lng": 172.1,
-          "timestamp": "2026-08-23 18:40:00 UTC",
-          "location": "Equatorial Pacific (赤道太平洋)"
+          "lat": 50.6796989440918,
+          "lng": 2.415321588516235,
+          "timestamp": "2026-09-16 06:47:04.000",
+          "location": "50.68, 2.42"
         },
         {
-          "lat": -5.3,
-          "lng": 165.8,
-          "timestamp": "2026-08-29 07:20:00 UTC",
-          "location": "Solomon Sea (索羅門海)"
+          "lat": 49.49066925048828,
+          "lng": 0.977353274822235,
+          "timestamp": "2026-09-16 06:47:43.000",
+          "location": "49.49, 0.98"
         },
         {
-          "lat": -18.2,
-          "lng": 156.4,
-          "timestamp": "2026-09-02 12:10:00 UTC",
-          "location": "Coral Sea (珊瑚海)"
+          "lat": 50.3613166809082,
+          "lng": 3.773663282394409,
+          "timestamp": "2026-09-16 06:52:44.000",
+          "location": "50.36, 3.77"
         },
         {
-          "lat": -28.6,
-          "lng": 153.8,
-          "timestamp": "2026-09-05 16:30:00 UTC",
-          "location": "Off Byron Bay NSW (拜倫灣外海)"
+          "lat": 50.679725646972656,
+          "lng": 2.415450096130371,
+          "timestamp": "2026-09-16 06:57:05.000",
+          "location": "50.68, 2.42"
         },
         {
-          "lat": -33.7,
-          "lng": 151.4,
-          "timestamp": "2026-09-07 08:20:00 UTC",
-          "location": "Sydney Northern Beaches Coast (雪梨北灘外海)"
+          "lat": 40.65929412841797,
+          "lng": -3.725714921951294,
+          "timestamp": "2026-09-16 06:57:10.000",
+          "location": "40.66, -3.73"
         },
         {
-          "lat": -36.9,
-          "lng": 150.1,
-          "timestamp": "2026-09-08 04:15:00 UTC",
-          "location": "Merimbula South Coast (南海岸登陸點)"
-        }
-      ]
-    },
-    {
-      "studyName": "Bar-tailed Godwit East Asian-Australasian Flyway Tracking",
-      "species": "Limosa lapponica (斑尾鷸)",
-      "individualId": "AU-BTGD-GPS-9912",
-      "sensorType": "5g PTT Satellite Transmitter",
-      "color": "#06b6d4",
-      "trackPoints": [
-        {
-          "lat": 64.5,
-          "lng": -165.4,
-          "timestamp": "2026-08-10 00:00:00 UTC",
-          "location": "Yukon Delta Alaska (阿拉斯加育空三角洲)"
+          "lat": 49.489803314208984,
+          "lng": 0.977116644382477,
+          "timestamp": "2026-09-16 06:57:43.000",
+          "location": "49.49, 0.98"
         },
         {
-          "lat": 42.1,
-          "lng": 175.2,
-          "timestamp": "2026-08-18 10:00:00 UTC",
-          "location": "Mid North Pacific (北太平洋航線)"
+          "lat": 50.959503173828125,
+          "lng": 3.343683242797852,
+          "timestamp": "2026-09-16 07:02:14.000",
+          "location": "50.96, 3.34"
         },
         {
-          "lat": 12.8,
-          "lng": 168.4,
-          "timestamp": "2026-08-25 15:30:00 UTC",
-          "location": "Marshall Islands Airspace (馬紹爾群島上空)"
+          "lat": 50.234222412109375,
+          "lng": 2.950358390808105,
+          "timestamp": "2026-09-16 07:04:55.000",
+          "location": "50.23, 2.95"
         },
         {
-          "lat": -12.4,
-          "lng": 158.2,
-          "timestamp": "2026-09-01 06:45:00 UTC",
-          "location": "Coral Sea Airway (珊瑚海航道)"
+          "lat": 49.49026107788086,
+          "lng": 0.976309955120087,
+          "timestamp": "2026-09-16 07:07:45.000",
+          "location": "49.49, 0.98"
         },
         {
-          "lat": -27.2,
-          "lng": 153.2,
-          "timestamp": "2026-09-06 11:20:00 UTC",
-          "location": "Moreton Bay QLD (昆州摩頓灣)"
+          "lat": 40.65962219238281,
+          "lng": -3.726626634597778,
+          "timestamp": "2026-09-16 07:12:09.000",
+          "location": "40.66, -3.73"
         },
         {
-          "lat": -32.8,
-          "lng": 151.8,
-          "timestamp": "2026-09-08 02:50:00 UTC",
-          "location": "Hunter Estuary NSW (獵人河口濕地)"
-        }
-      ]
-    },
-    {
-      "studyName": "Southern Giant Petrel Sub-Antarctic Circumpolar Telemetry",
-      "species": "Macronectes giganteus (南方巨鸌)",
-      "individualId": "AU-SGPT-ANT-033",
-      "sensorType": "Pelagic Solar GPS Tracker",
-      "color": "#ef4444",
-      "trackPoints": [
-        {
-          "lat": -54.5,
-          "lng": 158.9,
-          "timestamp": "2026-08-15 06:00:00 UTC",
-          "location": "Macquarie Island (麥夸里島繁殖地)"
+          "lat": 50.316558837890625,
+          "lng": 3.697933197021484,
+          "timestamp": "2026-09-16 07:12:43.000",
+          "location": "50.32, 3.70"
         },
         {
-          "lat": -48.2,
-          "lng": 145.0,
-          "timestamp": "2026-08-22 13:30:00 UTC",
-          "location": "Southern Ocean Roaring Forties (南大洋西風帶)"
+          "lat": 49.490501403808594,
+          "lng": 0.977629959583283,
+          "timestamp": "2026-09-16 07:17:45.000",
+          "location": "49.49, 0.98"
         },
         {
-          "lat": -43.2,
-          "lng": 147.5,
-          "timestamp": "2026-08-28 09:40:00 UTC",
-          "location": "Storm Bay TAS (塔州風暴灣外海)"
+          "lat": 50.96012878417969,
+          "lng": 3.343133449554443,
+          "timestamp": "2026-09-16 07:22:14.000",
+          "location": "50.96, 3.34"
         },
         {
-          "lat": -39.8,
-          "lng": 144.0,
-          "timestamp": "2026-09-02 11:15:00 UTC",
-          "location": "King Island / Bass Strait (金島巴斯海峽)"
+          "lat": 50.225460052490234,
+          "lng": 2.927000045776367,
+          "timestamp": "2026-09-16 07:25:00.000",
+          "location": "50.23, 2.93"
         },
         {
-          "lat": -37.5,
-          "lng": 139.8,
-          "timestamp": "2026-09-05 15:20:00 UTC",
-          "location": "Encounter Bay SA (南澳相遇灣海岸)"
+          "lat": 40.65888214111328,
+          "lng": -3.724519968032837,
+          "timestamp": "2026-09-16 07:27:09.000",
+          "location": "40.66, -3.72"
         },
         {
-          "lat": -35.5,
-          "lng": 138.6,
-          "timestamp": "2026-09-08 05:00:00 UTC",
-          "location": "Fleurieu Peninsula SA (弗勒里厄半島)"
-        }
-      ]
-    },
-    {
-      "studyName": "Black-browed Albatross Southern Continental Shelf Foraging",
-      "species": "Thalassarche melanophris (黑眉信天翁)",
-      "individualId": "AU-BBA-TAS-508",
-      "sensorType": "Satellite PTT Beacon",
-      "color": "#eab308",
-      "trackPoints": [
-        {
-          "lat": -50.8,
-          "lng": 166.0,
-          "timestamp": "2026-08-20 04:00:00 UTC",
-          "location": "Auckland Islands (奧克蘭群島)"
+          "lat": 49.49097442626953,
+          "lng": 0.978583335876465,
+          "timestamp": "2026-09-16 07:27:46.000",
+          "location": "49.49, 0.98"
         },
         {
-          "lat": -45.5,
-          "lng": 155.2,
-          "timestamp": "2026-08-26 12:00:00 UTC",
-          "location": "Tasman Sea Pelagic Shelf (塔斯曼海大陸棚)"
+          "lat": 50.311954498291016,
+          "lng": 3.699054956436157,
+          "timestamp": "2026-09-16 07:32:43.000",
+          "location": "50.31, 3.70"
         },
         {
-          "lat": -42.0,
-          "lng": 148.5,
-          "timestamp": "2026-09-01 08:30:00 UTC",
-          "location": "Freycinet Peninsula (塔州菲欣納半島)"
+          "lat": 49.49045944213867,
+          "lng": 0.97771829366684,
+          "timestamp": "2026-09-16 07:37:47.000",
+          "location": "49.49, 0.98"
         },
         {
-          "lat": -37.2,
-          "lng": 150.2,
-          "timestamp": "2026-09-05 14:10:00 UTC",
-          "location": "Twofold Bay Eden NSW (新州伊登海灣)"
+          "lat": 50.947227478027344,
+          "lng": 3.328994989395142,
+          "timestamp": "2026-09-16 07:42:13.000",
+          "location": "50.95, 3.33"
         },
         {
-          "lat": -34.8,
-          "lng": 151.1,
-          "timestamp": "2026-09-08 07:30:00 UTC",
-          "location": "Shoalhaven Marine Edge (肖爾黑文大陸架邊緣)"
-        }
-      ]
-    },
-    {
-      "studyName": "Red Knot East Asian Flyway Shoreline Migration",
-      "species": "Calidris canutus (紅腹濱鷸)",
-      "individualId": "AU-RKNT-WA-112",
-      "sensorType": "Ultra-light PinPoint GPS",
-      "color": "#10b981",
-      "trackPoints": [
-        {
-          "lat": 38.8,
-          "lng": 118.5,
-          "timestamp": "2026-08-12 03:00:00 UTC",
-          "location": "Bohai Bay Yellow Sea (黃海渤海灣)"
+          "lat": 40.6631965637207,
+          "lng": -3.725209951400757,
+          "timestamp": "2026-09-16 07:42:19.000",
+          "location": "40.66, -3.73"
         },
         {
-          "lat": 22.5,
-          "lng": 120.3,
-          "timestamp": "2026-08-20 18:00:00 UTC",
-          "location": "Taiwan Strait (台灣海峽)"
+          "lat": 49.49021911621094,
+          "lng": 0.976496636867523,
+          "timestamp": "2026-09-16 07:47:47.000",
+          "location": "49.49, 0.98"
         },
         {
-          "lat": 5.8,
-          "lng": 124.2,
-          "timestamp": "2026-08-27 10:45:00 UTC",
-          "location": "Celebes Sea (西里伯斯海)"
+          "lat": 50.30330276489258,
+          "lng": 3.693926572799683,
+          "timestamp": "2026-09-16 07:52:43.000",
+          "location": "50.30, 3.69"
         },
         {
-          "lat": -12.2,
-          "lng": 123.0,
-          "timestamp": "2026-09-03 07:15:00 UTC",
-          "location": "Ashmore Reef (阿什莫爾礁)"
+          "lat": 40.66299057006836,
+          "lng": -3.725133419036865,
+          "timestamp": "2026-09-16 07:57:10.000",
+          "location": "40.66, -3.73"
         },
         {
-          "lat": -17.9,
-          "lng": 122.2,
-          "timestamp": "2026-09-08 01:20:00 UTC",
-          "location": "Roebuck Bay Broome WA (西澳布魯姆羅巴克灣)"
-        }
-      ]
-    },
-    {
-      "studyName": "Greater Crested Tern Coastal Foraging Telemetry NSW/SA",
-      "species": "Thalasseus bergii (大鳳頭燕鷗)",
-      "individualId": "AU-GCT-NSW-041",
-      "sensorType": "Nano-GPS Logger",
-      "color": "#a855f7",
-      "trackPoints": [
-        {
-          "lat": -38.4,
-          "lng": 145.2,
-          "timestamp": "2026-09-01 08:00:00 UTC",
-          "location": "Phillip Island VIC (菲利普島)"
+          "lat": 49.49010467529297,
+          "lng": 0.976534962654114,
+          "timestamp": "2026-09-16 07:57:48.000",
+          "location": "49.49, 0.98"
         },
         {
-          "lat": -37.8,
-          "lng": 148.1,
-          "timestamp": "2026-09-03 14:10:00 UTC",
-          "location": "Lakes Entrance (吉普斯蘭湖)"
+          "lat": 50.94680404663086,
+          "lng": 3.328921794891357,
+          "timestamp": "2026-09-16 08:02:24.000",
+          "location": "50.95, 3.33"
         },
         {
-          "lat": -36.9,
-          "lng": 149.9,
-          "timestamp": "2026-09-05 09:30:00 UTC",
-          "location": "Eden / Merimbula (伊登沿岸)"
+          "lat": 40.662818908691406,
+          "lng": -3.723503351211548,
+          "timestamp": "2026-09-16 08:12:18.000",
+          "location": "40.66, -3.72"
         },
         {
-          "lat": -35.4,
-          "lng": 150.5,
-          "timestamp": "2026-09-06 16:00:00 UTC",
-          "location": "Ulladulla Shoalhaven (肖爾黑文)"
+          "lat": 50.30089569091797,
+          "lng": 3.681733369827271,
+          "timestamp": "2026-09-16 08:12:44.000",
+          "location": "50.30, 3.68"
         },
         {
-          "lat": -34.5,
-          "lng": 150.9,
-          "timestamp": "2026-09-07 11:45:00 UTC",
-          "location": "Port Kembla (肯布拉港)"
+          "lat": 50.94834899902344,
+          "lng": 3.327781677246094,
+          "timestamp": "2026-09-16 08:22:32.000",
+          "location": "50.95, 3.33"
         },
         {
-          "lat": -33.7,
-          "lng": 151.3,
-          "timestamp": "2026-09-08 06:15:00 UTC",
-          "location": "Warriewood Northern Beaches (雪梨北灘)"
+          "lat": 40.66557693481445,
+          "lng": -3.730051755905151,
+          "timestamp": "2026-09-16 08:27:27.000",
+          "location": "40.67, -3.73"
+        },
+        {
+          "lat": 50.30111312866211,
+          "lng": 3.681043386459351,
+          "timestamp": "2026-09-16 08:32:43.000",
+          "location": "50.30, 3.68"
+        },
+        {
+          "lat": 50.94799041748047,
+          "lng": 3.327703237533569,
+          "timestamp": "2026-09-16 08:42:15.000",
+          "location": "50.95, 3.33"
+        },
+        {
+          "lat": 40.65959930419922,
+          "lng": -3.725724935531616,
+          "timestamp": "2026-09-16 08:42:30.000",
+          "location": "40.66, -3.73"
+        },
+        {
+          "lat": 50.301490783691406,
+          "lng": 3.681626558303833,
+          "timestamp": "2026-09-16 08:52:43.000",
+          "location": "50.30, 3.68"
+        },
+        {
+          "lat": 40.659873962402344,
+          "lng": -3.725673198699951,
+          "timestamp": "2026-09-16 08:57:35.000",
+          "location": "40.66, -3.73"
+        },
+        {
+          "lat": 50.952781677246094,
+          "lng": 3.344178199768066,
+          "timestamp": "2026-09-16 09:02:16.000",
+          "location": "50.95, 3.34"
+        },
+        {
+          "lat": 40.65999984741211,
+          "lng": -3.724098205566406,
+          "timestamp": "2026-09-16 09:12:09.000",
+          "location": "40.66, -3.72"
+        },
+        {
+          "lat": 50.267608642578125,
+          "lng": 3.661773204803467,
+          "timestamp": "2026-09-16 09:12:43.000",
+          "location": "50.27, 3.66"
+        },
+        {
+          "lat": 50.95276641845703,
+          "lng": 3.344244956970215,
+          "timestamp": "2026-09-16 09:22:35.000",
+          "location": "50.95, 3.34"
+        },
+        {
+          "lat": 50.95388412475586,
+          "lng": 3.346173286437988,
+          "timestamp": "2026-09-16 09:32:11.000",
+          "location": "50.95, 3.35"
+        },
+        {
+          "lat": 50.26615524291992,
+          "lng": 3.618833303451538,
+          "timestamp": "2026-09-16 09:32:43.000",
+          "location": "50.27, 3.62"
+        },
+        {
+          "lat": 50.956661224365234,
+          "lng": 3.351818323135376,
+          "timestamp": "2026-09-16 09:42:12.000",
+          "location": "50.96, 3.35"
+        },
+        {
+          "lat": 50.956783294677734,
+          "lng": 3.35133171081543,
+          "timestamp": "2026-09-16 09:52:12.000",
+          "location": "50.96, 3.35"
+        },
+        {
+          "lat": 50.49109649658203,
+          "lng": 2.287801742553711,
+          "timestamp": "2026-09-16 09:54:05.000",
+          "location": "50.49, 2.29"
+        },
+        {
+          "lat": 50.95638656616211,
+          "lng": 3.352206707000732,
+          "timestamp": "2026-09-16 10:02:13.000",
+          "location": "50.96, 3.35"
+        },
+        {
+          "lat": 50.95622634887695,
+          "lng": 3.351538419723511,
+          "timestamp": "2026-09-16 10:12:12.000",
+          "location": "50.96, 3.35"
+        },
+        {
+          "lat": 50.95949935913086,
+          "lng": 3.343658447265625,
+          "timestamp": "2026-09-16 10:22:14.000",
+          "location": "50.96, 3.34"
+        },
+        {
+          "lat": 50.95592498779297,
+          "lng": 3.352073192596436,
+          "timestamp": "2026-09-16 10:32:12.000",
+          "location": "50.96, 3.35"
         }
       ]
     }
