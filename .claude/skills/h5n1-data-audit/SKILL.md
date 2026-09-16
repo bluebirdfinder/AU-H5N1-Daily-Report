@@ -8,7 +8,9 @@ description: Audit and reconcile the AU H5N1 monitoring dashboard (index.html/in
 這個 repo 有兩種頁面，資料新鮮度不完全相同，稽核前必須先分清楚：
 
 - **`index.html` / `index_en.html`**：`h5n1.py` 的 `compile_template()` 每次跑都會從 `report_template.html` 重新產生，數字理論上是活的。
-- **`risk_assessment.html` / `risk_assessment_en.html` / `risk_assessment_slides*.html`**：`h5n1.py` 只有 `sync_risk_assessment_weekly()` 會碰模板本身（歷次週報歸檔彈窗的連結），但**自 2026-09-16 起**事件數字（NSW/VIC/SA、全澳總數、方法論 Modal 裡的數字）已改為在頁面載入時透過 `syncCaseEventsFromEmbedded()` 讀 `assets/js/cases_events.js`（`window.casesEventsEmbedded`，由 `h5n1.py` 的 `write_cases_events_js()` 產生）動態校正，不再是死綁定。**候鳥數字（eBird 現場實測）與大部分敘述性文字仍是靜態**，還是要照下面的方法核對。稽核前先確認 `assets/js/cases_events.js` 存在且 `syncCaseEventsFromEmbedded()`/`write_cases_events_js()` 這兩個函式還在——如果哪次改版被移除或改壞了，就會退回舊的「全部寫死」狀態，屬於嚴重回歸。
+- **`risk_assessment.html` / `risk_assessment_en.html`**：`h5n1.py` 只有 `sync_risk_assessment_weekly()` 會碰模板本身（歷次週報歸檔彈窗的連結），但**自 2026-09-16 起**事件數字（NSW/VIC/SA、全澳總數、方法論 Modal 裡的數字）已改為在頁面載入時透過 `syncCaseEventsFromEmbedded()` 讀 `assets/js/cases_events.js`（`window.casesEventsEmbedded`，由 `h5n1.py` 的 `write_cases_events_js()` 產生）動態校正，不再是死綁定。**候鳥數字（eBird 現場實測）與大部分敘述性文字仍是靜態**，還是要照下面的方法核對。
+- **`h5n1_weekly_slides.html`（疫情週報簡報）/ `risk_assessment_slides.html`/`_en.html`（風險評估模型週報簡報）**：這三份完全獨立於上面兩類頁面。`sync_weekly_slides()`/`sync_risk_assessment_weekly()` 每週一自動跑，但**只做歸檔跟把封面日期區間文字換掉**，不校正內容數字——這是 2026-09-16 稽核時才發現的死角，`h5n1_weekly_slides.html` 當時完全沒讀過任何資料檔，`risk_assessment_slides.html` 唯一一處綁定程式碼還因為 `Array.isArray()` 判斷錯物件型態而是死的。現已修復為用 `data-bind` 屬性 + 載入時查詢覆寫，跟主頁面一樣接上 `assets/js/cases_events.js`；但「上週 X 起」這類週間比較敘述文字仍是純人工維護，不會自動改寫。
+- 稽核前先確認 `assets/js/cases_events.js` 存在，且上述幾個同步函式（`syncCaseEventsFromEmbedded()`、`write_cases_events_js()`、`syncWeeklySlideCaseEvents()`）都還在——如果哪次改版被移除或改壞了，就會退回舊的「全部寫死」狀態，屬於嚴重回歸。
 
 **核心原則：永遠不要相信 HTML 裡顯示的數字本身，一定要拿它去跟來源 JSON 重新算一次再比對。**
 
