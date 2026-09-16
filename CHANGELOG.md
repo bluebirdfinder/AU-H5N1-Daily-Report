@@ -2,6 +2,20 @@
 
 所有專案版本更新與重大變更均紀錄於此。
 
+## [v2.10.1] - 2026-09-16
+
+### ✅ `EBIRD_API_KEY` 已補設，候鳥數字凍結問題確認解除
+- 使用者於 GitHub Secrets 補上 `EBIRD_API_KEY` 後，真實環境 Actions 執行確認 eBird API 抓取成功，單次回傳 151–158 筆新鮮高風險觀測記錄，`bird_data.json` 的 `fetched_at_utc` 恢復正常每次更新，v2.10.0 記錄的「651 隻」凍結快照問題確認解除。
+
+### 🤖 Gemini 備援模型清單再度全滅，改採「重試同一模型」策略
+- v2.10.0 改用的備援模型 `gemini-2.5-flash-lite`/`gemini-2.5-pro`，在同一天 2 小時後的真實環境測試中也雙雙回傳 HTTP 404「no longer available to new users」——具名備援模型清單的下架速度快到「剛修好就又壞」。
+- **改為不再猜測其他具名模型**：`call_gemini_api_with_retry()` 的 `models` 清單改成 `["gemini-2.5-flash", "gemini-2.5-flash"]`，即唯一經真實環境反覆驗證持續有效的模型多重試一次，而非切到高機率也已下架的具名備援模型。
+
+### 🛰️ Movebank 從「從未真正呼叫 API」修復為真實串接 + 授權自動同意
+- **根因**：`fetch_movebank_data()` 舊版只依環境變數是否存在印狀態訊息，實際上從未呼叫過任何 Movebank API，永遠寫死輸出 6 條日期凍結在 2026-08-01~09-08 的示範航跡——跟候鳥「651 隻」是同一類「看起來即時、實際死資料」問題。
+- **修復**：新增 `fetch_movebank_live_tracks()`，以真實帳密呼叫 Movebank REST API：依「澳洲關鍵字 > 南半球緯度 > 海鳥/涉禽物種關鍵字 > 下載權限」排序候選研究；並實作 Movebank 官方的授權條款自動同意協議（`license-md5` handshake）解鎖需要條款同意的研究資料。輸出 JSON 新增 `is_live_data` 欄位，前端已綁定動態顯示「即時連線」或「範例資料」。
+- **真實環境驗證結果**：授權自動同意流程運作正常（多筆 study 成功通過 `license-md5` 驗證），但目前這個帳號排序到的候選研究（Nankeen Kestrels、Green python、Christmas Island flying fox 等）近 30 天內均無個體回傳 GPS 座標，判斷為已結束的歷史研究專案而非程式邏輯錯誤。系統依設計安全退回範例資料並正確標示 `is_live_data:false`，不會謊稱即時連線。若之後取得目前仍在追蹤中的澳洲海鳥 study 名稱/ID，可直接指定以跳過排序猜測。
+
 ## [v2.10.0] - 2026-09-16
 
 ### 🔍 首次 Claude Code 全面架構稽核與資料完整性修復

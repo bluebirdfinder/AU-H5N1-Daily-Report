@@ -61,7 +61,7 @@ print('NSW records:', len(nsw), 'NSW sum howMany:', sum((o.get('howMany') or 0) 
 2. **就算 JSON 有更新，前端數字還是沒動？** 檢查是不是綁定邏輯本身壞掉：
    - 找 `state_summary.NSW.total_birds` 這種欄位名 —— `bird_data.json` 的 schema 只有 `total_obs` / `risk_species_obs` / `region_code`，沒有 `total_birds`，凡是讀這個欄位的地方永遠拿到 `undefined`，會 fallback 到寫死的預設值（286 / 651 / 1407 都出現過，取決於哪次手改）。正確作法是像 `risk_assessment.html` 的 `renderEbirdOnMap()` 那樣，對 `high_risk_observations` 陣列做 `reduce((sum,o)=>sum+(o.howMany||1),0)` 現場加總，不要指望 JSON 裡有現成的加總欄位。
    - 確認顯示數字的 DOM 元素真的有對應的 `document.getElementById(...).textContent = ...` 賦值。曾發現 `report_template.html` 的 `#ebird-total-obs`（首頁候鳥總數大字）完全沒有任何 JS 更新它，是純靜態文字。
-3. **ALA / GBIF / Movebank 各自獨立檢查**，不要假設三個源共病：GBIF、Movebank 目前運作正常（有每日 git commit 佐證，`git log --oneline -- gbif_bird_data.json` 可查）；ALA (`ala_bird_data.json`) 過去稽核發現這個檔案從未被產生過，`fetch_ala_data()` 用裸 `requests.get()`，沒有像 `smart_fetch_url()` 那樣的 curl_cffi/Playwright 降級鏈，疑似被目標網站擋掉又把例外吃掉。
+3. **ALA / GBIF / Movebank 各自獨立檢查**，不要假設三個源共病：GBIF 目前運作正常（有每日 git commit 佐證，`git log --oneline -- gbif_bird_data.json` 可查）；ALA (`ala_bird_data.json`) 過去稽核發現這個檔案從未被產生過，`fetch_ala_data()` 用裸 `requests.get()`，沒有像 `smart_fetch_url()` 那樣的 curl_cffi/Playwright 降級鏈，疑似被目標網站擋掉又把例外吃掉。**Movebank 2026-09-16 前曾長期是「看起來有容錯機制、實際從未呼叫過任何 API」的假資料**（`fetch_movebank_data()` 只依環境變數印狀態訊息，永遠輸出寫死的示範航跡）——這是比「API 失敗」更難發現的陷阱，因為 log 不會報錯。稽核任何「有沒有真的打 API」的函式時，不能只看有沒有 try/except 或有沒有印訊息，要親自 grep 函式體內是否真的有 `requests.get`/`requests.post` 呼叫外部網址。目前已改為呼叫 `fetch_movebank_live_tracks()` 真實串接（含 Movebank 官方授權條款自動同意 `license-md5` 協議），輸出 JSON 有 `is_live_data` 欄位可直接判斷這次是不是真資料；若為 `false`，先看 log 是不是「候選研究均無近期個體」而非程式壞掉。
 
 ## Step 3 — 建立架構/資料流盤點表
 

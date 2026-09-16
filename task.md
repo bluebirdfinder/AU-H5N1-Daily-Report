@@ -10,7 +10,13 @@
 - [x] **修復 Gemini API 備援模型清單全滅問題**：真實環境 log 證實 `gemini-2.0-flash`/`gemini-1.5-flash`/`gemini-1.5-pro` 全部 404，已改用 `gemini-2.5-flash-lite`/`gemini-2.5-pro`。
 - [x] **確認 `EBIRD_API_KEY` 從未設定過**：真實 log + git 紀錄證實，`bird_data.json` 是 2026-09-07 人工上傳的一次性快照，從未經過 GitHub Actions 自動抓取。
 - [x] **確認 `ala_bird_data.json` 失敗根因**：真實環境 log 證實 `biocache.ala.org.au` 回傳 HTTP 403。
-- [ ] **待辦（需人工處理）**：去 GitHub Settings 新增 `EBIRD_API_KEY` Secret 並手動觸發一次 workflow 驗證；評估 `purina_auth.js` 密碼門是否需要真正的伺服器端驗證（repo 已確認 public，密碼門目前無實質保護效果）。
+- [ ] **待辦（需人工處理）**：評估 `purina_auth.js` 密碼門是否需要真正的伺服器端驗證（repo 已確認 public，密碼門目前無實質保護效果）。
+
+## 🟢 今日已完成重點 (2026-09-16 Completed - v2.10.1 二次修復)
+- [x] **`EBIRD_API_KEY` 已由使用者補設並驗證修復**：真實環境 Actions 執行確認 eBird API 抓取成功（151–158 筆新鮮觀測），候鳥數字凍結問題解除。
+- [x] **Gemini 備援模型清單二度全滅，改採重試同一模型策略**：`gemini-2.5-flash-lite`/`gemini-2.5-pro` 上線僅 2 小時即回 404，不再猜測具名備援模型，改為 `gemini-2.5-flash` 重試兩次。
+- [x] **Movebank 從「從未真正呼叫 API」修復為真實串接**：新增 `fetch_movebank_live_tracks()`，依澳洲/南半球/物種關鍵字排序候選研究，並實作官方授權條款自動同意（`license-md5`）協議；真實環境驗證授權流程正常，但目前候選研究均無近 30 天活體航跡，安全退回範例資料並正確標示 `is_live_data:false`。
+- [ ] **待辦（需使用者提供資訊）**：若使用者手上有已知目前仍在追蹤中的澳洲海鳥/候鳥 Movebank study 名稱或 ID，可直接指定以跳過排序猜測，取得真正即時航跡。
 
 ## 🟢 歷史已完成重點 (2026-09-08 Completed - v2.9.5 & v2.9.4 & v2.9.3 & v2.9.2)
 - [x] **🚨 確立最高指導原則：NSW 商業家禽場「零感染 (Area Freedom)」為唯一生死防線 (`AGENTS.md` / `AGENT.md`)**

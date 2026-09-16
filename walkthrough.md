@@ -17,6 +17,18 @@
 
 ---
 
+# 二次修復：EBIRD_API_KEY 補設、Gemini 模型再度全滅、Movebank 真實串接 (v2.10.1, 2026-09-16)
+
+v2.10.0 稽核完成後，使用者實際操作 GitHub Secrets 與追問時，又浮現三個需要在真實環境反覆驗證才能確認的問題：
+
+1. **`EBIRD_API_KEY` 確認補設成功**：使用者於 GitHub Settings → Secrets 新增後，觸發真實 workflow 執行，log 證實 eBird API 成功抓到 151–158 筆新鮮觀測，`bird_data.json` 恢復正常更新頻率。
+2. **Gemini 備援模型清單「修好又壞」**：v2.10.0 換上的 `gemini-2.5-flash-lite`/`gemini-2.5-pro` 在同一天 2 小時後的真實測試中也雙雙 404「no longer available to new users」——這證明具名備援模型清單本身是脆弱策略（Google 下架速度可以快於一次稽核週期）。最終改為放棄猜測新模型名稱，直接讓唯一持續驗證有效的 `gemini-2.5-flash` 重試一次。
+3. **Movebank 候鳥走廊資料是假的**：使用者追問「候鳥數據還有哪個抓不到」時發現，`fetch_movebank_data()` 從頭到尾沒有呼叫過任何 Movebank API，只是依環境變數印狀態訊息、永遠輸出寫死的 6 條示範航跡（日期凍結在 8 月）。使用者確認持有真實帳密後，改為呼叫新函式 `fetch_movebank_live_tracks()`：以「澳洲關鍵字 > 南半球緯度 > 物種關鍵字 > 下載權限」排序候選研究，並實作 Movebank 官方的授權條款自動同意（`license-md5`）協議。真實環境驗證授權流程本身正常（多筆 study 成功通過驗證），但排到的候選研究近 30 天內都沒有個體回傳 GPS 座標，判斷是已結束的歷史研究，系統誠實標示 `is_live_data:false` 並安全退回範例資料，不偽裝即時連線。
+
+**教訓**：候選函式「有沒有真的打 API」不能只看有沒有 try/except 或有沒有印訊息，要親自 grep 函式體內是否真的有 `requests.get`/`requests.post` 呼叫外部網址；「看起來像是有容錯機制」跟「其實從未真正嘗試過」是兩件事，後者往往比真正失敗更難發現，因為錯誤訊息看起來完全正常。
+
+---
+
 # H5N1 風控核心準則確立、候鳥雙軌數據重構、16:9 簡報與地圖一體化升級 (v2.9.5)
 
 已成功完成 **確立 NSW 商業禽舍「零感染 (Area Freedom)」為唯一生死防線**、**候鳥雙軌數據（模型推估 vs 現場實測）架構重構**、**2 年推演時間軸數據解耦與 DAFF 498 起事件對齊**、**16:9 簡報 Slide 4 候鳥數據補齊與全地圖左側一體化極簡面板 (Zero East-Coast Obstruction)**、**RWD 換頁按鈕溢出修復** 與 **全專案文檔同步 (README / CHANGELOG / SOP / Task / Walkthrough)**！
