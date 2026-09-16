@@ -18,8 +18,8 @@
         rel="stylesheet">
     <script src="assets/js/purina_auth.js"></script>
     <script src="assets/js/bird_data.js"></script>
-    <script src="assets/js/gbif_bird_data.js"></script>
     <script src="assets/js/movebank_tracks.js"></script>
+    <script src="assets/js/cases_events.js"></script>
 
     <style>
         body {
@@ -191,7 +191,7 @@
                         </span>
                         <span
                             class="inline-flex items-center rounded-md bg-blue-500/10 px-2.5 py-1 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-500/20">
-                            Blayney 廠地緣隔離：215+ 公里
+                            Blayney 廠地緣隔離：<span id="factory-min-dist-badge"><!-- MIN_DISTANCE_PLACEHOLDER --></span> 公里
                         </span>
                         <span
                             class="inline-flex items-center rounded-md bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-400 ring-1 ring-inset ring-amber-500/20">
@@ -217,8 +217,7 @@
                             <div>
                                 <span class="text-xs text-slate-400 block">地緣隔離防線安全事實</span>
                                 <p class="text-xs text-slate-300 mt-1 leading-relaxed">
-                                    本廠距離最近之新州沿海確診事件 (Jervis Bay / Hawks Nest) 僅 <strong class="text-amber-400">215
-                                        公里</strong>，距離南澳爆發帶達 <strong>940 公里</strong>，距離西澳帶達 <strong>2,300
+                                    本廠距離目前全澳最近之一起確診事件僅約 <strong class="text-amber-400" id="factory-min-dist-text"><!-- MIN_DISTANCE_PLACEHOLDER --> 公里</strong>，距離南澳爆發帶約 <strong>940 公里</strong>，距離西澳帶約 <strong>2,300
                                         公里</strong>。本廠處於內陸高地乾燥氣候 (海拔 860 米)，與沿海濕地存在天然地形屏障，地緣隔離依然極度安全。
                                 </p>
                             </div>
@@ -402,15 +401,37 @@
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         const updateHud = (data) => {
-                            if (data && data.total_risk_obs_count) {
-                                if (data.state_summary && data.state_summary.NSW) {
-                                    const nswEl = document.getElementById('ebird-nsw-obs');
-                                    if (nswEl) nswEl.innerHTML = `志工與觀鳥家實況回傳，NSW 境內目前有 <strong class="text-amber-300">${data.state_summary.NSW.risk_species_obs} 處點位 / ${data.state_summary.NSW.total_birds || 286} 隻</strong> 實測。`;
+                            if (!data) return;
+                            const obsList = Array.isArray(data.high_risk_observations) ? data.high_risk_observations : [];
+                            const totalObsCount = data.total_risk_obs_count || obsList.length;
+                            const totalBirds = obsList.reduce((sum, o) => sum + (o.howMany || 1), 0);
+
+                            const totalEl = document.getElementById('ebird-total-obs');
+                            if (totalEl && totalBirds > 0) {
+                                totalEl.textContent = `${totalBirds.toLocaleString()} 隻`;
+                                const ptSpan = totalEl.nextElementSibling;
+                                if (ptSpan) ptSpan.textContent = `(${totalObsCount} 處點位)`;
+                            }
+
+                            const nswObs = obsList.filter(o => o.state === 'NSW');
+                            const nswBirds = nswObs.reduce((sum, o) => sum + (o.howMany || 1), 0);
+                            const nswObsCount = (data.state_summary && data.state_summary.NSW) ? data.state_summary.NSW.risk_species_obs : nswObs.length;
+                            const nswEl = document.getElementById('ebird-nsw-obs');
+                            if (nswEl && nswBirds > 0) {
+                                nswEl.innerHTML = `志工與觀鳥家實況回傳，NSW 境內目前有 <strong class="text-amber-300">${nswObsCount} 處點位 / ${nswBirds.toLocaleString()} 隻</strong> 實測。`;
+                            }
+
+                            const timeEl = document.getElementById('ebird-last-updated');
+                            if (timeEl && data.fetched_at_taipei) {
+                                let label = `即時數據更新: ${data.fetched_at_taipei} (Taipei)`;
+                                if (data.fetched_at_utc) {
+                                    const ageDays = (Date.now() - new Date(data.fetched_at_utc).getTime()) / 86400000;
+                                    if (ageDays > 2) {
+                                        label = `⚠️ 資料已 ${Math.floor(ageDays)} 天未更新 (最後更新: ${data.fetched_at_taipei} Taipei)`;
+                                        timeEl.classList.add('text-amber-400');
+                                    }
                                 }
-                                if (data.fetched_at_taipei) {
-                                    const timeEl = document.getElementById('ebird-last-updated');
-                                    if (timeEl) timeEl.textContent = `即時數據更新: ${data.fetched_at_taipei} (Taipei)`;
-                                }
+                                timeEl.textContent = label;
                             }
                         };
                         if (typeof window.ebirdDataEmbedded !== 'undefined') {

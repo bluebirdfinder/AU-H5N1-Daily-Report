@@ -112,6 +112,7 @@
     <script src="assets/js/bird_data.js"></script>
     <script src="assets/js/gbif_bird_data.js"></script>
     <script src="assets/js/movebank_tracks.js"></script>
+    <script src="assets/js/cases_events.js"></script>
 </head>
 
 <body class="min-h-screen pb-12">
@@ -201,19 +202,19 @@
             </div>
 
             <!-- Card 2: Commercial Area Freedom -->
-            <div class="glass-card p-5 space-y-3 border-l-4 border-cyan-500">
+            <div id="card-commercial-status" class="glass-card p-5 space-y-3 border-l-4 border-cyan-500">
                 <div class="flex items-center justify-between text-xs text-slate-400 font-bold uppercase tracking-wider">
                     <span>商業家禽與蛋場狀態</span>
                     <i class="fa-solid fa-warehouse text-cyan-400"></i>
                 </div>
                 <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-black text-cyan-400 font-mono">100%</span>
-                    <span class="text-xs text-cyan-400 font-bold">完美安全</span>
+                    <span id="card-commercial-pct" class="text-4xl font-black text-cyan-400 font-mono">100%</span>
+                    <span id="card-commercial-label" class="text-xs text-cyan-400 font-bold">完美安全</span>
                 </div>
-                <p class="text-xs text-slate-300">
+                <p id="card-commercial-detail" class="text-xs text-slate-300">
                     全澳洲商業家禽、蛋場與乳牛場維持 <strong class="text-white">0 宗感染</strong>。
                 </p>
-                <div class="text-[11px] text-emerald-400 flex items-center gap-1 font-semibold">
+                <div id="card-commercial-badge" class="text-[11px] text-emerald-400 flex items-center gap-1 font-semibold">
                     <i class="fa-solid fa-circle-check"></i> 未觸發 TW APHIA 商業疫區禁令
                 </div>
             </div>
@@ -305,7 +306,7 @@
                         <span class="bg-amber-950 text-amber-300 border border-amber-700 text-[10px] px-2 py-0.5 rounded font-mono font-bold">得分 35</span>
                     </div>
                     <div class="text-amber-400 font-bold text-sm">
-                        22 起確診 (局限沿海帶)
+                        <span id="matrix-nsw-events">22 起確診</span> (局限沿海帶)
                     </div>
                     <p class="text-[11px] text-slate-300 leading-relaxed">
                         含雪梨北灘、肯布拉港與科夫斯港（瀕危赫頓鸌）。結合媒體新聞 ESI 嚴重度加權，目前仍受沿海阻隔，尚未滲入內陸家禽走廊。
@@ -320,7 +321,7 @@
                         </span>
                         <span class="bg-purple-950 text-purple-300 border border-purple-700 text-[10px] px-2 py-0.5 rounded font-mono font-bold">得分 30</span>
                     </div>
-                    <div class="text-purple-300 font-bold text-sm">
+                    <div class="text-purple-300 font-bold text-sm" id="matrix-vic-sa-events">
                         VIC 150起 / SA 271起
                     </div>
                     <p class="text-[11px] text-slate-300 leading-relaxed">
@@ -437,7 +438,7 @@
                                 <i class="fa-solid fa-shield-check text-emerald-400"></i> 0 宗商業感染 (當前)
                             </button>
                             <button id="btn-farm-1" onclick="setCommercialFarmStatus(1)" class="bg-slate-950 border border-slate-800 text-slate-400 p-2.5 rounded-lg font-bold flex items-center justify-center gap-2 hover:border-red-500/50 transition">
-                                <i class="fa-solid fa-triangle-exclamation text-red-400"></i> NSW 商業禽場爆發 1 起 (+75分)
+                                <i class="fa-solid fa-triangle-exclamation text-red-400"></i> NSW 商業禽場爆發 1 起 (強制封頂 100分)
                             </button>
                         </div>
                     </div>
@@ -546,6 +547,7 @@
                         <div class="text-[10px] text-slate-400 pt-0.5 border-t border-slate-800/80 leading-tight">
                             📍 <strong>當前停留態勢：</strong>候鳥主要停留在北部沿海泥灘，尚未大規模南下進入 NSW 內陸農場走廊。
                         </div>
+                        <div id="ebird-freshness-warning" class="hidden text-[10px] text-amber-300 pt-0.5 border-t border-slate-800/80 leading-tight font-bold"></div>
                     </div>
                 </div>
 
@@ -1236,7 +1238,7 @@
                 <div class="glass-card-emerald p-5 space-y-3 rounded-xl relative">
                     <div class="flex items-center justify-between">
                         <span class="bg-emerald-500 text-slate-950 text-xs font-black px-3 py-1 rounded-full uppercase">🟢 低風險區</span>
-                        <span class="font-mono text-emerald-400 font-bold text-xs">Score &lt; 30 (當前現況: 28)</span>
+                        <span class="font-mono text-emerald-400 font-bold text-xs">Score &lt; 30<span id="zone-current-1"></span></span>
                     </div>
                     <h4 class="font-bold text-white text-sm">正常下單與進口 (Normal Sourcing)</h4>
                     <ul class="text-xs text-slate-300 space-y-2 list-disc pl-4">
@@ -1250,7 +1252,7 @@
                 <div class="glass-card-amber p-5 space-y-3 rounded-xl relative">
                     <div class="flex items-center justify-between">
                         <span class="bg-amber-500 text-slate-950 text-xs font-black px-3 py-1 rounded-full uppercase">🟡 中風險區</span>
-                        <span class="font-mono text-amber-400 font-bold text-xs">Score 30 ~ 59</span>
+                        <span class="font-mono text-amber-400 font-bold text-xs">Score 30 ~ 59<span id="zone-current-2"></span></span>
                     </div>
                     <h4 class="font-bold text-white text-sm">安全庫存緩衝與批次加檢 (Buffer Stock)</h4>
                     <ul class="text-xs text-slate-300 space-y-2 list-disc pl-4">
@@ -1264,7 +1266,7 @@
                 <div class="glass-card-crimson p-5 space-y-3 rounded-xl relative">
                     <div class="flex items-center justify-between">
                         <span class="bg-red-600 text-white text-xs font-black px-3 py-1 rounded-full uppercase">🔴 高風險警示</span>
-                        <span class="font-mono text-red-400 font-bold text-xs">Score ≥ 60</span>
+                        <span class="font-mono text-red-400 font-bold text-xs">Score ≥ 60<span id="zone-current-3"></span></span>
                     </div>
                     <h4 class="font-bold text-white text-sm">暫緩下單與啟動替代廠源 (Pause Orders)</h4>
                     <ul class="text-xs text-slate-300 space-y-2 list-disc pl-4">
@@ -1278,7 +1280,6 @@
     </main>
 
     <!-- JavaScript Data & Logic for Dynamic Risk Calculation & Radar Chart -->
-    <script src="assets/js/bird_data.js"></script>
     <script>
         let radarChartInstance = null;
         let isCommercialFarmInfected = 0;
@@ -1292,11 +1293,16 @@
         };
 
         window.addEventListener('load', () => {
-            autoAdjustRiskParameters();
-            initRadarChart();
-            initMigrationGisMap();
-            initTimelineChart();
-            recalculateRisk();
+            // 每一步獨立 try/catch：避免其中一步拋出例外（例如 Chart.js CDN 被企業防火牆擋下）
+            // 導致後面所有步驟（包含決定風險分數的 recalculateRisk()）整串被中斷、永遠不會執行。
+            const steps = [syncCaseEventsFromEmbedded, autoAdjustRiskParameters, initRadarChart, initMigrationGisMap, initTimelineChart, recalculateRisk];
+            for (const step of steps) {
+                try {
+                    step();
+                } catch (e) {
+                    console.error(`[初始化步驟失敗] ${step.name}:`, e);
+                }
+            }
         });
 
         
@@ -1495,7 +1501,7 @@
                     <div style="font-family:sans-serif; min-width: 250px; line-height: 1.5; padding: 2px;">
                         <strong style="color:#38bdf8; font-size:14px; font-weight:800; display:block; margin-bottom:4px;">📍 新南威爾斯州 (NSW 轄區管轄界線)</strong>
                         <div style="font-size:11px; color:#f1f5f9; margin-bottom:3px;">• 台灣防檢署 (TW APHIA) 州級監控管制區</div>
-                        <div style="font-size:11px; color:#fbbf24; font-weight:bold; margin-bottom:3px;">• 當前野鳥確診事件: 22 起 (含雪梨北灘與肯布拉港)</div>
+                        <div style="font-size:11px; color:#fbbf24; font-weight:bold; margin-bottom:3px;">• 當前野鳥確診事件: ${(window.casesEventsEmbedded && window.casesEventsEmbedded.events_by_state && window.casesEventsEmbedded.events_by_state.NSW) || 22} 起 (含雪梨北灘與肯布拉港)</div>
                         <div style="font-size:11px; color:#34d399; font-weight:bold; margin-bottom:4px;">• 商業家禽禽舍: 0 感染 (100% 絕對安全)</div>
                         <div style="font-size:10px; color:#94a3b8; border-top:1px solid rgba(255,255,255,0.15); padding-top:4px;">
                             💡 只要商業家禽維持 0 感染，全州寵物食品享 Area Freedom 清潔宣告
@@ -1890,9 +1896,9 @@
         function syncTimelineDataWithLiveStats() {
             let totalAuCases = 498;
             let totalNswCases = 22;
-            if (typeof window.casesEventsEmbedded !== 'undefined' && Array.isArray(window.casesEventsEmbedded) && window.casesEventsEmbedded.length > 0) {
-                totalAuCases = window.casesEventsEmbedded.length;
-                totalNswCases = window.casesEventsEmbedded.filter(c => c.state === 'NSW' || (c.jurisdiction && c.jurisdiction.includes('NSW'))).length || 22;
+            if (window.casesEventsEmbedded && window.casesEventsEmbedded.events_by_state) {
+                totalAuCases = window.casesEventsEmbedded.total_events || totalAuCases;
+                totalNswCases = window.casesEventsEmbedded.events_by_state.NSW || totalNswCases;
             }
             timelineDataSeries.AU.casesActual[3] = totalAuCases;
             timelineDataSeries.AU.casesProjected[3] = totalAuCases;
@@ -2151,7 +2157,7 @@
             } else {
                 btn1.className = 'bg-red-950 border-2 border-red-500 text-red-200 p-2.5 rounded-lg font-bold flex items-center justify-center gap-2 transition';
                 btn0.className = 'bg-slate-950 border border-slate-800 text-slate-400 p-2.5 rounded-lg font-bold flex items-center justify-center gap-2 hover:border-emerald-500/50 transition';
-                ctrlText.textContent = 'NSW 商業禽場爆發 1 起 (+75分)';
+                ctrlText.textContent = 'NSW 商業禽場爆發 1 起 (強制封頂 100分)';
                 ctrlText.className = 'font-mono text-red-400 font-bold';
             }
             recalculateRisk();
@@ -2234,6 +2240,37 @@
                 banProb.className = 'text-4xl font-black text-emerald-400 font-mono';
                 barFill.className = 'gauge-bar-fill h-full bg-emerald-500';
             }
+
+            // Move the "當前現況" annotation to whichever Decision Zone card the live score actually falls in
+            ['zone-current-1', 'zone-current-2', 'zone-current-3'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = '';
+            });
+            const zoneId = (isCommercialFarmInfected === 1 || totalRisk >= 60) ? 'zone-current-3' : (totalRisk >= 30 ? 'zone-current-2' : 'zone-current-1');
+            const zoneEl = document.getElementById(zoneId);
+            if (zoneEl) zoneEl.textContent = ` (當前現況: ${totalRisk})`;
+
+            // Card 2 商業家禽與蛋場狀態：跟著「商業禽場爆發」模擬開關變色，不再固定顯示安全
+            const commCard = document.getElementById('card-commercial-status');
+            const commPct = document.getElementById('card-commercial-pct');
+            const commLabel = document.getElementById('card-commercial-label');
+            const commDetail = document.getElementById('card-commercial-detail');
+            const commBadge = document.getElementById('card-commercial-badge');
+            if (commCard) {
+                if (isCommercialFarmInfected === 1) {
+                    commCard.className = 'glass-card p-5 space-y-3 border-l-4 border-red-500';
+                    if (commPct) { commPct.textContent = '0%'; commPct.className = 'text-4xl font-black text-red-400 font-mono'; }
+                    if (commLabel) { commLabel.textContent = '已破口'; commLabel.className = 'text-xs text-red-400 font-bold'; }
+                    if (commDetail) commDetail.innerHTML = 'NSW 商業家禽場出現 <strong class="text-red-300">確診個案</strong>，Area Freedom 狀態解除。';
+                    if (commBadge) { commBadge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> 已觸發 TW APHIA 商業疫區禁令模擬情境'; commBadge.className = 'text-[11px] text-red-400 flex items-center gap-1 font-semibold'; }
+                } else {
+                    commCard.className = 'glass-card p-5 space-y-3 border-l-4 border-cyan-500';
+                    if (commPct) { commPct.textContent = '100%'; commPct.className = 'text-4xl font-black text-cyan-400 font-mono'; }
+                    if (commLabel) { commLabel.textContent = '完美安全'; commLabel.className = 'text-xs text-cyan-400 font-bold'; }
+                    if (commDetail) commDetail.innerHTML = '全澳洲商業家禽、蛋場與乳牛場維持 <strong class="text-white">0 宗感染</strong>。';
+                    if (commBadge) { commBadge.innerHTML = '<i class="fa-solid fa-circle-check"></i> 未觸發 TW APHIA 商業疫區禁令'; commBadge.className = 'text-[11px] text-emerald-400 flex items-center gap-1 font-semibold'; }
+                }
+            }
         }
 
         function autoAdjustRiskParameters() {
@@ -2264,11 +2301,22 @@
             let nswLiveObs = 0;
             if (typeof window.ebirdDataEmbedded !== 'undefined' && window.ebirdDataEmbedded.high_risk_observations) {
                 const obsList = window.ebirdDataEmbedded.high_risk_observations;
+                const nswObsList = obsList.filter(o => o.state === 'NSW');
                 totalLiveBirds = obsList.reduce((sum, o) => sum + (o.howMany || 1), 0);
-                nswLiveObs = obsList.filter(o => o.state === 'NSW').length;
+                nswLiveObs = nswObsList.length;
+                const nswLiveBirds = nswObsList.reduce((sum, o) => sum + (o.howMany || 1), 0);
                 const raCountEl = document.getElementById('ra-ebird-live-count');
                 if (raCountEl && totalLiveBirds > 0) {
-                    raCountEl.innerHTML = `${totalLiveBirds.toLocaleString()} 隻 <span class="text-slate-400 font-normal">(NSW: ${window.ebirdDataEmbedded.state_summary?.NSW?.total_birds || 286}隻)</span>`;
+                    raCountEl.innerHTML = `${totalLiveBirds.toLocaleString()} 隻 <span class="text-slate-400 font-normal">(NSW: ${nswLiveBirds.toLocaleString()}隻)</span>`;
+                }
+
+                const freshnessEl = document.getElementById('ebird-freshness-warning');
+                if (freshnessEl && window.ebirdDataEmbedded.fetched_at_utc) {
+                    const ageDays = (Date.now() - new Date(window.ebirdDataEmbedded.fetched_at_utc).getTime()) / 86400000;
+                    if (ageDays > 2) {
+                        freshnessEl.textContent = `⚠️ eBird 資料已 ${Math.floor(ageDays)} 天未更新，以上實測數字非即時（最後抓取: ${window.ebirdDataEmbedded.fetched_at_taipei || '未知'}）`;
+                        freshnessEl.classList.remove('hidden');
+                    }
                 }
             }
 
@@ -2281,11 +2329,6 @@
             const migSelect = document.getElementById('select-migratory');
             if (migSelect) {
                 migSelect.value = String(autoMigratoryScore);
-            }
-
-            const nswSelect = document.getElementById('select-nsw-events');
-            if (nswSelect) {
-                nswSelect.value = '35'; // 22 official active events in NSW
             }
 
             const autoBadge = document.getElementById('migratory-auto-badge');
@@ -2302,8 +2345,63 @@
             document.getElementById('select-housing').value = '20';
             document.getElementById('select-vector').value = '30';
             setCommercialFarmStatus(0);
+            syncCaseEventsFromEmbedded();
             autoAdjustRiskParameters();
             recalculateRisk();
+        }
+
+        // ==========================================
+        // Live Case/Event Sync (window.casesEventsEmbedded)
+        // ==========================================
+        // 讀取 h5n1.py write_cases_events_js() 寫出的 assets/js/cases_events.js，
+        // 讓本頁的 NSW/VIC/SA 事件數字與 index.html 的 window.OFFICIAL_STATS 永遠對齊，
+        // 不再需要每次官方數字變動就手動改這個頁面裡好幾處寫死的舊快照。
+        function tierForNswEvents(n) {
+            if (n < 20) return 15;
+            if (n <= 50) return 35;
+            if (n <= 100) return 60;
+            return 90;
+        }
+
+        function syncCaseEventsFromEmbedded() {
+            const embedded = window.casesEventsEmbedded;
+            if (!embedded || !embedded.events_by_state) return;
+
+            const totalEvents = embedded.total_events || 0;
+            const nswEvents = embedded.events_by_state.NSW || 0;
+            const vicEvents = embedded.events_by_state.VIC || 0;
+            const saEvents = embedded.events_by_state.SA || 0;
+
+            const kpiEl = document.getElementById('kpi-nsw-events-val');
+            if (kpiEl) kpiEl.textContent = nswEvents;
+
+            const matrixNswEl = document.getElementById('matrix-nsw-events');
+            if (matrixNswEl) matrixNswEl.textContent = `${nswEvents} 起確診`;
+
+            const matrixVicSaEl = document.getElementById('matrix-vic-sa-events');
+            if (matrixVicSaEl) matrixVicSaEl.textContent = `VIC ${vicEvents}起 / SA ${saEvents}起`;
+
+            ['modal-total-events-1', 'modal-total-events-2'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = totalEvents;
+            });
+            ['modal-nsw-events-1', 'modal-nsw-events-2'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = nswEvents;
+            });
+
+            const tierScore = tierForNswEvents(nswEvents);
+            const nswSelect = document.getElementById('select-nsw-events');
+            if (nswSelect) {
+                nswSelect.value = String(tierScore);
+                const opt35 = nswSelect.querySelector('option[value="35"]');
+                if (opt35) opt35.textContent = `🟡 NSW 野鳥確診溫和增加 (20 ~ 50 起, 當前現況 ${nswEvents} 起, 得分 35)`;
+            }
+            const ctrlValEl = document.getElementById('ctrl-val-nsw-events');
+            if (ctrlValEl) {
+                const tierLabels = { 15: '零星沿海確診', 35: '野鳥確診溫和增加', 60: '野鳥確診快速竄升', 90: '野鳥爆發大規模群聚死亡' };
+                ctrlValEl.textContent = `${tierLabels[tierScore]} (當前現況 ${nswEvents} 起, 得分 ${tierScore})`;
+            }
         }
     
         // ==========================================
@@ -2512,7 +2610,7 @@
                         </li>
                         <li>
                             <strong class="text-white">CSIRO 澳洲疾病預防中心 (ACDP) & 農業部 (DAFF)：</strong>
-                            全澳野鳥確診事件真實通報數（當前 484 起，NSW 22 起含雪梨北灘與肯布拉港），全澳商業禽舍維持 <strong class="text-emerald-300">0 宗感染</strong>。
+                            全澳野鳥確診事件真實通報數（當前 <span id="modal-total-events-1">484</span> 起，NSW <span id="modal-nsw-events-1">22</span> 起含雪梨北灘與肯布拉港），全澳商業禽舍維持 <strong class="text-emerald-300">0 宗感染</strong>。
                         </li>
                     </ul>
                 </div>
@@ -2558,7 +2656,7 @@
                     <ul class="list-disc pl-5 space-y-1.5 text-slate-300 text-[11px]">
                         <li>
                             <strong class="text-amber-300">歷史確診數據段 (2026.06 ~ 2026.09)：</strong>
-                            引述 DAFF/CSIRO 實際通報（全澳 484 起，NSW 22 起），真實反映首波亞南極海鳥登陸時之沿海確診。
+                            引述 DAFF/CSIRO 實際通報（全澳 <span id="modal-total-events-2">484</span> 起，NSW <span id="modal-nsw-events-2">22</span> 起），真實反映首波亞南極海鳥登陸時之沿海確診。
                         </li>
                         <li>
                             <strong class="text-cyan-300">雙波峰推演數據段 (2026.10 ~ 2028.06)：</strong>

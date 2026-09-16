@@ -5,10 +5,10 @@ description: Audit and reconcile the AU H5N1 monitoring dashboard (index.html/in
 
 # H5N1 Dashboard Data Audit
 
-這個 repo 有兩種頁面，資料新鮮度完全不同，稽核前必須先分清楚：
+這個 repo 有兩種頁面，資料新鮮度不完全相同，稽核前必須先分清楚：
 
 - **`index.html` / `index_en.html`**：`h5n1.py` 的 `compile_template()` 每次跑都會從 `report_template.html` 重新產生，數字理論上是活的。
-- **`risk_assessment.html` / `risk_assessment_en.html` / `risk_assessment_slides*.html`**：`h5n1.py` 只有 `sync_risk_assessment_weekly()` 會碰，而且只改歷次週報歸檔彈窗的連結。裡面幾乎所有分數、州別事件數、候鳥數字都是**人工寫死的靜態文字**，不會因為 `cases_events.json` 或 `bird_data.json` 更新而自動改變。過去的稽核已證實這裡會長期凍結在某次手動編輯當下的數字（例如 2026-09-08 v2.9.0 的 NSW=22 一路凍結到 09-16，實際已經是 32）。
+- **`risk_assessment.html` / `risk_assessment_en.html` / `risk_assessment_slides*.html`**：`h5n1.py` 只有 `sync_risk_assessment_weekly()` 會碰模板本身（歷次週報歸檔彈窗的連結），但**自 2026-09-16 起**事件數字（NSW/VIC/SA、全澳總數、方法論 Modal 裡的數字）已改為在頁面載入時透過 `syncCaseEventsFromEmbedded()` 讀 `assets/js/cases_events.js`（`window.casesEventsEmbedded`，由 `h5n1.py` 的 `write_cases_events_js()` 產生）動態校正，不再是死綁定。**候鳥數字（eBird 現場實測）與大部分敘述性文字仍是靜態**，還是要照下面的方法核對。稽核前先確認 `assets/js/cases_events.js` 存在且 `syncCaseEventsFromEmbedded()`/`write_cases_events_js()` 這兩個函式還在——如果哪次改版被移除或改壞了，就會退回舊的「全部寫死」狀態，屬於嚴重回歸。
 
 **核心原則：永遠不要相信 HTML 裡顯示的數字本身，一定要拿它去跟來源 JSON 重新算一次再比對。**
 

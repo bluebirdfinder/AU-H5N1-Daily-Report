@@ -819,8 +819,18 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
         if sum(dynamic_species.values()) > 0:
             stats["species_counts"] = dynamic_species
 
+        # 以 cases_events.json 自行重新統計的確診事件數/州別分布覆寫寫死的舊快照數字。
+        # compute_stats_from_cases() 原本就是為了這個用途而寫的「DAFF 官網無法連線時的權威回退方案」，
+        # 但過去從未真正被呼叫過，導致 DAFF 連線失敗時永遠退回這裡最上方寫死的舊數字（曾長期停留在
+        # 484 起/NSW 22 起，即使 cases_events.json 早已更新到 541 起/NSW 32 起）。
+        computed = compute_stats_from_cases(cases_data)
+        if computed["total_events"] > 0:
+            stats["total_events"] = computed["total_events"]
+            stats["events_by_state"] = computed["events_by_state"]
+            stats["source"] = "cases_json"
+
     if not daff_soup:
-        print(f"[DAFF 官網無法連線] 以預設官方最新數據計算: {stats['total_events']} 起確診事件 / {stats['negative_events']} 起陰性排除")
+        print(f"[DAFF 官網無法連線] 以 {stats['source']} 數據計算: {stats['total_events']} 起確診事件 / {stats['negative_events']} 起陰性排除")
         return stats
 
     text = re.sub(r"\s+", " ", daff_soup.get_text(" ", strip=True))
@@ -2001,7 +2011,12 @@ def main():
     events_cases, official_stats = fetch_daff_updates()
     events_cases = [c for c in events_cases if c.get("id", "").startswith("EVENT-")]
     save_cases_to_json(events_cases, "cases_events.json")
-    
+
+    try:
+        write_cases_events_js(official_stats)
+    except Exception as e:
+        print(f"[Cases Events 同步例外] {e}")
+
     events_cases.sort(key=lambda x: x.get("notify_date", ""))
     
     historical_cases = load_cases_from_json("cases.json")
@@ -2479,6 +2494,37 @@ def fetch_ebird_data():
         print(f"[eBird API] ✅ 成功同步寫入 assets/js/bird_data.js (免 fetch 零阻擋通道)")
     except Exception as e:
         print(f"[eBird API] 寫入 bird_data.json/js 失敗: {str(e)[:80]}")
+
+
+def write_cases_events_js(official_stats):
+    """
+    將官方權威統計 (official_stats，與 index.html 的 window.OFFICIAL_STATS 同一份資料)
+    同步輸出為 assets/js/cases_events.js，供 risk_assessment.html / risk_assessment_en.html
+    等未走 compile_template() 編譯管線的半靜態頁面透過 window.casesEventsEmbedded 讀取。
+
+    背景：risk_assessment.html 原本就寫了讀取 window.casesEventsEmbedded 的程式碼
+    (syncTimelineDataWithLiveStats())，但從未有任何檔案真正賦值這個全域，是死綁定，
+    導致該頁的 NSW/SA/VIC/TAS 事件數長期停留在人工編輯當下的舊快照。這裡補上這一份
+    AGENT.md 原本就要求要有的 assets/js/cases_events.js，讓死綁定變成真正活的資料源，
+    也讓風險評估頁與疫情監控頁的事件數字永遠對齊同一份 official_stats，不必再各自維護。
+    """
+    payload = {
+        "generated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "total_events": official_stats.get("total_events", 0),
+        "negative_events": official_stats.get("negative_events", 0),
+        "hotline_reports": official_stats.get("hotline_reports", 0),
+        "events_by_state": official_stats.get("events_by_state", {}),
+        "species_counts": official_stats.get("species_counts", {}),
+        "source": official_stats.get("source", "unknown"),
+    }
+    try:
+        os.makedirs("assets/js", exist_ok=True)
+        with open("assets/js/cases_events.js", "w", encoding="utf-8") as f:
+            f.write("window.casesEventsEmbedded = " + json.dumps(payload, ensure_ascii=False, indent=2) + ";\n")
+        nsw_n = payload["events_by_state"].get("NSW", 0)
+        print(f"[Cases Events 同步] ✅ 成功寫入 assets/js/cases_events.js (全澳 {payload['total_events']} 起 / NSW {nsw_n} 起)")
+    except Exception as e:
+        print(f"[Cases Events 同步失敗] {str(e)[:80]}")
 
 
 # ==================== ALA API (Atlas of Living Australia) 免 Key 候鳥數據備援模組 ====================

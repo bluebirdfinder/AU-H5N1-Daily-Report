@@ -15,8 +15,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="assets/js/purina_auth.js"></script>
     <script src="assets/js/bird_data.js"></script>
-    <script src="assets/js/gbif_bird_data.js"></script>
     <script src="assets/js/movebank_tracks.js"></script>
+    <script src="assets/js/cases_events.js"></script>
 
     <style>
         body {
@@ -346,15 +346,37 @@
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         const updateHud = (data) => {
-                            if (data && data.total_risk_obs_count) {
-                                if (data.state_summary && data.state_summary.NSW) {
-                                    const nswEl = document.getElementById('ebird-nsw-obs');
-                                    if (nswEl) nswEl.innerHTML = `Real-time volunteer sightings: NSW has <strong class="text-amber-300">${data.state_summary.NSW.risk_species_obs} transects / ${data.state_summary.NSW.total_birds || 286} birds</strong> observed.`;
+                            if (!data) return;
+                            const obsList = Array.isArray(data.high_risk_observations) ? data.high_risk_observations : [];
+                            const totalObsCount = data.total_risk_obs_count || obsList.length;
+                            const totalBirds = obsList.reduce((sum, o) => sum + (o.howMany || 1), 0);
+
+                            const totalEl = document.getElementById('ebird-total-obs');
+                            if (totalEl && totalBirds > 0) {
+                                totalEl.textContent = `${totalBirds.toLocaleString()} Birds`;
+                                const ptSpan = totalEl.nextElementSibling;
+                                if (ptSpan) ptSpan.textContent = `(${totalObsCount} Transects)`;
+                            }
+
+                            const nswObs = obsList.filter(o => o.state === 'NSW');
+                            const nswBirds = nswObs.reduce((sum, o) => sum + (o.howMany || 1), 0);
+                            const nswObsCount = (data.state_summary && data.state_summary.NSW) ? data.state_summary.NSW.risk_species_obs : nswObs.length;
+                            const nswEl = document.getElementById('ebird-nsw-obs');
+                            if (nswEl && nswBirds > 0) {
+                                nswEl.innerHTML = `Real-time volunteer sightings: NSW has <strong class="text-amber-300">${nswObsCount} transects / ${nswBirds.toLocaleString()} birds</strong> observed.`;
+                            }
+
+                            const timeEl = document.getElementById('ebird-last-updated');
+                            if (timeEl && data.fetched_at_taipei) {
+                                let label = `Live Synced: ${data.fetched_at_taipei} (Taipei)`;
+                                if (data.fetched_at_utc) {
+                                    const ageDays = (Date.now() - new Date(data.fetched_at_utc).getTime()) / 86400000;
+                                    if (ageDays > 2) {
+                                        label = `⚠️ Data stale for ${Math.floor(ageDays)} days (last updated: ${data.fetched_at_taipei} Taipei)`;
+                                        timeEl.classList.add('text-amber-400');
+                                    }
                                 }
-                                if (data.fetched_at_taipei) {
-                                    const timeEl = document.getElementById('ebird-last-updated');
-                                    if (timeEl) timeEl.textContent = `Live Synced: ${data.fetched_at_taipei} (Taipei)`;
-                                }
+                                timeEl.textContent = label;
                             }
                         };
                         if (typeof window.ebirdDataEmbedded !== 'undefined') {
