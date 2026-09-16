@@ -1,15 +1,15 @@
 window.casesEventsEmbedded = {
-  "generated_at_utc": "2026-09-16T08:57:14Z",
-  "total_events": 541,
+  "generated_at_utc": "2026-09-16T10:35:21Z",
+  "total_events": 551,
   "negative_events": 2450,
-  "hotline_reports": 36800,
+  "hotline_reports": 45115,
   "events_by_state": {
     "WA": 10,
-    "SA": 295,
-    "VIC": 165,
+    "SA": 299,
+    "VIC": 169,
     "NSW": 32,
     "QLD": 2,
-    "TAS": 37,
+    "TAS": 38,
     "NT": 0,
     "ACT": 0
   },
@@ -23,5 +23,5 @@ window.casesEventsEmbedded = {
     "Little Penguin": 1,
     "Falcon & Other": 5
   },
-  "source": "cases_json"
+  "source": "live"
 };
