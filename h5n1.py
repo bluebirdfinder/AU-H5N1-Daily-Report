@@ -2751,36 +2751,50 @@ def fetch_movebank_live_tracks(mb_user, mb_pass):
 
     studies = _parse_csv(resp.text)
 
-    # 2026-09-16 修正：Movebank 帳號預設就能「看到」全平台公開 study 的中繼資料（本帳號實測
-    # 一次可見 2059 / 8769 個），絕大多數跟本專案的高風險澳洲海鳥無關（第一次真實測試就抓到
-    # 大食蟻獸、塑膠瓶追蹤、孟買紅鶴這種不相關 study，且多半沒有真正的下載權限）。
-    # 改為：優先挑「真的有下載權限」的 study，並用本專案關注的高風險候鳥物種關鍵字篩選，
-    # 避免抓到帳號能看到、但跟 H5N1 澳洲候鳥監控完全無關的公開 study。
+    # 2026-09-16 修正 (第一輪)：Movebank 帳號預設就能「看到」全平台公開 study 的中繼資料
+    # （本帳號實測一次可見 2059 / 8769 個），絕大多數跟本專案的高風險澳洲海鳥無關（第一次真實
+    # 測試就抓到大食蟻獸、塑膠瓶追蹤、孟買紅鶴這種不相關 study，且多半沒有真正的下載權限）。
+    # 2026-09-16 修正 (第二輪)：光用物種關鍵字篩選會抓到全球同物種但跟澳洲無關的 study
+    # （實測抓到荷蘭/比利時的銀鷗、歐亞杓鷸研究，不是澳洲候鳥），改用計分排序：
+    # 「名稱含 Australia」> 「南半球座標 (main_location_lat < 0)」> 「高風險物種關鍵字」，
+    # 同分再以是否有下載權限排序，盡量優先嘗試跟本專案真正相關的 study。
     HIGH_RISK_SPECIES_KEYWORDS = [
         "shearwater", "godwit", "petrel", "albatross", "knot", "tern",
         "skua", "gull", "stint", "sandpiper", "plover", "curlew",
         "ardenna", "limosa", "macronectes", "thalassarche", "calidris", "thalasseus",
-        "australia", "australian",
     ]
 
-    def _is_relevant(s):
+    def _relevance_score(s):
         name = (s.get("name") or "").lower()
-        return any(kw in name for kw in HIGH_RISK_SPECIES_KEYWORDS)
+        score = 0
+        if "australia" in name or "australian" in name:
+            score += 100
+        try:
+            if float(s.get("main_location_lat", "")) < 0:
+                score += 20
+        except (ValueError, TypeError):
+            pass
+        if any(kw in name for kw in HIGH_RISK_SPECIES_KEYWORDS):
+            score += 10
+        if s.get("i_have_download_access", "").lower() == "true":
+            score += 5
+        return score
 
     downloadable = [s for s in studies if s.get("i_have_download_access", "").lower() == "true"]
     visible_only = [s for s in studies if s.get("i_can_see_data", "").lower() == "true"]
     print(f"[Movebank API] 帳號有下載權限 {len(downloadable)} 個 / 可見中繼資料 {len(visible_only)} 個 / 全站共 {len(studies)} 個 study")
 
-    relevant_downloadable = [s for s in downloadable if _is_relevant(s)]
-    candidates = relevant_downloadable or downloadable or [s for s in visible_only if _is_relevant(s)] or visible_only
-    if not candidates:
+    pool = downloadable or visible_only
+    if not pool:
         raise ValueError("帳號名下沒有任何可讀取資料的 study")
-    print(f"[Movebank API] 篩選後採用 {len(candidates)} 個候選 study（優先：有下載權限 + 物種關鍵字相符）")
+    ranked = sorted(pool, key=_relevance_score, reverse=True)
+    candidates = [s for s in ranked if _relevance_score(s) > 0] or ranked
+    print(f"[Movebank API] 依相關性排序後採用前 {min(len(candidates), 10)} 個候選 study（最高分: {ranked[0].get('name')!r} = {_relevance_score(ranked[0])} 分）")
 
     since = (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y%m%d000000000")
     live_studies = []
 
-    for study in candidates[:6]:
+    for study in candidates[:10]:
         study_id = study.get("id")
         study_name = study.get("name") or f"Movebank Study {study_id}"
         if not study_id:
