@@ -577,6 +577,7 @@
             border-left-color: var(--accent-emerald);
         }
     </style>
+    <script src="assets/js/cases_events.js"></script>
 </head>
 <body>
 
@@ -626,17 +627,17 @@
                     <div class="card alert-card">
                         <div class="card-icon"><i class="fa-solid fa-virus"></i></div>
                         <div class="card-title">全國確診總數</div>
-                        <div class="stat-number crimson">484 <span style="font-size:18px;">起</span></div>
+                        <div class="stat-number crimson"><span data-bind="total-events">484</span> <span style="font-size:18px;">起</span></div>
                         <div class="stat-change"><i class="fa-solid fa-arrow-trend-up"></i> 一週內激增 +137 起</div>
-                        <div class="card-desc" style="margin-top: 10px;">自上週一 (8/24) 約 347 起爆發增長至 484 起。</div>
+                        <div class="card-desc" style="margin-top: 10px;">自上週一 (8/24) 約 347 起爆發增長至 <span data-bind="total-events">484</span> 起。</div>
                     </div>
 
                     <div class="card">
                         <div class="card-icon" style="color: var(--accent-amber); background: rgba(255,184,0,0.15);"><i class="fa-solid fa-location-dot"></i></div>
                         <div class="card-title">新南威爾斯州 (NSW)</div>
-                        <div class="stat-number" style="color: var(--accent-amber);">22 <span style="font-size:18px;">起</span></div>
+                        <div class="stat-number" style="color: var(--accent-amber);"><span data-bind="nsw-events">22</span> <span style="font-size:18px;">起</span></div>
                         <div class="stat-change" style="background: rgba(255,184,0,0.15); color: var(--accent-amber);"><i class="fa-solid fa-plus"></i> 一週增加 +5 起</div>
-                        <div class="card-desc" style="margin-top: 10px;">由上週 17 起增至 22 起 (病毒首度進入雪梨都會圈)。</div>
+                        <div class="card-desc" style="margin-top: 10px;">由上週 17 起增至 <span data-bind="nsw-events">22</span> 起 (病毒首度進入雪梨都會圈)。</div>
                     </div>
 
                     <div class="card emerald-card">
@@ -768,9 +769,9 @@
 
                 <div class="grid-3" style="margin-bottom: 16px;">
                     <div class="card">
-                        <div class="card-title"><i class="fa-solid fa-location-pin" style="color: var(--accent-amber);"></i> 確診個案累計 22 起</div>
+                        <div class="card-title"><i class="fa-solid fa-location-pin" style="color: var(--accent-amber);"></i> 確診個案累計 <span data-bind="nsw-events">22</span> 起</div>
                         <div class="card-desc">
-                            全州確診事件增至 <b>22 起</b>。最新定點突破至<b>雪梨北灘 (Warriewood)</b> 大鳳頭燕鷗、<b>肯布拉港</b>與中北岸<b>科夫斯港</b>瀕危赫頓鸌。
+                            全州確診事件增至 <b><span data-bind="nsw-events">22</span> 起</b>。最新定點突破至<b>雪梨北灘 (Warriewood)</b> 大鳳頭燕鷗、<b>肯布拉港</b>與中北岸<b>科夫斯港</b>瀕危赫頓鸌。
                         </div>
                     </div>
 
@@ -837,7 +838,7 @@
                     <div class="header-date">2026.06.W3 – 2026.09.W1</div>
                 </div>
                 <h2 class="slide-title"><i class="fa-solid fa-chart-line" style="color: var(--accent-cyan)"></i> 澳洲疫情統計摘要與每週增長趨勢</h2>
-                <p class="slide-subtitle">全澳累計 484 起確診事件之官方數據摘要與每週增長曲線 (WEEKLY EPI-CURVE)</p>
+                <p class="slide-subtitle">全澳累計 <span data-bind="total-events">484</span> 起確診事件之官方數據摘要與每週增長曲線 (WEEKLY EPI-CURVE)</p>
 
                 <div class="grid-2">
                     <!-- Left: Core Summary Card -->
@@ -845,8 +846,8 @@
                         <div>
                             <div class="card-title" style="color: var(--accent-cyan);"><i class="fa-solid fa-clipboard-list"></i> 全澳疫情核心數據摘要</div>
                             <ul class="list-styled" style="margin-top: 10px; gap: 8px;">
-                                <li><b>全澳確診總數：</b><span class="badge-pill badge-red" style="font-size:14px;">484 起確診事件</span> (單週激增 +137 起)</li>
-                                <li><b>通報與排除：</b><span class="badge-pill badge-cyan">1,273 起</span> 陰性排除 / <span class="badge-pill badge-cyan">34,358 筆</span> 熱線通報</li>
+                                <li><b>全澳確診總數：</b><span class="badge-pill badge-red" style="font-size:14px;"><span data-bind="total-events">484</span> 起確診事件</span> (單週激增 +137 起)</li>
+                                <li><b>通報與排除：</b><span class="badge-pill badge-cyan"><span data-bind="negative-events">1,273</span> 起</span> 陰性排除 / <span class="badge-pill badge-cyan"><span data-bind="hotline-reports">34,358</span> 筆</span> 熱線通報</li>
                                 <li><b>商業產業防線：</b><span class="badge-pill badge-green">100% 完美零確診</span> (家禽、蛋場與乳牛場安全)</li>
                                 <li><b>人類公衛風險：</b><span class="badge-pill badge-green">極低風險等級</span></li>
                             </ul>
@@ -855,12 +856,12 @@
                         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; margin-top: 12px;">
                             <div style="font-size: 12px; color: var(--text-secondary); font-weight: 700; margin-bottom: 6px;">🏛️ 各州與行政區確診統計 (Events By Territory)</div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 13px; font-family: 'Outfit', sans-serif;">
-                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 南澳 (SA): <strong style="color:#fff;">271 起</strong></div>
-                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 維州 (VIC): <strong style="color:#fff;">150 起</strong></div>
-                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 塔州 (TAS): <strong style="color:#fff;">29 起</strong></div>
-                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 新州 (NSW): <strong style="color:#fff;">22 起</strong></div>
-                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 西澳 (WA): <strong style="color:#fff;">10 起</strong></div>
-                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 昆州 (QLD): <strong style="color:#fff;">2 起</strong></div>
+                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 南澳 (SA): <strong style="color:#fff;"><span data-bind="sa-events">271</span> 起</strong></div>
+                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 維州 (VIC): <strong style="color:#fff;"><span data-bind="vic-events">150</span> 起</strong></div>
+                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 塔州 (TAS): <strong style="color:#fff;"><span data-bind="tas-events">29</span> 起</strong></div>
+                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 新州 (NSW): <strong style="color:#fff;"><span data-bind="nsw-events">22</span> 起</strong></div>
+                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 西澳 (WA): <strong style="color:#fff;"><span data-bind="wa-events">10</span> 起</strong></div>
+                                <div><i class="fa-solid fa-caret-right" style="color:var(--accent-amber);"></i> 昆州 (QLD): <strong style="color:#fff;"><span data-bind="qld-events">2</span> 起</strong></div>
                             </div>
                         </div>
                     </div>
@@ -1210,8 +1211,35 @@
             });
         }
 
+        // 2026-09-16 修復：本檔案原本完全沒有讀取 cases_events.js，NSW/全澳/各州事件數與陰性排除/熱線通報數字
+        // 永遠停在上次人工編輯這份簡報時寫死的舊值。現在改為載入時動態校正「當前累計數字」；
+        // 「上週 X 起」這類週間比較敘述文字維持人工撰寫，本次不自動改寫（缺乏可靠的「上週」資料來源，
+        // 硬猜會製造出看起來精確、實際是編造的假趨勢，比維持靜態的舊敘述風險更高）。
+        function syncWeeklySlideCaseEvents() {
+            if (typeof window.casesEventsEmbedded === 'undefined') return;
+            const e = window.casesEventsEmbedded;
+            const bind = (key, value) => {
+                if (typeof value === 'undefined' || value === null) return;
+                document.querySelectorAll(`[data-bind="${key}"]`).forEach(el => {
+                    el.textContent = typeof value === 'number' ? value.toLocaleString('en-US') : value;
+                });
+            };
+            bind('total-events', e.total_events);
+            bind('negative-events', e.negative_events);
+            bind('hotline-reports', e.hotline_reports);
+            if (e.events_by_state) {
+                bind('nsw-events', e.events_by_state.NSW);
+                bind('sa-events', e.events_by_state.SA);
+                bind('vic-events', e.events_by_state.VIC);
+                bind('tas-events', e.events_by_state.TAS);
+                bind('wa-events', e.events_by_state.WA);
+                bind('qld-events', e.events_by_state.QLD);
+            }
+        }
+
         window.addEventListener('load', () => {
-            initSlideEpiChart();
+            try { syncWeeklySlideCaseEvents(); } catch (e) { console.error('[疫情週報] syncWeeklySlideCaseEvents 失敗:', e); }
+            try { initSlideEpiChart(); } catch (e) { console.error('[疫情週報] initSlideEpiChart 失敗:', e); }
         });
 
         updateSlideUI();

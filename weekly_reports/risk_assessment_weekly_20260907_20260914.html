@@ -171,7 +171,7 @@
                     <!-- KPI 3 -->
                     <div class="glass-card p-4 space-y-2 border-l-4 border-blue-500">
                         <div class="text-[11px] text-slate-400 font-bold uppercase">NSW 全州野鳥確診事件</div>
-                        <div class="text-2xl font-black text-white font-mono">22 起事件</div>
+                        <div class="text-2xl font-black text-white font-mono" id="slide-nsw-events-val">22 起事件</div>
                         <p class="text-[11px] text-slate-300 leading-relaxed">
                             含雪梨北灘與肯布拉港海鳥個案，內陸養殖舍與 Blayney 廠區零波及。
                         </p>
@@ -717,6 +717,17 @@
         let slideRadarChartInstance = null;
         let birdataChartInstance = null;
 
+        // 2026-09-16 修復：週報簡報原本完全沒有讀取 cases_events.js，NSW/全澳事件數永遠是編譯當下寫死的舊值
+        function syncSlideCaseEvents() {
+            if (typeof window.casesEventsEmbedded === 'undefined') return;
+            const embedded = window.casesEventsEmbedded;
+            const nswVal = document.getElementById('slide-nsw-events-val');
+            if (nswVal && embedded.events_by_state && typeof embedded.events_by_state.NSW === 'number') {
+                nswVal.textContent = `${embedded.events_by_state.NSW} 起事件`;
+            }
+        }
+        try { syncSlideCaseEvents(); } catch (e) { console.error('[週報簡報] syncSlideCaseEvents 失敗:', e); }
+
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
                 nextSlide();
@@ -933,8 +944,8 @@
             ];
 
             let totalAuCases = 498;
-            if (typeof window.casesEventsEmbedded !== 'undefined' && Array.isArray(window.casesEventsEmbedded) && window.casesEventsEmbedded.length > 0) {
-                totalAuCases = window.casesEventsEmbedded.length;
+            if (typeof window.casesEventsEmbedded !== 'undefined' && typeof window.casesEventsEmbedded.total_events === 'number') {
+                totalAuCases = window.casesEventsEmbedded.total_events;
             }
 
             birdataChartInstance = new Chart(ctx, {

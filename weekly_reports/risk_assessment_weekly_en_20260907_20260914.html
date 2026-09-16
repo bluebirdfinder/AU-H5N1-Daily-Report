@@ -171,7 +171,7 @@
                     <!-- KPI 3 -->
                     <div class="glass-card p-4 space-y-2 border-l-4 border-blue-500">
                         <div class="text-[11px] text-slate-400 font-bold uppercase">NSW Wild Bird Confirmed Cases</div>
-                        <div class="text-2xl font-black text-white font-mono">22 Events</div>
+                        <div class="text-2xl font-black text-white font-mono" id="slide-nsw-events-val">22 Events</div>
                         <p class="text-[11px] text-slate-300 leading-relaxed">
                             Includes Sydney Northern Beaches & Port Kembla cases; 0 impact on inland farms or Blayney plant.
                         </p>
@@ -719,6 +719,17 @@
         let slideGisMapInstance = null;
         let slideRadarChartInstance = null;
         let birdataChartInstance = null;
+
+        // 2026-09-16 fix: slide deck never read cases_events.js before; NSW event count was frozen at compile-time static value
+        function syncSlideCaseEvents() {
+            if (typeof window.casesEventsEmbedded === 'undefined') return;
+            const embedded = window.casesEventsEmbedded;
+            const nswVal = document.getElementById('slide-nsw-events-val');
+            if (nswVal && embedded.events_by_state && typeof embedded.events_by_state.NSW === 'number') {
+                nswVal.textContent = `${embedded.events_by_state.NSW} Events`;
+            }
+        }
+        try { syncSlideCaseEvents(); } catch (e) { console.error('[Weekly Slides] syncSlideCaseEvents failed:', e); }
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
