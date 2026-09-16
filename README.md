@@ -33,7 +33,7 @@
 - **BioResponse NSW 前線野外公務員專用 App**：新州國家公園管理員專用應變 App，提供 24hr 動物疾病緊急專線 (`1800 675 888`)。
 
 ### 5. 🤖 Gemini AI 全網情報整合 (DAFF + 各州政策 + 新聞 RSS + Gemini Search Grounding)
-- **純事件計數規範**：對齊 DAFF 官方最新國際標準：**全澳 498 起確診事件 (Positive Events)**、**2,450 起陰性排除事件** 與 **36,800 筆熱線通報**。
+- **純事件計數規範**：對齊 DAFF 官方最新國際標準統計，事件總數隨每日抓取動態更新（本文件版本歷史所載數字僅為撰寫當下快照，即時數字請以 `index.html`/`assets/js/cases_events.js` 為準）。
 - **商業禽場維持 100% 零感染**：全澳所有商業家禽、蛋場、乳牛與豬場維持「0 確診」完美防線 (Area Freedom Status)。
 
 ---
@@ -45,6 +45,16 @@
 2. **覆核與新聞班次（台灣 07:00 / 澳洲 AEST 09:00 / 23:00 UTC）**：隔日早晨覆核，即時捕捉各州官網與澳洲媒體 RSS 最新事件。
 
 ---
+
+### v2.10.0 (2026-09-16)
+- 🔍 **Claude Code 首次全專案架構稽核與資料完整性修復**：
+  - 逐區塊比對 `index.html`/`risk_assessment.html` 顯示數字與 `cases_events.json`/`bird_data.json` 實際內容，修復 NSW/SA/VIC/TAS 事件數長期停留在 2026-09-08 舊快照（頁面顯示 22 起，資料庫實際已達 32 起）的問題。
+  - 根因：`parse_daff_official_stats()` 離線 fallback 使用寫死字典，而非呼叫既有的 `compute_stats_from_cases()` 權威回退方案；已修正並新增 `write_cases_events_js()` 產出 `assets/js/cases_events.js`，讓 `risk_assessment.html` 原本的死綁定變成真正動態同步。
+- 🦅 **修復候鳥「現場實測」數字停滯問題**：修正 `state_summary.NSW.total_birds` 不存在欄位造成的永遠 fallback bug；補上首頁候鳥總數大字缺失的 JS 綁定；新增候鳥資料超過 2 天未更新時的「⚠️ 資料已過期」警示。
+- 🛡️ **修復風險評估頁初始化鏈連鎖失敗風險**：Playwright 實測發現單一步驟失敗（如 CDN 被防火牆擋下）會導致後續所有初始化（含風險分數計算）整串不執行，已改為逐步獨立 try/catch。
+- 🧹 修正 Decision Zone 分數矛盾、商業禽場按鈕文字與實際邏輯不符、Card 2 未隨模擬器連動等多處內部不一致。
+- 📚 新增 `CLAUDE.md` 與 `.claude/skills/h5n1-data-audit/`，記錄本輪稽核發現與標準稽核流程，供未來維護參考。
+- ⚠️ 已知未修復：`EBIRD_API_KEY` secret 狀態待人工確認、`ala_bird_data.json` 抓取從未成功、`purina_auth.js` 存取密碼門僅為前端裝飾無真實保密效果。詳見 `CLAUDE.md`。
 
 ### v2.9.5 (2026-09-08)
 - 🚨 **確立最高指導原則：NSW 商業家禽場「零感染 (Area Freedom)」為唯一生死防線 (`AGENTS.md`)**：
@@ -139,8 +149,11 @@
 * **`h5n1_weekly_slides.html`**：**16:9 網頁版高階簡報投影片**。
 * **`index.html` / `index_en.html`**：編譯後生成的正式雙語動態報告網頁。
 * **`h5n1.py`**：自動爬取官方、新聞 RSS、eBird API 與 ALA API 之核心 Python 引擎。
-* **`cases_events.json`**：**動態事件資料庫** (484 起 Positive Events 點位與屬性紀錄)。
+* **`cases_events.json`**：**動態事件資料庫** (542 起 Positive Events 點位與屬性紀錄，唯一 ground truth)。
 * **`cases.json`**：**歷史單鳥隻數資料庫** (236 隻凍結點位紀錄)。
+* **`assets/js/cases_events.js`**：**`cases_events.json`/`official_stats` 的免 CORS 打包版本**，`risk_assessment.html` 靠此檔案動態校正 NSW/州別事件數字（`h5n1.py` 的 `write_cases_events_js()` 產生）。
+* **`CLAUDE.md`**：Claude Code 專案記憶，記錄核心規則與已知資料完整性陷阱清單。
+* **`.claude/skills/h5n1-data-audit/`**：稽核頁面數字/候鳥資料是否過期的標準流程 skill。
 * **`SOP.md`**：開發與發布標準作業程序 SOP。
 * **`walkthrough.md`**：開發與改版驗證紀錄。
 * **`task.md`**：任務排程與檢核表。

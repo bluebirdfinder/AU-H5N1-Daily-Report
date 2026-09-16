@@ -6,8 +6,11 @@
 
 ### 📋 7 步驟 SOP 規範
 
+#### Step 0: Read Project Memory (讀取專案記憶，2026-09-16 新增)
+- 修改前先讀 `CLAUDE.md`（已知資料完整性陷阱清單）；核對頁面數字或候鳥資料時使用 `.claude/skills/h5n1-data-audit/SKILL.md` 的標準流程，先重算 ground truth 再比對畫面顯示。
+
 #### Step 1: Feature Implementation (功能與數據修復)
-- 在核心代碼檔中進行變更：`h5n1.py`（數據抓取與編譯引擎）、`report_template.html`（網頁結構與樣式模板）、`cases_events.json`（數據庫）。
+- 在核心代碼檔中進行變更：`h5n1.py`（數據抓取與編譯引擎）、`report_template.html`（網頁結構與樣式模板）、`cases_events.json`（數據庫）、`risk_assessment.html`/`_en.html`（風險模型頁，事件數字已動態化，改動前確認 `syncCaseEventsFromEmbedded()` 與 `assets/js/cases_events.js` 沒被破壞）。
 
 #### Step 2: Syntax & Structure Check (語法與 HTML 標籤檢查)
 - 確保 Python 語法無訛、無未補捉的 Exceptions。

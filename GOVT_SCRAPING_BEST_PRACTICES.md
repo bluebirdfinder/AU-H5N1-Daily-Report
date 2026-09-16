@@ -85,6 +85,7 @@
 | **V9.0** | 2026-08-18 | 重構 Gemini API 升級至 2.5 系列模型 (`gemini-2.5-flash` / `gemini-2.5-flash-lite` / `gemini-2.5-pro`) 並加入指數退避重試機制 (Exponential Backoff Retry)；解開 DAFF 官網 `curl_cffi` 限制並導入 Playwright `set_content()` 本地 DOM 瞬間渲染截圖；物種圓餅圖與一鍵快篩控制列全面轉為 `cases_events.json` 資料庫 100% 自動加總計算。 | 徹底解決 GitHub Actions 45 秒 Playwright 網路逾時導致的白屏截圖與 Vision API 讀出 0 的隱藏死角；徹底解決舊 1.5 模型 404 / 503 拋錯痛點；實現前端所有標籤與圖表零硬編碼 100% 動態化。 |
 | **V10.0** | 2026-09-04 | 導入 `eBird API v2` 實時野鳥觀測與 `Atlas of Living Australia (ALA)` 免 Key 備援，構建 4 層全維度數據備援架構；建置定量風險評估模型儀表板與 16:9 高階簡報系統。 | 解決野外即時生態觀測盲區，提供進口決策量化風控與高層週報簡報自動化。 |
 | **V11.0** | 2026-09-08 | 納入 **全澳政策動態與都會生物安全雷達 (Policy Radar Module)**（VIC 圈養令延長 vs NSW 自願指引 / Taronga Zoo 疫苗臨床試驗 / BioResponse NSW App / 阿德萊德紅狐都會警戒）；更新雪梨北灘 (Warriewood)、肯布拉港與科夫斯港瀕危赫頓鸌確診點位與物種生態庫，全澳確診事件同步至 484 起 (NSW 22 起)。 | 解決疫情進入雪梨都會區與瀕危留鳥確診後，公務應變政策、各州圈養規範與都會防線缺乏即時整合追蹤的決策痛點。 |
+| **V12.0** | 2026-09-16 | **Claude Code 首次全專案架構稽核**：修復 `risk_assessment.html` 事件數字死綁定問題（新增 `write_cases_events_js()` 與 `assets/js/cases_events.js`，讓 `window.casesEventsEmbedded` 從未賦值的死程式碼變成真正動態同步）；修復 `parse_daff_official_stats()` 離線 fallback 使用寫死字典而非既有 `compute_stats_from_cases()` 權威回退方案的問題；修復候鳥數字 `total_birds` 不存在欄位 bug 與首頁候鳥總數缺失綁定；修復初始化鏈單步失敗連鎖中斷風險；新增 `CLAUDE.md` 與稽核 skill 作為專案記憶。 | 解決頁面顯示數字與資料庫實際內容長期脫鉤（NSW 事件數停留在 22 起，實際已 32 起；候鳥數字停滯 12 天）卻無人發現的資料完整性風險，並建立往後稽核的標準流程與記憶機制。 |
 
 
 

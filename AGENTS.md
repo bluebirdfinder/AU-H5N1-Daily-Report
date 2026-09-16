@@ -54,6 +54,13 @@
 
 ---
 
+## 🔒 資料動態同步鐵律（2026-09-16 稽核後新增）
+
+1. **嚴禁在 HTML/JS 裡寫死任何會隨疫情變化的數字**（事件數、候鳥數、風險分數）。所有此類數字都必須有明確可追溯的資料來源（Python 模板變數替換，或讀取 `window.*Embedded` 全域變數並有對應的 `document.getElementById(...).textContent = ...` 賦值），不可只放一段看起來合理的靜態文字。
+2. **`id` 存在不代表有人真的在寫它**：過去稽核發現多處元素有 `id` 卻從未被任何 JS 賦值（死綁定）。新增任何看似動態的元素後，務必實際 grep 確認賦值那一行程式碼存在，或用 Playwright 開頁面驗證。
+3. **`window.addEventListener('load', ...)` 內多步驟初始化，每一步都要獨立 `try/catch`**：單一步驟失敗（例如 CDN 被企業防火牆擋下）絕不能連帶讓後面步驟（尤其是算風險分數的 `recalculateRisk()`）整串不執行。
+4. 詳細的已知陷阱清單、根因與修復記錄見 `CLAUDE.md`；例行稽核程序見 `.claude/skills/h5n1-data-audit/SKILL.md`。
+
 ## 📌 開發與維護檢核清單 (Pre-Flight Checklist)
 
 在任何程式碼修改或文字更新前，必須確認：
@@ -62,3 +69,4 @@
 - [ ] 是否維持全澳商業家禽、蛋場、乳牛、豬場「0 確診」之 Area Freedom 正確陳述？
 - [ ] 是否確保所有 CDN 引用皆符合 Cloudflare 資安白名單？
 - [ ] 是否維持中英文雙語（`index.html` / `index_en.html`、`risk_assessment.html` / `risk_assessment_en.html`、`risk_assessment_slides.html` / `risk_assessment_slides_en.html`）100% 同步？
+- [ ] 是否確認新增或修改的數字型元素都有可追溯的動態資料來源，沒有新增寫死數字？

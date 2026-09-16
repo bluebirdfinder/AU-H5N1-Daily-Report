@@ -1,6 +1,15 @@
 # 任務清單與進度記錄 (Task Progress Record)
 
-## 🟢 今日已完成重點 (2026-09-08 Completed - v2.9.5 & v2.9.4 & v2.9.3 & v2.9.2)
+## 🟢 今日已完成重點 (2026-09-16 Completed - v2.10.0 Claude Code 全面架構稽核)
+- [x] **監控頁 + 風險評估頁逐區塊架構稽核**（33 個功能區塊，含資料來源分類、稽核發現）。
+- [x] **修復 NSW/SA/VIC/TAS 事件數凍結於 2026-09-08 舊快照**：`parse_daff_official_stats()` 離線 fallback 改為呼叫既有的 `compute_stats_from_cases()`；新增 `write_cases_events_js()` 產出 `assets/js/cases_events.js`，讓 `risk_assessment.html` 原本的死綁定（`window.casesEventsEmbedded`）變成真正動態同步。
+- [x] **修復候鳥「現場實測」數字停滯問題**：修正不存在的 `state_summary.NSW.total_birds` 欄位參照；補上首頁候鳥總數大字缺失的 JS 綁定；新增資料超過 2 天未更新的過期警示。
+- [x] **修復 `risk_assessment.html` 初始化鏈連鎖失敗風險**：Playwright 實測驗證，改為逐步獨立 try/catch。
+- [x] **修正多處內部矛盾**：Decision Zone 分數註記、商業禽場按鈕文字與邏輯不符、Card 2 未隨模擬器連動。
+- [x] **新增 `CLAUDE.md` 與 `.claude/skills/h5n1-data-audit/`**，記錄稽核發現與標準稽核流程。
+- [ ] **待辦（需人工處理）**：確認 `EBIRD_API_KEY` GitHub Secret 狀態；修復 `ala_bird_data.json` 抓取降級鏈；評估 `purina_auth.js` 密碼門是否需要真正的伺服器端驗證。
+
+## 🟢 歷史已完成重點 (2026-09-08 Completed - v2.9.5 & v2.9.4 & v2.9.3 & v2.9.2)
 - [x] **🚨 確立最高指導原則：NSW 商業家禽場「零感染 (Area Freedom)」為唯一生死防線 (`AGENTS.md` / `AGENT.md`)**
   - [x] 明確建立最高指導原則：台灣檢疫法規以 NSW 全轄區為宣告單位，NSW 商業家禽場 0 確診是唯一的生死防線 (Red Line)。
   - [x] 嚴禁以距離 Blayney 廠單點公里數評估安全，全面校正為以 NSW 轄區整體防線與野鳥外溢威脅為核心。

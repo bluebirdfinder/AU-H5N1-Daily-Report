@@ -2,6 +2,36 @@
 
 所有專案版本更新與重大變更均紀錄於此。
 
+## [v2.10.0] - 2026-09-16
+
+### 🔍 首次 Claude Code 全面架構稽核與資料完整性修復
+本輪由 Claude 對全專案（`h5n1.py`、`index.html`/`_en.html`、`risk_assessment.html`/`_en.html`）進行第一次完整稽核，逐區塊比對頁面顯示數字與 `cases_events.json`/`bird_data.json` 實際內容，發現並修復多個「畫面看起來正常、但數字早已與資料庫脫鉤」的問題。完整稽核表見專案內部記錄。
+
+### 🚨 修復 NSW/SA/VIC/TAS 事件數凍結於 2026-09-08 舊快照
+- **根因**：`h5n1.py` 的 `parse_daff_official_stats()` 在 DAFF 官網連不上時，永遠退回函式最上方寫死的字典（長期停留在全澳 484 起 / NSW 22 起）；資料庫自己就有的權威回退方案 `compute_stats_from_cases()` 從未被呼叫過。
+- **修復**：DAFF 連不上時改為呼叫 `compute_stats_from_cases()`，用 `cases_events.json` 現有資料重新統計。
+- **`risk_assessment.html`/`_en.html` 新增 `write_cases_events_js()` 產出的 `assets/js/cases_events.js`（`window.casesEventsEmbedded`）**：頁面原本就寫了要讀這個全域變數的程式碼，但從未有任何檔案真正賦值，是死綁定。現在 NSW 卡片、科學矩陣、NSW 事件下拉選單、方法論 Modal、2 年推演時間軸的「現況」數據點全部動態讀取同一份權威資料，不再各自維護一份會過期的靜態數字。
+
+### 🦅 修復候鳥「現場實測」數字長期停滯問題
+- **`state_summary.NSW.total_birds` 欄位名 bug**：該欄位在 `bird_data.json` schema 中並不存在，多處引用永遠 fallback 到寫死數字（286 / 651 / 1,407，視版本而定）。已改為對 `high_risk_observations` 現場加總。
+- **`report_template.html` 首頁候鳥總數大字（`#ebird-total-obs`）補上 JS 綁定**：原本完全沒有綁定，永遠顯示編譯當下的靜態文字。
+- **新增資料新鮮度警示**：`bird_data.json` 超過 2 天未更新時，頁面顯示「⚠️ 資料已 N 天未更新」，不再讓數字看似即時。
+
+### 🛡️ 修復初始化鏈連鎖失敗風險
+- 以 Playwright 實測發現，`risk_assessment.html` 的 `window.addEventListener('load', ...)` 內多個初始化步驟依序同步呼叫，只要其中一步拋出例外（例如 Chart.js CDN 被企業防火牆擋下——本專案 README 反覆提及的已知痛點），後面所有步驟（含決定風險分數的 `recalculateRisk()`）會整串不執行。已改為逐步獨立 `try/catch`。
+
+### 🧹 雜項一致性修正
+- Decision Zone Matrix「當前現況」註記改為動態貼到真正對應的分數區間（含商業禽場破口時強制標紅）；商業禽場模擬按鈕文字「+75分」改為與程式邏輯一致的「強制封頂 100分」；Card 2（商業家禽狀態）改為隨模擬器連動變色，不再永遠顯示安全；移除 `index.html`/`_en.html` 對未使用的 `gbif_bird_data.js`（193KB）之載入；中文版工廠地緣距離卡片補上英文版原本就有的 `MIN_DISTANCE_PLACEHOLDER` 動態綁定。
+
+### 📚 新增專案稽核記憶
+- 新增 `CLAUDE.md`：記錄核心規則、本輪稽核發現的資料完整性陷阱清單，供未來所有 Claude 工作階段讀取。
+- 新增 `.claude/skills/h5n1-data-audit/`：封裝「核對頁面數字 / 候鳥資料是否過期」的標準稽核流程。
+
+### ⚠️ 已知但本輪未修復（需人工確認或涉及外部環境）
+- `EBIRD_API_KEY` GitHub Secret 狀態未知，`bird_data.json` 截至本次稽核仍停在 2026-09-04；需擁有 repo 權限者至 Settings → Secrets 確認。
+- `ala_bird_data.json` 從未成功產生過（`fetch_ala_data()` 缺乏抗封鎖降級鏈，疑似被 ALA 網站擋下）。GBIF、Movebank 兩源正常。
+- `assets/js/purina_auth.js` 的存取密碼門為純前端裝飾（明碼密碼 + 視覺遮罩，底層 DOM 內容未被移除），無法提供頁面文字宣稱的「機密」保護等級，建議另行評估是否需要真正的伺服器端驗證。
+
 ## [v2.9.5] - 2026-09-08
 
 ### 🚨 確立最高指導原則：NSW 商業家禽場「零感染 (Area Freedom)」為唯一生死防線 (`AGENTS.md` / `AGENT.md`)
