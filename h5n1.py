@@ -2806,24 +2806,41 @@ def fetch_movebank_live_tracks(mb_user, mb_pass):
     # （實測抓到荷蘭/比利時的銀鷗、歐亞杓鷸研究，不是澳洲候鳥），改用計分排序：
     # 「名稱含 Australia」> 「南半球座標 (main_location_lat < 0)」> 「高風險物種關鍵字」，
     # 同分再以是否有下載權限排序，盡量優先嘗試跟本專案真正相關的 study。
+    # 2026-09-16 修正 (第三輪)：真實環境測試發現排到的 study 全是無關物種（Nankeen Kestrels、
+    # Green python、Christmas Island flying fox 等）——因為「名稱含 Australia」給的權重過高，
+    # 反而讓 Water buffalo/Swamp wallabies 這種跟候鳥無關但剛好取名有 Australia 的動物研究排到前面，
+    # 物種關鍵字權重卻太低。使用者直接在 Movebank 官網用 taxon search 找到
+    # 「Tracking Curlew sandpipers/Great Knots/Red-necked stints along the EAAF」三個研究，
+    # 名稱完全沒有 Australia 字樣卻是東亞—澳大拉西亞遷飛區 (EAAF) 的核心研究對象，證實原本的權重
+    # 分配本末倒置。現在調整為：使用者驗證過的研究名稱給最高分保證優先；EAAF 關鍵字次高；
+    # 物種關鍵字權重提高；「Australia」字樣權重大幅降低（只當作次要加分，不再是主要判斷依據）。
     HIGH_RISK_SPECIES_KEYWORDS = [
         "shearwater", "godwit", "petrel", "albatross", "knot", "tern",
         "skua", "gull", "stint", "sandpiper", "plover", "curlew",
         "ardenna", "limosa", "macronectes", "thalassarche", "calidris", "thalasseus",
     ]
+    USER_VERIFIED_STUDY_NAMES = [
+        "tracking curlew sandpipers along the eaaf",
+        "tracking great knots along the eaaf",
+        "tracking red-necked stints along the eaaf",
+    ]
 
     def _relevance_score(s):
         name = (s.get("name") or "").lower()
         score = 0
+        if name in USER_VERIFIED_STUDY_NAMES:
+            score += 1000
+        if "eaaf" in name:
+            score += 50
+        if any(kw in name for kw in HIGH_RISK_SPECIES_KEYWORDS):
+            score += 30
         if "australia" in name or "australian" in name:
-            score += 100
+            score += 15
         try:
             if float(s.get("main_location_lat", "")) < 0:
                 score += 20
         except (ValueError, TypeError):
             pass
-        if any(kw in name for kw in HIGH_RISK_SPECIES_KEYWORDS):
-            score += 10
         if s.get("i_have_download_access", "").lower() == "true":
             score += 5
         return score
@@ -2832,7 +2849,18 @@ def fetch_movebank_live_tracks(mb_user, mb_pass):
     visible_only = [s for s in studies if s.get("i_can_see_data", "").lower() == "true"]
     print(f"[Movebank API] 帳號有下載權限 {len(downloadable)} 個 / 可見中繼資料 {len(visible_only)} 個 / 全站共 {len(studies)} 個 study")
 
-    pool = downloadable or visible_only
+    # 2026-09-16 修正 (第三輪)：原本 pool = downloadable or visible_only 是 Python 的 or 短路邏輯，
+    # 只要 downloadable 非空，visible_only 就整組被忽略——但使用者驗證過的 3 個 EAAF 研究若只開放
+    # 「查看中繼資料」而非完整下載權限（Movebank 上常見需先向 study 擁有者申請），就永遠進不了候選池，
+    # 不管 _relevance_score() 給它們多高分都沒用。改為兩邊取聯集（依 study id 去重），讓真正相關但
+    # 尚未取得完整下載權限的 study 也有機會進入候選清單，交給後面的 license-md5 流程去嘗試。
+    seen_ids = set()
+    pool = []
+    for s in downloadable + visible_only:
+        sid = s.get("id")
+        if sid not in seen_ids:
+            seen_ids.add(sid)
+            pool.append(s)
     if not pool:
         raise ValueError("帳號名下沒有任何可讀取資料的 study")
     ranked = sorted(pool, key=_relevance_score, reverse=True)
