@@ -527,13 +527,13 @@ def playwright_fetch_url(url, html_content=None, screenshot_path=None, timeout=3
 def call_gemini_api_with_retry(payload, params, headers, timeout=35):
     """
     通用 Gemini API 指數退避重試與 Fallback 模型調用器。
-    - 主力模型 (Primary): gemini-2.5-flash
-    - 備援模型 1 (Fallback 1): gemini-2.5-flash-lite
-    - 備援模型 2 (Fallback 2): gemini-2.5-pro
-    2026-09-16 稽核：舊清單裡的 gemini-2.0-flash / gemini-1.5-flash / gemini-1.5-pro
-    在真實環境已全數回傳 404「no longer available」，導致主力模型一遇到暫時性逾時，
-    後面備援全滅，直接摧毀 Gemini 摘要與截圖 OCR 功能（有靜態文字兜底所以網頁不會壞，
-    但「即時 AI 摘要」形同虛設卻沒人發現）。改用專案自己在 v9.0 就已驗證可用的 2.5 系列。
+    2026-09-16 稽核第一輪：舊清單裡的 gemini-2.0-flash / gemini-1.5-flash / gemini-1.5-pro
+    在真實環境已全數回傳 404「no longer available」，改用 gemini-2.5-flash-lite / gemini-2.5-pro。
+    2026-09-16 稽核第二輪（同一天 2 小時後再測）：gemini-2.5-flash-lite 與 gemini-2.5-pro
+    也雙雙回傳 404「no longer available to new users」，只有 gemini-2.5-flash 本身持續驗證有效
+    （已在兩次真實環境測試中成功呼叫）。與其再猜一個可能又會過期的模型名稱，改為對唯一
+    已驗證有效的 gemini-2.5-flash 多給一輪重試機會，而不是切到高機率也已下架的具名備援模型。
+    若未來要換回多模型備援，請先用真實 GEMINI_API_KEY 手動測試該模型名稱仍然可用。
     針對 503 (High Demand)、429 (Rate Limit) 及連線超時等暫時性錯誤，
     實作 3 次指數退避重試 (2s, 4s, 8s + 隨機 jitter)。
     只有當單一模型 3 次重試均告失敗後，才切換至下一個備援模型。
@@ -543,8 +543,7 @@ def call_gemini_api_with_retry(payload, params, headers, timeout=35):
 
     models = [
         "gemini-2.5-flash",
-        "gemini-2.5-flash-lite",
-        "gemini-2.5-pro"
+        "gemini-2.5-flash",
     ]
     
     for model_index, model_name in enumerate(models, 1):
@@ -590,7 +589,7 @@ def call_gemini_api_with_retry(payload, params, headers, timeout=35):
 def parse_screenshot_with_gemini_vision(screenshot_path):
     """
     使用 Gemini Vision API 讀取官方網站黃底精確數據截圖，自動識別最新 H5N1 確診數字與日期。
-    採用 gemini-2.5-flash (Primary), gemini-2.5-flash-lite (Fallback 1), gemini-2.5-pro (Fallback 2)。
+    採用 gemini-2.5-flash，唯一已在真實環境驗證持續有效的模型（見 call_gemini_api_with_retry 說明）。
     實作 3 次指數退避重試與完整的 Logging 追蹤。
     需要在環境變數設定 GEMINI_API_KEY。
     """
@@ -2751,15 +2750,37 @@ def fetch_movebank_live_tracks(mb_user, mb_pass):
         raise ValueError(f"study 清單回傳非預期格式 (前 120 字: {resp.text[:120]!r})")
 
     studies = _parse_csv(resp.text)
-    accessible = [s for s in studies if s.get("i_can_see_data", "").lower() == "true"]
-    print(f"[Movebank API] 帳號可讀取 {len(accessible)} / {len(studies)} 個 study")
-    if not accessible:
+
+    # 2026-09-16 修正：Movebank 帳號預設就能「看到」全平台公開 study 的中繼資料（本帳號實測
+    # 一次可見 2059 / 8769 個），絕大多數跟本專案的高風險澳洲海鳥無關（第一次真實測試就抓到
+    # 大食蟻獸、塑膠瓶追蹤、孟買紅鶴這種不相關 study，且多半沒有真正的下載權限）。
+    # 改為：優先挑「真的有下載權限」的 study，並用本專案關注的高風險候鳥物種關鍵字篩選，
+    # 避免抓到帳號能看到、但跟 H5N1 澳洲候鳥監控完全無關的公開 study。
+    HIGH_RISK_SPECIES_KEYWORDS = [
+        "shearwater", "godwit", "petrel", "albatross", "knot", "tern",
+        "skua", "gull", "stint", "sandpiper", "plover", "curlew",
+        "ardenna", "limosa", "macronectes", "thalassarche", "calidris", "thalasseus",
+        "australia", "australian",
+    ]
+
+    def _is_relevant(s):
+        name = (s.get("name") or "").lower()
+        return any(kw in name for kw in HIGH_RISK_SPECIES_KEYWORDS)
+
+    downloadable = [s for s in studies if s.get("i_have_download_access", "").lower() == "true"]
+    visible_only = [s for s in studies if s.get("i_can_see_data", "").lower() == "true"]
+    print(f"[Movebank API] 帳號有下載權限 {len(downloadable)} 個 / 可見中繼資料 {len(visible_only)} 個 / 全站共 {len(studies)} 個 study")
+
+    relevant_downloadable = [s for s in downloadable if _is_relevant(s)]
+    candidates = relevant_downloadable or downloadable or [s for s in visible_only if _is_relevant(s)] or visible_only
+    if not candidates:
         raise ValueError("帳號名下沒有任何可讀取資料的 study")
+    print(f"[Movebank API] 篩選後採用 {len(candidates)} 個候選 study（優先：有下載權限 + 物種關鍵字相符）")
 
     since = (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y%m%d000000000")
     live_studies = []
 
-    for study in accessible[:6]:
+    for study in candidates[:6]:
         study_id = study.get("id")
         study_name = study.get("name") or f"Movebank Study {study_id}"
         if not study_id:
