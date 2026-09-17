@@ -2,6 +2,30 @@
 
 所有專案版本更新與重大變更均紀錄於此。
 
+## [v2.10.2] - 2026-09-17
+
+### 🚨 三份週報簡報檔案從未被前兩輪稽核觸及，是全新發現的死角
+- 使用者追問「全部都稽核完了嗎」，逐一清點 repo 才發現 `h5n1_weekly_slides.html`（疫情週報）與 `risk_assessment_slides.html`/`_en.html`（風險評估模型週報）完全獨立於 `index.html`/`risk_assessment.html`，`sync_weekly_slides()`/`sync_risk_assessment_weekly()` 每週一自動跑，但只做「歸檔」與「換封面日期」，從未校正內容數字。
+- `h5n1_weekly_slides.html` 內容最後一次真正修改是 2026-09-14，完全沒有讀取任何資料檔，NSW/全澳/各州事件數、陰性排除、熱線通報全部寫死在 HTML 裡；`risk_assessment_slides.html` 唯一一處試圖讀取即時資料的程式碼用 `Array.isArray()` 誤判物件為陣列，是死綁定。
+- **修復**：三個檔案都接上 `assets/js/cases_events.js`，用 `data-bind` 屬性標記所有「當前累計數字」；已用 Node Playwright 對 `file://` 直接開檔驗證全部與權威資料一致（全澳 551/NSW 32/SA 299/VIC 169/TAS 38/WA 10/QLD 2）。「上週 X 起」這類週間比較敘述文字刻意維持人工撰寫，不自動改寫，避免編造假趨勢。
+- **一併完成跨頁數據一致性驗證**：用 Playwright 對全部 8 個頁面（`index`/`index_en`/`risk_assessment`/`risk_assessment_en`/兩份簡報中英文/`h5n1_weekly_slides`）重新讀取 DOM 顯示文字，確認 NSW/全澳事件數、候鳥總數在所有頁面完全一致，無跨頁矛盾。
+
+### 🕵️ ALA 403 修復 + 意外發現並修掉更底層的 Playwright 死路徑
+- **根因**：`fetch_ala_data()` 用裸 `requests.get()`，被 `biocache.ala.org.au` 的 WAF 直接判定為爬蟲回傳 HTTP 403。已改為呼叫跟 DAFF 同一條 `smart_fetch_url()` 四段降級鏈（curl_cffi → CF Worker → Playwright → requests），並處理 Playwright 導向 API 端點時瀏覽器自動包一層 `<pre>` HTML 標籤的解析。
+- **意外發現**：`playwright_fetch_url()` 在一般網址導航情境下（未傳入 `html_content`）永遠 `return html_content`（即永遠回傳呼叫時傳入的 `None`），而不是回傳它自己抓到的 `fetched_html`——代表 `smart_fetch_url()` 的「真實瀏覽器」防線對所有一般用途（包括既有的 DAFF 抓取）一直是死的。已修正為 `return fetched_html`。
+- **真實環境驗證結果**：Playwright 修復本身證實有效——同一次執行中 SA/VIC/QLD 政府頁在 curl_cffi 與 CF Worker 都失敗後，成功靠 Playwright 拿到 15~25 萬字元真實內容（過去這條路徑永遠回傳 None）。但 ALA 本身：Playwright 只拿到 195 字元（遠低於 500 字元可信門檻），研判是 WAF 直接針對 GitHub Actions IP 網段回應拒絕頁，擋的是來源 IP、不是瀏覽器指紋，故仍抓不到 ALA 資料。ALA 抓取端修復已驗證邏輯正確，但資料源本身在此環境仍不可達；且 `ala_bird_data.json` 目前無任何前端頁面讀取，屬於獨立於本次修復的另一塊工作。
+
+### 🛰️ Movebank 排序演算法修正：找回真正相關的候鳥研究
+- 使用者直接在 Movebank 官網用 taxon search 找到 3 個真正相關的 EAAF 候鳥研究（Tracking Curlew sandpipers/Great Knots/Red-necked stints along the EAAF），名稱完全沒有「Australia」字樣，卻在前一輪的自動排序中完全沒被排到——因為排序給「名稱含 Australia」+100 分、物種關鍵字只給 +10 分，導致 Water buffalo、Swamp wallabies 這類跟候鳥無關但名稱含 Australia 的研究排到前面。
+- **修復**：重新調整權重（使用者驗證過的研究名稱 +1000 保證優先、EAAF 關鍵字 +50、物種關鍵字 10→30、Australia 字樣 100→15）；同時修掉 `pool = downloadable or visible_only` 的邏輯錯誤（Python `or` 短路，只要有任何下載權限的 study 存在，只能查看中繼資料的 study 就整組被忽略），改為兩邊取聯集。
+- **真實環境驗證結果**：排序修復完全成功，`Tracking Curlew sandpipers along the EAAF` 排到最高分（1100 分），並額外挖出多個同樣相關的鷸鴴科研究（Grey Plover、AWSG Little Curlew/Grey Plover Tracking、Bar-tailed Godwit/Great Knot Piersma Northwest Australia）。但這些 study 全部回傳 Movebank 官方訊息「No data are available for download」，需要使用者另外向研究擁有者申請權限，此步驟無法自動化。
+
+### 🦅 依 Wildlife Health Australia / DCCEEW / BirdLife Australia 官方來源擴充候鳥物種清單
+- 使用者提供 Wildlife Health Australia《Avian influenza in wildlife in Australia》Fact Sheet（2026-09）全文，確認雁形目與鴴形目是天然宿主，且澳洲本土雁鴨科不會離境遷徙——真正的境外病毒引入路徑是候鳥（8-11月鴴形目遷徙、境外雁鴨科、南極海鳥）。
+- 使用者另提供 DCCEEW/BirdLife Australia 聯合《國家風險評估》全文，發現方法論陷阱：該評估的「國家風險分數」= 易感性 + 脆弱性（滅絕風險）兩者相加，不能直接當監測用清單——原文自承劍尾鸚鵡、平原走鴴等極危陸鳥雖列高風險，實際「不太可能暴露於病毒或傳播病毒」。
+- **修復**：只採用文中明確點名「易感性高、會傳播病毒」的物種，於 GBIF `HIGH_RISK_SPECIES` 學名清單新增 `Calidris ferruginea`（尖尾濱鷸，使用者親自於 Movebank 找到的 EAAF 旗艦候鳥）、`Cygnus atratus`（黑天鵝）、`Anseranas semipalmata`（麥雞鵝）；eBird/Movebank 關鍵字清單同步補上對應關鍵字。刻意排除 Christmas Island Frigatebird 等「極度風險」離島特有種——其風險分數主要來自單一離島繁殖地的脆弱性，跟 NSW/Blayney 廠風險路徑地理上無關。
+- **真實環境驗證結果**：GBIF 去重後記錄數從 488 筆增加到 570 筆，確認新增三個物種真的抓到資料——`Calidris ferruginea` 28 筆、`Cygnus atratus` 30 筆、`Anseranas semipalmata` 24 筆，總計 82 筆新記錄，與增加量完全吻合。
+
 ## [v2.10.1] - 2026-09-16
 
 ### ✅ `EBIRD_API_KEY` 已補設，候鳥數字凍結問題確認解除

@@ -18,6 +18,14 @@
 - [x] **Movebank 從「從未真正呼叫 API」修復為真實串接**：新增 `fetch_movebank_live_tracks()`，依澳洲/南半球/物種關鍵字排序候選研究，並實作官方授權條款自動同意（`license-md5`）協議；真實環境驗證授權流程正常，但目前候選研究均無近 30 天活體航跡，安全退回範例資料並正確標示 `is_live_data:false`。
 - [ ] **待辦（需使用者提供資訊）**：若使用者手上有已知目前仍在追蹤中的澳洲海鳥/候鳥 Movebank study 名稱或 ID，可直接指定以跳過排序猜測，取得真正即時航跡。
 
+## 🟢 今日已完成重點 (2026-09-17 Completed - v2.10.2 三度修復：全 repo 稽核死角 + Movebank 排序 + 物種清單)
+- [x] **發現並修復三份週報簡報從未被稽核的死角**：使用者問「全部都稽核完了嗎」才發現 `h5n1_weekly_slides.html`/`risk_assessment_slides.html`/`_en.html` 完全獨立於主頁面，事件數字全部寫死；已接上 `cases_events.js`，Playwright 驗證跨 8 個頁面數字一致。
+- [x] **完成跨頁數據一致性驗證**：全澳/NSW 事件數與候鳥總數在 index/risk_assessment/兩份簡報（含中英文）全部一致，無矛盾。
+- [x] **修復 ALA 403**：改用 `smart_fetch_url()` 四段降級鏈；意外發現並修掉 `playwright_fetch_url()` 一般導航情境永遠回傳 `None` 的底層 bug（連帶提升既有 DAFF 抓取韌性）。真實環境證實修復邏輯正確，但 ALA 網站仍擋 GitHub Actions IP，資料源尚不可達。
+- [x] **修復 Movebank 排序演算法**：使用者在 Movebank 官網找到 3 個真正相關的 EAAF 候鳥研究，找出「Australia 字樣」權重蓋過「物種關鍵字」的問題並修正；真實環境驗證排序完全修好，但找到的研究均需另外向擁有者申請下載權限（無法自動化）。
+- [x] **依 WHA/DCCEEW/BirdLife Australia 官方文件擴充候鳥物種清單**：新增黑天鵝、麥雞鵝、尖尾濱鷸；記錄「易感性 vs 滅絕脆弱性」方法論陷阱，刻意排除跟監測目的無關的純脆弱性物種。
+- [ ] **待辦（需使用者處理）**：Movebank 找到的相關研究向擁有者申請下載權限；`purina_auth.js` 密碼門商業決策；ALA 是否值得繼續投入繞過 IP 封鎖。
+
 ## 🟢 歷史已完成重點 (2026-09-08 Completed - v2.9.5 & v2.9.4 & v2.9.3 & v2.9.2)
 - [x] **🚨 確立最高指導原則：NSW 商業家禽場「零感染 (Area Freedom)」為唯一生死防線 (`AGENTS.md` / `AGENT.md`)**
   - [x] 明確建立最高指導原則：台灣檢疫法規以 NSW 全轄區為宣告單位，NSW 商業家禽場 0 確診是唯一的生死防線 (Red Line)。

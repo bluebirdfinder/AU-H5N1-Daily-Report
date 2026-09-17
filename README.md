@@ -61,6 +61,12 @@
 - 🤖 **Gemini 備援模型清單二度全滅，改採「重試同一模型」策略**：v2.10.0 換上的 `gemini-2.5-flash-lite`/`gemini-2.5-pro` 兩小時後也雙雙 404，改為不再猜測具名備援模型，直接把唯一驗證有效的 `gemini-2.5-flash` 多重試一次。
 - 🛰️ **Movebank 從未真正呼叫 API 修復為真實串接**：新增 `fetch_movebank_live_tracks()`，依澳洲/南半球/物種關鍵字排序候選研究，並實作 Movebank 官方授權條款自動同意（`license-md5`）協議。真實環境驗證授權流程本身正常，但目前排到的候選研究近 30 天內均無個體回傳座標（推測為已結束的歷史研究），系統正確標示 `is_live_data:false` 並安全退回範例資料。詳見 `CLAUDE.md`。
 
+### v2.10.2 (2026-09-17)
+- 🚨 **三份週報簡報檔案（`h5n1_weekly_slides.html`、`risk_assessment_slides.html`/`_en.html`）從未被前兩輪稽核觸及**：全部接上 `assets/js/cases_events.js`，Playwright 驗證跨 8 個頁面數字完全一致（全澳 551/NSW 32 起）。「上週 X 起」等週間比較敘述文字刻意維持人工撰寫。
+- 🕵️ **ALA 403 修復 + 意外修掉更底層的 Playwright bug**：`fetch_ala_data()` 改用 `smart_fetch_url()` 四段降級鏈；過程中發現 `playwright_fetch_url()` 一般導航情境下永遠回傳 `None`（也連帶提升既有 DAFF 抓取的韌性）。真實環境證實 Playwright 修復有效，但 ALA 網站本身仍會擋 GitHub Actions 的來源 IP，資料源尚不可達。
+- 🛰️ **Movebank 排序演算法修正**：使用者在 Movebank 官網找到 3 個真正相關的 EAAF 候鳥研究，找出排序權重「Australia 字樣」蓋過「物種關鍵字」的問題並修正；真實環境驗證排序修復成功，但找到的相關研究均需另外向擁有者申請下載權限。
+- 🦅 **依 WHA/DCCEEW/BirdLife Australia 官方來源擴充候鳥物種清單**：新增黑天鵝、麥雞鵝、尖尾濱鷸三個有明確依據的物種，並記錄了「易感性 vs 滅絕脆弱性」的方法論陷阱，刻意排除純脆弱性驅動、跟監測目的無關的物種。真實環境驗證：GBIF 記錄數 488→570 筆，新增物種各抓到 24~30 筆真實記錄。詳見 `CLAUDE.md`。
+
 ### v2.9.5 (2026-09-08)
 - 🚨 **確立最高指導原則：NSW 商業家禽場「零感染 (Area Freedom)」為唯一生死防線 (`AGENTS.md`)**：
   - 確立台灣動植物防疫檢疫署 (BAPHIQ) 以「州轄區」為疫區宣告單位，嚴禁以「距離工廠公里數」模糊焦點，風險評估錨定於「逼近 NSW 州界」與「NSW 野鳥外溢至商業禽舍風險」。
