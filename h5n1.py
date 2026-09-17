@@ -2398,12 +2398,16 @@ def fetch_ebird_data():
     headers = {"X-eBirdApiToken": ebird_key}
 
     # 目標物種關鍵字 (與 H5N1 高風險遷徙候鳥相關)
+    # 2026-09-17：依 Wildlife Health Australia (2026-09 Fact Sheet) 與 DCCEEW/BirdLife Australia
+    # 聯合國家風險評估補上 "swan"/"goose"——原文明確點名黑天鵝、麥雞鵝屬於「易感性高、會傳播病毒」
+    # 的物種（跟純粹族群瀕危、不太會實際傳播的物種是兩回事，例如清單上也有劍尾鸚鵡、平原走鴴
+    # 這類極危陸鳥，但原文自己說明牠們「不太可能暴露於病毒或傳播病毒」，故意不採用這類純脆弱性物種）。
     HIGH_RISK_SPECIES_KEYWORDS = [
         "tern", "gull", "petrel", "skua", "shearwater", "godwit", "stint",
         "sandpiper", "plover", "dotterel", "snipe", "tattler", "knot",
         "turnstone", "whimbrel", "curlew", "stilt", "avocet", "ibis",
         "spoonbill", "heron", "egret", "cormorant", "pelican", "duck",
-        "teal", "shoveler", "widgeon", "pintail", "garganey",
+        "teal", "shoveler", "widgeon", "pintail", "garganey", "swan", "goose",
     ]
 
     # 各州 eBird regionCode 對應
@@ -2648,7 +2652,12 @@ def fetch_gbif_data():
     print("[GBIF API] 開始抓取全球生物多樣性學術科研與海洋科考候鳥數據 (免 Key 補齊專案)...")
     url = "https://api.gbif.org/v1/occurrence/search"
 
-    # 目標高風險海鳥與遷徙候鳥學名 (全澳 15 大核心遷徙與遠洋物種)
+    # 目標高風險海鳥與遷徙候鳥學名 (全澳 18 大核心遷徙與遠洋物種)
+    # 2026-09-17 依 Wildlife Health Australia Fact Sheet (2026-09) 與 DCCEEW/BirdLife Australia
+    # 聯合國家風險評估補上 3 種：尖尾濱鷸（使用者親自在 Movebank 上找到的 EAAF 旗艦候鳥種，原本只能
+    # 靠關鍵字比對間接抓到）、黑天鵝與麥雞鵝（官方文件明確點名「易感性高、會傳播病毒」，非純粹瀕危
+    # 卻不太會實際傳播的物種——例如同一份評估裡的劍尾鸚鵡、平原走鴴就被排除，因為原文自己說牠們
+    # 「不太可能暴露於病毒或傳播病毒」，只是族群小、一旦感染會滅絕）。
     HIGH_RISK_SPECIES = [
         "Thalasseus bergii",              # 大鳳頭燕鷗 (Crested Tern)
         "Chroicocephalus novaehollandiae", # 澳洲銀鷗 (Silver Gull)
@@ -2667,6 +2676,9 @@ def fetch_gbif_data():
         "Numenius madagascariensis",      # 黦鷸 / 東方麻鷸 (Far Eastern Curlew)
         "Anas gracilis",                  # 澳洲灰鴨 (Grey Teal)
         "Pelecanus conspicillatus",       # 澳洲鵜鶘 (Australian Pelican)
+        "Calidris ferruginea",            # 尖尾濱鷸 (Curlew Sandpiper)
+        "Cygnus atratus",                 # 黑天鵝 (Black Swan)
+        "Anseranas semipalmata",          # 麥雞鵝 (Magpie Goose)
     ]
 
     EBIRD_DATASET_KEY = "4fa7b334-ce0d-4e88-aaae-e75ce0b049b2"
@@ -2814,10 +2826,13 @@ def fetch_movebank_live_tracks(mb_user, mb_pass):
     # 名稱完全沒有 Australia 字樣卻是東亞—澳大拉西亞遷飛區 (EAAF) 的核心研究對象，證實原本的權重
     # 分配本末倒置。現在調整為：使用者驗證過的研究名稱給最高分保證優先；EAAF 關鍵字次高；
     # 物種關鍵字權重提高；「Australia」字樣權重大幅降低（只當作次要加分，不再是主要判斷依據）。
+    # 2026-09-17：依 Wildlife Health Australia / DCCEEW / BirdLife Australia 官方風險評估補上
+    # "swan"/"goose"/"cygnus"/"anseranas"（黑天鵝、麥雞鵝——原文明確點名易感性高、會傳播病毒）。
     HIGH_RISK_SPECIES_KEYWORDS = [
         "shearwater", "godwit", "petrel", "albatross", "knot", "tern",
         "skua", "gull", "stint", "sandpiper", "plover", "curlew",
         "ardenna", "limosa", "macronectes", "thalassarche", "calidris", "thalasseus",
+        "swan", "goose", "cygnus", "anseranas",
     ]
     USER_VERIFIED_STUDY_NAMES = [
         "tracking curlew sandpipers along the eaaf",

@@ -53,6 +53,17 @@
 
 **教訓**：往後任何「這個數字對不對」的問題，先用 `python3` 對 `cases_events.json` / `bird_data.json` 重新算一次 ground truth，不要只看 HTML 顯示的字。畫面好看 ≠ 數字是活的；有 `id` 也不代表真的有 JS 在寫它，要親自 grep 確認賦值那一行存在。
 
+## 2026-09-17：高風險候鳥物種清單擴充（依官方權威來源，非隨口列的清單）
+
+使用者親自在 Movebank 上找到 3 個真正相關但清單漏掉的 EAAF 候鳥研究後，追問「候鳥物種清單有沒有漏」，進而要求依 WOAH/澳洲官方來源重新核對。此環境的網路政策擋掉了 `dcceew.gov.au`/`wildlifehealthaustralia.com.au`/`birdlife.org.au`/`woah.org` 等網域（`WebFetch` 全部回傳 `EGRESS_BLOCKED`，且 `/root/.ccr/README.md` 明確說這是組織政策、不可繞過），改由使用者直接貼上兩份官方文件全文：
+
+1. **Wildlife Health Australia《Avian influenza in wildlife in Australia》Fact Sheet（2026-09，v5.2）**：確認雁形目（Anseriformes：鴨/天鵝/雁）與鴴形目（Charadriiformes：鷗/燕鷗/鷸鴴）是所有 AIV 的天然宿主——跟現有清單的「目」層級選擇方向一致。關鍵細節：**澳洲本土雁鴨科不會遷徙出境**，真正把病毒帶進澳洲的是三條路徑：① 每年 8-11 月從北半球遷徙來的鴴形目候鳥、② 常年從澳洲以北進入的雁鴨科、③ 常年從南極/亞南極遷徙來的海鳥（賊鷗、鸌）。此文件沒有列出具體物種清單。
+2. **DCCEEW「H5 bird flu and native species」+ BirdLife Australia／Charles Darwin University 聯合《國家風險評估》報導**：明確點出方法論陷阱——國家風險分數 = 易感性（susceptibility）+ 脆弱性（vulnerability，滅絕風險），**兩者混在一起，不能直接當「監測用的高風險物種清單」使用**。原文自己警告：劍尾鸚鵡、須冠蜜鳥、平原走鴴這些極危陸鳥雖在「高風險」清單上，但「不太可能暴露於病毒或傳播病毒」，純粹因族群小、一感染就可能滅絕才上榜。真正該採用的是文中明確點名「易感性高、會傳播病毒」的物種：**黑天鵝（Black Swan）、麥雞鵝（Magpie Goose）**（澳洲鵜鶘已在清單）。Christmas Island Frigatebird、Abbott's Booby、Heard/Macquarie Island Imperial Shag 等「極度風險」物種**刻意不採用**——牠們風險分數主要來自「單一離島繁殖地」的脆弱性，地理上侷限在偏遠外島，跟 NSW/Blayney 廠風險路徑關聯低。
+
+**已修改**：`h5n1.py` 三處物種清單都補上——GBIF 的 `HIGH_RISK_SPECIES`（學名精確清單）新增 `Calidris ferruginea`（尖尾濱鷸，使用者親自在 Movebank 找到的 EAAF 旗艦候鳥，原本只能靠關鍵字間接抓到）、`Cygnus atratus`（黑天鵝）、`Anseranas semipalmata`（麥雞鵝）；eBird 與 Movebank 的 `HIGH_RISK_SPECIES_KEYWORDS` 都補上 `"swan"`/`"goose"`（Movebank 另加 `"cygnus"`/`"anseranas"` 學名關鍵字）。**尚未在真實環境驗證**（下次自動排程或手動觸發 workflow 時才會實際查到這幾個新物種的觀測記錄）。
+
+**方法論教訓**：往後任何「拿官方清單擴充物種清單」的請求，第一步永遠是先確認**這份清單衡量的是什麼**——「會不會滅絕」跟「會不會傳播」是兩個完全不同的問題，同一份報告混著兩者算出一個分數時，不能只看排名高低就照單全收，要找報告裡明確點出「這個物種易感性高/會傳播」的那一句話再採用。
+
 ## 開發規範
 
 - CDN 白名單只能用 `cdnjs.cloudflare.com`，不可用 `cdn.jsdelivr.net` / `unpkg.com`（企業資安政策，見 AGENT.md）。
