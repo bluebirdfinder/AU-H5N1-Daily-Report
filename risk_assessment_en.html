@@ -111,6 +111,7 @@
     <script src="assets/js/purina_auth.js"></script>
     <script src="assets/js/bird_data.js"></script>
     <script src="assets/js/gbif_bird_data.js"></script>
+    <script src="assets/js/ala_bird_data.js"></script>
     <script src="assets/js/movebank_tracks.js"></script>
     <script src="assets/js/cases_events.js"></script>
 </head>
@@ -1741,6 +1742,46 @@
                 });
             }
 
+            // 10. Load ALA (Atlas of Living Australia) Citizen Science / Museum Records onto Map
+            // 2026-09-17: biocache.ala.org.au currently blocks GitHub Actions IPs at the network
+            // level, so the fetcher writes out available:false placeholder data. Check `available`
+            // before drawing so we never render a false "0 records" state as if it were live data.
+            const alaMarkerLayers = [];
+            function renderAlaOnMap(data) {
+                if (!data || data.available === false || !Array.isArray(data.observations)) return;
+                data.observations.slice(0, 100).forEach(obs => {
+                    if (obs.lat && obs.lng) {
+                        const marker = L.circleMarker([obs.lat, obs.lng], {
+                            radius: 3.5,
+                            fillColor: '#a78bfa',
+                            color: '#ffffff',
+                            weight: 0.8,
+                            opacity: 0.8,
+                            fillOpacity: 0.75
+                        }).addTo(gisLeafletMap);
+
+                        marker.bindTooltip(`
+                            <div style="font-family:sans-serif; min-width: 220px; line-height: 1.4; padding: 2px;">
+                                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+                                    <strong style="color:#a78bfa; font-size:11px; font-weight:800;">🧬 ALA Citizen Science / Museum Record</strong>
+                                    <span style="background:rgba(167, 139, 250, 0.2); color:#a78bfa; border:1px solid #a78bfa; font-size:9px; font-weight:bold; padding:1px 4px; border-radius:3px;">ALA</span>
+                                </div>
+                                <div style="font-size:11px; color:#f8fafc; margin-bottom:2px;">
+                                    ${obs.commonName || obs.scientificName || 'Unnamed species'}
+                                </div>
+                                <div style="font-size:10px; color:#cbd5e1; margin-bottom:2px;">
+                                    🏛️ Source: ${obs.dataResource || 'Atlas of Living Australia'}
+                                </div>
+                                <div style="font-size:9px; color:#94a3b8; border-top:1px solid rgba(255,255,255,0.15); padding-top:3px; margin-top:3px;">
+                                    📅 Record date: ${obs.obsDate || 'Unknown'} | State: ${obs.state || 'Unknown'}
+                                </div>
+                            </div>
+                        `, { sticky: true });
+                        alaMarkerLayers.push(marker);
+                    }
+                });
+            }
+
             if (typeof window.ebirdDataEmbedded !== 'undefined') {
                 renderEbirdOnMap(window.ebirdDataEmbedded);
             } else {
@@ -1768,6 +1809,16 @@
                     renderGbifOnMap(data);
                 }).catch(err => {
                     console.warn('GBIF data fetch notice:', err);
+                });
+            }
+
+            if (typeof window.alaBirdDataEmbedded !== 'undefined') {
+                renderAlaOnMap(window.alaBirdDataEmbedded);
+            } else {
+                fetch('ala_bird_data.json').then(r => r.json()).then(data => {
+                    renderAlaOnMap(data);
+                }).catch(err => {
+                    console.warn('ALA data fetch notice:', err);
                 });
             }
 

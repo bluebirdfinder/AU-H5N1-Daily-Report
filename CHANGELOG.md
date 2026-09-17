@@ -2,6 +2,20 @@
 
 所有專案版本更新與重大變更均紀錄於此。
 
+## [v2.10.3] - 2026-09-17
+
+### 🗂️ 本機工作環境從裸資料夾重建為真正的 git repo
+- 使用者將 repo 所有檔案下載到本機 Windows 資料夾（無 `.git`），既有的 `git diff`/`git log` 稽核方法在此狀態下無法使用。已對本機資料夾執行 `git init`、接上 `origin`（`bluebirdfinder/AU-H5N1-Daily-Report`）、`git fetch`，並用 `git reset origin/main`（只動索引、不覆寫工作目錄）把 `HEAD` 接上追蹤 `origin/main` 的本機 `main` 分支，確認本機檔案與遠端最新 commit 僅有抓取時間戳記差異，無真實資料落差。
+
+### 🛡️ ALA 前端補上防禦性綁定（抓取端本身仍被 WAF 擋，非本次修復範圍）
+- 拉真實 `gh run view` log 重新確認：`fetch_ala_data()` 在最新一次 GitHub Actions 執行仍然失敗，`biocache.ala.org.au` 對 GitHub Actions 來源 IP 僅回傳 195 字元內容，未達 `smart_fetch_url()` 可信度門檻，四段降級鏈全滅——與 v2.10.2 記錄的現象一致，確認是 IP 層級封鎖、非程式碼問題。
+- `fetch_ala_data()` 改為無論成功或失敗都會寫出 `ala_bird_data.json` 與 `assets/js/ala_bird_data.js`（`window.alaBirdDataEmbedded`），失敗時輸出 `{"available": false, ...}` 空殼，避免前端 `<script>` 標籤在正式環境每次都 404。
+- `risk_assessment.html`/`_en.html` 新增對應 `<script>` 標籤與 `renderAlaOnMap()`，比照既有 `renderGbifOnMap()` 把 ALA 觀測點畫成地圖圖層；`available:false` 時直接跳過，不顯示假的「0 筆」狀態。已用本機 HTTP server + 瀏覽器實測中英文兩版皆正常載入、console 無錯誤。真實 `available:true` 資料的圖層渲染效果尚待 ALA 資料源真的可達時才能驗證。
+
+### 🛰️ Movebank 排序修正真實環境二次驗證 + 新增靜默失敗診斷
+- 拉 2026-09-17 00:19 真實 log 確認 v2.10.2 的排序權重修正確實生效：使用者驗證過的 `Tracking Curlew sandpipers along the EAAF` 研究以 1100 分排名第一，證實排序邏輯修對了；這些研究目前仍因 Movebank 端本身無可下載資料而安全退回範例資料，非程式問題。
+- 發現新異常：同一天 40 分鐘後的下一次執行，Movebank 回報「全站共 0 個 study」，與同日稍早的 8769 個天差地遠，且原本完全沒有任何診斷輸出。已在 `fetch_movebank_live_tracks()` 補上一行診斷（印出原始回應長度與前 200 字），下次再發生時才有線索判斷是暫時性異常還是回應格式真的改變。
+
 ## [v2.10.2] - 2026-09-17
 
 ### 🚨 三份週報簡報檔案從未被前兩輪稽核觸及，是全新發現的死角

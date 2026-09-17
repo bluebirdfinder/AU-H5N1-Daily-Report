@@ -42,6 +42,19 @@ v2.10.0 稽核完成後，使用者實際操作 GitHub Secrets 與追問時，�
 
 ---
 
+# 四次修復：本機環境重建、ALA 前端防禦性綁定、Movebank 二次驗證與靜默失敗診斷 (v2.10.3, 2026-09-17)
+
+使用者把整個 repo 下載到本機 Windows 資料夾繼續工作，並接續上一輪留下的三個「等你決定」事項，指定先做 ALA 前端顯示與 Movebank 排序驗證，密碼門留到最後。
+
+1. **本機資料夾不是 git repo，既有稽核方法失效**：下載下來的資料夾沒有 `.git`，代表 `git diff`/`git log` 這套本專案反覆依賴的稽核方法完全用不了。補上 `git init`、接上 `origin`（`bluebirdfinder/AU-H5N1-Daily-Report`）、`git fetch`，並用 `git reset origin/main`（只動索引、不覆寫既有下載檔案）讓本機 `main` 分支追蹤 `origin/main`，確認本機檔案與遠端最新 commit 只差抓取時間戳記，沒有真實資料落差。
+2. **ALA 前端顯示：抓取端仍是死的，改做防禦性綁定而非模仿 GBIF 整塊複製**：先用 `gh run view` 拉真實 GitHub Actions log 確認 `fetch_ala_data()` 目前依然每次失敗——`biocache.ala.org.au` 對 GitHub Actions 來源 IP 只回傳 195 字元內容，跟 v2.10.2 記錄的現象一致，是 IP 層級封鎖，本輪沒有再花時間嘗試繞過。既然資料源仍不可達，直接照抄 GBIF 那樣做一整塊新的資料源展示區沒有意義；改為讓 `fetch_ala_data()` 不論成功失敗都寫出 `ala_bird_data.json`/`assets/js/ala_bird_data.js`（失敗時是 `available:false` 的空殼），並在 `risk_assessment.html`/`_en.html` 加上讀取這個檔案的 `renderAlaOnMap()` 地圖圖層——資料一旦哪天能抓到就會自動顯示，抓不到時安全跳過，不會讓 `<script>` 標籤在正式環境 404、也不會顯示假的「0 筆」狀態。用本機 `python -m http.server` 開真實頁面測試才發現：這個瀏覽工具對 `file://` 只給靜態快照、不會真的跑 JS，改用 HTTP server 才能驗證中英文兩版都正確載入且 console 無錯誤。
+3. **Movebank 排序修正得到真實環境直接證實**：拉當天稍早（00:19）的真實 log，確認上一輪修正的排序權重確實把使用者驗證過的 3 個 EAAF 研究排到最前面（`Tracking Curlew sandpipers along the EAAF` 以 1100 分排名第一）——排序邏輯本身修對了，只是這些研究在 Movebank 端目前沒有可下載的新座標，系統照設計安全退回範例資料。
+4. **意外抓到一個新的靜默失敗**：同一天再晚 40 分鐘的下一次執行，Movebank 回報「全站共 0 個 study」，跟稍早的 8769 個天差地遠，但程式碼在這種「請求技術上成功、解析出 0 筆」的情況完全沒印任何診斷，事後無法判斷原因。補上一行診斷（印出原始回應長度與前 200 字），下次再發生才有線索可查，而不是又要重新從頭猜測。
+
+**教訓**：使用者只是說「我把檔案抓到本機資料夾」，不代表這個資料夾有 `.git`——往後遇到類似描述，第一步先確認 git 狀態，不要預設既有的稽核工具鏈能直接沿用。另外，修完程式碼只要有跑過 `python h5n1.py`（哪怕只是為了驗證語法），跑完一定要立刻檢查 `git status`，把沙盒離線環境產生的降級資料用 `git restore` 復原，只留下真正手動修改的檔案，避免工作目錄裡混著沙盒資料誤導下一次判斷。
+
+---
+
 # H5N1 風控核心準則確立、候鳥雙軌數據重構、16:9 簡報與地圖一體化升級 (v2.9.5)
 
 已成功完成 **確立 NSW 商業禽舍「零感染 (Area Freedom)」為唯一生死防線**、**候鳥雙軌數據（模型推估 vs 現場實測）架構重構**、**2 年推演時間軸數據解耦與 DAFF 498 起事件對齊**、**16:9 簡報 Slide 4 候鳥數據補齊與全地圖左側一體化極簡面板 (Zero East-Coast Obstruction)**、**RWD 換頁按鈕溢出修復** 與 **全專案文檔同步 (README / CHANGELOG / SOP / Task / Walkthrough)**！

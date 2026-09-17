@@ -111,6 +111,7 @@
     <script src="assets/js/purina_auth.js"></script>
     <script src="assets/js/bird_data.js"></script>
     <script src="assets/js/gbif_bird_data.js"></script>
+    <script src="assets/js/ala_bird_data.js"></script>
     <script src="assets/js/movebank_tracks.js"></script>
     <script src="assets/js/cases_events.js"></script>
 </head>
@@ -1737,6 +1738,45 @@
                 });
             }
 
+            // 10. Load ALA (Atlas of Living Australia) Citizen Science / Museum Records onto Map
+            // 2026-09-17：biocache.ala.org.au 目前對 GitHub Actions IP 封鎖，抓取端會寫出
+            // available:false 的空殼資料，這裡先判斷 available 再畫圖，避免顯示 0 筆假資料。
+            const alaMarkerLayers = [];
+            function renderAlaOnMap(data) {
+                if (!data || data.available === false || !Array.isArray(data.observations)) return;
+                data.observations.slice(0, 100).forEach(obs => {
+                    if (obs.lat && obs.lng) {
+                        const marker = L.circleMarker([obs.lat, obs.lng], {
+                            radius: 3.5,
+                            fillColor: '#a78bfa',
+                            color: '#ffffff',
+                            weight: 0.8,
+                            opacity: 0.8,
+                            fillOpacity: 0.75
+                        }).addTo(gisLeafletMap);
+
+                        marker.bindTooltip(`
+                            <div style="font-family:sans-serif; min-width: 220px; line-height: 1.4; padding: 2px;">
+                                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+                                    <strong style="color:#a78bfa; font-size:11px; font-weight:800;">🧬 ALA 公民科學/博物館紀錄</strong>
+                                    <span style="background:rgba(167, 139, 250, 0.2); color:#a78bfa; border:1px solid #a78bfa; font-size:9px; font-weight:bold; padding:1px 4px; border-radius:3px;">ALA</span>
+                                </div>
+                                <div style="font-size:11px; color:#f8fafc; margin-bottom:2px;">
+                                    ${obs.commonName || obs.scientificName || '未命名物種'}
+                                </div>
+                                <div style="font-size:10px; color:#cbd5e1; margin-bottom:2px;">
+                                    🏛️ 來源: ${obs.dataResource || 'Atlas of Living Australia'}
+                                </div>
+                                <div style="font-size:9px; color:#94a3b8; border-top:1px solid rgba(255,255,255,0.15); padding-top:3px; margin-top:3px;">
+                                    📅 紀錄日期: ${obs.obsDate || '未知'} | 州別: ${obs.state || 'Unknown'}
+                                </div>
+                            </div>
+                        `, { sticky: true });
+                        alaMarkerLayers.push(marker);
+                    }
+                });
+            }
+
             if (typeof window.ebirdDataEmbedded !== 'undefined') {
                 renderEbirdOnMap(window.ebirdDataEmbedded);
             } else {
@@ -1764,6 +1804,16 @@
                     renderGbifOnMap(data);
                 }).catch(err => {
                     console.warn('GBIF data fetch notice:', err);
+                });
+            }
+
+            if (typeof window.alaBirdDataEmbedded !== 'undefined') {
+                renderAlaOnMap(window.alaBirdDataEmbedded);
+            } else {
+                fetch('ala_bird_data.json').then(r => r.json()).then(data => {
+                    renderAlaOnMap(data);
+                }).catch(err => {
+                    console.warn('ALA data fetch notice:', err);
                 });
             }
 

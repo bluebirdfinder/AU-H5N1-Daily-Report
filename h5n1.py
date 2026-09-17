@@ -2566,6 +2566,42 @@ def fetch_ala_data():
         "dir": "desc"
     }
 
+    def _write_ala_output(available, reason=""):
+        """
+        不論成功或失敗都寫出 ala_bird_data.json 與 assets/js/ala_bird_data.js。
+        2026-09-17：biocache.ala.org.au 目前對 GitHub Actions 所在 IP 網段的所有請求
+        （含 curl_cffi 擬真與真實 Playwright 瀏覽器）都直接回極短內容，四段降級鏈
+        每次執行幾乎必定失敗，屬於 IP 層級封鎖，非本專案程式碼可解。若前端 <script src="assets/js/ala_bird_data.js">
+        只在抓取成功時才寫檔，這個資源在正式環境會近乎每次都 404。改為失敗時也寫出
+        「available: false」的空殼資料，讓前端可以安全判斷並隱藏 ALA 區塊，而非引用一個不存在的檔案；
+        一旦未來封鎖解除、抓取成功，前端會自動改用真實資料，不需要再改程式碼。
+        """
+        utc_now = datetime.now(timezone.utc)
+        taipei_now = utc_now + timedelta(hours=8)
+        payload = {
+            "fetched_at_utc": utc_now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "fetched_at_taipei": taipei_now.strftime("%Y-%m-%d %H:%M:%S"),
+            "source": "Atlas of Living Australia (Biocache API)",
+            "available": available,
+            "unavailable_reason": reason if not available else "",
+            "total_matched_in_ala": 0,
+            "sample_records_count": 0,
+            "state_counts": {},
+            "observations": []
+        }
+        return payload
+
+    def _finalize(payload, log_success_msg):
+        try:
+            with open("ala_bird_data.json", "w", encoding="utf-8") as f:
+                json.dump(payload, f, ensure_ascii=False, indent=2)
+            os.makedirs("assets/js", exist_ok=True)
+            with open("assets/js/ala_bird_data.js", "w", encoding="utf-8") as f_js:
+                f_js.write("window.alaBirdDataEmbedded = " + json.dumps(payload, ensure_ascii=False, indent=2) + ";\n")
+            print(log_success_msg)
+        except Exception as e:
+            print(f"[ALA API] 寫入 ala_bird_data.json/js 失敗: {str(e)[:80]}")
+
     try:
         import urllib.parse
         import html as html_module
@@ -2573,6 +2609,7 @@ def fetch_ala_data():
         raw_text = smart_fetch_url(url, headers={"Accept": "application/json"}, timeout=12)
         if not raw_text:
             print("[ALA API] 四段降級鏈全部失敗，跳過 ALA 數據處理")
+            _finalize(_write_ala_output(False, "四段降級鏈全部失敗"), "[ALA API] 已寫入空殼 ala_bird_data.json/js（本次無可用資料，前端將自動隱藏 ALA 區塊）")
             return
 
         # Playwright 直接導向 API 網址時，Chrome 會把純 JSON 包一層 <html><body><pre>...</pre></body></html>，
@@ -2583,6 +2620,7 @@ def fetch_ala_data():
             pre_match = re.search(r"<pre[^>]*>(.*?)</pre>", raw_text, re.DOTALL)
             if not pre_match:
                 print("[ALA API] 回應內容無法解析為 JSON，跳過 ALA 數據處理")
+                _finalize(_write_ala_output(False, "回應內容無法解析為 JSON"), "[ALA API] 已寫入空殼 ala_bird_data.json/js（本次無可用資料，前端將自動隱藏 ALA 區塊）")
                 return
             data = json.loads(html_module.unescape(pre_match.group(1)))
 
@@ -2624,18 +2662,19 @@ def fetch_ala_data():
             "fetched_at_utc": utc_now.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "fetched_at_taipei": taipei_now.strftime("%Y-%m-%d %H:%M:%S"),
             "source": "Atlas of Living Australia (Biocache API)",
+            "available": True,
+            "unavailable_reason": "",
             "total_matched_in_ala": total_records,
             "sample_records_count": len(processed_obs),
             "state_counts": state_counts,
             "observations": processed_obs
         }
 
-        with open("ala_bird_data.json", "w", encoding="utf-8") as f:
-            json.dump(ala_json, f, ensure_ascii=False, indent=2)
-        print(f"[ALA API] ✅ 成功寫入 ala_bird_data.json ({len(processed_obs)} 筆紀錄)")
+        _finalize(ala_json, f"[ALA API] ✅ 成功寫入 ala_bird_data.json 與 assets/js/ala_bird_data.js ({len(processed_obs)} 筆紀錄)")
 
     except Exception as e:
         print(f"[ALA API] 抓取例外: {str(e)[:100]}")
+        _finalize(_write_ala_output(False, f"抓取例外: {str(e)[:100]}"), "[ALA API] 已寫入空殼 ala_bird_data.json/js（本次無可用資料，前端將自動隱藏 ALA 區塊）")
 
 
 # ==================== GBIF API 全球生物多樣性機構 (補齊學術/科考/海洋遙測) ====================
@@ -2810,6 +2849,12 @@ def fetch_movebank_live_tracks(mb_user, mb_pass):
         raise ValueError("study 清單回傳非預期格式或需要授權條款")
 
     studies = _parse_csv(resp_text)
+    if not studies:
+        # 2026-09-17：曾在真實環境觀測到 study 清單請求「成功」(HTTP 200、格式像 CSV)
+        # 卻解析出 0 筆，與同一天稍早同帳號抓到 8769 個 study 的結果矛盾，且原本完全沒有
+        # 任何診斷輸出，事後無法判斷是 Movebank 端暫時性異常還是回應格式真的變了。
+        # 印出原始回應長度與前 200 字，下次再發生時才有線索可查。
+        print(f"[Movebank API] study 清單解析為 0 筆，原始回應長度 {len(resp_text)} 字，前 200 字: {resp_text[:200]!r}")
 
     # 2026-09-16 修正 (第一輪)：Movebank 帳號預設就能「看到」全平台公開 study 的中繼資料
     # （本帳號實測一次可見 2059 / 8769 個），絕大多數跟本專案的高風險澳洲海鳥無關（第一次真實

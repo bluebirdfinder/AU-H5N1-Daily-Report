@@ -26,6 +26,13 @@
 - [x] **依 WHA/DCCEEW/BirdLife Australia 官方文件擴充候鳥物種清單**：新增黑天鵝、麥雞鵝、尖尾濱鷸；記錄「易感性 vs 滅絕脆弱性」方法論陷阱，刻意排除跟監測目的無關的純脆弱性物種。
 - [ ] **待辦（需使用者處理）**：Movebank 找到的相關研究向擁有者申請下載權限；`purina_auth.js` 密碼門商業決策；ALA 是否值得繼續投入繞過 IP 封鎖。
 
+## 🟢 今日已完成重點 (2026-09-17 Completed - v2.10.3 本機環境重建 + ALA 前端防禦性綁定 + Movebank 二次驗證)
+- [x] **本機工作環境重建為 git repo**：使用者將整個 repo 下載為本機裸資料夾（無 `.git`），補上 `git init` + `git remote add origin` + `git fetch`，確認本機檔案與 `origin/main` 僅有抓取時間戳記差異、無真實資料落差。
+- [x] **ALA 前端補上防禦性綁定**：真實 `gh run view` log 重新確認抓取端仍被 WAF 擋（195 字元回應），與 v2.10.2 記錄一致，非本次修復範圍。`fetch_ala_data()` 改為失敗時也寫出安全空殼 `ala_bird_data.json`/`assets/js/ala_bird_data.js`；`risk_assessment.html`/`_en.html` 新增 `renderAlaOnMap()` 地圖圖層（比照既有 GBIF 圖層），資料可用時自動顯示、不可用時安全隱藏。已用本機 HTTP server + 瀏覽器實測中英文兩版 console 無錯誤。
+- [x] **Movebank 排序修正真實環境二次驗證**：真實 log 直接證實 v2.10.2 排序修正生效，使用者驗證過的 EAAF 研究排名第一（1100 分）。
+- [x] **發現並修復 Movebank 靜默失敗**：同一天另一次執行回報「全站 0 個 study」，與同日稍早的 8769 個天差地遠，且原本毫無診斷輸出；已補上原始回應長度/前 200 字的診斷 log。
+- [ ] **待辦（需使用者處理）**：`purina_auth.js` 密碼門商業決策（拿掉「機密」文案 vs 認真做伺服器端驗證）；ALA 資料源在 GitHub Actions 環境下是否值得繼續投入繞過 IP 封鎖；下次排程執行後檢查 Movebank「0 個 study」新診斷 log 是否再次出現。
+
 ## 🟢 歷史已完成重點 (2026-09-08 Completed - v2.9.5 & v2.9.4 & v2.9.3 & v2.9.2)
 - [x] **🚨 確立最高指導原則：NSW 商業家禽場「零感染 (Area Freedom)」為唯一生死防線 (`AGENTS.md` / `AGENT.md`)**
   - [x] 明確建立最高指導原則：台灣檢疫法規以 NSW 全轄區為宣告單位，NSW 商業家禽場 0 確診是唯一的生死防線 (Red Line)。
