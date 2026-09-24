@@ -1,15 +1,15 @@
 window.casesEventsEmbedded = {
-  "generated_at_utc": "2026-09-24T00:58:15Z",
-  "total_events": 625,
+  "generated_at_utc": "2026-09-24T13:03:45Z",
+  "total_events": 640,
   "negative_events": 2450,
-  "hotline_reports": 49864,
+  "hotline_reports": 50755,
   "events_by_state": {
     "WA": 10,
     "SA": 317,
-    "VIC": 195,
-    "NSW": 56,
+    "VIC": 199,
+    "NSW": 66,
     "QLD": 2,
-    "TAS": 44,
+    "TAS": 45,
     "NT": 0,
     "ACT": 0
   },
