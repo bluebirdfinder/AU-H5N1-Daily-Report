@@ -18,7 +18,7 @@
 
 ### 🦭 首頁新增哺乳類跨種感染事件卡片
 - `report_template.html`/`_en.html` 新增獨立卡片（總數、各州、NSW、最近採樣日、物種分佈），資料來自 `assets/js/daff_mammal_events.js`。**不併入鳥類物種圖表與任何風險分數**；資料缺失或 0 筆時自動隱藏。
-- 已知未驗證/未處理：編譯後 `index*.html` 的卡片以實際排程結果為準；`cases_events.json` 尚未用 xlsx 逐筆校正；`Other Territories` 網頁正則遇到其他領地時會全算成 JBT。
+- 已知未處理：`cases_events.json` 尚未用 xlsx 逐筆校正；`Other Territories` 網頁正則遇到其他領地時會全算成 JBT。
 
 ## [v2.10.3] - 2026-09-17
 

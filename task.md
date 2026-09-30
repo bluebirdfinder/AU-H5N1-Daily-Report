@@ -6,7 +6,7 @@
 - [x] **新增 `fetch_daff_events_xlsx()`**：下載/解析 DAFF 官方逐筆 xlsx → `daff_events.json`，並與 `cases_events.js` 對帳（真實環境驗證通過）。
 - [x] **首頁哺乳類跨種感染事件卡片**（中英文模板）：18 筆，不併入風險分數。
 - [x] 更新 `CLAUDE.md`、`CHANGELOG.md`、`README.md`、`task.md`、`walkthrough.md`，並更正「DAFF 是純野鳥統計」的錯誤結論。
-- [ ] 待驗證：編譯後 `index.html`/`index_en.html` 上的哺乳類卡片。
+- [x] 編譯後 `index.html`/`index_en.html` 上的哺乳類卡片已驗證（run 於 2026-09-30 08:56，卡片可見、18 起、無 JS 錯誤）。
 - [ ] 待決定：是否用 xlsx 逐筆校正 `cases_events.json`；ALA 抓取仍被 IP 封鎖；`purina_auth.js` 密碼門僅為視覺遮罩。
 
 ## 🟢 今日已完成重點 (2026-09-16 Completed - v2.10.0 Claude Code 全面架構稽核)
