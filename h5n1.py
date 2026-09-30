@@ -868,13 +868,22 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
         # 2026-09-30：DAFF 自 Jervis Bay Territory（傑維斯灣領地，聯邦直轄地，法律上不算 NSW）
         # 2026-09-11 首例確診起，把它列為獨立於 NSW 的統計類別；原本六州正則沒有這一條，
         # 導致州別加總（WA+SA+VIC+NSW+QLD+TAS）比全澳總數少了剛好 1 起，此筆被靜默漏掉。
-        ("JBT", r"(\d+)\s+in\s+Jervis Bay Territory"),
+        # 實際頁面原文（2026-09-30 使用者貼出）："1 in Other Territories*"，註腳才寫
+        # "Jervis Bay Territory (Commonwealth jurisdiction)"，所以要比對 Other Territories。
+        ("JBT", r"(\d+)\s+in\s+(?:Other Territories|Jervis Bay Territory)"),
         ("TAS", r"(\d+)\s+in\s+Tasmania"),
     ]
     for st, pat in st_patterns:
         m = re.search(pat, text, re.IGNORECASE)
         if m:
             stats["events_by_state"][st] = int(m.group(1))
+
+    # 診斷：印出頁面中含州別字樣的原文片段，供比對 JBT 等正則為何沒命中（僅 log，不影響統計）
+    try:
+        for m_dbg in re.finditer(r"[^\n]{0,80}(?:Jervis|Territory|\bin\s+(?:New South Wales|Victoria|Tasmania|Western Australia|South Australia|Queensland))[^\n]{0,80}", text, re.IGNORECASE):
+            print(f"[DAFF 州別原文診斷] {m_dbg.group(0).strip()}")
+    except Exception as e:
+        print(f"[DAFF 州別原文診斷] 失敗: {e}")
 
     stats["source"] = "live"
     stats["scrape_time"] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
@@ -2067,6 +2076,11 @@ def main():
         print(f"[eBird API 執行例外] {e}")
 
     try:
+        fetch_daff_events_xlsx()
+    except Exception as e:
+        print(f"[DAFF xlsx 執行例外] {e}")
+
+    try:
         fetch_ala_data()
     except Exception as e:
         print(f"[ALA API 執行例外] {e}")
@@ -2548,6 +2562,122 @@ def write_cases_events_js(official_stats):
         print(f"[Cases Events 同步] ✅ 成功寫入 assets/js/cases_events.js (全澳 {payload['total_events']} 起 / NSW {nsw_n} 起)")
     except Exception as e:
         print(f"[Cases Events 同步失敗] {str(e)[:80]}")
+
+
+# ==================== DAFF 官方逐筆事件 xlsx（2026-09-30 新增，第一步：只抓取＋對帳，不改頁面數字）====================
+DAFF_EVENTS_XLSX_URL = "https://www.agriculture.gov.au/sites/default/files/documents/H5_bird_flu_events.xlsx"
+_MAMMAL_RE = re.compile(r"seal|sea lion|fox|dolphin|whale|porpoise|mammal", re.IGNORECASE)
+
+
+def parse_daff_events_xlsx(data):
+    """
+    以標準庫 (zipfile + xml) 解析 DAFF 官方 H5_bird_flu_events.xlsx，不依賴 openpyxl。
+    欄位：Record id / Date sampled / Jurisdiction / LGA / Locality / Common name / Scientific name。
+    實測此檔用 inline string（無 sharedStrings），但兩種都支援；日期為 Excel 序號，
+    134 筆是 '#N/A'（DAFF 端資料缺漏），一律轉成 None 而非猜測。
+    """
+    import io
+    import zipfile
+    import xml.etree.ElementTree as ET
+    M = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+    z = zipfile.ZipFile(io.BytesIO(data))
+    shared = []
+    if "xl/sharedStrings.xml" in z.namelist():
+        shared = ["".join(t.text or "" for t in si.iter(M + "t"))
+                  for si in ET.fromstring(z.read("xl/sharedStrings.xml")).iter(M + "si")]
+    rows = []
+    for r in ET.fromstring(z.read("xl/worksheets/sheet1.xml")).iter(M + "row"):
+        d = {}
+        for c in r.findall(M + "c"):
+            col = "".join(ch for ch in c.get("r", "") if ch.isalpha())
+            v, i = c.find(M + "v"), c.find(M + "is")
+            if i is not None:
+                d[col] = "".join(t.text or "" for t in i.iter(M + "t"))
+            elif v is not None:
+                d[col] = shared[int(v.text)] if c.get("t") == "s" else v.text
+        rows.append(d)
+    records = []
+    for d in rows[1:]:
+        if not d.get("A"):
+            continue
+        sampled = None
+        if str(d.get("B", "")).isdigit():
+            sampled = (datetime(1899, 12, 30) + timedelta(days=int(d["B"]))).strftime("%Y-%m-%d")
+        common = d.get("F", "") or ""
+        jur = d.get("C", "") or ""
+        place = f"{d.get('D', '')} {d.get('E', '')}"
+        # 「Other」領地：以地名判斷是否為 Jervis Bay Territory，其他領地維持 Other
+        state = "JBT" if jur == "Other" and "jervis" in place.lower() else jur
+        records.append({
+            "record_id": d["A"], "date_sampled": sampled, "jurisdiction": jur, "state": state,
+            "lga": d.get("D"), "locality": d.get("E"), "common_name": common,
+            "scientific_name": d.get("G"),
+            "is_mammal": bool(_MAMMAL_RE.search(common)),
+        })
+    return records
+
+
+def fetch_daff_events_xlsx():
+    """
+    下載 DAFF 官方逐筆事件 xlsx → daff_events.json，並印出與 official_stats 的對帳報告。
+    第一步只抓取與對帳：不修改 cases_events.json 或任何頁面數字。任何失敗都安全跳過。
+    """
+    print("[DAFF xlsx] 開始下載官方逐筆事件檔...")
+    data = None
+    try:
+        from curl_cffi import requests as cffi_requests
+        resp = cffi_requests.get(DAFF_EVENTS_XLSX_URL, impersonate="chrome", timeout=60)
+        if resp.status_code == 200 and resp.content[:2] == b"PK":
+            data = resp.content
+    except Exception as e:
+        print(f"[DAFF xlsx] curl_cffi 失敗: {str(e)[:80]}")
+    if data is None:
+        try:
+            resp = requests.get(DAFF_EVENTS_XLSX_URL, timeout=60,
+                                headers={"User-Agent": "Mozilla/5.0"})
+            if resp.status_code == 200 and resp.content[:2] == b"PK":
+                data = resp.content
+            else:
+                print(f"[DAFF xlsx] requests 回應異常: HTTP {resp.status_code}, {len(resp.content)} bytes")
+        except Exception as e:
+            print(f"[DAFF xlsx] requests 失敗: {str(e)[:80]}")
+    if data is None:
+        print("[DAFF xlsx] ⚠️ 下載失敗，保留上一份 daff_events.json（若有），不影響其他流程")
+        return
+
+    records = parse_daff_events_xlsx(data)
+    if not records:
+        print("[DAFF xlsx] ⚠️ 解析出 0 筆，放棄寫入")
+        return
+    by_state = {}
+    for r in records:
+        by_state[r["state"]] = by_state.get(r["state"], 0) + 1
+    mammals = [r for r in records if r["is_mammal"]]
+    payload = {
+        "fetched_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "source": DAFF_EVENTS_XLSX_URL,
+        "total_events": len(records),
+        "events_by_state": by_state,
+        "mammal_events": len(mammals),
+        "records": records,
+    }
+    with open("daff_events.json", "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=1)
+    print(f"[DAFF xlsx] ✅ 寫入 daff_events.json：{len(records)} 筆 | 各州 {by_state} | 哺乳類 {len(mammals)} 筆")
+
+    # 對帳：與同次執行剛寫出的 assets/js/cases_events.js（official_stats）比較
+    try:
+        txt = open("assets/js/cases_events.js", encoding="utf-8").read()
+        official = json.loads(txt[txt.index("{"): txt.rindex("}") + 1])
+        diffs = []
+        if official.get("total_events") != len(records):
+            diffs.append(f"總數 網頁={official.get('total_events')} xlsx={len(records)}")
+        for st, n in official.get("events_by_state", {}).items():
+            if n and by_state.get(st, 0) != n:
+                diffs.append(f"{st} 網頁={n} xlsx={by_state.get(st, 0)}")
+        print("[DAFF xlsx 對帳] " + ("✅ 與網頁統計完全一致" if not diffs else "⚠️ 不一致: " + "; ".join(diffs)))
+    except Exception as e:
+        print(f"[DAFF xlsx 對帳] 略過: {str(e)[:80]}")
 
 
 # ==================== ALA API (Atlas of Living Australia) 免 Key 候鳥數據備援模組 ====================
