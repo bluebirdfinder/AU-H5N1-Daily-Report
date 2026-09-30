@@ -876,6 +876,13 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
         if m:
             stats["events_by_state"][st] = int(m.group(1))
 
+    # 診斷：印出頁面中含州別字樣的原文片段，供比對 JBT 等正則為何沒命中（僅 log，不影響統計）
+    try:
+        for m_dbg in re.finditer(r"[^\n]{0,80}(?:Jervis|Territory|\bin\s+(?:New South Wales|Victoria|Tasmania|Western Australia|South Australia|Queensland))[^\n]{0,80}", text, re.IGNORECASE):
+            print(f"[DAFF 州別原文診斷] {m_dbg.group(0).strip()}")
+    except Exception as e:
+        print(f"[DAFF 州別原文診斷] 失敗: {e}")
+
     stats["source"] = "live"
     stats["scrape_time"] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     print(f"[DAFF 官網精確解析 ({datetime.now(timezone.utc).strftime('%Y-%m-%d')})] 確診總事件數: {stats['total_events']} 起 | 陰性事件數: {stats['negative_events']} 起 | 物種統計: {stats['species_counts']}")
