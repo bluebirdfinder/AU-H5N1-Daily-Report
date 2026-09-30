@@ -2,6 +2,24 @@
 
 所有專案版本更新與重大變更均紀錄於此。
 
+## [v2.11.0] - 2026-09-30
+
+### 🧾 DAFF 改制現況複查與 GBIF 資料凍結修復
+- 複查確認 DAFF 事件制改版為 2026-08-12 生效，本專案早已因應；13 天無人看管期間，跨頁數字（全澳 666 / NSW 67）與 8 個頁面仍一致，無回歸。
+- **GBIF 凍結 8 天修復（真實環境已驗證）**：`fetch_gbif_data()` 原本沒有日期篩選，8 天內每次都回同一批 570 筆。新增 `eventDate` 近 90 天滾動窗口；驗證結果：記錄變為 414 筆、最新觀測日 2026-09-21。
+
+### 🏝️ Jervis Bay Territory 納入州別統計
+- DAFF 自 2026-09-11 起將傑維斯灣領地列為獨立於 NSW 的類別，原本六州加總比全澳總數少 1。`h5n1.py` 五處州別關鍵字清單新增 JBT（刻意放在 NSW 之前，關鍵字用 `Jervis Bay Territory`/`Booderee`，避免把屬於 NSW 的 EVENT-427 誤判）；`h5n1_weekly_slides.html` 補上 JBT 明細行。
+- **第一版正則實測失敗**：DAFF 頁面實際寫 `1 in Other Territories*`（Jervis Bay 只在註腳），已改為同時接受兩種寫法，並加入 `[DAFF 州別原文診斷]` log。真實環境驗證：JBT=1，州別加總 668 = 全澳總數。
+
+### 📥 新增 DAFF 官方逐筆事件 xlsx 接入
+- 新增 `fetch_daff_events_xlsx()`：下載 `H5_bird_flu_events.xlsx`、以標準庫解析、寫出 `daff_events.json`，並與 `cases_events.js` 對帳。真實環境驗證：668 筆、各州與官網一致、對帳通過。
+- 發現並更正先前錯誤結論：DAFF 並非純野鳥統計，xlsx 含 **18 筆哺乳類事件**（毛皮海豹 5、海獅 3、紅狐 4、海豚 6；SA 10、VIC 8），計入 668 總數但網頁物種圖表不含。134 筆採樣日期為 `#N/A`，一律存為 `null`。
+
+### 🦭 首頁新增哺乳類跨種感染事件卡片
+- `report_template.html`/`_en.html` 新增獨立卡片（總數、各州、NSW、最近採樣日、物種分佈），資料來自 `assets/js/daff_mammal_events.js`。**不併入鳥類物種圖表與任何風險分數**；資料缺失或 0 筆時自動隱藏。
+- 已知未驗證/未處理：編譯後 `index*.html` 的卡片以實際排程結果為準；`cases_events.json` 尚未用 xlsx 逐筆校正；`Other Territories` 網頁正則遇到其他領地時會全算成 JBT。
+
 ## [v2.10.3] - 2026-09-17
 
 ### 🗂️ 本機工作環境從裸資料夾重建為真正的 git repo

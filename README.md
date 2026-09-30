@@ -46,6 +46,12 @@
 
 ---
 
+### v2.11.0 (2026-09-30)
+- 📥 **接入 DAFF 官方逐筆事件 xlsx**：新增 `fetch_daff_events_xlsx()`，每次排程下載並解析官方 `H5_bird_flu_events.xlsx` 為 `daff_events.json`，與網頁統計自動對帳（真實環境驗證：668 筆、完全一致）。
+- 🦭 **新增哺乳類跨種感染事件卡片**：官方檔案含 18 筆海豹、海獅、紅狐、海豚事件（計入總數但官網圖表不含），首頁獨立顯示，不併入風險分數。
+- 🏝️ **Jervis Bay Territory 納入州別統計**：修正六州加總比全澳總數少 1 的問題（DAFF 頁面寫作 `Other Territories`）。
+- 🐦 **GBIF 加入近 90 天滾動窗口**：修復 8 天內回傳同一批 570 筆記錄的凍結問題。詳見 `CHANGELOG.md` 與 `CLAUDE.md`。
+
 ### v2.10.0 (2026-09-16)
 - 🔍 **Claude Code 首次全專案架構稽核與資料完整性修復**：
   - 逐區塊比對 `index.html`/`risk_assessment.html` 顯示數字與 `cases_events.json`/`bird_data.json` 實際內容，修復 NSW/SA/VIC/TAS 事件數長期停留在 2026-09-08 舊快照（頁面顯示 22 起，資料庫實際已達 32 起）的問題。
@@ -166,6 +172,7 @@
 * **`index.html` / `index_en.html`**：編譯後生成的正式雙語動態報告網頁。
 * **`h5n1.py`**：自動爬取官方、新聞 RSS、eBird API 與 ALA API 之核心 Python 引擎。
 * **`cases_events.json`**：**動態事件資料庫** (542 起 Positive Events 點位與屬性紀錄，唯一 ground truth)。
+* **`daff_events.json` / `assets/js/daff_mammal_events.js`**：**DAFF 官方逐筆事件 xlsx 的解析結果與哺乳類事件摘要** (668 筆，含 18 筆哺乳類；`fetch_daff_events_xlsx()` 每次排程更新)。
 * **`cases.json`**：**歷史單鳥隻數資料庫** (236 隻凍結點位紀錄)。
 * **`assets/js/cases_events.js`**：**`cases_events.json`/`official_stats` 的免 CORS 打包版本**，`risk_assessment.html` 靠此檔案動態校正 NSW/州別事件數字（`h5n1.py` 的 `write_cases_events_js()` 產生）。
 * **`CLAUDE.md`**：Claude Code 專案記憶，記錄核心規則與已知資料完整性陷阱清單。

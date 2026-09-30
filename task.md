@@ -1,5 +1,14 @@
 # 任務清單與進度記錄 (Task Progress Record)
 
+## 🟢 今日已完成重點 (2026-09-30 Completed - v2.11.0 DAFF 官方 xlsx 接入與哺乳類追蹤)
+- [x] **GBIF 查詢加入近 90 天 `eventDate` 滾動窗口**：修復 8 天回傳同一批 570 筆記錄的凍結問題（真實環境驗證：414 筆、最新觀測日 2026-09-21）。
+- [x] **Jervis Bay Territory 納入州別統計**：五處州別關鍵字清單 + 週報簡報明細行；第一版正則實測未命中，依頁面原文 `1 in Other Territories*` 修正（真實環境驗證 JBT=1、州別加總 668）。
+- [x] **新增 `fetch_daff_events_xlsx()`**：下載/解析 DAFF 官方逐筆 xlsx → `daff_events.json`，並與 `cases_events.js` 對帳（真實環境驗證通過）。
+- [x] **首頁哺乳類跨種感染事件卡片**（中英文模板）：18 筆，不併入風險分數。
+- [x] 更新 `CLAUDE.md`、`CHANGELOG.md`、`README.md`、`task.md`、`walkthrough.md`，並更正「DAFF 是純野鳥統計」的錯誤結論。
+- [ ] 待驗證：編譯後 `index.html`/`index_en.html` 上的哺乳類卡片。
+- [ ] 待決定：是否用 xlsx 逐筆校正 `cases_events.json`；ALA 抓取仍被 IP 封鎖；`purina_auth.js` 密碼門僅為視覺遮罩。
+
 ## 🟢 今日已完成重點 (2026-09-16 Completed - v2.10.0 Claude Code 全面架構稽核)
 - [x] **監控頁 + 風險評估頁逐區塊架構稽核**（33 個功能區塊，含資料來源分類、稽核發現）。
 - [x] **修復 NSW/SA/VIC/TAS 事件數凍結於 2026-09-08 舊快照**：`parse_daff_official_stats()` 離線 fallback 改為呼叫既有的 `compute_stats_from_cases()`；新增 `write_cases_events_js()` 產出 `assets/js/cases_events.js`，讓 `risk_assessment.html` 原本的死綁定（`window.casesEventsEmbedded`）變成真正動態同步。
