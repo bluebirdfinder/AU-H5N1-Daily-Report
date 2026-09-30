@@ -868,7 +868,9 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
         # 2026-09-30：DAFF 自 Jervis Bay Territory（傑維斯灣領地，聯邦直轄地，法律上不算 NSW）
         # 2026-09-11 首例確診起，把它列為獨立於 NSW 的統計類別；原本六州正則沒有這一條，
         # 導致州別加總（WA+SA+VIC+NSW+QLD+TAS）比全澳總數少了剛好 1 起，此筆被靜默漏掉。
-        ("JBT", r"(\d+)\s+in\s+Jervis Bay Territory"),
+        # 實際頁面原文（2026-09-30 使用者貼出）："1 in Other Territories*"，註腳才寫
+        # "Jervis Bay Territory (Commonwealth jurisdiction)"，所以要比對 Other Territories。
+        ("JBT", r"(\d+)\s+in\s+(?:Other Territories|Jervis Bay Territory)"),
         ("TAS", r"(\d+)\s+in\s+Tasmania"),
     ]
     for st, pat in st_patterns:
