@@ -70,8 +70,8 @@
 
 1. **跨頁一致性複查（全部通過）**：用 Playwright 重新驗證 09-16/17 修過的 6 個位置（index/index_en 的 `OFFICIAL_STATS`、risk_assessment/_en 的 KPI 卡、兩份 `risk_assessment_slides` 的 KPI、`h5n1_weekly_slides` 的全部 `data-bind`），13 天、超過 15 次自動排程執行後全部仍與 `cases_events.js` 一致（全澳 666 / NSW 67），沒有回歸。
 2. **⚠️ GBIF 資料「看起來每天在更新、實際上 8 天沒抓到任何新記錄」（真 bug，已修復）**：`fetch_gbif_data()` 的查詢參數只有 `country`/`scientificName`/`hasCoordinate`/`limit`，完全沒有帶日期範圍或排序參數。GBIF 的 `occurrence/search` 在沒有 `eventDate` 篩選時，回傳的是內部預設排序（非按時間新舊）的固定前 N 筆——逐筆比對 2026-09-22 與 2026-09-30 兩天的 `gbif_bird_data.json`，570 筆記錄的「物種+經緯度+日期」組合**完全相同**，只有 `fetched_at_utc` 時間戳在變。跟 Movebank/週報簡報是同一種「有真的打 API、但回傳內容從未真正變化」的陷阱，只是這次連程式邏輯本身都沒錯，純粹是漏了一個查詢參數。**修復**：新增 `eventDate` 近 90 天滾動區間篩選，讓查詢範圍隨執行當下時間往前推移，新記錄會進入窗口、舊記錄會被排除。**尚未在真實環境驗證**（需要下次排程執行後比對 `gbif_bird_data.json` 是否真的隨日期變化）。
-3. **哺乳類跨種案例完全未被追蹤（新發現的範疇缺口，非既有邏輯的 bug）**：真實世界 2026 年 8-9 月已有紅狐（Adelaide）、澳洲海獅、海豚、長鼻毛皮海豹等哺乳類 H5N1 確診案例（WWF/The Conversation/CSIRO 相關報導證實）。查證發現 DAFF 官方「Event data」表格本身就是純野鳥統計——爬到的 `species_counts` 8 個分類全是鳥種，加總剛好等於 `total_events`，完全沒有哺乳類項目，代表我們的爬蟲忠實反映了 DAFF 這張表的統計範圍，不是漏抓。但連帶發現 `discover_new_cases()`（新地點自動偵測）的關鍵字清單（`wild bird`/`petrel`/`skua`/`seabird`/`influenza`/`h5n1`/`h5`/`detection`）完全沒有 `fox`/`seal`/`dolphin`/`sea lion`/`mammal` 等哺乳類關鍵字——若 DAFF 未來把哺乳類案例併入同一張表，現有邏輯會直接把相關段落濾掉，連被動發現的機會都沒有。使用者決定新增追蹤，但要求先評估資料來源（官方或有公信力媒體），**尚未實作，設計提案待下一步討論**。
-4. **⚠️ Jervis Bay Territory（傑維斯灣領地）讓六州加總對不起全澳總數（已修復，真 bug，經算術驗證）**：使用者貼的 Gemini 摘要提到「傑維斯灣領地 1 起」這個新分類，查證後不只確認屬實（ABC/WWF 等報導證實 DAFF 自 2026-09-11 Booderee 國家公園首例確診起，把這個聯邦直轄地列為獨立於 NSW 的統計類別），還用算術直接抓到本專案的真 bug：`WA 10 + SA 321 + VIC 220 + NSW 67 + QLD 2 + TAS 45 = 665`，但全澳總數是 `666`，剛好差 1，跟 Jervis Bay 那 1 起完全吻合。根因：`parse_daff_official_stats()` 的 `st_patterns` 州別擷取正則只有 WA/SA/NSW/QLD/VIC/TAS 六條，全澳總數靠另一組獨立正則抓到、有算進去，但六州明細表沒有 JBT 的比對規則，靜默漏掉。**修復**：在 `st_patterns` 新增 `("JBT", r"(\d+)\s+in\s+Jervis Bay Territory")`；在四個各自獨立維護州別關鍵字清單的函式（`compute_stats_from_cases()`、`auto_reconcile_event_shortfalls()`、`auto_fill_state_shortfalls()`、`enforce_official_state_ceilings()`）都補上 JBT 條目，且**刻意放在 NSW 之前**、關鍵字刻意用精確的 `"Jervis Bay Territory"`/`"Booderee"` 而非裸的 `"Jervis Bay"`——因為傑維斯灣這個海灣本身橫跨 NSW 的 Shoalhaven 轄區與 JBT 兩邊，資料庫裡既有的 `EVENT-427`（2026-08-28，地名寫「新南威爾斯州傑維斯灣 (Jervis Bay / Shoalhaven)」）是真正的 NSW 案例，若用裸關鍵字比對會把這筆既有案例誤判成 JBT（已用 Python 手動驗證這筆記錄不會被新關鍵字誤抓）。前端只有 `h5n1_weekly_slides.html` 有完整八州明細清單需要補 `data-bind="jbt-events"`；`risk_assessment.html`/`_en.html`、兩份 `risk_assessment_slides*.html` 都只綁定 NSW/VIC/SA 三個錨點州，不受影響不需修改。**尚未在真實環境驗證**（沒有觸發真正的 DAFF 即時抓取來確認 regex 真的抓得到「in Jervis Bay Territory」這行文字，目前只確認語法、關鍵字比對邏輯、既有記錄不會被誤判）。
+3. **哺乳類跨種案例完全未被追蹤（新發現的範疇缺口，非既有邏輯的 bug）**：真實世界 2026 年 8-9 月已有紅狐（Adelaide）、澳洲海獅、海豚、長鼻毛皮海豹等哺乳類 H5N1 確診案例（WWF/The Conversation/CSIRO 相關報導證實）。（⚠️ 已更正，見下方 2026-09-30 後續章節：DAFF 逐筆 xlsx 實際含 18 筆哺乳類事件，網頁物種圖表才是純野鳥）查證發現 DAFF 官方「Event data」網頁圖表本身只顯示鳥種——爬到的 `species_counts` 8 個分類全是鳥種，加總剛好等於 `total_events`，完全沒有哺乳類項目，代表我們的爬蟲忠實反映了 DAFF 這張表的統計範圍，不是漏抓。但連帶發現 `discover_new_cases()`（新地點自動偵測）的關鍵字清單（`wild bird`/`petrel`/`skua`/`seabird`/`influenza`/`h5n1`/`h5`/`detection`）完全沒有 `fox`/`seal`/`dolphin`/`sea lion`/`mammal` 等哺乳類關鍵字——若 DAFF 未來把哺乳類案例併入同一張表，現有邏輯會直接把相關段落濾掉，連被動發現的機會都沒有。使用者決定新增追蹤，但要求先評估資料來源（官方或有公信力媒體），**已實作：見下方後續章節（改用 DAFF 官方 xlsx，不需另外評估媒體來源）**。
+4. **⚠️ Jervis Bay Territory（傑維斯灣領地）讓六州加總對不起全澳總數（已修復，真 bug，經算術驗證）**：使用者貼的 Gemini 摘要提到「傑維斯灣領地 1 起」這個新分類，查證後不只確認屬實（ABC/WWF 等報導證實 DAFF 自 2026-09-11 Booderee 國家公園首例確診起，把這個聯邦直轄地列為獨立於 NSW 的統計類別），還用算術直接抓到本專案的真 bug：`WA 10 + SA 321 + VIC 220 + NSW 67 + QLD 2 + TAS 45 = 665`，但全澳總數是 `666`，剛好差 1，跟 Jervis Bay 那 1 起完全吻合。根因：`parse_daff_official_stats()` 的 `st_patterns` 州別擷取正則只有 WA/SA/NSW/QLD/VIC/TAS 六條，全澳總數靠另一組獨立正則抓到、有算進去，但六州明細表沒有 JBT 的比對規則，靜默漏掉。**修復**：在 `st_patterns` 新增 `("JBT", r"(\d+)\s+in\s+Jervis Bay Territory")（⚠️ 已更正：頁面實際寫 `1 in Other Territories*`，見後續章節）`；在四個各自獨立維護州別關鍵字清單的函式（`compute_stats_from_cases()`、`auto_reconcile_event_shortfalls()`、`auto_fill_state_shortfalls()`、`enforce_official_state_ceilings()`）都補上 JBT 條目，且**刻意放在 NSW 之前**、關鍵字刻意用精確的 `"Jervis Bay Territory"`/`"Booderee"` 而非裸的 `"Jervis Bay"`——因為傑維斯灣這個海灣本身橫跨 NSW 的 Shoalhaven 轄區與 JBT 兩邊，資料庫裡既有的 `EVENT-427`（2026-08-28，地名寫「新南威爾斯州傑維斯灣 (Jervis Bay / Shoalhaven)」）是真正的 NSW 案例，若用裸關鍵字比對會把這筆既有案例誤判成 JBT（已用 Python 手動驗證這筆記錄不會被新關鍵字誤抓）。前端只有 `h5n1_weekly_slides.html` 有完整八州明細清單需要補 `data-bind="jbt-events"`；`risk_assessment.html`/`_en.html`、兩份 `risk_assessment_slides*.html` 都只綁定 NSW/VIC/SA 三個錨點州，不受影響不需修改。**尚未在真實環境驗證**（沒有觸發真正的 DAFF 即時抓取來確認 regex 真的抓得到「in Jervis Bay Territory」這行文字，目前只確認語法、關鍵字比對邏輯、既有記錄不會被誤判）。
 
 ## 2026-09-17：ALA 前端綁定補完、Movebank 排序修正真實環境驗證、Movebank 新增靜默失敗診斷
 
@@ -88,6 +88,22 @@
 3. **修改前先 `git init` + 接上 GitHub remote**：使用者這次是把 repo 下載成本機一般資料夾（無 `.git`），既有的稽核方法（`git diff`/`git log` 比對）在這種狀態下用不了。已對本機資料夾執行 `git init`、`git remote add origin`、`git fetch`，並把 `HEAD` 指到追蹤 `origin/main` 的本機 `main` 分支（用 `git reset origin/main` 只動索引不動工作目錄，避免既有下載檔案被覆寫）。**教訓**：往後如果使用者說「我把檔案抓到本機資料夾」，先假設它不是 git repo，主動確認並重建 git 連線，不要預設 `git status`/`git diff` 這些指令能直接用。
 
 **方法論教訓（本輪新增）**：修完程式碼後只要有跑過 `python h5n1.py`，即使是為了驗證語法／離線安全性，也一定要跑完就立刻 `git status` 檢查，把沙盒離線環境產生的降級資料（GBIF/eBird 用真實資料重新覆寫過的 `bird_data.json`/`index.html`/週報歸檔等）用 `git restore` 復原回遠端版本，只保留真正手動修改的檔案；不要假設「反正沒 commit 就沒事」，工作目錄裡混著降級資料本身就會讓下一個人（或下一次的自己）誤判現況。
+
+## 2026-09-30（後續）：JBT 正則實測失敗、DAFF 官方 xlsx 接入、哺乳類卡片
+
+同一天稍晚，使用者貼出 DAFF `latest-data` 頁面原文與官方 `H5_bird_flu_events.xlsx`，推翻並修正了上面章節的三個結論（這個環境連不到 `agriculture.gov.au`，組織政策擋掉，所有真實內容都靠使用者貼上，或讓 GitHub Actions runner 抓取後讀 Actions log）。
+
+1. **⚠️ JBT 正則第一版根本沒命中（已修，真實環境驗證）**：頁面實際文字是 `1 in Other Territories*`，「Jervis Bay Territory (Commonwealth jurisdiction)」只是下一行註腳，所以 `in Jervis Bay Territory` 永遠比對不到，`events_by_state.JBT` 一直是 0，州別加總仍差 1。教訓：正則寫在沒看過原文的情況下就是猜測——`parse_daff_official_stats()` 現在會把含州別字樣的原文片段印進 log（`[DAFF 州別原文診斷]`）。現行正則同時接受 `Other Territories` 與 `Jervis Bay Territory`。run 36686132662 驗證：JBT=1，州別加總 668 = 全澳總數。
+2. **⚠️ 「DAFF 是純野鳥統計」是錯的（已更正）**：官方逐筆 xlsx 共 668 列，含 **18 筆哺乳類**（毛皮海豹 5、澳洲海獅 3、紅狐 4、海豚 6；SA 10、VIC 8、NSW 0）。它們計入 668 總數，只是網頁的物種圖表沒畫。先前只看了網頁圖表就下結論，沒有拿到逐筆檔。教訓：**官方頁面的圖表 ≠ 官方資料全貌，有下載連結就先抓下載檔**。
+3. **新增 `fetch_daff_events_xlsx()`（`h5n1.py`）**：每次排程下載 `https://www.agriculture.gov.au/sites/default/files/documents/H5_bird_flu_events.xlsx`（curl_cffi → requests），用標準庫（`zipfile` + `xml.etree`）解析，不依賴 openpyxl；寫出 `daff_events.json`（每筆含 record_id、採樣日、州、LGA、地名、俗名、學名、`is_mammal`），並與 `assets/js/cases_events.js` 對帳（log 標籤 `[DAFF xlsx 對帳]`）。真實環境驗證通過：runner 下載成功，668 筆，對帳完全一致。
+   - xlsx 用 inline string（沒有 sharedStrings）；日期是 Excel 序號，**134 筆是 `#N/A`，一律存 `null`，不猜**。
+   - Record id 規律：`-WB-` 野鳥、`-WM-` 野生哺乳類、`-FM-` 野外哺乳類（如紅狐）。
+   - 「Other」轄區依 LGA/地名含 "jervis" 判定為 JBT，其他領地維持 Other。
+   - **`cases_events.json` 尚未用 xlsx 校正**：資料庫的物種與地點多為自建節點，與官方逐筆紀錄不逐筆對應；這是刻意保留的下一步，範圍大，待卡片穩定運作幾天再評估。
+4. **哺乳類卡片（`report_template.html`/`_en.html`）**：新增獨立卡片，資料來自 `assets/js/daff_mammal_events.js`（`window.daffMammalEmbedded`，由 `write_daff_mammal_js()` 產生；種子檔已 commit，避免 script 404）。**刻意不併入鳥類物種圖表、`cases_events.json` 或任何風險分數**——風險錨點仍是「NSW 商業家禽 0 確診」。資料缺失或 0 筆時卡片自動隱藏。
+5. **GBIF 90 天窗口修復已驗證**：記錄從固定的 570 筆變成 414 筆，最新觀測日 2026-09-21，`fetched_at_utc` 更新。之後可用逐筆比對確認內容持續變動。
+
+**未處理/待決定**：`Other Territories` 若日後納入 Norfolk Island 等其他領地，網頁正則會把它們全算成 JBT（xlsx 路徑已用地名區分，網頁路徑沒有）；Crested Tern 網頁統計 498→500 是 DAFF 圖表自身變動，未追查。
 
 ## 開發規範
 
@@ -106,6 +122,8 @@
 | `cases_events.json` | 事件制病例資料庫（唯一 ground truth） |
 | `assets/js/cases_events.js` | `cases_events.json`/`official_stats` 的免 CORS 打包版本（2026-09-16 新增），`risk_assessment.html` 靠這個檔案動態校正 |
 | `bird_data.json` / `gbif_bird_data.json` / `movebank_tracks.json` | 三個候鳥數據源；eBird 已於 2026-09-16 補上 `EBIRD_API_KEY` 並驗證自動更新；GBIF 正常每日更新；Movebank 已串接真實 API + 授權自動同意流程，但目前排到的 study 均無近期活體航跡，故仍以標示清楚的範例資料 (`is_live_data:false`) 兜底 |
+| `daff_events.json` | DAFF 官方逐筆事件 xlsx 的解析結果（668 筆，含 `is_mammal`），每次排程由 `fetch_daff_events_xlsx()` 更新；比網頁圖表更完整的官方來源 |
+| `assets/js/daff_mammal_events.js` | 哺乳類事件摘要（`window.daffMammalEmbedded`），供首頁哺乳類卡片讀取 |
 | `assets/js/*.js` | 上述 JSON 的免 CORS 打包版本，供 `file://` 離線開啟 |
 | `h5n1_weekly_slides.html` | 疫情週報 16:9 簡報，`sync_weekly_slides()` 只改封面日期區間；事件數字 2026-09-16 已接上 `cases_events.js`（`data-bind` 屬性 + `syncWeeklySlideCaseEvents()`），週間比較敘述文字（「上週 X 起」）仍人工維護 |
 | `risk_assessment_slides.html`/`_en.html` | 風險評估模型週報 16:9 簡報，`sync_risk_assessment_weekly()` 只改封面日期區間；KPI 卡片與時間軸圖表當前點 2026-09-16 已接上 `cases_events.js`（`data-bind="nsw-events"` + 修正 `Array.isArray` 誤判） |

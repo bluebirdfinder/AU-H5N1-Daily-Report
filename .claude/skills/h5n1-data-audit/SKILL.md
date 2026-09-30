@@ -16,6 +16,8 @@ description: Audit and reconcile the AU H5N1 monitoring dashboard (index.html/in
 
 ## Step 1 — 用 JSON 算出 ground truth
 
+> **2026-09-30 補充**：`daff_events.json`（DAFF 官方逐筆 xlsx 的解析結果，668 筆）是比 `cases_events.json` 更權威的逐筆來源。核對州別/總數時，先比對它的 `events_by_state` 與 `total_events`；`[DAFF xlsx 對帳]` log 不是 ✅ 就表示網頁統計與官方檔不一致。注意 xlsx 含哺乳類事件（`is_mammal`），網頁物種圖表不含。
+
 不要用肉眼掃 HTML 猜對不對。跑這段（邏輯完全比照 `h5n1.py` 的 `compute_stats_from_cases()`，同一套 `loc_map`）：
 
 ```bash
