@@ -1,5 +1,5 @@
 window.casesEventsEmbedded = {
-  "generated_at_utc": "2026-09-30T07:52:49Z",
+  "generated_at_utc": "2026-09-30T08:38:44Z",
   "total_events": 668,
   "negative_events": 2450,
   "hotline_reports": 54551,
@@ -15,7 +15,7 @@ window.casesEventsEmbedded = {
     "ACT": 0
   },
   "species_counts": {
-    "Crested Tern": 500,
+    "Crested Tern": 501,
     "Silver Gull": 82,
     "Giant Petrel": 70,
     "Pacific Gull": 4,
