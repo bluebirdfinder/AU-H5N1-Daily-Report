@@ -2724,12 +2724,21 @@ def fetch_gbif_data():
     all_gbif_records = []
     seen_hashes = set()
 
+    # 2026-09-30 修復：原本查詢完全沒有日期範圍，GBIF 在缺少 eventDate/排序參數時回傳的是內部
+    # 預設排序的「前 N 筆」，不是依時間排序——導致連續 8 天執行都拿到一模一樣的 570 筆舊資料
+    # （逐筆比對經緯度+日期+物種完全相同），時間戳看起來每天在動，實際上完全沒有更新過。
+    # 改為限定近 90 天觀測窗，讓查詢隨著時間推移真的納入新記錄、排除窗口外的舊記錄。
+    utc_now_for_window = datetime.now(timezone.utc)
+    event_date_since = (utc_now_for_window - timedelta(days=90)).strftime("%Y-%m-%d")
+    event_date_until = utc_now_for_window.strftime("%Y-%m-%d")
+
     for sp in HIGH_RISK_SPECIES:
         try:
             params = {
                 "country": "AU",
                 "scientificName": sp,
                 "hasCoordinate": "true",
+                "eventDate": f"{event_date_since},{event_date_until}",
                 "limit": 30,
             }
             resp = requests.get(url, params=params, timeout=10, verify=False)
