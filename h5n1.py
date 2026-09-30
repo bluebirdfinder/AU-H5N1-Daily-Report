@@ -732,6 +732,13 @@ def compute_stats_from_cases(cases_data):
     這是 DAFF 官網無法連線時的權威回退方案 —— cases.json 本身才是我們維護的唯一真相來源。
     """
     loc_map = [
+        # 2026-09-30：JBT（Jervis Bay Territory，傑維斯灣領地）必須排在 NSW 之前——DAFF 自 2026-09-11
+        # Booderee 國家公園首例確診起，已將此聯邦直轄地獨立列為跟 NSW 分開的統計類別（法律上不算 NSW）。
+        # 關鍵字刻意只用「Jervis Bay Territory」/「Booderee」，不用裸的「Jervis Bay」——傑維斯灣這個海灣
+        # 本身橫跨 NSW 的 Shoalhaven 轄區與 JBT 兩邊，資料庫裡既有的 EVENT-427（2026-08-28，地名寫
+        # 「新南威爾斯州傑維斯灣 (Jervis Bay / Shoalhaven)」）是真正的 NSW 案例，不是 JBT，若用裸關鍵字
+        # 比對會把這筆既有的 NSW 案例誤判成 JBT。
+        ("JBT", ["Jervis Bay Territory", "傑維斯灣領地", "Booderee", "布德利"]),
         ("WA",  ["西澳", "WA"]),
         ("SA",  ["南澳", "SA"]),
         ("VIC", ["維多利亞", "VIC", "維州"]),
@@ -775,7 +782,7 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
         "total_events": 484,
         "negative_events": 2450,
         "hotline_reports": 36800,
-        "events_by_state": {"WA": 10, "SA": 271, "VIC": 150, "NSW": 22, "QLD": 2, "TAS": 29, "NT": 0, "ACT": 0},
+        "events_by_state": {"WA": 10, "SA": 271, "VIC": 150, "NSW": 22, "QLD": 2, "TAS": 29, "NT": 0, "ACT": 0, "JBT": 0},
         "species_counts": {
             "Crested Tern": 348,
             "Silver Gull": 62,
@@ -858,6 +865,10 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
         ("NSW", r"(\d+)\s+in\s+New South Wales"),
         ("QLD", r"(\d+)\s+in\s+Queensland"),
         ("VIC", r"(\d+)\s+in\s+Victoria"),
+        # 2026-09-30：DAFF 自 Jervis Bay Territory（傑維斯灣領地，聯邦直轄地，法律上不算 NSW）
+        # 2026-09-11 首例確診起，把它列為獨立於 NSW 的統計類別；原本六州正則沒有這一條，
+        # 導致州別加總（WA+SA+VIC+NSW+QLD+TAS）比全澳總數少了剛好 1 起，此筆被靜默漏掉。
+        ("JBT", r"(\d+)\s+in\s+Jervis Bay Territory"),
         ("TAS", r"(\d+)\s+in\s+Tasmania"),
     ]
     for st, pat in st_patterns:
@@ -1096,6 +1107,7 @@ def auto_reconcile_event_shortfalls(cases_data, official_stats):
         return cases_data
 
     loc_map = [
+        ("JBT", ["Jervis Bay Territory", "傑維斯灣領地", "Booderee", "布德利"], (-35.1483, 150.6969)),
         ("WA",  ["西澳", "WA"], (-31.9505, 115.8605)),
         ("SA",  ["南澳", "SA"], (-34.9285, 138.6007)),
         ("VIC", ["維多利亞", "VIC", "維州"], (-37.8136, 144.9631)),
@@ -1170,8 +1182,9 @@ def auto_fill_state_shortfalls(cases_data, official_stats):
     """
     official_by_state = official_stats.get("detections_by_state", {})
     total_target = official_stats.get("total_detections", 236)
-    
+
     loc_map = [
+        ("JBT", ["Jervis Bay Territory", "傑維斯灣領地", "Booderee", "布德利"], (-35.1483, 150.6969)),
         ("WA",  ["西澳", "WA"], (-31.9505, 115.8605)),
         ("SA",  ["南澳", "SA"], (-34.9285, 138.6007)),
         ("VIC", ["維多利亞", "VIC", "維州"], (-37.8136, 144.9631)),
@@ -1264,6 +1277,7 @@ def enforce_official_state_ceilings(cases_data, official_stats):
         return cases_data
 
     loc_map = [
+        ("JBT", ["Jervis Bay Territory", "傑維斯灣領地", "Booderee", "布德利"]),
         ("WA",  ["西澳", "WA"]),
         ("SA",  ["南澳", "SA"]),
         ("VIC", ["維多利亞", "VIC", "維州"]),
