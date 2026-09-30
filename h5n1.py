@@ -2617,6 +2617,34 @@ def parse_daff_events_xlsx(data):
     return records
 
 
+def write_daff_mammal_js(payload):
+    """
+    由 daff_events.json 的內容輸出 assets/js/daff_mammal_events.js (window.daffMammalEmbedded)，
+    供首頁「哺乳類跨種事件」卡片讀取。哺乳類事件獨立呈現，不併入任何風險分數。
+    """
+    mam = [r for r in payload.get("records", []) if r.get("is_mammal")]
+    by_state, by_species = {}, {}
+    for r in mam:
+        by_state[r["state"]] = by_state.get(r["state"], 0) + 1
+        by_species[r["common_name"]] = by_species.get(r["common_name"], 0) + 1
+    dates = sorted(r["date_sampled"] for r in mam if r.get("date_sampled"))
+    out = {
+        "fetched_at_utc": payload.get("fetched_at_utc"),
+        "total_events": payload.get("total_events", 0),
+        "mammal_events": len(mam),
+        "by_state": by_state,
+        "by_species": by_species,
+        "latest_sampled": dates[-1] if dates else None,
+    }
+    try:
+        os.makedirs("assets/js", exist_ok=True)
+        with open("assets/js/daff_mammal_events.js", "w", encoding="utf-8") as f:
+            f.write("window.daffMammalEmbedded = " + json.dumps(out, ensure_ascii=False, indent=2) + ";\n")
+        print(f"[DAFF xlsx] ✅ 寫入 assets/js/daff_mammal_events.js (哺乳類 {len(mam)} 筆)")
+    except Exception as e:
+        print(f"[DAFF xlsx] 寫入 daff_mammal_events.js 失敗: {str(e)[:80]}")
+
+
 def fetch_daff_events_xlsx():
     """
     下載 DAFF 官方逐筆事件 xlsx → daff_events.json，並印出與 official_stats 的對帳報告。
@@ -2664,6 +2692,7 @@ def fetch_daff_events_xlsx():
     with open("daff_events.json", "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=1)
     print(f"[DAFF xlsx] ✅ 寫入 daff_events.json：{len(records)} 筆 | 各州 {by_state} | 哺乳類 {len(mammals)} 筆")
+    write_daff_mammal_js(payload)
 
     # 對帳：與同次執行剛寫出的 assets/js/cases_events.js（official_stats）比較
     try:
