@@ -179,9 +179,7 @@
                                 <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider mb-1">📰
                                     媒體與生態監測風向 (MEDIA & ECOLOGY WATCH)</span>
                                 <div class="text-slate-200 text-sm leading-relaxed">
-                                    <p>截至2026年9月30日，澳洲H5N1高致病性禽流感疫情持續在野生鳥類間迅速傳播，並已擴散至多個州，其中南澳州仍是疫情中心，確診事件達319起。最新鳥類確診動態顯示，南澳州沿海地區出現大規模死亡事件，包括佩吉斯島（Pages Islands）約900隻<span class="text-amber-300 font-extrabold bg-amber-950/60 px-1 py-0.5 rounded border border-amber-700/50">大鳳頭燕鷗</span>死亡，以及約克半島（Yorke Peninsula）首次確診鵜鶘案例。維多利亞州和新南威爾斯州沿海也持續有野鳥確診，塔斯馬尼亞州近期新增七起疫情事件，遍及全島，但未有大規模鳥類死亡報告。</p>
-<p><strong>⚠️ <span class="text-fuchsia-300 font-bold">哺乳類</span>跨種監測特別提醒：</strong> 據最新報導，H5N1已確認感染多種澳洲野生哺乳動物。南澳州於八月下旬首次在阿德萊德的一隻<span class="text-fuchsia-300 font-bold">紅狐狸</span>體內檢測到H5N1病毒，隨後維多利亞州托基（Torquay）也出現第二起狐狸染病案例。海洋哺乳動物方面，南澳州證實有長鼻毛皮<span class="text-fuchsia-300 font-bold">海豹</span>（long-nosed fur seal）死亡案例，並於九月在袋鼠島（Kangaroo Island）的<span class="text-fuchsia-300 font-bold">海豹</span>灣發現瀕危的澳洲<span class="text-fuchsia-300 font-bold">海獅</span>（Australian sea lion）確診，隨後佩吉斯島又發現四起<span class="text-fuchsia-300 font-bold">海獅</span>病例。此外，南澳州也確認一隻海豚感染H5N1。維多利亞州近期亦有兩隻<span class="text-fuchsia-300 font-bold">海豹</span>確診。儘管如此，澳洲當局目前尚未發現<span class="text-fuchsia-300 font-extrabold bg-fuchsia-950/70 px-1.5 py-0.5 rounded border border-fuchsia-500/40">哺乳類動物</span>之間出現H5N1傳播的證據。</p>
-<p>全澳所有商業家禽農場持續維護<span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">100%無疫區</span>，生產鏈安全未受影響。當局重申，目前對公眾健康的風險極低，但建議民眾避免接觸生病或死亡的野生動物，並向相關單位通報。更多資訊請參考 <a href="https://www.birdflu.gov.au">birdflu.gov.au</a>。</p>
+                                    根據 <a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a> 與 <a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">新南威爾斯州政府 (NSW DPIRD)</a> 等媒體 <span class="text-amber-400 font-bold">2026 年 9 月 30 日 最新報導</span>，澳洲官方自 8/12 起正式採用國際標準「事件導向 (Event-based Reporting)」統計，全澳累計 <span class="text-red-400 font-bold"><span class="text-red-400 font-extrabold text-base">668 起確診事件</span></span>（陰性排除 <span class="text-sky-400 font-semibold">2,450 起</span>）。聯邦首席獸醫官重申：<span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40">澳洲所有商業家禽農場維持 <span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">100% 零感染</span>，<span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">對一般人類健康風險極低</span></span>。
                                 </div>
                             </div>
                         </div>
@@ -327,6 +325,57 @@
                         則受限於近海棲地，內陸傳播風險極低。建議布萊尼廠區持續強化露天飼料倉儲對海鷗等城鎮棲息鳥類之防鳥網與生物安全隔離防線。
                     </p>
                 </div>
+
+
+                <!-- 🦭 哺乳類跨種事件卡片：資料來自 assets/js/daff_mammal_events.js（DAFF 官方逐筆 xlsx），獨立於風險分數 -->
+                <div id="mammal-events-card" class="hidden bg-slate-900/80 p-5 rounded-2xl border border-amber-700/50 text-xs space-y-3">
+                    <div class="font-bold text-amber-300 text-sm">🦭 野生哺乳類跨種感染事件（獨立呈現，不計入下方鳥類物種圖表與風險分數）</div>
+                    <p class="text-slate-400 leading-relaxed">DAFF 官方逐筆事件檔（Excel）中，物種為海豹、海獅、紅狐、海豚的確診事件；已包含在全澳累計總數內，但官網物種圖表不含。</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
+                        <div class="bg-slate-800/70 p-3 rounded-lg"><div class="text-slate-400">哺乳類確診事件</div><div id="mammal-total" class="text-xl font-black text-amber-300">-</div></div>
+                        <div class="bg-slate-800/70 p-3 rounded-lg"><div class="text-slate-400">各州分佈</div><div id="mammal-by-state" class="text-slate-200">-</div></div>
+                        <div class="bg-slate-800/70 p-3 rounded-lg"><div class="text-slate-400">NSW 哺乳類事件</div><div id="mammal-nsw" class="text-xl font-black text-emerald-300">0</div></div>
+                        <div class="bg-slate-800/70 p-3 rounded-lg"><div class="text-slate-400">最近採樣日</div><div id="mammal-latest" class="text-slate-200">-</div></div>
+                    </div>
+                    <div><div class="text-slate-400 mb-1">物種分佈</div><div id="mammal-by-species" class="flex flex-wrap gap-2 font-mono"></div></div>
+                    <p class="text-[11px] text-slate-500">說明：本區為跨種感染的監測資訊，僅供參考；風險評估的錨點仍為「NSW 商業家禽 0 確診」，此處數字不影響風險分數。</p>
+                </div>
+                <script src="assets/js/daff_mammal_events.js"></script>
+                <script>
+                    (function () {
+                        try {
+                            const d = window.daffMammalEmbedded;
+                            const card = document.getElementById('mammal-events-card');
+                            if (!d || !card || !d.mammal_events) return;
+                            const ZH = true;
+                            const groups = [
+                                [/fur seal/i, ZH ? '毛皮海豹' : 'Fur seal'],
+                                [/sea lion/i, ZH ? '澳洲海獅' : 'Australian sea lion'],
+                                [/fox/i, ZH ? '紅狐' : 'Red fox'],
+                                [/dolphin/i, ZH ? '海豚' : 'Dolphin']
+                            ];
+                            const agg = {};
+                            Object.entries(d.by_species || {}).forEach(([name, n]) => {
+                                const g = groups.find(x => x[0].test(name));
+                                const k = g ? g[1] : name;
+                                agg[k] = (agg[k] || 0) + n;
+                            });
+                            document.getElementById('mammal-total').textContent = d.mammal_events + ' 起';
+                            document.getElementById('mammal-by-state').textContent =
+                                Object.entries(d.by_state || {}).map(([s, n]) => s + ' ' + n).join(' / ') || '-';
+                            document.getElementById('mammal-nsw').textContent = (d.by_state && d.by_state.NSW) || 0;
+                            document.getElementById('mammal-latest').textContent = d.latest_sampled || '-';
+                            const sp = document.getElementById('mammal-by-species');
+                            Object.entries(agg).sort((a, b) => b[1] - a[1]).forEach(([k, n]) => {
+                                const s = document.createElement('span');
+                                s.className = 'px-2 py-1 rounded-full bg-amber-950 text-amber-200 border border-amber-800/60';
+                                s.textContent = k + ' ' + n;
+                                sp.appendChild(s);
+                            });
+                            card.classList.remove('hidden');
+                        } catch (e) { console.warn('mammal card skipped', e); }
+                    })();
+                </script>
 
                 <!-- 🦅 2026 年度國際候鳥抵澳即時進度與多源遙測聯防看板 -->
                 <div id="ebird-live-widget" class="bg-slate-900/90 p-5 rounded-2xl border border-cyan-800/70 text-xs space-y-3.5 shadow-xl">
@@ -555,7 +604,7 @@
                             </div>
                             <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                                 <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">遷徙屬性: 沿海游動性海鳥</span>
-                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 501 起 (75%)</span>
+                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF通報: 502 起 (75%)</span>
                             </div>
                             <p class="text-xs text-slate-300 leading-relaxed">
                                 <strong class="text-blue-300">棲息習性：</strong>專一食魚，極度偏好在沿海沙洲與外島進行數千隻規模的高密度密集群聚繁殖。
@@ -10488,6 +10537,20 @@
     "confirm_date": "2026-09-30",
     "detection_count": 1,
     "notes": "【DAFF 權威數據對齊事件】官方最新通報確診事件，物種：野生燕鷗 (大鳳頭燕鷗 / Crested tern)，確保事件庫與 DAFF 官網總數 (668 起) 100% 對齊。"
+  },
+  {
+    "id": "EVENT-669",
+    "type": "Confirmed",
+    "source_status": "official_updated",
+    "species": "野生燕鷗 (大鳳頭燕鷗 / Crested tern)",
+    "location": "JBT 官方最新通報區域 (個案 1)",
+    "latitude": -35.5983,
+    "longitude": 150.3369,
+    "found_date": "2026-09-30",
+    "notify_date": "2026-09-30",
+    "confirm_date": "2026-09-30",
+    "detection_count": 1,
+    "notes": "【DAFF 權威數據對齊事件】官方最新通報確診事件，物種：野生燕鷗 (大鳳頭燕鷗 / Crested tern)，確保事件庫與 DAFF 官網總數 (668 起) 100% 對齊。"
   }
 ];
         window.H5N1_HISTORICAL_CASES = /* H5N1_HISTORICAL_CASES_PLACEHOLDER */ [
@@ -11390,7 +11453,7 @@
     "ACT": 0
   },
   "species_counts": {
-    "Crested Tern": 501,
+    "Crested Tern": 502,
     "Silver Gull": 82,
     "Giant Petrel": 70,
     "Pacific Gull": 4,
@@ -11400,7 +11463,7 @@
     "Falcon & Other": 5
   },
   "source": "live",
-  "scrape_time": "2026-09-30 08:38 UTC"
+  "scrape_time": "2026-09-30 08:51 UTC"
 };
 
         const factoryLat = -33.521027;

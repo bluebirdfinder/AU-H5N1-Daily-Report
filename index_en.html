@@ -445,6 +445,57 @@
                     </div>
                 </div>
 
+
+                <!-- 🦭 哺乳類跨種事件卡片：資料來自 assets/js/daff_mammal_events.js（DAFF 官方逐筆 xlsx），獨立於風險分數 -->
+                <div id="mammal-events-card" class="hidden bg-slate-900/80 p-5 rounded-2xl border border-amber-700/50 text-xs space-y-3">
+                    <div class="font-bold text-amber-300 text-sm">🦭 Wild Mammal Spillover Events (shown separately; not in the bird species chart or risk score)</div>
+                    <p class="text-slate-400 leading-relaxed">Confirmed events in DAFF's official per-event file involving seals, sea lions, red foxes and dolphins. They are included in the national total but not in DAFF's species chart.</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
+                        <div class="bg-slate-800/70 p-3 rounded-lg"><div class="text-slate-400">Mammal events</div><div id="mammal-total" class="text-xl font-black text-amber-300">-</div></div>
+                        <div class="bg-slate-800/70 p-3 rounded-lg"><div class="text-slate-400">By state</div><div id="mammal-by-state" class="text-slate-200">-</div></div>
+                        <div class="bg-slate-800/70 p-3 rounded-lg"><div class="text-slate-400">NSW mammal events</div><div id="mammal-nsw" class="text-xl font-black text-emerald-300">0</div></div>
+                        <div class="bg-slate-800/70 p-3 rounded-lg"><div class="text-slate-400">Latest sampled</div><div id="mammal-latest" class="text-slate-200">-</div></div>
+                    </div>
+                    <div><div class="text-slate-400 mb-1">By species</div><div id="mammal-by-species" class="flex flex-wrap gap-2 font-mono"></div></div>
+                    <p class="text-[11px] text-slate-500">Note: monitoring information only. The risk anchor remains 'zero confirmed NSW commercial poultry cases'; these numbers do not affect the risk score.</p>
+                </div>
+                <script src="assets/js/daff_mammal_events.js"></script>
+                <script>
+                    (function () {
+                        try {
+                            const d = window.daffMammalEmbedded;
+                            const card = document.getElementById('mammal-events-card');
+                            if (!d || !card || !d.mammal_events) return;
+                            const ZH = false;
+                            const groups = [
+                                [/fur seal/i, ZH ? '毛皮海豹' : 'Fur seal'],
+                                [/sea lion/i, ZH ? '澳洲海獅' : 'Australian sea lion'],
+                                [/fox/i, ZH ? '紅狐' : 'Red fox'],
+                                [/dolphin/i, ZH ? '海豚' : 'Dolphin']
+                            ];
+                            const agg = {};
+                            Object.entries(d.by_species || {}).forEach(([name, n]) => {
+                                const g = groups.find(x => x[0].test(name));
+                                const k = g ? g[1] : name;
+                                agg[k] = (agg[k] || 0) + n;
+                            });
+                            document.getElementById('mammal-total').textContent = d.mammal_events + ' events';
+                            document.getElementById('mammal-by-state').textContent =
+                                Object.entries(d.by_state || {}).map(([s, n]) => s + ' ' + n).join(' / ') || '-';
+                            document.getElementById('mammal-nsw').textContent = (d.by_state && d.by_state.NSW) || 0;
+                            document.getElementById('mammal-latest').textContent = d.latest_sampled || '-';
+                            const sp = document.getElementById('mammal-by-species');
+                            Object.entries(agg).sort((a, b) => b[1] - a[1]).forEach(([k, n]) => {
+                                const s = document.createElement('span');
+                                s.className = 'px-2 py-1 rounded-full bg-amber-950 text-amber-200 border border-amber-800/60';
+                                s.textContent = k + ' ' + n;
+                                sp.appendChild(s);
+                            });
+                            card.classList.remove('hidden');
+                        } catch (e) { console.warn('mammal card skipped', e); }
+                    })();
+                </script>
+
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="bg-slate-900/70 p-5 rounded-xl border border-slate-700/60 flex flex-col justify-between">
                         <div>
@@ -491,7 +542,7 @@
                             </div>
                             <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                                 <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">Status: Coastal Nomadic Seabird</span>
-                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF Detections: 501 (75%)</span>
+                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF Detections: 502 (75%)</span>
                             </div>
                             <p class="text-xs text-slate-300 leading-relaxed">
                                 <strong class="text-blue-300">Habitats & Ecology: </strong>Piscivorous, nests in dense breeding colonies of thousands on offshore islands and sandbars.
@@ -10167,6 +10218,20 @@
     "confirm_date": "2026-09-30",
     "detection_count": 1,
     "notes": "【DAFF 權威數據對齊事件】官方最新通報確診事件，物種：野生燕鷗 (大鳳頭燕鷗 / Crested tern)，確保事件庫與 DAFF 官網總數 (668 起) 100% 對齊。"
+  },
+  {
+    "id": "EVENT-669",
+    "type": "Confirmed",
+    "source_status": "official_updated",
+    "species": "野生燕鷗 (大鳳頭燕鷗 / Crested tern)",
+    "location": "JBT 官方最新通報區域 (個案 1)",
+    "latitude": -35.5983,
+    "longitude": 150.3369,
+    "found_date": "2026-09-30",
+    "notify_date": "2026-09-30",
+    "confirm_date": "2026-09-30",
+    "detection_count": 1,
+    "notes": "【DAFF 權威數據對齊事件】官方最新通報確診事件，物種：野生燕鷗 (大鳳頭燕鷗 / Crested tern)，確保事件庫與 DAFF 官網總數 (668 起) 100% 對齊。"
   }
 ];
         window.H5N1_HISTORICAL_CASES = /* H5N1_HISTORICAL_CASES_PLACEHOLDER */ [
@@ -11069,7 +11134,7 @@
     "ACT": 0
   },
   "species_counts": {
-    "Crested Tern": 501,
+    "Crested Tern": 502,
     "Silver Gull": 82,
     "Giant Petrel": 70,
     "Pacific Gull": 4,
@@ -11079,7 +11144,7 @@
     "Falcon & Other": 5
   },
   "source": "live",
-  "scrape_time": "2026-09-30 08:38 UTC"
+  "scrape_time": "2026-09-30 08:51 UTC"
 };
 
         const factoryLat = -33.521027;
