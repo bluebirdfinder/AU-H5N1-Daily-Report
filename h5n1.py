@@ -2645,6 +2645,44 @@ def write_daff_mammal_js(payload):
         print(f"[DAFF xlsx] 寫入 daff_mammal_events.js 失敗: {str(e)[:80]}")
 
 
+def write_daff_weekly_js(payload):
+    """
+    由 daff_events.json 的逐筆紀錄，依「採樣日所在週（週一起算）」彙整成週次資料，
+    輸出 assets/js/daff_weekly.js (window.daffWeeklyEmbedded)，供首頁全澳週曲線與 NSW 週趨勢圖使用。
+    134 筆左右的採樣日為 #N/A 的紀錄無法歸週，只計入 undated_events，不猜日期。
+    最近兩週因各州登記延遲，數字事後常被補增，輸出 incomplete_from 供前端標示。
+    """
+    recs = payload.get("records", [])
+    dated = [r for r in recs if r.get("date_sampled")]
+    undated = len(recs) - len(dated)
+    out = {"fetched_at_utc": payload.get("fetched_at_utc"), "total_events": len(recs),
+           "dated_events": len(dated), "undated_events": undated, "weeks": [], "incomplete_from": None}
+    if dated:
+        def monday(s):
+            d = datetime.strptime(s, "%Y-%m-%d").date()
+            return d - timedelta(days=d.weekday())
+        buckets = {}
+        for r in dated:
+            m = monday(r["date_sampled"])
+            b = buckets.setdefault(m, {"total": 0, "by_state": {}})
+            b["total"] += 1
+            b["by_state"][r["state"]] = b["by_state"].get(r["state"], 0) + 1
+        first, last = min(buckets), max(max(buckets), datetime.now(timezone.utc).date() - timedelta(days=datetime.now(timezone.utc).date().weekday()))
+        cur = first
+        while cur <= last:
+            b = buckets.get(cur, {"total": 0, "by_state": {}})
+            out["weeks"].append({"start": cur.isoformat(), "total": b["total"], "by_state": b["by_state"]})
+            cur += timedelta(days=7)
+        out["incomplete_from"] = out["weeks"][max(0, len(out["weeks"]) - 2)]["start"]
+    try:
+        os.makedirs("assets/js", exist_ok=True)
+        with open("assets/js/daff_weekly.js", "w", encoding="utf-8") as f:
+            f.write("window.daffWeeklyEmbedded = " + json.dumps(out, ensure_ascii=False, indent=1) + ";\n")
+        print(f"[DAFF xlsx] ✅ 寫入 assets/js/daff_weekly.js ({len(out['weeks'])} 週, 有日期 {len(dated)} / 無日期 {undated})")
+    except Exception as e:
+        print(f"[DAFF xlsx] 寫入 daff_weekly.js 失敗: {str(e)[:80]}")
+
+
 def fetch_daff_events_xlsx():
     """
     下載 DAFF 官方逐筆事件 xlsx → daff_events.json，並印出與 official_stats 的對帳報告。
@@ -2693,6 +2731,7 @@ def fetch_daff_events_xlsx():
         json.dump(payload, f, ensure_ascii=False, indent=1)
     print(f"[DAFF xlsx] ✅ 寫入 daff_events.json：{len(records)} 筆 | 各州 {by_state} | 哺乳類 {len(mammals)} 筆")
     write_daff_mammal_js(payload)
+    write_daff_weekly_js(payload)
 
     # 對帳：與同次執行剛寫出的 assets/js/cases_events.js（official_stats）比較
     try:

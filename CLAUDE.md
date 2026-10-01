@@ -105,6 +105,12 @@
 
 **未處理/待決定**：`Other Territories` 若日後納入 Norfolk Island 等其他領地，網頁正則會把它們全算成 JBT（xlsx 路徑已用地名區分，網頁路徑沒有）；Crested Tern 網頁統計 498→500 是 DAFF 圖表自身變動，未追查。
 
+## 2026-10-01：週趨勢圖改用官方逐筆檔
+
+- 首頁舊週曲線來自 `cases_events.json`，與官方採樣週不一致（9 月 W1 假高峰約 170 vs 官方每週最高 91）；已改為優先用 `daff_weekly.js`，並新增 NSW 週趨勢卡片。
+- **判讀陷阱**：官方檔最近兩週的數字事後會被補增（9/29 檔 → 10/1 檔，採樣日 9/24–9/28 多 8 筆），「最近幾週變少」大多是登記延遲，不能直接當疫情趨緩；DAFF 8/12 起不再對已知疫區逐隻檢測，數字是下限而非真實發生量，但兩者無法用現有資料分離。Gemini 曾稱 668→676 全是新疫區/新物種，實際 8 筆中 6 筆是大鳳頭燕鷗、1 筆紅狐，不支持該說法。
+- 驗證限制：沙盒連不到 Chart.js/Leaflet CDN，只用替身驗證資料，沒有目視過實際圖形。
+
 ## 開發規範
 
 - CDN 白名單只能用 `cdnjs.cloudflare.com`，不可用 `cdn.jsdelivr.net` / `unpkg.com`（企業資安政策，見 AGENT.md）。
@@ -124,6 +130,7 @@
 | `bird_data.json` / `gbif_bird_data.json` / `movebank_tracks.json` | 三個候鳥數據源；eBird 已於 2026-09-16 補上 `EBIRD_API_KEY` 並驗證自動更新；GBIF 正常每日更新；Movebank 已串接真實 API + 授權自動同意流程，但目前排到的 study 均無近期活體航跡，故仍以標示清楚的範例資料 (`is_live_data:false`) 兜底 |
 | `daff_events.json` | DAFF 官方逐筆事件 xlsx 的解析結果（668 筆，含 `is_mammal`），每次排程由 `fetch_daff_events_xlsx()` 更新；比網頁圖表更完整的官方來源 |
 | `assets/js/daff_mammal_events.js` | 哺乳類事件摘要（`window.daffMammalEmbedded`），供首頁哺乳類卡片讀取 |
+| `assets/js/daff_weekly.js` / `daff_weekly_charts.js` | 官方逐筆檔依採樣週彙整的資料與共用圖表腳本（2026-10-01 新增），驅動首頁全澳週曲線與 NSW 週趨勢圖；最近兩週登記延遲，不可解讀為趨緩 |
 | `assets/js/*.js` | 上述 JSON 的免 CORS 打包版本，供 `file://` 離線開啟 |
 | `h5n1_weekly_slides.html` | 疫情週報 16:9 簡報，`sync_weekly_slides()` 只改封面日期區間；事件數字 2026-09-16 已接上 `cases_events.js`（`data-bind` 屬性 + `syncWeeklySlideCaseEvents()`），週間比較敘述文字（「上週 X 起」）仍人工維護 |
 | `risk_assessment_slides.html`/`_en.html` | 風險評估模型週報 16:9 簡報，`sync_risk_assessment_weekly()` 只改封面日期區間；KPI 卡片與時間軸圖表當前點 2026-09-16 已接上 `cases_events.js`（`data-bind="nsw-events"` + 修正 `Array.isArray` 誤判） |
