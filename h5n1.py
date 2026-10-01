@@ -1168,7 +1168,7 @@ def auto_reconcile_event_shortfalls(cases_data, official_stats):
                     "type": "Confirmed",
                     "source_status": "official_updated",
                     "species": sp_choice,
-                    "location": f"{st} 官方最新通報區域 (個案 {i+1})",
+                    "location": f"{'Jervis Bay Territory (傑維斯灣領地)' if st == 'JBT' else st} 官方最新通報區域 (個案 {i+1})",
                     "latitude": round(base_lat + lat_offset, 4),
                     "longitude": round(base_lon + lon_offset, 4),
                     "found_date": now_taipei,
@@ -1232,7 +1232,7 @@ def auto_fill_state_shortfalls(cases_data, official_stats):
                 "type": "Confirmed",
                 "source_status": "official_updated",
                 "species": "野生海鳥 (大鳳頭燕鷗 / 官方最新通報個案)" if st == "VIC" else "野生海鳥 (官方對齊個案)",
-                "location": "維多利亞州墨爾本東南部 City of Casey (凱西市)" if st == "VIC" else f"{st} 官方最新通報區域",
+                "location": "維多利亞州墨爾本東南部 City of Casey (凱西市)" if st == "VIC" else f"{'Jervis Bay Territory (傑維斯灣領地)' if st == 'JBT' else st} 官方最新通報區域",
                 "latitude": -38.0300 if st == "VIC" else -35.0,
                 "longitude": 145.3200 if st == "VIC" else 138.0,
                 "found_date": now_taipei,
@@ -2657,6 +2657,63 @@ def write_daff_weekly_js(payload):
     undated = len(recs) - len(dated)
     out = {"fetched_at_utc": payload.get("fetched_at_utc"), "total_events": len(recs),
            "dated_events": len(dated), "undated_events": undated, "weeks": [], "incomplete_from": None}
+    # 物種圖（鳥類）：以官方逐筆檔俗名歸入首頁既有 8 個類別，其餘鳥類併入 Falcon & Other；哺乳類另計、不併入此圖
+    sp = {"Crested Tern": 0, "Silver Gull": 0, "Giant Petrel": 0, "Pacific Gull": 0,
+          "Brown Skua": 0, "Cormorant": 0, "Little Penguin": 0, "Falcon & Other": 0}
+    for r in recs:
+        if r.get("is_mammal"):
+            continue
+        n = (r.get("common_name") or "").lower()
+        if "crested tern" in n:
+            k = "Crested Tern"
+        elif "silver gull" in n:
+            k = "Silver Gull"
+        elif "giant petrel" in n:
+            k = "Giant Petrel"
+        elif "pacific gull" in n:
+            k = "Pacific Gull"
+        elif "skua" in n:
+            k = "Brown Skua"
+        elif "cormorant" in n:
+            k = "Cormorant"
+        elif "little penguin" in n:
+            k = "Little Penguin"
+        else:
+            k = "Falcon & Other"
+        sp[k] += 1
+    # 月彙整（依採樣日所在月）：供風險評估頁「疫情走勢」圖的實際累計線使用
+    monthly = {}
+    for r in dated:
+        m = r["date_sampled"][:7]
+        x = monthly.setdefault(m, {"total": 0, "by_state": {}})
+        x["total"] += 1
+        x["by_state"][r["state"]] = x["by_state"].get(r["state"], 0) + 1
+    out["monthly"] = dict(sorted(monthly.items()))
+    # NSW 觀察指標（只提供資料，不設門檻、不下判斷）：陸鳥/猛禽事件、Blayney 所在中西部事件
+    land_kw = ("raven", "magpie", "myna", "kite", "eagle", "falcon", "goshawk", "harrier", "boobook", "hawk", "owl")
+    central_west = ["Blayney", "Bathurst Regional", "Orange", "Cabonne", "Cowra", "Oberon", "Lithgow", "Mid-Western Regional", "Forbes", "Parkes"]
+    def is_land(r):
+        n = (r.get("common_name") or "").lower()
+        return (not r.get("is_mammal")) and any(k in n for k in land_kw)
+    nsw_land, other_land = {}, 0
+    for r in recs:
+        if not is_land(r):
+            continue
+        if r.get("state") == "NSW":
+            nsw_land[r["common_name"]] = nsw_land.get(r["common_name"], 0) + 1
+        else:
+            other_land += 1
+    out["nsw_watch"] = {
+        "nsw_land_birds": nsw_land,
+        "nsw_land_birds_total": sum(nsw_land.values()),
+        "other_states_land_birds": other_land,
+        "central_west_lgas": central_west,
+        "central_west_events": sum(1 for r in recs if r.get("state") == "NSW" and (r.get("lga") or "") in central_west),
+        "nsw_events": sum(1 for r in recs if r.get("state") == "NSW"),
+    }
+    out["species_birds"] = sp
+    out["bird_events"] = sum(sp.values())
+    out["mammal_events"] = sum(1 for r in recs if r.get("is_mammal"))
     if dated:
         def monday(s):
             d = datetime.strptime(s, "%Y-%m-%d").date()

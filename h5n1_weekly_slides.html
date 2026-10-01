@@ -578,6 +578,8 @@
         }
     </style>
     <script src="assets/js/cases_events.js"></script>
+    <script src="assets/js/daff_weekly.js"></script>
+    <script src="assets/js/daff_weekly_charts.js"></script>
 </head>
 <body>
 
@@ -604,7 +606,7 @@
                         <span>一週核心疫情摘要與風險評估</span>
                     </h1>
                     <p class="cover-subtitle">
-                        本週記錄了全澳野生動物疫情爆發以來最關鍵的轉折：病毒突破海洋生態圈邁向陸地哺乳類，極地研究站啟動歷史性撤離，全澳確診事件單週激增 137 起。
+                        本週記錄了全澳野生動物疫情爆發以來最關鍵的轉折：病毒突破海洋生態圈邁向陸地哺乳類，極地研究站啟動歷史性撤離，官方採樣週統計中，最近完整一週（<span data-weekly="last-start">-</span> 起）全澳新增 <span data-weekly="national-last">-</span> 起。
                     </p>
                     <div class="cover-meta">
                         <div class="meta-item"><i class="fa-solid fa-map-location-dot"></i> 評估範圍：澳洲全國 / NSW 專題</div>
@@ -628,16 +630,16 @@
                         <div class="card-icon"><i class="fa-solid fa-virus"></i></div>
                         <div class="card-title">全國確診總數</div>
                         <div class="stat-number crimson"><span data-bind="total-events">484</span> <span style="font-size:18px;">起</span></div>
-                        <div class="stat-change"><i class="fa-solid fa-arrow-trend-up"></i> 一週內激增 +137 起</div>
-                        <div class="card-desc" style="margin-top: 10px;">自上週一 (8/24) 約 347 起爆發增長至 <span data-bind="total-events">484</span> 起。</div>
+                        <div class="stat-change"><i class="fa-solid fa-arrow-trend-up"></i> 最近完整一週（<span data-weekly="last-start">-</span> 起）新增 <span data-weekly="national-last">-</span> 起</div>
+                        <div class="card-desc" style="margin-top: 10px;">累計 <span data-bind="total-events">484</span> 起；其中 <span data-weekly="undated">-</span> 起官方未填採樣日。最近兩週因登記延遲尚未完整，數字事後會被補增。</div>
                     </div>
 
                     <div class="card">
                         <div class="card-icon" style="color: var(--accent-amber); background: rgba(255,184,0,0.15);"><i class="fa-solid fa-location-dot"></i></div>
                         <div class="card-title">新南威爾斯州 (NSW)</div>
                         <div class="stat-number" style="color: var(--accent-amber);"><span data-bind="nsw-events">22</span> <span style="font-size:18px;">起</span></div>
-                        <div class="stat-change" style="background: rgba(255,184,0,0.15); color: var(--accent-amber);"><i class="fa-solid fa-plus"></i> 一週增加 +5 起</div>
-                        <div class="card-desc" style="margin-top: 10px;">由上週 17 起增至 <span data-bind="nsw-events">22</span> 起 (病毒首度進入雪梨都會圈)。</div>
+                        <div class="stat-change" style="background: rgba(255,184,0,0.15); color: var(--accent-amber);"><i class="fa-solid fa-plus"></i> 最近完整一週 +<span data-weekly="nsw-last">-</span> 起</div>
+                        <div class="card-desc" style="margin-top: 10px;">累計 <span data-bind="nsw-events">22</span> 起，多數位於沿海地區（資料：DAFF 官方逐筆檔）。</div>
                     </div>
 
                     <div class="card emerald-card">
@@ -846,7 +848,7 @@
                         <div>
                             <div class="card-title" style="color: var(--accent-cyan);"><i class="fa-solid fa-clipboard-list"></i> 全澳疫情核心數據摘要</div>
                             <ul class="list-styled" style="margin-top: 10px; gap: 8px;">
-                                <li><b>全澳確診總數：</b><span class="badge-pill badge-red" style="font-size:14px;"><span data-bind="total-events">484</span> 起確診事件</span> (單週激增 +137 起)</li>
+                                <li><b>全澳確診總數：</b><span class="badge-pill badge-red" style="font-size:14px;"><span data-bind="total-events">484</span> 起確診事件</span> (最近完整一週 +<span data-weekly="national-last">-</span> 起)</li>
                                 <li><b>通報與排除：</b><span class="badge-pill badge-cyan"><span data-bind="negative-events">1,273</span> 起</span> 陰性排除 / <span class="badge-pill badge-cyan"><span data-bind="hotline-reports">34,358</span> 筆</span> 熱線通報</li>
                                 <li><b>商業產業防線：</b><span class="badge-pill badge-green">100% 完美零確診</span> (家禽、蛋場與乳牛場安全)</li>
                                 <li><b>人類公衛風險：</b><span class="badge-pill badge-green">極低風險等級</span></li>
@@ -1132,6 +1134,8 @@
         function initSlideEpiChart() {
             const ctx = document.getElementById('slideEpiChart');
             if (!ctx || slideChartInstance) return;
+            // 優先使用 DAFF 官方逐筆檔（原本讀的 window.H5N1_EVENTS 在本檔案從未定義，永遠退回寫死的示範資料）
+            try { if (window.DaffWeekly && window.DaffWeekly.renderNational('slideEpiChart', 'zh')) { slideChartInstance = ctx._daffChart; return; } } catch (e) { console.warn('official weekly slide chart skipped', e); }
 
             const events = (window.H5N1_EVENTS && window.H5N1_EVENTS.length > 0) ? window.H5N1_EVENTS : [];
             const weekLabels = generateSlideWeekLabels(events);
@@ -1214,8 +1218,8 @@
 
         // 2026-09-16 修復：本檔案原本完全沒有讀取 cases_events.js，NSW/全澳/各州事件數與陰性排除/熱線通報數字
         // 永遠停在上次人工編輯這份簡報時寫死的舊值。現在改為載入時動態校正「當前累計數字」；
-        // 「上週 X 起」這類週間比較敘述文字維持人工撰寫，本次不自動改寫（缺乏可靠的「上週」資料來源，
-        // 硬猜會製造出看起來精確、實際是編造的假趨勢，比維持靜態的舊敘述風險更高）。
+        // 2026-10-01 更新：「上週 X 起」類對照改由 syncWeeklySlideWeekly() 以官方逐筆檔（採樣週）填入；
+        // 其餘敘述性文字（事件綜述、南極撤離等）仍為人工撰寫。
         function syncWeeklySlideCaseEvents() {
             if (typeof window.casesEventsEmbedded === 'undefined') return;
             const e = window.casesEventsEmbedded;
@@ -1239,7 +1243,22 @@
             }
         }
 
+        // 以 DAFF 官方逐筆檔（採樣週）取代原本寫死的「上週 X 起」對照；最近兩週登記未完整，改用最近完整一週
+        function syncWeeklySlideWeekly() {
+            const D = window.daffWeeklyEmbedded;
+            if (!D || !D.weeks || D.weeks.length < 3) return;
+            let i = D.weeks.findIndex(w => w.start === D.incomplete_from);
+            i = (i > 0 ? i : D.weeks.length - 2) - 1;
+            const w = D.weeks[i];
+            const set = (k, v) => document.querySelectorAll(`[data-weekly="${k}"]`).forEach(el => { el.textContent = v; });
+            set('last-start', w.start.slice(5).replace('-', '/').replace(/^0/, ''));
+            set('national-last', w.total);
+            set('nsw-last', (w.by_state && w.by_state.NSW) || 0);
+            set('undated', D.undated_events);
+        }
+
         window.addEventListener('load', () => {
+            try { syncWeeklySlideWeekly(); } catch (e) { console.error('[疫情週報] syncWeeklySlideWeekly 失敗:', e); }
             try { syncWeeklySlideCaseEvents(); } catch (e) { console.error('[疫情週報] syncWeeklySlideCaseEvents 失敗:', e); }
             try { initSlideEpiChart(); } catch (e) { console.error('[疫情週報] initSlideEpiChart 失敗:', e); }
         });

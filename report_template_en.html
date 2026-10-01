@@ -976,8 +976,15 @@
                 'Falcon & Other': 0,
             };
 
+            // Prefer DAFF's official per-event file (8 bird groups; mammals are counted separately in the mammal card)
+            const officialSp = window.daffWeeklyEmbedded && window.daffWeeklyEmbedded.species_birds;
             const sc = stats.species_counts;
-            if (sc && (sc['Crested Tern'] || sc['Silver Gull'])) {
+            if (officialSp) {
+                const o = window.daffWeeklyEmbedded;
+                Object.keys(counts).forEach(k => { counts[k] = officialSp[k] || 0; });
+                const sub = document.querySelector('#speciesDonutChart') && document.querySelector('#speciesDonutChart').closest('div').parentElement.querySelector('p');
+                if (sub) sub.textContent = `Of ${o.total_events} national events, ${o.bird_events} are birds grouped by species (DAFF official per-event file); ${o.mammal_events} mammal events are in the mammal card and not in this chart.`;
+            } else if (sc && (sc['Crested Tern'] || sc['Silver Gull'])) {
                 counts['Crested Tern'] = sc['Crested Tern'] || 326;
                 counts['Silver Gull'] = sc['Silver Gull'] || 61;
                 counts['Giant Petrel'] = sc['Giant Petrel'] || 55;

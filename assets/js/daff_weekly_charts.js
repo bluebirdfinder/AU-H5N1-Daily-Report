@@ -3,11 +3,11 @@
 (function () {
     function T(lang) {
         return lang === 'en' ? {
-            weekly: 'Weekly positive events (by sampling week)', cum: 'Cumulative (dated events only)',
+            weekly: 'Weekly positive events (by sampling week; faded = incomplete)', cum: 'Cumulative (dated events only)',
             incomplete: 'Latest 2 weeks (registration incomplete)', wk: 'Week of ',
             yl: '▲ Weekly events', yr: '▲ Cumulative'
         } : {
-            weekly: '週確診事件（依採樣週）', cum: '累計（僅含有採樣日者）',
+            weekly: '週確診事件（依採樣週；淡色＝登記未完整）', cum: '累計（僅含有採樣日者）',
             incomplete: '最近兩週（登記未完整）', wk: '週起 ',
             yl: '▲ 週增事件', yr: '▲ 累計事件'
         };
