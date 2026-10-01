@@ -20,6 +20,8 @@
     <script src="assets/js/bird_data.js"></script>
     <script src="assets/js/movebank_tracks.js"></script>
     <script src="assets/js/cases_events.js"></script>
+    <script src="assets/js/daff_weekly.js"></script>
+    <script src="assets/js/daff_weekly_charts.js"></script>
 
     <style>
         body {
@@ -287,7 +289,19 @@
                     <div class="h-[260px] w-full relative">
                         <canvas id="eventTrendChart"></canvas>
                     </div>
+                    <p id="daff-weekly-note" class="text-[11px] text-slate-500 mt-3 leading-relaxed"></p>
                 </div>
+            </div>
+
+            <!-- NSW 週趨勢：資料來自 assets/js/daff_weekly.js（DAFF 官方逐筆 xlsx），無資料時自動隱藏 -->
+            <div id="nsw-trend-card" class="hidden bg-slate-800 p-6 rounded-2xl border border-amber-700/40">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                    <h3 class="text-sm font-semibold text-amber-300 uppercase tracking-wider">📈 新南威爾斯州 (NSW) 週趨勢（依官方採樣週）</h3>
+                    <span class="text-xs font-mono text-slate-300">NSW 累計（有採樣日）: <strong id="nsw-trend-total" class="text-amber-300 text-base">-</strong></span>
+                </div>
+                <p class="text-[11px] text-slate-400 mb-4">NSW 境內野生動物確診事件，依 DAFF 官方逐筆檔的採樣日所在週彙整。注意：這是野生動物事件，不是商業家禽；風險評估的紅線仍是「NSW 商業家禽 0 確診」。</p>
+                <div class="h-[240px] w-full relative"><canvas id="nswTrendChart"></canvas></div>
+                <p id="nsw-trend-note" class="text-[11px] text-slate-500 mt-3 leading-relaxed"></p>
             </div>
 
             <!-- ========================================================================= -->
@@ -1484,6 +1498,8 @@
         function initEventWeeklyChart() {
             const ctx = document.getElementById('eventTrendChart');
             if (!ctx) return;
+            // 優先使用 DAFF 官方逐筆檔（採樣週）；無資料時退回下方 cases_events.json 版本
+            try { if (window.DaffWeekly && window.DaffWeekly.renderNational('eventTrendChart', 'zh')) return; } catch (e) { console.warn('official weekly chart skipped', e); }
 
             const events = (window.H5N1_EVENTS && window.H5N1_EVENTS.length > 0) ? window.H5N1_EVENTS : window.H5N1_HISTORICAL_CASES;
             const weekLabels = generateWeekLabels(events);
