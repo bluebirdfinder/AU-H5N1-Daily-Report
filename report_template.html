@@ -1246,8 +1246,22 @@
             };
 
             // 優先從 OFFICIAL_STATS 讀取官網權威 Power BI 視覺對帳數字
+            // 優先使用 DAFF 官方逐筆檔（鳥類 8 類；哺乳類另計，見哺乳類卡片），總和與全澳總數可對帳
+            const officialSp = window.daffWeeklyEmbedded && window.daffWeeklyEmbedded.species_birds;
             const sc = stats.species_counts;
-            if (sc && (sc['Crested Tern'] || sc['Silver Gull'])) {
+            if (officialSp) {
+                const o = window.daffWeeklyEmbedded;
+                counts['大鳳頭燕鷗 (Crested Tern)'] = officialSp['Crested Tern'] || 0;
+                counts['銀鷗 / 海鷗 (Silver Gull)'] = officialSp['Silver Gull'] || 0;
+                counts['巨鸌類 (Giant Petrel)'] = officialSp['Giant Petrel'] || 0;
+                counts['太平洋鷗 (Pacific Gull)'] = officialSp['Pacific Gull'] || 0;
+                counts['棕賊鷗 (Brown Skua)'] = officialSp['Brown Skua'] || 0;
+                counts['黑面鸕鶿 (Cormorant)'] = officialSp['Cormorant'] || 0;
+                counts['小企鵝 (Little Penguin)'] = officialSp['Little Penguin'] || 0;
+                counts['遊隼/其它 (Falcon & Other)'] = officialSp['Falcon & Other'] || 0;
+                const st2 = document.getElementById('species-chart-subtitle');
+                if (st2) st2.textContent = `全澳 ${o.total_events} 起中，鳥類 ${o.bird_events} 起依物種歸類（資料：DAFF 官方逐筆檔）；另有 ${o.mammal_events} 起哺乳類事件，見哺乳類卡片，未列入此圖。`;
+            } else if (sc && (sc['Crested Tern'] || sc['Silver Gull'])) {
                 counts['大鳳頭燕鷗 (Crested Tern)'] = sc['Crested Tern'] || 189;
                 counts['銀鷗 / 海鷗 (Silver Gull)'] = sc['Silver Gull'] || 31;
                 counts['巨鸌類 (Giant Petrel)'] = sc['Giant Petrel'] || 18;

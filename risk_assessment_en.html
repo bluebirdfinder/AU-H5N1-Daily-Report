@@ -114,6 +114,7 @@
     <script src="assets/js/ala_bird_data.js"></script>
     <script src="assets/js/movebank_tracks.js"></script>
     <script src="assets/js/cases_events.js"></script>
+    <script src="assets/js/daff_weekly.js"></script>
 </head>
 
 <body class="min-h-screen pb-12">
@@ -844,6 +845,57 @@
         </div>
 
 
+
+        <!-- NSW 觀察指標：資料來自 assets/js/daff_weekly.js（DAFF 官方逐筆 xlsx 每日計算）；只顯示指標，門檻由人工決定 -->
+        <div id="nsw-watch-card" class="hidden glass-card p-6 sm:p-8 space-y-4 border-l-4 border-cyan-500">
+            <div>
+                <h3 class="text-lg font-bold text-white">🔭 NSW Watch Indicators (data board: figures only, no verdict or thresholds)</h3>
+                <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">Computed daily from DAFF's official per-event file. Thresholds are not set: they need to be agreed with AOA / the business side. This board makes no shipping decision for anyone.</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1">
+                    <div class="text-slate-400">NSW weekly new events (sampling week)</div>
+                    <div id="nsw-watch-weeks" class="font-mono text-white text-sm"></div>
+                    <div class="text-[10px] text-slate-500">* Last two weeks are incomplete (registration lag) and will be revised upward.</div>
+                </div>
+                <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1">
+                    <div class="text-slate-400">NSW raptor / land-bird events</div>
+                    <div id="nsw-watch-land" class="font-mono text-amber-300 text-xl font-black"></div>
+                    <div id="nsw-watch-land-sp" class="text-[10px] text-slate-400"></div>
+                    <div class="text-[10px] text-slate-500">Same group in other states: <span id="nsw-watch-land-other"></span></div>
+                </div>
+                <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1">
+                    <div class="text-slate-400">Central West (Blayney area) events</div>
+                    <div id="nsw-watch-cw" class="font-mono text-emerald-300 text-xl font-black"></div>
+                    <div class="text-[10px] text-slate-500">LGAs watched: <span id="nsw-watch-cw-lgas"></span></div>
+                </div>
+                <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1">
+                    <div class="text-slate-400">Commercial poultry</div>
+                    <div class="text-[11px] text-slate-300 leading-relaxed">This source (DAFF wildlife events) does not include poultry notifications. Use NSW DPI / the Emergency Animal Disease Hotline; the commercial-farm status on this page is shown in the indicators above.</div>
+                </div>
+            </div>
+            <script>
+                (function () {
+                    try {
+                        const D = window.daffWeeklyEmbedded;
+                        if (!D || !D.nsw_watch || !D.weeks || D.weeks.length < 5) return;
+                        const W = D.nsw_watch;
+                        const inc = D.weeks.findIndex(w => w.start === D.incomplete_from);
+                        const end = inc > 0 ? inc : D.weeks.length - 2;
+                        const mk = (w, faded) => '<span' + (faded ? ' class="opacity-50"' : '') + '>' + w.start.slice(5).replace('-', '/') + ': <strong>' + ((w.by_state && w.by_state.NSW) || 0) + '</strong>' + (faded ? '*' : '') + '</span>';
+                        const rows = D.weeks.slice(Math.max(0, end - 3), D.weeks.length).map((w, i, arr) => mk(w, D.weeks.indexOf(w) >= end));
+                        document.getElementById('nsw-watch-weeks').innerHTML = rows.join('<br>');
+                        document.getElementById('nsw-watch-land').textContent = W.nsw_land_birds_total + ' ';
+                        document.getElementById('nsw-watch-land-sp').textContent = Object.entries(W.nsw_land_birds).map(([k, v]) => k + ' ' + v).join(' / ') || '-';
+                        document.getElementById('nsw-watch-land-other').textContent = W.other_states_land_birds + ' ';
+                        document.getElementById('nsw-watch-cw').textContent = W.central_west_events + ' ';
+                        document.getElementById('nsw-watch-cw-lgas').textContent = W.central_west_lgas.join(', ');
+                        document.getElementById('nsw-watch-card').classList.remove('hidden');
+                    } catch (e) { console.warn('nsw watch card skipped', e); }
+                })();
+            </script>
+        </div>
+
         <!-- 2-Year Multi-Wave Epidemiological & Migratory Timeline (2026-2028) Card -->
         <div class="glass-card p-6 sm:p-8 space-y-6 border-l-4 border-amber-500">
             <div class="border-b border-slate-800 pb-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -902,7 +954,7 @@
                         <span class="w-3.5 h-1 bg-yellow-400 inline-block rounded-full"></span> ── Cases (Official Actual, up to Sep)
                     </span>
                     <span class="flex items-center gap-1.5 font-semibold text-orange-400">
-                        <span class="w-3.5 h-0.5 border-b-2 border-dashed border-orange-500 inline-block"></span> ---- Cases (Epidemiological Projection)
+                        <span class="w-3.5 h-0.5 border-b-2 border-dashed border-orange-500 inline-block"></span> <span id="legend-cases-projection">---- Cases (Epidemiological Projection)</span>
                     </span>
                     <span class="flex items-center gap-1.5 font-semibold text-cyan-300">
                         <span class="w-3.5 h-1 bg-cyan-400 inline-block rounded-full"></span> ── Birds (Observed Census, up to Sep)
@@ -1959,6 +2011,37 @@
             timelineDataSeries.AU.casesProjected[3] = totalAuCases;
             timelineDataSeries.NSW.casesActual[3] = totalNswCases;
             timelineDataSeries.NSW.casesProjected[3] = totalNswCases;
+
+            // 2026-10-01：過去月份改用 DAFF 官方逐筆檔（依採樣日所在月）的累計，不再用寫死的舊值；
+            // 手寫的「流行病學推演」線若已低於實際累計（例如 NSW 推演 10 月 35 起 < 實際 68 起），
+            // 會讓決策者誤以為情況會好轉，因此隱藏，並在圖例說明，待人工重新校準後再恢復。
+            const W = window.daffWeeklyEmbedded;
+            if (W && W.monthly) {
+                const months = ['2026-06', '2026-07', '2026-08', '2026-09'];
+                let au = 0, nsw = 0;
+                months.forEach((m, i) => {
+                    const x = W.monthly[m] || { total: 0, by_state: {} };
+                    au += x.total; nsw += (x.by_state.NSW || 0);
+                    timelineDataSeries.AU.casesActual[i] = au;
+                    timelineDataSeries.NSW.casesActual[i] = nsw;
+                });
+                timelineDataSeries.AU.labelCasesActual = 'AU Cases (official, by sampling date; ' + W.undated_events + ' with no sampling date excluded)';
+                timelineDataSeries.AU.casesProjected[3] = au;
+                timelineDataSeries.NSW.casesProjected[3] = nsw;
+                let hidden = false;
+                ['AU', 'NSW'].forEach(k => {
+                    const s = timelineDataSeries[k];
+                    const liveTotal = (k === 'AU') ? totalAuCases : totalNswCases;
+                    if (s.casesProjected[4] !== null && s.casesProjected[4] < liveTotal) {
+                        s.casesProjected = s.casesProjected.map(() => null);
+                        hidden = true;
+                    }
+                });
+                if (hidden) {
+                    const el = document.getElementById('legend-cases-projection');
+                    if (el) el.textContent = '---- Cases (epidemiological projection: the old projection is already below actual data; hidden until recalibrated)';
+                }
+            }
         }
 
         function initTimelineChart() {
