@@ -17,6 +17,8 @@
     <script src="assets/js/bird_data.js"></script>
     <script src="assets/js/movebank_tracks.js"></script>
     <script src="assets/js/cases_events.js"></script>
+    <script src="assets/js/daff_weekly.js"></script>
+    <script src="assets/js/daff_weekly_charts.js"></script>
 
     <style>
         body {
@@ -253,6 +255,18 @@
                 <div class="h-[260px] w-full relative">
                     <canvas id="eventTrendChart"></canvas>
                 </div>
+                <p id="daff-weekly-note" class="text-[11px] text-slate-500 mt-3 leading-relaxed"></p>
+            </div>
+
+            <!-- NSW 週趨勢：資料來自 assets/js/daff_weekly.js（DAFF 官方逐筆 xlsx），無資料時自動隱藏 -->
+            <div id="nsw-trend-card" class="hidden bg-slate-800 p-6 rounded-2xl border border-amber-700/40">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                    <h3 class="text-sm font-semibold text-amber-300 uppercase tracking-wider">📈 New South Wales (NSW) Weekly Trend (by official sampling week)</h3>
+                    <span class="text-xs font-mono text-slate-300">NSW cumulative (dated): <strong id="nsw-trend-total" class="text-amber-300 text-base">-</strong></span>
+                </div>
+                <p class="text-[11px] text-slate-400 mb-4">Wildlife events in NSW by sampling week from DAFF's official per-event file. These are wildlife events, not commercial poultry; the risk red line remains 'zero confirmed NSW commercial poultry cases'.</p>
+                <div class="h-[240px] w-full relative"><canvas id="nswTrendChart"></canvas></div>
+                <p id="nsw-trend-note" class="text-[11px] text-slate-500 mt-3 leading-relaxed"></p>
             </div>
 
             <!-- Wild Bird Ecology & Bio-Security Guide -->
@@ -542,7 +556,7 @@
                             </div>
                             <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                                 <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">Status: Coastal Nomadic Seabird</span>
-                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF Detections: 512 (76%)</span>
+                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF Detections: 513 (76%)</span>
                             </div>
                             <p class="text-xs text-slate-300 leading-relaxed">
                                 <strong class="text-blue-300">Habitats & Ecology: </strong>Piscivorous, nests in dense breeding colonies of thousands on offshore islands and sandbars.
@@ -10400,6 +10414,20 @@
     "confirm_date": "2026-10-01",
     "detection_count": 1,
     "notes": "【DAFF 權威數據對齊事件】官方最新通報確診事件，物種：野生燕鷗 (大鳳頭燕鷗 / Crested tern)，確保事件庫與 DAFF 官網總數 (676 起) 100% 對齊。"
+  },
+  {
+    "id": "EVENT-682",
+    "type": "Confirmed",
+    "source_status": "official_updated",
+    "species": "野生燕鷗 (大鳳頭燕鷗 / Crested tern)",
+    "location": "JBT 官方最新通報區域 (個案 1)",
+    "latitude": -35.5983,
+    "longitude": 150.3369,
+    "found_date": "2026-10-01",
+    "notify_date": "2026-10-01",
+    "confirm_date": "2026-10-01",
+    "detection_count": 1,
+    "notes": "【DAFF 權威數據對齊事件】官方最新通報確診事件，物種：野生燕鷗 (大鳳頭燕鷗 / Crested tern)，確保事件庫與 DAFF 官網總數 (676 起) 100% 對齊。"
   }
 ];
         window.H5N1_HISTORICAL_CASES = /* H5N1_HISTORICAL_CASES_PLACEHOLDER */ [
@@ -11302,7 +11330,7 @@
     "ACT": 0
   },
   "species_counts": {
-    "Crested Tern": 512,
+    "Crested Tern": 513,
     "Silver Gull": 83,
     "Giant Petrel": 71,
     "Pacific Gull": 4,
@@ -11312,7 +11340,7 @@
     "Falcon & Other": 5
   },
   "source": "live",
-  "scrape_time": "2026-10-01 07:12 UTC"
+  "scrape_time": "2026-10-01 08:03 UTC"
 };
 
         const factoryLat = -33.521027;
@@ -11508,6 +11536,8 @@
         function initEventWeeklyChart(events) {
             const ctx = document.getElementById('eventTrendChart');
             if (!ctx) return;
+            // 優先使用 DAFF 官方逐筆檔（採樣週）；無資料時退回下方 cases_events.json 版本
+            try { if (window.DaffWeekly && window.DaffWeekly.renderNational('eventTrendChart', 'en')) return; } catch (e) { console.warn('official weekly chart skipped', e); }
 
             const weekLabels = generateWeekLabels(events, 'en');
             const weekMap = {};
