@@ -1,7 +1,7 @@
 window.daffWeeklyEmbedded = {
- "fetched_at_utc": "2026-10-02T01:53:44Z",
- "total_events": 676,
- "dated_events": 542,
+ "fetched_at_utc": "2026-10-02T14:21:09Z",
+ "total_events": 680,
+ "dated_events": 546,
  "undated_events": 134,
  "weeks": [
   {
@@ -74,12 +74,12 @@ window.daffWeeklyEmbedded = {
   },
   {
    "start": "2026-08-17",
-   "total": 77,
+   "total": 78,
    "by_state": {
     "TAS": 5,
     "VIC": 28,
     "NSW": 6,
-    "SA": 37,
+    "SA": 38,
     "QLD": 1
    }
   },
@@ -136,9 +136,10 @@ window.daffWeeklyEmbedded = {
   },
   {
    "start": "2026-09-28",
-   "total": 1,
+   "total": 4,
    "by_state": {
-    "VIC": 1
+    "VIC": 3,
+    "SA": 1
    }
   }
  ],
@@ -162,20 +163,20 @@ window.daffWeeklyEmbedded = {
    }
   },
   "2026-08": {
-   "total": 325,
+   "total": 326,
    "by_state": {
     "VIC": 143,
     "NSW": 19,
-    "SA": 135,
+    "SA": 136,
     "TAS": 27,
     "QLD": 1
    }
   },
   "2026-09": {
-   "total": 193,
+   "total": 196,
    "by_state": {
-    "VIC": 75,
-    "SA": 51,
+    "VIC": 77,
+    "SA": 52,
     "NSW": 47,
     "TAS": 19,
     "JBT": 1
@@ -189,7 +190,7 @@ window.daffWeeklyEmbedded = {
    "Whistling Kite": 1
   },
   "nsw_land_birds_total": 3,
-  "other_states_land_birds": 34,
+  "other_states_land_birds": 35,
   "central_west_lgas": [
    "Blayney",
    "Bathurst Regional",
@@ -206,15 +207,15 @@ window.daffWeeklyEmbedded = {
   "nsw_events": 68
  },
  "species_birds": {
-  "Crested Tern": 438,
-  "Silver Gull": 70,
+  "Crested Tern": 439,
+  "Silver Gull": 71,
   "Giant Petrel": 18,
   "Pacific Gull": 18,
   "Brown Skua": 3,
   "Cormorant": 20,
   "Little Penguin": 15,
-  "Falcon & Other": 75
+  "Falcon & Other": 76
  },
- "bird_events": 657,
- "mammal_events": 19
+ "bird_events": 660,
+ "mammal_events": 20
 };

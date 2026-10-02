@@ -1,10 +1,10 @@
 window.daffMammalEmbedded = {
-  "fetched_at_utc": "2026-10-02T01:53:44Z",
-  "total_events": 676,
-  "mammal_events": 19,
+  "fetched_at_utc": "2026-10-02T14:21:09Z",
+  "total_events": 680,
+  "mammal_events": 20,
   "by_state": {
     "SA": 10,
-    "VIC": 9
+    "VIC": 10
   },
   "by_species": {
     "Long-nosed fur seal": 4,
@@ -13,7 +13,7 @@ window.daffMammalEmbedded = {
     "Common Dolphin": 3,
     "Australian sea lion": 3,
     "Dolphins": 2,
-    "Australian fur seal": 1
+    "Australian fur seal": 2
   },
-  "latest_sampled": "2026-09-27"
+  "latest_sampled": "2026-09-29"
 };

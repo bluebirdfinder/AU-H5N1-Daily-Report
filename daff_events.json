@@ -1,17 +1,17 @@
 {
- "fetched_at_utc": "2026-10-02T01:53:44Z",
+ "fetched_at_utc": "2026-10-02T14:21:09Z",
  "source": "https://www.agriculture.gov.au/sites/default/files/documents/H5_bird_flu_events.xlsx",
- "total_events": 676,
+ "total_events": 680,
  "events_by_state": {
   "WA": 10,
-  "SA": 321,
+  "SA": 323,
   "NSW": 68,
   "QLD": 2,
-  "VIC": 228,
+  "VIC": 230,
   "TAS": 46,
   "JBT": 1
  },
- "mammal_events": 19,
+ "mammal_events": 20,
  "records": [
   {
    "record_id": "WA-WB-001",
@@ -3809,17 +3809,6 @@
    "is_mammal": false
   },
   {
-   "record_id": "SA-WB-198",
-   "date_sampled": "2026-08-20",
-   "jurisdiction": "SA",
-   "state": "SA",
-   "lga": "Lower Eyre",
-   "locality": "Rocky Island",
-   "common_name": "Greater Crested Tern",
-   "scientific_name": "Thalasseus bergii",
-   "is_mammal": false
-  },
-  {
    "record_id": "SA-WB-199",
    "date_sampled": "2026-08-20",
    "jurisdiction": "SA",
@@ -7214,8 +7203,8 @@
    "state": "VIC",
    "lga": "East Gippsland",
    "locality": "Metung",
-   "common_name": "Raven sp.",
-   "scientific_name": "Corvus sp.",
+   "common_name": "Australian Raven",
+   "scientific_name": "Corvus coronoides",
    "is_mammal": false
   },
   {
@@ -7396,28 +7385,6 @@
   },
   {
    "record_id": "VIC-WB-215",
-   "date_sampled": "2026-09-24",
-   "jurisdiction": "VIC",
-   "state": "VIC",
-   "lga": "East Gippsland",
-   "locality": "Bemm River",
-   "common_name": "Greater Crested Tern",
-   "scientific_name": "Thalasseus bergii",
-   "is_mammal": false
-  },
-  {
-   "record_id": "VIC-WB-216",
-   "date_sampled": "2026-09-24",
-   "jurisdiction": "VIC",
-   "state": "VIC",
-   "lga": "East Gippsland",
-   "locality": "Bemm River",
-   "common_name": "Greater Crested Tern",
-   "scientific_name": "Thalasseus bergii",
-   "is_mammal": false
-  },
-  {
-   "record_id": "VIC-WB-217",
    "date_sampled": "2026-09-25",
    "jurisdiction": "VIC",
    "state": "VIC",
@@ -7428,7 +7395,7 @@
    "is_mammal": false
   },
   {
-   "record_id": "VIC-WB-218",
+   "record_id": "VIC-WB-216",
    "date_sampled": "2026-09-25",
    "jurisdiction": "VIC",
    "state": "VIC",
@@ -7439,7 +7406,7 @@
    "is_mammal": false
   },
   {
-   "record_id": "VIC-WB-219",
+   "record_id": "VIC-WB-217",
    "date_sampled": "2026-09-28",
    "jurisdiction": "VIC",
    "state": "VIC",
@@ -7448,6 +7415,83 @@
    "common_name": "Greater Crested Tern",
    "scientific_name": "Thalasseus bergii",
    "is_mammal": false
+  },
+  {
+   "record_id": "SA-WB-198",
+   "date_sampled": "2026-08-18",
+   "jurisdiction": "SA",
+   "state": "SA",
+   "lga": "Lower Eyre",
+   "locality": "Liguanea Island",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "SA-WB-313",
+   "date_sampled": "2026-08-18",
+   "jurisdiction": "SA",
+   "state": "SA",
+   "lga": "Lower Eyre",
+   "locality": "Curta Rocks",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "SA-WB-314",
+   "date_sampled": "2026-09-28",
+   "jurisdiction": "SA",
+   "state": "SA",
+   "lga": "Victor Harbor",
+   "locality": "Encounter Bay",
+   "common_name": "Silver Gull",
+   "scientific_name": "Chroicocephalus novaehollandiae",
+   "is_mammal": false
+  },
+  {
+   "record_id": "VIC-WB-218",
+   "date_sampled": "2026-09-24",
+   "jurisdiction": "VIC",
+   "state": "VIC",
+   "lga": "South Gippsland",
+   "locality": "Walkerville South",
+   "common_name": "Raven sp.",
+   "scientific_name": "Corvus sp.",
+   "is_mammal": false
+  },
+  {
+   "record_id": "VIC-WB-219",
+   "date_sampled": "2026-09-28",
+   "jurisdiction": "VIC",
+   "state": "VIC",
+   "lga": "South Gippsland",
+   "locality": "Port Welshpool",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "VIC-WB-220",
+   "date_sampled": "2026-09-25",
+   "jurisdiction": "VIC",
+   "state": "VIC",
+   "lga": "South Gippsland",
+   "locality": "Walkerville North",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "VIC-WM-007",
+   "date_sampled": "2026-09-29",
+   "jurisdiction": "VIC",
+   "state": "VIC",
+   "lga": "Colac Otway",
+   "locality": "Apollo Bay",
+   "common_name": "Australian fur seal",
+   "scientific_name": "Arctocephalus pusillus doriferus",
+   "is_mammal": true
   }
  ]
 }
