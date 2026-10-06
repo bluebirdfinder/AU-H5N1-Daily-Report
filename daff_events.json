@@ -1,13 +1,13 @@
 {
- "fetched_at_utc": "2026-10-05T16:39:19Z",
+ "fetched_at_utc": "2026-10-06T02:35:53Z",
  "source": "https://www.agriculture.gov.au/sites/default/files/documents/H5_bird_flu_events.xlsx",
- "total_events": 682,
+ "total_events": 686,
  "events_by_state": {
   "WA": 10,
   "SA": 325,
   "NSW": 68,
   "QLD": 2,
-  "VIC": 230,
+  "VIC": 234,
   "TAS": 46,
   "JBT": 1
  },
@@ -7513,6 +7513,50 @@
    "locality": "Penneshaw",
    "common_name": "Black-faced Cormorant",
    "scientific_name": "Phalacrocorax fuscescens",
+   "is_mammal": false
+  },
+  {
+   "record_id": "VIC-WB-221",
+   "date_sampled": "2026-09-30",
+   "jurisdiction": "VIC",
+   "state": "VIC",
+   "lga": "Mornington Peninsula",
+   "locality": "Crib Point",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "VIC-WB-222",
+   "date_sampled": "2026-09-29",
+   "jurisdiction": "VIC",
+   "state": "VIC",
+   "lga": "East Gippsland",
+   "locality": "Bemm River",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "VIC-WB-223",
+   "date_sampled": "2026-09-29",
+   "jurisdiction": "VIC",
+   "state": "VIC",
+   "lga": "East Gippsland",
+   "locality": "Metung",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "VIC-WB-224",
+   "date_sampled": "2026-09-29",
+   "jurisdiction": "VIC",
+   "state": "VIC",
+   "lga": "East Gippsland",
+   "locality": "Metung",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
    "is_mammal": false
   }
  ]
