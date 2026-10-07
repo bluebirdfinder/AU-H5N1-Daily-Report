@@ -1,14 +1,14 @@
 {
- "fetched_at_utc": "2026-10-07T01:54:35Z",
+ "fetched_at_utc": "2026-10-07T14:57:36Z",
  "source": "https://www.agriculture.gov.au/sites/default/files/documents/H5_bird_flu_events.xlsx",
- "total_events": 686,
+ "total_events": 690,
  "events_by_state": {
   "WA": 10,
-  "SA": 325,
+  "SA": 327,
   "NSW": 68,
   "QLD": 2,
-  "VIC": 234,
-  "TAS": 46,
+  "VIC": 235,
+  "TAS": 47,
   "JBT": 1
  },
  "mammal_events": 20,
@@ -7555,6 +7555,50 @@
    "state": "VIC",
    "lga": "East Gippsland",
    "locality": "Metung",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "SA-WB-317",
+   "date_sampled": "2026-10-01",
+   "jurisdiction": "SA",
+   "state": "SA",
+   "lga": "Ceduna",
+   "locality": "Ceduna",
+   "common_name": "Fluttering Shearwater",
+   "scientific_name": "Puffinus gavia",
+   "is_mammal": false
+  },
+  {
+   "record_id": "SA-WB-318",
+   "date_sampled": "2026-10-01",
+   "jurisdiction": "SA",
+   "state": "SA",
+   "lga": "Port Lincoln",
+   "locality": "Port Lincoln",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "TAS-WB-047",
+   "date_sampled": "2026-10-02",
+   "jurisdiction": "TAS",
+   "state": "TAS",
+   "lga": "Dorset",
+   "locality": "Bridport",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "VIC-WB-225",
+   "date_sampled": "2026-10-01",
+   "jurisdiction": "VIC",
+   "state": "VIC",
+   "lga": "East Gippsland",
+   "locality": "Mallacoota",
    "common_name": "Greater Crested Tern",
    "scientific_name": "Thalasseus bergii",
    "is_mammal": false
