@@ -124,6 +124,7 @@
 
 - 數字（690／各州）與官方逐筆檔一致；排程自動更新有效。**Gemini 可用來交叉確認數字，政策與原因類敘述要保留**（它曾稱 668→676 全是新疫區/新物種，與資料不符）。未驗證、未採用：NSW 小藍企鵝疫苗、聯邦「過渡管理」、「海外變異株突破疫苗」。
 - **首頁「各州圈養令」等 4 張政策卡片是寫死在 `report_template*.html` 的文字**，會悄悄過期（維州寫延長至 9/18，Gemini 稱 10/16）。現已加 `data-asof` 並由 `daff_weekly_charts.js` 的 `markAsOf()` 在超過 14 天時顯示 ⚠️；`h5n1.py` 抓維州／新州頁時會印 `[VIC/NSW 政策原文診斷]` 供人工核對。**更新卡片文字時要同步改 `data-asof` 日期**。
+- **維州圈養令已於 2026-10-08 用官方原文更新**（Agriculture Victoria「control order – requirement to prevent poultry contact with wild birds」：南部 LGA 含大墨爾本、50+ 隻、再延長 28 天至少至 2026-10-16）。Gemini 說的 10/16 正確。卡片內 `data-asof` 現在是每個子段落各自一個日期（維州 2026-10-08、新州 2026-09-16 未核對）。**維州主頁只有連結標題，圈養令日期在專屬子頁 `.../about-h5-bird-flu/control-order-housing-requirement`**；`log_policy_page_diagnostics()` 會把該頁文字印進 log，下次到期（10/16）前可用它核對。
 - DAFF 報告政策原文已放在週曲線圖說明下方（英文原文＋中文意譯，中文為本站翻譯）。
 
 ## 開發規範

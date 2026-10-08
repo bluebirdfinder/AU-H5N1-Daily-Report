@@ -2096,6 +2096,11 @@ def main():
         print(f"[DAFF xlsx 執行例外] {e}")
 
     try:
+        log_policy_page_diagnostics()
+    except Exception as e:
+        print(f"[政策頁診斷 執行例外] {e}")
+
+    try:
         fetch_ala_data()
     except Exception as e:
         print(f"[ALA API 執行例外] {e}")
@@ -2753,6 +2758,43 @@ def write_daff_weekly_js(payload):
         print(f"[DAFF xlsx] ✅ 寫入 assets/js/daff_weekly.js ({len(out['weeks'])} 週, 有日期 {len(dated)} / 無日期 {undated})")
     except Exception as e:
         print(f"[DAFF xlsx] 寫入 daff_weekly.js 失敗: {str(e)[:80]}")
+
+
+def log_policy_page_diagnostics():
+    """
+    診斷（僅 log，不影響任何統計或頁面）：抓取需要人工核對的州政府政策子頁，把頁面文字逐行印進 log。
+    用途：首頁「各州圈養令」卡片是寫死文字，需要對照官方原文更新；本環境連不到這些網域，
+    但 GitHub Actions runner 可以，所以讓排程把原文印出來再由人工/Claude 讀取。
+    """
+    pages = {
+        "VIC 圈養令": "https://agriculture.vic.gov.au/biosecurity/animal-diseases/poultry-diseases/H5N1-avian-influenza-H5-bird-flu/about-h5-bird-flu/control-order-housing-requirement",
+    }
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+    for tag, url in pages.items():
+        try:
+            html_content = smart_fetch_url(url, headers=headers, timeout=15)
+            if not html_content:
+                print(f"[政策頁診斷 {tag}] 抓取失敗: {url}")
+                continue
+            soup = BeautifulSoup(html_content, "html.parser")
+            for t in soup(["script", "style", "nav", "header", "footer"]):
+                t.decompose()
+            seen, n = set(), 0
+            for line in soup.get_text("\n").split("\n"):
+                line = " ".join(line.split())
+                if len(line) >= 20 and line not in seen:
+                    seen.add(line)
+                    n += 1
+                    print(f"[政策頁診斷 {tag}] {line[:400]}")
+                    if n >= 80:
+                        break
+            print(f"[政策頁診斷 {tag}] 共印出 {n} 行 ({len(html_content)} 字元原始內容)")
+        except Exception as e:
+            print(f"[政策頁診斷 {tag}] 例外: {e}")
 
 
 def fetch_daff_events_xlsx():
