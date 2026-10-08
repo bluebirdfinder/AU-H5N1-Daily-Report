@@ -1,0 +1,20 @@
+# 唯讀診斷：只在 claude/gifted-davinci-5zwh1e 分支被 push 時執行，不用任何 secret、不推 commit。
+name: NSW Power BI Probe
+on:
+  push:
+    branches: [claude/gifted-davinci-5zwh1e]
+    paths: ['scripts/nsw_powerbi_probe.py', '.github/workflows/nsw_probe.yml']
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: |
+          pip install playwright
+          playwright install chromium --with-deps
+      - run: python scripts/nsw_powerbi_probe.py
