@@ -150,3 +150,10 @@
 | `assets/js/*.js` | 上述 JSON 的免 CORS 打包版本，供 `file://` 離線開啟 |
 | `h5n1_weekly_slides.html` | 疫情週報 16:9 簡報，`sync_weekly_slides()` 只改封面日期區間；事件數字 2026-09-16 已接上 `cases_events.js`（`data-bind` 屬性 + `syncWeeklySlideCaseEvents()`），週間比較敘述文字（「上週 X 起」）仍人工維護 |
 | `risk_assessment_slides.html`/`_en.html` | 風險評估模型週報 16:9 簡報，`sync_risk_assessment_weekly()` 只改封面日期區間；KPI 卡片與時間軸圖表當前點 2026-09-16 已接上 `cases_events.js`（`data-bind="nsw-events"` + 修正 `Array.isArray` 誤判） |
+
+## 2026-10-08（後續）：NSW 官方頁 Power BI 對帳
+
+- NSW 官方 bird-flu 頁（`www.nsw.gov.au/regional-and-primary-industries/biosecurity/bird-flu`）內嵌公開 Power BI 報表（資料集 `HPAI_LGA_Public`，iframe 標題「HPAI LGA map」），沙盒連不到該網域，改由 Actions runner 用 Playwright 攔截 `querydata` 取得（探針 run 37753386039 驗證）。實測 NSW 70 起（頁面文字同為 70），DAFF xlsx 當時 68 起，差 2 起（Bega Valley、Lake Macquarie），判斷是 DAFF 登記落後，未逐筆核對。
+- 已新增 `log_nsw_powerbi_reconciliation()`（`h5n1.py`）：**只印 log、不寫檔、不改任何統計**，標籤 `[NSW PowerBI 對帳]`，印各 LGA 事件數、Power BI 加總、頁面文字數字、與 `daff_events.json` NSW 的差距。**尚未在排程環境驗證**，下次排程後讀 log 確認。
+- Power BI 回應是壓縮格式（`R` 位元遮罩＝沿用上一列、`Ø`＝空值），解碼邏輯已用探針 log 的真實 payload 手動驗證。
+- 「4 起無 LGA」是 NSW 端未歸 LGA，與 DAFF 的對應關係是推算，未驗證。是否把 NSW 當 NSW 權威來源是人工決策，尚未做。
