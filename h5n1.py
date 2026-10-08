@@ -1014,6 +1014,21 @@ def fetch_daff_updates():
         if html_content:
             soup = BeautifulSoup(html_content, "html.parser")
             soups.append(soup)
+            # 診斷（僅 log，不影響統計）：印出維州/新州頁面中跟圈養令、延長日期、疫苗有關的原文段落，
+            # 供人工核對首頁「各州圈養令」卡片（該卡片為寫死文字，會過期）
+            if name in ("VIC", "NSW"):
+                try:
+                    kw = re.compile(r"control order|housing|indoor|lockdown|extend|expire|until|vaccin|penguin|october|\b\d{1,2} oct", re.IGNORECASE)
+                    seen = set()
+                    for line in soup.get_text("\n").split("\n"):
+                        line = " ".join(line.split())
+                        if 25 <= len(line) and kw.search(line) and line not in seen:
+                            seen.add(line)
+                            print(f"[{name} 政策原文診斷] {line[:320]}")
+                            if len(seen) >= 25:
+                                break
+                except Exception as e:
+                    print(f"[{name} 政策原文診斷] 失敗: {e}")
             if name == "DAFF_Entry":
                 daff_soup = soup
         else:

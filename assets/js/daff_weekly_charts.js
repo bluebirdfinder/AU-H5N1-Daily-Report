@@ -73,7 +73,25 @@
             return ok;
         }
     };
+
+    // 「資料截至」標示：政策卡片是人工維護的文字，超過 14 天未更新就標示可能過期，避免悄悄過期
+    function markAsOf() {
+        const en = document.documentElement.lang === 'en' || /_en\.html/.test(location.pathname);
+        document.querySelectorAll('[data-asof]').forEach(function (el) {
+            const d = new Date(el.getAttribute('data-asof') + 'T00:00:00Z');
+            if (isNaN(d.getTime())) return;
+            const days = Math.floor((Date.now() - d.getTime()) / 86400000);
+            const stale = days > 14;
+            const b = document.createElement('div');
+            b.className = 'text-[10px] font-mono mt-1 ' + (stale ? 'text-amber-300' : 'text-slate-500');
+            b.textContent = en
+                ? (stale ? '⚠️ Text last updated ' + el.getAttribute('data-asof') + ' (' + days + ' days ago, may be out of date; inferred from version history)' : 'Text last updated ' + el.getAttribute('data-asof'))
+                : (stale ? '⚠️ 資料截至 ' + el.getAttribute('data-asof') + '（已 ' + days + ' 天未更新，可能已過期；依版本紀錄推定）' : '資料截至 ' + el.getAttribute('data-asof'));
+            el.appendChild(b);
+        });
+    }
     window.addEventListener('load', function () {
+        try { markAsOf(); } catch (e) { console.warn('asof skipped', e); }
         try { window.DaffWeekly.renderNsw('nswTrendChart', document.documentElement.lang === 'en' || /_en\.html/.test(location.pathname) ? 'en' : 'zh'); } catch (e) { console.warn('nsw weekly skipped', e); }
     });
 })();

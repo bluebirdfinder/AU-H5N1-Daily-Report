@@ -120,6 +120,12 @@
 5. **NSW 觀察指標看板**：每週新增、猛禽/陸鳥事件、中西部（Blayney 周邊）事件，由 `write_daff_weekly_js()` 的 `nsw_watch` 計算。只顯示數據，門檻值未訂定。
 6. 其他：`nsw_cases_map.html` 由 `generate_nsw_map.py` 另外產生、未被任何頁面連結，停在 9/16，未處理。
 
+## 2026-10-08：與 Gemini 週報交叉比對
+
+- 數字（690／各州）與官方逐筆檔一致；排程自動更新有效。**Gemini 可用來交叉確認數字，政策與原因類敘述要保留**（它曾稱 668→676 全是新疫區/新物種，與資料不符）。未驗證、未採用：NSW 小藍企鵝疫苗、聯邦「過渡管理」、「海外變異株突破疫苗」。
+- **首頁「各州圈養令」等 4 張政策卡片是寫死在 `report_template*.html` 的文字**，會悄悄過期（維州寫延長至 9/18，Gemini 稱 10/16）。現已加 `data-asof` 並由 `daff_weekly_charts.js` 的 `markAsOf()` 在超過 14 天時顯示 ⚠️；`h5n1.py` 抓維州／新州頁時會印 `[VIC/NSW 政策原文診斷]` 供人工核對。**更新卡片文字時要同步改 `data-asof` 日期**。
+- DAFF 報告政策原文已放在週曲線圖說明下方（英文原文＋中文意譯，中文為本站翻譯）。
+
 ## 開發規範
 
 - CDN 白名單只能用 `cdnjs.cloudflare.com`，不可用 `cdn.jsdelivr.net` / `unpkg.com`（企業資安政策，見 AGENT.md）。
