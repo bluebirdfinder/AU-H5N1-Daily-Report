@@ -1,7 +1,7 @@
 window.daffWeeklyEmbedded = {
- "fetched_at_utc": "2026-10-12T17:11:07Z",
- "total_events": 700,
- "dated_events": 566,
+ "fetched_at_utc": "2026-10-13T03:17:06Z",
+ "total_events": 705,
+ "dated_events": 571,
  "undated_events": 134,
  "weeks": [
   {
@@ -146,9 +146,11 @@ window.daffWeeklyEmbedded = {
   },
   {
    "start": "2026-10-05",
-   "total": 1,
+   "total": 6,
    "by_state": {
-    "SA": 1
+    "SA": 1,
+    "TAS": 1,
+    "VIC": 4
    }
   },
   {
@@ -197,11 +199,11 @@ window.daffWeeklyEmbedded = {
    }
   },
   "2026-10": {
-   "total": 13,
+   "total": 18,
    "by_state": {
     "SA": 5,
-    "TAS": 3,
-    "VIC": 3,
+    "TAS": 4,
+    "VIC": 7,
     "NSW": 2
    }
   }
@@ -214,7 +216,7 @@ window.daffWeeklyEmbedded = {
    "Australian Magpie": 1
   },
   "nsw_land_birds_total": 4,
-  "other_states_land_birds": 35,
+  "other_states_land_birds": 36,
   "central_west_lgas": [
    "Blayney",
    "Bathurst Regional",
@@ -232,14 +234,14 @@ window.daffWeeklyEmbedded = {
  },
  "species_birds": {
   "Crested Tern": 450,
-  "Silver Gull": 72,
+  "Silver Gull": 73,
   "Giant Petrel": 18,
-  "Pacific Gull": 19,
+  "Pacific Gull": 20,
   "Brown Skua": 3,
   "Cormorant": 21,
   "Little Penguin": 16,
-  "Falcon & Other": 81
+  "Falcon & Other": 84
  },
- "bird_events": 680,
+ "bird_events": 685,
  "mammal_events": 20
 };
