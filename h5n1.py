@@ -2101,6 +2101,11 @@ def main():
         print(f"[政策頁診斷 執行例外] {e}")
 
     try:
+        log_nsw_powerbi_reconciliation()
+    except Exception as e:
+        print(f"[NSW PowerBI 對帳 執行例外] {e}")
+
+    try:
         fetch_ala_data()
     except Exception as e:
         print(f"[ALA API 執行例外] {e}")
@@ -2795,6 +2800,91 @@ def log_policy_page_diagnostics():
             print(f"[政策頁診斷 {tag}] 共印出 {n} 行 ({len(html_content)} 字元原始內容)")
         except Exception as e:
             print(f"[政策頁診斷 {tag}] 例外: {e}")
+
+
+def log_nsw_powerbi_reconciliation():
+    """
+    診斷（僅 log，不寫任何檔案、不影響統計或頁面）：載入 NSW 官方 bird-flu 頁面內嵌的公開 Power BI 報表
+    (HPAI_LGA_Public)，攔截 querydata 回應，印出 NSW 各 LGA 事件數，並與 daff_events.json 的 NSW 筆數對帳。
+    NSW 頁面比 DAFF 逐筆檔更新且有 LGA 層級；此處只對帳，不採用為權威數字。
+    """
+    url = "https://www.nsw.gov.au/regional-and-primary-industries/biosecurity/bird-flu"
+    ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    try:
+        from playwright.sync_api import sync_playwright
+    except Exception as e:
+        print(f"[NSW PowerBI 對帳] 無 Playwright，略過: {str(e)[:80]}")
+        return
+
+    bodies = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        try:
+            page = browser.new_context(user_agent=ua, viewport={"width": 1400, "height": 2200}).new_page()
+
+            def on_resp(r):
+                if "analysis.windows.net" in r.url and "querydata" in r.url:
+                    try:
+                        bodies.append(r.text())
+                    except Exception:
+                        pass
+
+            page.on("response", on_resp)
+            page.goto(url, wait_until="networkidle", timeout=90000)
+            page.wait_for_timeout(8000)
+            page_text = page.inner_text("body")
+        finally:
+            browser.close()
+
+    def decode_rows(dm0):
+        # Power BI DSR 壓縮：R 位元遮罩=沿用上一列同欄值，Ø 位元遮罩=該欄為空，C 只放其餘欄位
+        rows, prev = [], None
+        for row in dm0:
+            cells = row.get("C", [])
+            rmask, nmask = row.get("R", 0), row.get("Ø", 0)
+            ncols = max(len(prev) if prev else 0, len(cells) + bin(rmask).count("1") + bin(nmask).count("1"))
+            out, ci = [], 0
+            for i in range(ncols):
+                if rmask & (1 << i):
+                    out.append(prev[i] if prev else None)
+                elif nmask & (1 << i):
+                    out.append(None)
+                else:
+                    out.append(cells[ci] if ci < len(cells) else None)
+                    ci += 1
+            rows.append(out)
+            prev = out
+        return rows
+
+    lga_counts = None
+    for body in bodies:
+        try:
+            data = json.loads(body)
+            for res in data.get("results", []):
+                d = res["result"]["data"]
+                names = [s.get("Name", "") for s in d["descriptor"]["Select"] if s]
+                if names and names[0] == "Event.LGA":
+                    dm0 = d["dsr"]["DS"][0]["PH"][0]["DM0"]
+                    lga_counts = [(r[0], r[1]) for r in decode_rows(dm0)]
+        except Exception:
+            continue
+
+    if not lga_counts:
+        print(f"[NSW PowerBI 對帳] 未攔截到 LGA querydata（共 {len(bodies)} 個 querydata 回應）")
+        return
+
+    nsw_total = sum(c for _, c in lga_counts if c)
+    for lga, c in sorted(lga_counts, key=lambda x: -(x[1] or 0)):
+        print(f"[NSW PowerBI 對帳] {lga or '(無 LGA)'}: {c}")
+    m = re.search(r"NSW has recorded (\d+) H5 bird flu events", page_text)
+    print(f"[NSW PowerBI 對帳] Power BI LGA 加總 {nsw_total}；頁面文字 {m.group(1) if m else '未找到'}")
+    try:
+        daff = json.load(open("daff_events.json", encoding="utf-8"))
+        daff_nsw = (daff.get("events_by_state") or {}).get("NSW")
+        print(f"[NSW PowerBI 對帳] DAFF xlsx NSW {daff_nsw}；差距 {nsw_total - daff_nsw:+d}"
+              "（NSW 較新時為正；DAFF 最近兩週會事後補登）")
+    except Exception as e:
+        print(f"[NSW PowerBI 對帳] 無法讀取 daff_events.json: {str(e)[:80]}")
 
 
 def fetch_daff_events_xlsx():
