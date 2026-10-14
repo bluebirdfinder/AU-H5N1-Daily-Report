@@ -157,3 +157,9 @@
 - 已新增 `log_nsw_powerbi_reconciliation()`（`h5n1.py`）：**只印 log、不寫檔、不改任何統計**，標籤 `[NSW PowerBI 對帳]`，印各 LGA 事件數、Power BI 加總、頁面文字數字、與 `daff_events.json` NSW 的差距。**尚未在排程環境驗證**，下次排程後讀 log 確認。
 - Power BI 回應是壓縮格式（`R` 位元遮罩＝沿用上一列、`Ø`＝空值），解碼邏輯已用探針 log 的真實 payload 手動驗證。
 - 「4 起無 LGA」是 NSW 端未歸 LGA，與 DAFF 的對應關係是推算，未驗證。是否把 NSW 當 NSW 權威來源是人工決策，尚未做。
+
+## 2026-10-14：PR #8 合併、Movebank 範例航跡標示
+
+- PR #8（`log_nsw_powerbi_reconciliation()`）已合併，下次排程起會印 `[NSW PowerBI 對帳]`，**尚未讀過真實排程的輸出**。
+- 風險分數的候鳥項只用 eBird（`totalLiveBirds`/`nswLiveObs`），**Movebank 與 ALA 都不參與風險分數**。ALA 是 GBIF 澳洲節點，GBIF 已涵蓋大部分澳洲紀錄，ALA 抓不到影響有限。
+- Movebank 目前是範例航跡（`is_live_data:false`，日期凍在 8/1–9/8）。地圖上的航跡 tooltip 原本寫「實測航跡」，會誤導；已改為 `is_live_data` 為 false 時顯示「⚠️ 範例航跡（非即時）」（`risk_assessment*.html`、`report_template*.html`）。真正取得即時資料需要 Movebank study 擁有者授權，是使用者端的行動。
