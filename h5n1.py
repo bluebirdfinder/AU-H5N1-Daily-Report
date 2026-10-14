@@ -686,6 +686,7 @@ def smart_fetch_url(url, headers=None, timeout=10):
         if resp.status_code == 200 and resp.text and len(resp.text) > 500:
             print(f"[curl_cffi 擬真 Chrome 成功] {url} ({len(resp.text)} chars)")
             return resp.text
+        print(f"[curl_cffi 擬真未採信] {url[:90]} status={resp.status_code}, {len(resp.text or '')} chars")
     except Exception as e:
         print(f"[curl_cffi 擬真嘗試] {str(e)[:80]}")
 
@@ -2979,7 +2980,8 @@ def fetch_ala_data():
     params = {
         "q": "country:Australia",
         "fq": family_fq,
-        "pageSize": 150,
+        # api.ala.org.au 單次上限約 100~125 筆（150 會回 503，2026-10-14 探針實測）
+        "pageSize": 100,
         "sort": "eventDate",
         "dir": "desc"
     }
