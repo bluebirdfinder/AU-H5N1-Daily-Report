@@ -2965,7 +2965,9 @@ def fetch_ala_data():
     瀏覽器 → 純 requests 的四段降級鏈，繞過裸 requests 容易被 WAF 識別阻擋的問題。
     """
     print("[ALA API] 開始抓取 Atlas of Living Australia 野鳥數據 (免 Key 備援)...")
-    base_url = "https://biocache.ala.org.au/ws/occurrences/search"
+    # 2026-10-14：改用官方 API 閘道。探針證實 biocache.ala.org.au / biocache-ws.ala.org.au 這兩個主機名對 GitHub runner 回 403（awselb），
+    # 但 api.ala.org.au 同一份 biocache 資料直接回 200，不是 IP 層級封鎖。
+    base_url = "https://api.ala.org.au/occurrences/occurrences/search"
 
     # 涵蓋水鳥、海鳥、雁鴨科、鷗科、鷸鴴科等 H5N1 高風險鳥類科別
     family_fq = (

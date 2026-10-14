@@ -61,3 +61,18 @@ if worker:
         run(f"{name} | CF Worker", via_worker)
 else:
     print("[ALA probe] 未設定 CF_WORKER_URL，略過 Worker 測試")
+
+# 驗證正式抓取函式（改用 api.ala.org.au 後）：直接跑 h5n1.fetch_ala_data()，只在 runner 暫存目錄寫檔，不 commit
+if os.environ.get("RUN_FETCH") == "1":
+    sys.path.insert(0, os.getcwd())
+    import json
+    import h5n1
+    h5n1.fetch_ala_data()
+    try:
+        d = json.load(open("ala_bird_data.json", encoding="utf-8"))
+        print(f"[ALA probe 正式函式] available={d.get('available')} reason={d.get('unavailable_reason')!r} "
+              f"records={d.get('sample_records_count')} total_in_ala={d.get('total_matched_in_ala')} states={d.get('state_counts')}")
+        for o in d.get("observations", [])[:5]:
+            print(f"[ALA probe 正式函式] sample: {o}")
+    except Exception as e:
+        print(f"[ALA probe 正式函式] 讀取輸出失敗: {e}")

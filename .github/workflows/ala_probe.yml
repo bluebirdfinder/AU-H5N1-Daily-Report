@@ -3,7 +3,7 @@ name: ALA Probe
 on:
   push:
     branches: [claude/determined-hamilton-1k7gky]
-    paths: ['scripts/ala_probe.py', '.github/workflows/ala_probe.yml']
+    paths: ['scripts/ala_probe.py', '.github/workflows/ala_probe.yml', 'h5n1.py']
 permissions:
   contents: read
 jobs:
@@ -14,7 +14,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      - run: pip install requests curl_cffi
+      - run: pip install requests curl_cffi beautifulsoup4 urllib3
       - run: python scripts/ala_probe.py
         env:
           CF_WORKER_URL: ${{ secrets.CF_WORKER_URL }}
+          RUN_FETCH: '1'
