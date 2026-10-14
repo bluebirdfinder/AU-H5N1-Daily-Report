@@ -19,3 +19,4 @@ jobs:
         env:
           CF_WORKER_URL: ${{ secrets.CF_WORKER_URL }}
           RUN_FETCH: '1'
+          RUN_VARIANTS: '1'

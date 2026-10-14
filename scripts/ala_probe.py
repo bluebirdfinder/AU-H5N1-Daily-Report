@@ -76,3 +76,31 @@ if os.environ.get("RUN_FETCH") == "1":
             print(f"[ALA probe 正式函式] sample: {o}")
     except Exception as e:
         print(f"[ALA probe 正式函式] 讀取輸出失敗: {e}")
+
+# 第三段：api.ala.org.au 上正式查詢的各種變體，找出哪個條件造成失敗
+if os.environ.get("RUN_VARIANTS") == "1":
+    base = TARGETS["B 官方 API 閘道 api.ala.org.au"]
+    fams = ["Anatidae", "Laridae", "Scolopacidae", "Charadriidae", "Procellariidae", "Pelecanidae", "Ardeidae", "Sulidae", "Podicipedidae"]
+    or_str = " OR ".join(f"family:{f}" for f in fams)
+    variants = {
+        "V1 正式參數(150筆+OR+sort)": {"q": "country:Australia", "fq": or_str, "pageSize": 150, "sort": "eventDate", "dir": "desc"},
+        "V2 pageSize=20": {"q": "country:Australia", "fq": or_str, "pageSize": 20, "sort": "eventDate", "dir": "desc"},
+        "V3 無 sort": {"q": "country:Australia", "fq": or_str, "pageSize": 20},
+        "V4 family:(A OR B) 括號寫法": {"q": "country:Australia", "fq": "family:(" + " OR ".join(fams) + ")", "pageSize": 20, "sort": "eventDate", "dir": "desc"},
+        "V5 單一科別": {"q": "country:Australia", "fq": "family:Laridae", "pageSize": 150, "sort": "eventDate", "dir": "desc"},
+    }
+    for vname, qs in variants.items():
+        url = base + "?" + urllib.parse.urlencode(qs)
+        print(f"[ALA probe 變體] {vname} url長度={len(url)}")
+
+        def r1(url=url):
+            r = requests.get(url, headers={"User-Agent": UA, "Accept": "application/json"}, timeout=40)
+            return r.status_code, r.headers, r.text
+
+        run(f"{vname} | requests", r1)
+        if cffi:
+            def r2(url=url):
+                r = cffi.get(url, impersonate="chrome124", timeout=40)
+                return r.status_code, r.headers, r.text
+
+            run(f"{vname} | curl_cffi", r2)
