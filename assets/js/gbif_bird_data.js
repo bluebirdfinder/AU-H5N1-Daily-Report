@@ -1,9 +1,9 @@
 window.gbifBirdDataEmbedded = {
-  "fetched_at_utc": "2026-10-14T01:29:56Z",
-  "fetched_at_taipei": "2026-10-14 09:29:56",
+  "fetched_at_utc": "2026-10-14T13:14:20Z",
+  "fetched_at_taipei": "2026-10-14 21:14:20",
   "source": "GBIF Global Biodiversity Information Facility (Excluding eBird duplicates)",
   "purpose": "Complement citizen science with scientific research, marine survey transects, and museum records",
-  "records_count": 417,
+  "records_count": 421,
   "records": [
     {
       "scientificName": "Thalasseus bergii",
@@ -1403,6 +1403,17 @@ window.gbifBirdDataEmbedded = {
       "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
     },
     {
+      "scientificName": "Puffinus carneipes",
+      "commonName": "Ardenna carneipes",
+      "lat": -33.7415,
+      "lng": 115.3649,
+      "eventDate": "2026-09-30",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
       "scientificName": "Puffinus huttoni",
       "commonName": "Puffinus huttoni",
       "lat": -28.2473,
@@ -1496,6 +1507,17 @@ window.gbifBirdDataEmbedded = {
       "lat": -43.0371,
       "lng": 148.2578,
       "eventDate": "2026-09-08",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Puffinus huttoni",
+      "commonName": "Puffinus huttoni",
+      "lat": -33.7544,
+      "lng": 115.2674,
+      "eventDate": "2026-09-30",
       "basisOfRecord": "HUMAN_OBSERVATION",
       "institutionCode": "iNaturalist",
       "datasetName": "iNaturalist research-grade observations",
@@ -2346,6 +2368,28 @@ window.gbifBirdDataEmbedded = {
       "basisOfRecord": "HUMAN_OBSERVATION",
       "institutionCode": "GBIF_RESEARCH",
       "datasetName": "Academic & Marine Research Survey",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Calidris canutus",
+      "commonName": "Calidris canutus",
+      "lat": -35.3676,
+      "lng": 139.1518,
+      "eventDate": "2026-10-05",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Calidris canutus",
+      "commonName": "Calidris canutus",
+      "lat": -25.6122,
+      "lng": 152.877,
+      "eventDate": "2026-10-01",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
       "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
     },
     {
