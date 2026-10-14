@@ -1720,7 +1720,7 @@
                     trackPolyline.bindTooltip(`
                         <div style="font-family:sans-serif; min-width:240px; line-height:1.4;">
                             <div style="font-size:10px; font-weight:800; color:${study.color || '#f97316'}; text-transform:uppercase; margin-bottom:2px;">
-                                🛰️ Movebank 衛星發報器實測航跡
+                                🛰️ Movebank 衛星發報器${data.is_live_data ? '實測航跡' : ' ⚠️ 範例航跡（非即時，僅示意）'}
                             </div>
                             <div style="font-size:12px; font-weight:bold; color:#ffffff;">
                                 ${study.species}

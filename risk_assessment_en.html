@@ -1724,7 +1724,7 @@
                     trackPolyline.bindTooltip(`
                         <div style="font-family:sans-serif; min-width:240px; line-height:1.4;">
                             <div style="font-size:10px; font-weight:800; color:${study.color || '#f97316'}; text-transform:uppercase; margin-bottom:2px;">
-                                🛰️ Movebank Satellite Transmitter Live Track
+                                🛰️ Movebank Satellite Transmitter ${data.is_live_data ? 'Live Track' : '⚠️ Sample Track (not live, illustrative only)'}
                             </div>
                             <div style="font-size:12px; font-weight:bold; color:#ffffff;">
                                 ${study.species}

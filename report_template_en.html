@@ -913,7 +913,7 @@
                         weight: 2.5,
                         opacity: 0.85,
                         dashArray: '6, 5'
-                    }).addTo(eventMapObj).bindTooltip(`🛰️ Movebank Telemetry: <b>${study.species}</b>`, { sticky: true });
+                    }).addTo(eventMapObj).bindTooltip(`🛰️ Movebank Telemetry${data.is_live_data ? '' : ' ⚠️ Sample track (not live)'}: <b>${study.species}</b>`, { sticky: true });
                 });
             };
             if (typeof window.movebankTracksEmbedded !== 'undefined') {
