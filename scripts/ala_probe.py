@@ -77,30 +77,33 @@ if os.environ.get("RUN_FETCH") == "1":
     except Exception as e:
         print(f"[ALA probe 正式函式] 讀取輸出失敗: {e}")
 
-# 第三段：api.ala.org.au 上正式查詢的各種變體，找出哪個條件造成失敗
+# 第四段：找 pageSize 上限，並驗證 startIndex 分頁（api.ala.org.au，正式 OR 條件）
 if os.environ.get("RUN_VARIANTS") == "1":
+    import json, time
     base = TARGETS["B 官方 API 閘道 api.ala.org.au"]
     fams = ["Anatidae", "Laridae", "Scolopacidae", "Charadriidae", "Procellariidae", "Pelecanidae", "Ardeidae", "Sulidae", "Podicipedidae"]
-    or_str = " OR ".join(f"family:{f}" for f in fams)
-    variants = {
-        "V1 正式參數(150筆+OR+sort)": {"q": "country:Australia", "fq": or_str, "pageSize": 150, "sort": "eventDate", "dir": "desc"},
-        "V2 pageSize=20": {"q": "country:Australia", "fq": or_str, "pageSize": 20, "sort": "eventDate", "dir": "desc"},
-        "V3 無 sort": {"q": "country:Australia", "fq": or_str, "pageSize": 20},
-        "V4 family:(A OR B) 括號寫法": {"q": "country:Australia", "fq": "family:(" + " OR ".join(fams) + ")", "pageSize": 20, "sort": "eventDate", "dir": "desc"},
-        "V5 單一科別": {"q": "country:Australia", "fq": "family:Laridae", "pageSize": 150, "sort": "eventDate", "dir": "desc"},
-    }
-    for vname, qs in variants.items():
-        url = base + "?" + urllib.parse.urlencode(qs)
-        print(f"[ALA probe 變體] {vname} url長度={len(url)}")
-
-        def r1(url=url):
-            r = requests.get(url, headers={"User-Agent": UA, "Accept": "application/json"}, timeout=40)
-            return r.status_code, r.headers, r.text
-
-        run(f"{vname} | requests", r1)
-        if cffi:
-            def r2(url=url):
-                r = cffi.get(url, impersonate="chrome124", timeout=40)
-                return r.status_code, r.headers, r.text
-
-            run(f"{vname} | curl_cffi", r2)
+    fq = " OR ".join(f"family:{f}" for f in fams)
+    for size in (30, 50, 75, 100, 125):
+        qs = {"q": "country:Australia", "fq": fq, "pageSize": size, "sort": "eventDate", "dir": "desc"}
+        t = time.time()
+        try:
+            r = requests.get(base + "?" + urllib.parse.urlencode(qs), headers={"User-Agent": UA, "Accept": "application/json"}, timeout=60)
+            n = len(r.json().get("occurrences", [])) if r.status_code == 200 else "-"
+            print(f"[ALA probe 上限] pageSize={size} -> HTTP {r.status_code}, 記錄數={n}, {len(r.text)} 字元, {time.time()-t:.1f}s")
+        except Exception as e:
+            print(f"[ALA probe 上限] pageSize={size} -> 例外 {type(e).__name__}: {str(e)[:100]}")
+    # 分頁：3 頁 x 50
+    got = []
+    for page in range(3):
+        qs = {"q": "country:Australia", "fq": fq, "pageSize": 50, "startIndex": page * 50, "sort": "eventDate", "dir": "desc"}
+        try:
+            r = requests.get(base + "?" + urllib.parse.urlencode(qs), headers={"User-Agent": UA, "Accept": "application/json"}, timeout=60)
+            occ = r.json().get("occurrences", []) if r.status_code == 200 else []
+            got += [o.get("uuid") for o in occ]
+            print(f"[ALA probe 分頁] page={page} startIndex={page*50} -> HTTP {r.status_code}, {len(occ)} 筆")
+        except Exception as e:
+            print(f"[ALA probe 分頁] page={page} -> 例外 {type(e).__name__}: {str(e)[:100]}")
+    print(f"[ALA probe 分頁] 共 {len(got)} 筆，不重複 {len(set(got))} 筆")
+    if occ:
+        o = occ[0]
+        print("[ALA probe 欄位] " + json.dumps({k: o.get(k) for k in ("vernacularName", "scientificName", "family", "decimalLatitude", "decimalLongitude", "eventDate", "stateProvince", "dataResourceName", "individualCount")}, ensure_ascii=False))
