@@ -1,0 +1,20 @@
+# 唯讀診斷：只在 claude/determined-hamilton-1k7gky 分支被 push 時執行，不推 commit，只用 CF_WORKER_URL 一個 secret（值不會印出）。
+name: ALA Probe
+on:
+  push:
+    branches: [claude/determined-hamilton-1k7gky]
+    paths: ['scripts/ala_probe.py', '.github/workflows/ala_probe.yml']
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: pip install requests curl_cffi
+      - run: python scripts/ala_probe.py
+        env:
+          CF_WORKER_URL: ${{ secrets.CF_WORKER_URL }}
