@@ -163,3 +163,12 @@
 - PR #8（`log_nsw_powerbi_reconciliation()`）已合併，下次排程起會印 `[NSW PowerBI 對帳]`，**尚未讀過真實排程的輸出**。
 - 風險分數的候鳥項只用 eBird（`totalLiveBirds`/`nswLiveObs`），**Movebank 與 ALA 都不參與風險分數**。ALA 是 GBIF 澳洲節點，GBIF 已涵蓋大部分澳洲紀錄，ALA 抓不到影響有限。
 - Movebank 目前是範例航跡（`is_live_data:false`，日期凍在 8/1–9/8）。地圖上的航跡 tooltip 原本寫「實測航跡」，會誤導；已改為 `is_live_data` 為 false 時顯示「⚠️ 範例航跡（非即時）」（`risk_assessment*.html`、`report_template*.html`）。真正取得即時資料需要 Movebank study 擁有者授權，是使用者端的行動。
+
+## 2026-10-15：ALA 恢復可用（更正先前「IP 層級封鎖」的結論）
+
+- **先前結論有誤**：2026-09-16/17 記錄「ALA 擋的是 GitHub Actions 來源 IP」是推測，當時 log 沒印狀態碼。2026-10-14 在 runner 上跑探針證實：被擋（403, awselb）的只有 `biocache.ala.org.au` 與 `biocache-ws.ala.org.au` 這兩個**主機名**；官方 API 閘道 `https://api.ala.org.au/occurrences/occurrences/search` 回傳同一份 biocache 資料，一般 requests 與 curl_cffi 皆 200，不需代理。
+- `fetch_ala_data()` 已改用該閘道，`pageSize` 由 150 改為 **100**：閘道單次上限約 100~125 筆（125、150 回 503）；`startIndex` 分頁有效且不重複，必要時可分頁取更多。
+- `smart_fetch_url()` 的 curl_cffi 段現在在回應不被採信時會印 `status=` 與字元數（`[curl_cffi 擬真未採信]`），先前是靜默失敗。
+- 驗證（run 38667328579）：`available=True`、100 筆（NSW 33、QLD 35、VIC 23、SA 6、WA 2、TAS 1）。座標、日期、州別、來源齊全；樣本全為 iNaturalist 公民科學紀錄，`individualCount` 皆為空（程式預設為 1），因此只適合當點位圖層，**不可當數量指標**。
+- 同日 18:54–19:20 UTC 曾遇 ALA 後端 Solr 叢集故障（`No live SolrServers available`，HTTP 500，連 Worker 也一樣），是 ALA 端暫時性問題，隔日恢復。遇到 500 先判斷是否上游故障，不要以為是我們被擋。
+- **尚未驗證**：前端 `renderAlaOnMap()` 圖層過去從未用 `available:true` 的真實資料畫過，合併後下次排程才會第一次出現，需目視檢查圖層與 tooltip。
