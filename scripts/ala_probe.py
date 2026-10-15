@@ -108,3 +108,4 @@ if os.environ.get("RUN_VARIANTS") == "1":
         o = occ[0]
         print("[ALA probe 欄位] " + json.dumps({k: o.get(k) for k in ("vernacularName", "scientificName", "family", "decimalLatitude", "decimalLongitude", "eventDate", "stateProvince", "dataResourceName", "individualCount")}, ensure_ascii=False))
 # retry 19:20Z
+# retry 1015T0144Z
