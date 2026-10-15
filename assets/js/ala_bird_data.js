@@ -1,11 +1,1019 @@
 window.alaBirdDataEmbedded = {
-  "fetched_at_utc": "2026-10-15T01:06:14Z",
-  "fetched_at_taipei": "2026-10-15 09:06:14",
+  "fetched_at_utc": "2026-10-15T13:00:25Z",
+  "fetched_at_taipei": "2026-10-15 21:00:25",
   "source": "Atlas of Living Australia (Biocache API)",
-  "available": false,
-  "unavailable_reason": "四段降級鏈全部失敗",
-  "total_matched_in_ala": 0,
-  "sample_records_count": 0,
-  "state_counts": {},
-  "observations": []
+  "available": true,
+  "unavailable_reason": "",
+  "total_matched_in_ala": 17158475,
+  "sample_records_count": 100,
+  "state_counts": {
+    "New South Wales": 33,
+    "Victoria": 23,
+    "Queensland": 35,
+    "Tasmania": 1,
+    "South Australia": 6,
+    "Western Australia": 2
+  },
+  "observations": [
+    {
+      "commonName": "Silver Gull",
+      "scientificName": "Chroicocephalus novaehollandiae",
+      "lat": -28.362474,
+      "lng": 153.579612,
+      "obsDate": "2026-10-11 16:48 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "White-necked Heron",
+      "scientificName": "Ardea pacifica",
+      "lat": -36.797078,
+      "lng": 144.295472,
+      "obsDate": "2026-10-11 16:03 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australian Wood Duck",
+      "scientificName": "Chenonetta jubata",
+      "lat": -27.369518,
+      "lng": 153.033808,
+      "obsDate": "2026-10-11 15:05 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australian Wood Duck",
+      "scientificName": "Chenonetta jubata",
+      "lat": -42.130722,
+      "lng": 148.073761,
+      "obsDate": "2026-10-11 15:03 UTC",
+      "state": "Tasmania",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Pacific Black Duck",
+      "scientificName": "Anas (Anas) superciliosa",
+      "lat": -27.369264,
+      "lng": 153.034948,
+      "obsDate": "2026-10-11 15:01 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Masked Lapwing",
+      "scientificName": "Vanellus (Lobipluvia) miles",
+      "lat": -27.432555,
+      "lng": 153.543717,
+      "obsDate": "2026-10-11 14:51 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Pacific Gull",
+      "scientificName": "Larus pacificus",
+      "lat": -35.536543,
+      "lng": 138.682599,
+      "obsDate": "2026-10-11 14:48 UTC",
+      "state": "South Australia",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "White-faced Heron",
+      "scientificName": "Egretta novaehollandiae",
+      "lat": -37.617108,
+      "lng": 144.750533,
+      "obsDate": "2026-10-11 14:41 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Nankeen Night-heron",
+      "scientificName": "Nycticorax caledonicus",
+      "lat": -36.333464,
+      "lng": 146.314757,
+      "obsDate": "2026-10-11 14:29 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australian Wood Duck",
+      "scientificName": "Chenonetta jubata",
+      "lat": -37.883475,
+      "lng": 145.13588,
+      "obsDate": "2026-10-11 14:04 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australian Pelican",
+      "scientificName": "Pelecanus conspicillatus",
+      "lat": -33.828113,
+      "lng": 151.083048,
+      "obsDate": "2026-10-11 13:55 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "",
+      "scientificName": "Butorides",
+      "lat": -33.915613,
+      "lng": 151.12935,
+      "obsDate": "2026-10-11 13:51 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Black Swan",
+      "scientificName": "Cygnus atratus",
+      "lat": -35.037006,
+      "lng": 138.73495,
+      "obsDate": "2026-10-11 13:31 UTC",
+      "state": "South Australia",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Plumed Whistling-duck",
+      "scientificName": "Dendrocygna eytoni",
+      "lat": -35.037182,
+      "lng": 138.734983,
+      "obsDate": "2026-10-11 13:26 UTC",
+      "state": "South Australia",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Chestnut Teal",
+      "scientificName": "Anas (Nettion) castanea",
+      "lat": -37.87875,
+      "lng": 145.251158,
+      "obsDate": "2026-10-11 13:22 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australian Shelduck",
+      "scientificName": "Tadorna (Casarca) tadornoides",
+      "lat": -35.037231,
+      "lng": 138.73502,
+      "obsDate": "2026-10-11 13:22 UTC",
+      "state": "South Australia",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australian Wood Duck",
+      "scientificName": "Chenonetta jubata",
+      "lat": -33.785825,
+      "lng": 151.146239,
+      "obsDate": "2026-10-11 13:20 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Red Knot",
+      "scientificName": "Calidris (Calidris) canutus",
+      "lat": -31.875497,
+      "lng": 152.689588,
+      "obsDate": "2026-10-11 13:16 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Eastern Reef Egret",
+      "scientificName": "Egretta sacra",
+      "lat": -26.787815,
+      "lng": 153.138352,
+      "obsDate": "2026-10-11 13:09 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australian Pelican",
+      "scientificName": "Pelecanus conspicillatus",
+      "lat": -33.448658,
+      "lng": 151.449078,
+      "obsDate": "2026-10-11 13:09 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Masked Lapwing",
+      "scientificName": "Vanellus (Lobipluvia) miles",
+      "lat": -33.814724,
+      "lng": 151.289429,
+      "obsDate": "2026-10-11 13:04 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Masked Lapwing",
+      "scientificName": "Vanellus (Lobipluvia) miles",
+      "lat": -33.814701,
+      "lng": 151.289413,
+      "obsDate": "2026-10-11 13:04 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australasian Grebe",
+      "scientificName": "Tachybaptus novaehollandiae",
+      "lat": -21.160788,
+      "lng": 149.158186,
+      "obsDate": "2026-10-11 13:00 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Wandering Whistling-duck",
+      "scientificName": "Dendrocygna arcuata",
+      "lat": -21.156248,
+      "lng": 149.15785,
+      "obsDate": "2026-10-11 12:59 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Crested Tern",
+      "scientificName": "Thalasseus bergii",
+      "lat": -31.876725,
+      "lng": 152.685822,
+      "obsDate": "2026-10-11 12:53 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Bar-tailed Godwit",
+      "scientificName": "Limosa lapponica",
+      "lat": -31.876453,
+      "lng": 152.685638,
+      "obsDate": "2026-10-11 12:52 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Red-capped Plover",
+      "scientificName": "Charadrius (Charadrius) ruficapillus",
+      "lat": -31.874035,
+      "lng": 152.694135,
+      "obsDate": "2026-10-11 12:42 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Chestnut Teal",
+      "scientificName": "Anas (Nettion) castanea",
+      "lat": -38.070619,
+      "lng": 145.126029,
+      "obsDate": "2026-10-11 12:42 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australian Pelican",
+      "scientificName": "Pelecanus conspicillatus",
+      "lat": -16.918659,
+      "lng": 145.7766,
+      "obsDate": "2026-10-11 12:37 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "White-faced Heron",
+      "scientificName": "Egretta novaehollandiae",
+      "lat": -16.918659,
+      "lng": 145.7766,
+      "obsDate": "2026-10-11 12:37 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Crested Tern",
+      "scientificName": "Thalasseus bergii",
+      "lat": -31.87647,
+      "lng": 152.69019,
+      "obsDate": "2026-10-11 12:25 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Bar-tailed Godwit",
+      "scientificName": "Limosa lapponica",
+      "lat": -31.876975,
+      "lng": 152.689333,
+      "obsDate": "2026-10-11 12:24 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Red Knot",
+      "scientificName": "Calidris (Calidris) canutus",
+      "lat": -31.876653,
+      "lng": 152.690328,
+      "obsDate": "2026-10-11 12:24 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Caspian Tern",
+      "scientificName": "Hydroprogne caspia",
+      "lat": -33.2322,
+      "lng": 134.674912,
+      "obsDate": "2026-10-11 12:22 UTC",
+      "state": "South Australia",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Red-necked Stint",
+      "scientificName": "Calidris (Ereunetes) ruficollis",
+      "lat": -31.875312,
+      "lng": 152.691055,
+      "obsDate": "2026-10-11 12:15 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australian Wood Duck",
+      "scientificName": "Chenonetta jubata",
+      "lat": -35.341417,
+      "lng": 149.281067,
+      "obsDate": "2026-10-11 12:13 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Little Egret",
+      "scientificName": "Egretta garzetta",
+      "lat": -27.43484,
+      "lng": 153.1474,
+      "obsDate": "2026-10-11 11:58 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "White-faced Heron",
+      "scientificName": "Egretta novaehollandiae",
+      "lat": -33.874726,
+      "lng": 151.176771,
+      "obsDate": "2026-10-11 11:57 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Intermediate Egret",
+      "scientificName": "Ardea intermedia",
+      "lat": -27.434787,
+      "lng": 153.147338,
+      "obsDate": "2026-10-11 11:57 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Little Egret",
+      "scientificName": "Egretta garzetta",
+      "lat": -27.434795,
+      "lng": 153.147338,
+      "obsDate": "2026-10-11 11:57 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australian Wood Duck",
+      "scientificName": "Chenonetta jubata",
+      "lat": -27.434767,
+      "lng": 153.147338,
+      "obsDate": "2026-10-11 11:56 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Great Egret",
+      "scientificName": "Ardea alba",
+      "lat": -27.434692,
+      "lng": 153.148865,
+      "obsDate": "2026-10-11 11:49 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Wandering Whistling-duck",
+      "scientificName": "Dendrocygna arcuata",
+      "lat": -27.434657,
+      "lng": 153.148545,
+      "obsDate": "2026-10-11 11:48 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Great Egret",
+      "scientificName": "Ardea alba",
+      "lat": -27.434658,
+      "lng": 153.148513,
+      "obsDate": "2026-10-11 11:47 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Intermediate Egret",
+      "scientificName": "Ardea intermedia",
+      "lat": -27.434637,
+      "lng": 153.148392,
+      "obsDate": "2026-10-11 11:46 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australian Wood Duck",
+      "scientificName": "Chenonetta jubata",
+      "lat": -36.437405,
+      "lng": 148.443192,
+      "obsDate": "2026-10-11 11:36 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Wandering Whistling-duck",
+      "scientificName": "Dendrocygna arcuata",
+      "lat": -27.434322,
+      "lng": 153.149063,
+      "obsDate": "2026-10-11 11:34 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "",
+      "scientificName": "Anas",
+      "lat": -33.441939,
+      "lng": 151.351415,
+      "obsDate": "2026-10-11 11:32 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Wandering Whistling-duck",
+      "scientificName": "Dendrocygna arcuata",
+      "lat": -27.434268,
+      "lng": 153.14888,
+      "obsDate": "2026-10-11 11:32 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "",
+      "scientificName": "Anas",
+      "lat": -33.441911,
+      "lng": 151.351342,
+      "obsDate": "2026-10-11 11:31 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Wandering Whistling-duck",
+      "scientificName": "Dendrocygna arcuata",
+      "lat": -27.434268,
+      "lng": 153.14885,
+      "obsDate": "2026-10-11 11:31 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Common Mallard",
+      "scientificName": "Anas (Anas) platyrhynchos",
+      "lat": -33.441886,
+      "lng": 151.351319,
+      "obsDate": "2026-10-11 11:30 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Little Tern",
+      "scientificName": "Sternula albifrons",
+      "lat": -31.876959,
+      "lng": 152.690225,
+      "obsDate": "2026-10-11 11:29 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Common Mallard",
+      "scientificName": "Anas (Anas) platyrhynchos",
+      "lat": -33.441851,
+      "lng": 151.351378,
+      "obsDate": "2026-10-11 11:28 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Intermediate Egret",
+      "scientificName": "Ardea intermedia",
+      "lat": -27.4342,
+      "lng": 153.148315,
+      "obsDate": "2026-10-11 11:26 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Pacific Black Duck",
+      "scientificName": "Anas (Anas) superciliosa",
+      "lat": -27.434213,
+      "lng": 153.148255,
+      "obsDate": "2026-10-11 11:25 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australian Wood Duck",
+      "scientificName": "Chenonetta jubata",
+      "lat": -37.865558,
+      "lng": 145.10464,
+      "obsDate": "2026-10-11 11:24 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "",
+      "scientificName": "Anas",
+      "lat": -33.441779,
+      "lng": 151.351385,
+      "obsDate": "2026-10-11 11:21 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Plumed Whistling-duck",
+      "scientificName": "Dendrocygna eytoni",
+      "lat": -20.899622,
+      "lng": 148.966613,
+      "obsDate": "2026-10-11 11:16 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "White-necked Heron",
+      "scientificName": "Ardea pacifica",
+      "lat": -35.514928,
+      "lng": 150.375703,
+      "obsDate": "2026-10-11 11:13 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Black Swan",
+      "scientificName": "Cygnus atratus",
+      "lat": -37.824158,
+      "lng": 144.94736,
+      "obsDate": "2026-10-11 11:02 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Rajah Shelduck",
+      "scientificName": "Radjah radjah",
+      "lat": -20.899078,
+      "lng": 148.963897,
+      "obsDate": "2026-10-11 11:00 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Black Swan",
+      "scientificName": "Cygnus atratus",
+      "lat": -35.512387,
+      "lng": 150.376162,
+      "obsDate": "2026-10-11 10:51 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Great Egret",
+      "scientificName": "Ardea alba",
+      "lat": -37.797242,
+      "lng": 144.915192,
+      "obsDate": "2026-10-11 10:49 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australian Wood Duck",
+      "scientificName": "Chenonetta jubata",
+      "lat": -37.796025,
+      "lng": 144.913637,
+      "obsDate": "2026-10-11 10:45 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australian Pelican",
+      "scientificName": "Pelecanus conspicillatus",
+      "lat": -33.451012,
+      "lng": 151.453464,
+      "obsDate": "2026-10-11 10:44 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Nankeen Night-heron",
+      "scientificName": "Nycticorax caledonicus",
+      "lat": -36.372795,
+      "lng": 142.981828,
+      "obsDate": "2026-10-11 10:41 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "White-necked Heron",
+      "scientificName": "Ardea pacifica",
+      "lat": -36.372742,
+      "lng": 142.982178,
+      "obsDate": "2026-10-11 10:40 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Pacific Black Duck",
+      "scientificName": "Anas (Anas) superciliosa",
+      "lat": -25.368126,
+      "lng": 152.788482,
+      "obsDate": "2026-10-11 10:35 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Great Egret",
+      "scientificName": "Ardea alba",
+      "lat": -36.375317,
+      "lng": 142.986083,
+      "obsDate": "2026-10-11 10:34 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Australasian Grebe",
+      "scientificName": "Tachybaptus novaehollandiae",
+      "lat": -30.429973,
+      "lng": 151.596295,
+      "obsDate": "2026-10-11 10:31 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "White-faced Heron",
+      "scientificName": "Egretta novaehollandiae",
+      "lat": -37.385372,
+      "lng": 144.995925,
+      "obsDate": "2026-10-11 10:27 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Hardhead",
+      "scientificName": "Aythya (Nyroca) australis",
+      "lat": -30.429973,
+      "lng": 151.596295,
+      "obsDate": "2026-10-11 10:27 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Black Swan",
+      "scientificName": "Cygnus atratus",
+      "lat": -38.092908,
+      "lng": 145.356903,
+      "obsDate": "2026-10-11 10:18 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "White-faced Heron",
+      "scientificName": "Egretta novaehollandiae",
+      "lat": -33.734129,
+      "lng": 150.717732,
+      "obsDate": "2026-10-11 10:16 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Pacific Golden Plover",
+      "scientificName": "Pluvialis fulva",
+      "lat": -30.31237,
+      "lng": 153.144653,
+      "obsDate": "2026-10-11 10:10 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Silver Gull",
+      "scientificName": "Chroicocephalus novaehollandiae",
+      "lat": -31.989347,
+      "lng": 115.514578,
+      "obsDate": "2026-10-11 10:01 UTC",
+      "state": "Western Australia",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Great Egret",
+      "scientificName": "Ardea alba",
+      "lat": -37.782005,
+      "lng": 144.943695,
+      "obsDate": "2026-10-11 09:50 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Masked Lapwing",
+      "scientificName": "Vanellus (Lobipluvia) miles",
+      "lat": -16.915299,
+      "lng": 145.773612,
+      "obsDate": "2026-10-11 09:46 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Crested Tern",
+      "scientificName": "Thalasseus bergii",
+      "lat": -31.9,
+      "lng": 115.4,
+      "obsDate": "2026-10-11 09:44 UTC",
+      "state": "Western Australia",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Eastern Curlew",
+      "scientificName": "Numenius (Numenius) madagascariensis",
+      "lat": -16.914597,
+      "lng": 145.772864,
+      "obsDate": "2026-10-11 09:42 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Silver Gull",
+      "scientificName": "Chroicocephalus novaehollandiae",
+      "lat": -16.914385,
+      "lng": 145.772635,
+      "obsDate": "2026-10-11 09:41 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "",
+      "scientificName": "Ardea",
+      "lat": -27.491911,
+      "lng": 153.135529,
+      "obsDate": "2026-10-11 09:26 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Masked Lapwing",
+      "scientificName": "Vanellus (Lobipluvia) miles",
+      "lat": -16.919363,
+      "lng": 145.777588,
+      "obsDate": "2026-10-11 09:23 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "White-faced Heron",
+      "scientificName": "Egretta novaehollandiae",
+      "lat": -38.149025,
+      "lng": 144.302247,
+      "obsDate": "2026-10-11 09:09 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Southern Masked Lapwing",
+      "scientificName": "Vanellus (Lobipluvia) miles novaehollandiae",
+      "lat": -27.318807,
+      "lng": 152.79603,
+      "obsDate": "2026-10-11 08:50 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Pacific Golden Plover",
+      "scientificName": "Pluvialis fulva",
+      "lat": -27.567757,
+      "lng": 153.294439,
+      "obsDate": "2026-10-11 08:40 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "White-necked Heron",
+      "scientificName": "Ardea pacifica",
+      "lat": -34.450052,
+      "lng": 140.561578,
+      "obsDate": "2026-10-11 08:39 UTC",
+      "state": "South Australia",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "White-faced Heron",
+      "scientificName": "Egretta novaehollandiae",
+      "lat": -34.8208,
+      "lng": 150.560792,
+      "obsDate": "2026-10-11 08:38 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "White-necked Heron",
+      "scientificName": "Ardea pacifica",
+      "lat": -35.110214,
+      "lng": 148.979538,
+      "obsDate": "2026-10-11 08:15 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "White-necked Heron",
+      "scientificName": "Ardea pacifica",
+      "lat": -37.761842,
+      "lng": 145.626189,
+      "obsDate": "2026-10-11 08:11 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Grey Teal",
+      "scientificName": "Anas (Nettion) gracilis",
+      "lat": -37.233122,
+      "lng": 142.663962,
+      "obsDate": "2026-10-11 07:50 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Hoary-headed Grebe",
+      "scientificName": "Poliocephalus poliocephalus",
+      "lat": -37.233122,
+      "lng": 142.66397,
+      "obsDate": "2026-10-11 07:50 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "White-necked Heron",
+      "scientificName": "Ardea pacifica",
+      "lat": -37.233325,
+      "lng": 142.664697,
+      "obsDate": "2026-10-11 07:46 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Hardhead",
+      "scientificName": "Aythya (Nyroca) australis",
+      "lat": -37.23632,
+      "lng": 142.665858,
+      "obsDate": "2026-10-11 07:33 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Masked Lapwing",
+      "scientificName": "Vanellus (Lobipluvia) miles",
+      "lat": -20.058778,
+      "lng": 148.890625,
+      "obsDate": "2026-10-11 07:33 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Torresian Wandering Whistling-duck",
+      "scientificName": "Dendrocygna arcuata australis",
+      "lat": -27.316519,
+      "lng": 153.063715,
+      "obsDate": "2026-10-11 07:16 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Chestnut Teal",
+      "scientificName": "Anas (Nettion) castanea",
+      "lat": -37.236187,
+      "lng": 142.663812,
+      "obsDate": "2026-10-11 07:13 UTC",
+      "state": "Victoria",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Plumed Whistling-duck",
+      "scientificName": "Dendrocygna eytoni",
+      "lat": -27.116645,
+      "lng": 152.900926,
+      "obsDate": "2026-10-11 07:01 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Chestnut Teal",
+      "scientificName": "Anas (Nettion) castanea",
+      "lat": -27.574704,
+      "lng": 153.298692,
+      "obsDate": "2026-10-11 06:56 UTC",
+      "state": "Queensland",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    }
+  ]
 };
