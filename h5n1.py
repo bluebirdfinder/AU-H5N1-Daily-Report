@@ -686,6 +686,7 @@ def smart_fetch_url(url, headers=None, timeout=10):
         if resp.status_code == 200 and resp.text and len(resp.text) > 500:
             print(f"[curl_cffi 擬真 Chrome 成功] {url} ({len(resp.text)} chars)")
             return resp.text
+        print(f"[curl_cffi 擬真未採信] {url[:90]} status={resp.status_code}, {len(resp.text or '')} chars")
     except Exception as e:
         print(f"[curl_cffi 擬真嘗試] {str(e)[:80]}")
 
@@ -2965,7 +2966,9 @@ def fetch_ala_data():
     瀏覽器 → 純 requests 的四段降級鏈，繞過裸 requests 容易被 WAF 識別阻擋的問題。
     """
     print("[ALA API] 開始抓取 Atlas of Living Australia 野鳥數據 (免 Key 備援)...")
-    base_url = "https://biocache.ala.org.au/ws/occurrences/search"
+    # 2026-10-14：改用官方 API 閘道。探針證實 biocache.ala.org.au / biocache-ws.ala.org.au 這兩個主機名對 GitHub runner 回 403（awselb），
+    # 但 api.ala.org.au 同一份 biocache 資料直接回 200，不是 IP 層級封鎖。
+    base_url = "https://api.ala.org.au/occurrences/occurrences/search"
 
     # 涵蓋水鳥、海鳥、雁鴨科、鷗科、鷸鴴科等 H5N1 高風險鳥類科別
     family_fq = (
@@ -2977,7 +2980,8 @@ def fetch_ala_data():
     params = {
         "q": "country:Australia",
         "fq": family_fq,
-        "pageSize": 150,
+        # api.ala.org.au 單次上限約 100~125 筆（150 會回 503，2026-10-14 探針實測）
+        "pageSize": 100,
         "sort": "eventDate",
         "dir": "desc"
     }
