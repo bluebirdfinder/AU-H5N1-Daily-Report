@@ -1,6 +1,6 @@
 window.gbifBirdDataEmbedded = {
-  "fetched_at_utc": "2026-10-16T00:55:20Z",
-  "fetched_at_taipei": "2026-10-16 08:55:20",
+  "fetched_at_utc": "2026-10-16T12:54:55Z",
+  "fetched_at_taipei": "2026-10-16 20:54:55",
   "source": "GBIF Global Biodiversity Information Facility (Excluding eBird duplicates)",
   "purpose": "Complement citizen science with scientific research, marine survey transects, and museum records",
   "records_count": 412,
@@ -1090,7 +1090,7 @@ window.gbifBirdDataEmbedded = {
       "lng": 152.3152,
       "eventDate": "2026-08-10",
       "basisOfRecord": "HUMAN_OBSERVATION",
-      "institutionCode": "NSW Dept of Planning, Industry and Environment",
+      "institutionCode": "Department of Climate Change, Energy, the Environment and Water",
       "datasetName": "DPIE Default Sightings",
       "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
     },
