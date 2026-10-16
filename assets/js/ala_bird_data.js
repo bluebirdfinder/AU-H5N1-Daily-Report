@@ -1,20 +1,41 @@
 window.alaBirdDataEmbedded = {
-  "fetched_at_utc": "2026-10-15T13:00:25Z",
-  "fetched_at_taipei": "2026-10-15 21:00:25",
+  "fetched_at_utc": "2026-10-16T00:54:56Z",
+  "fetched_at_taipei": "2026-10-16 08:54:56",
   "source": "Atlas of Living Australia (Biocache API)",
   "available": true,
   "unavailable_reason": "",
-  "total_matched_in_ala": 17158475,
+  "total_matched_in_ala": 17158622,
   "sample_records_count": 100,
   "state_counts": {
+    "Australian Capital Territory": 2,
     "New South Wales": 33,
     "Victoria": 23,
-    "Queensland": 35,
+    "Queensland": 33,
     "Tasmania": 1,
     "South Australia": 6,
     "Western Australia": 2
   },
   "observations": [
+    {
+      "commonName": "Australian Wood Duck",
+      "scientificName": "Chenonetta jubata",
+      "lat": -35.386389,
+      "lng": 149.027532,
+      "obsDate": "2026-10-14 07:19 UTC",
+      "state": "Australian Capital Territory",
+      "dataResource": "NatureMapr",
+      "individualCount": 1
+    },
+    {
+      "commonName": "Pacific Black Duck",
+      "scientificName": "Anas (Anas) superciliosa",
+      "lat": -35.315422,
+      "lng": 149.159597,
+      "obsDate": "2026-10-13 21:06 UTC",
+      "state": "Australian Capital Territory",
+      "dataResource": "NatureMapr",
+      "individualCount": 1
+    },
     {
       "commonName": "Silver Gull",
       "scientificName": "Chroicocephalus novaehollandiae",
@@ -992,26 +1013,6 @@ window.alaBirdDataEmbedded = {
       "lng": 142.663812,
       "obsDate": "2026-10-11 07:13 UTC",
       "state": "Victoria",
-      "dataResource": "iNaturalist Australia",
-      "individualCount": 1
-    },
-    {
-      "commonName": "Plumed Whistling-duck",
-      "scientificName": "Dendrocygna eytoni",
-      "lat": -27.116645,
-      "lng": 152.900926,
-      "obsDate": "2026-10-11 07:01 UTC",
-      "state": "Queensland",
-      "dataResource": "iNaturalist Australia",
-      "individualCount": 1
-    },
-    {
-      "commonName": "Chestnut Teal",
-      "scientificName": "Anas (Nettion) castanea",
-      "lat": -27.574704,
-      "lng": 153.298692,
-      "obsDate": "2026-10-11 06:56 UTC",
-      "state": "Queensland",
       "dataResource": "iNaturalist Australia",
       "individualCount": 1
     }
