@@ -1,6 +1,6 @@
 window.gbifBirdDataEmbedded = {
-  "fetched_at_utc": "2026-10-19T00:37:17Z",
-  "fetched_at_taipei": "2026-10-19 08:37:17",
+  "fetched_at_utc": "2026-10-19T15:11:31Z",
+  "fetched_at_taipei": "2026-10-19 23:11:31",
   "source": "GBIF Global Biodiversity Information Facility (Excluding eBird duplicates)",
   "purpose": "Complement citizen science with scientific research, marine survey transects, and museum records",
   "records_count": 414,
