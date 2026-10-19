@@ -1,5 +1,5 @@
 window.casesEventsEmbedded = {
-  "generated_at_utc": "2026-10-18T12:19:22Z",
+  "generated_at_utc": "2026-10-19T00:35:51Z",
   "total_events": 713,
   "negative_events": 2450,
   "hotline_reports": 64437,
