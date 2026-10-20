@@ -1,5 +1,5 @@
 window.daffWeeklyEmbedded = {
- "fetched_at_utc": "2026-10-20T01:22:03Z",
+ "fetched_at_utc": "2026-10-20T13:11:22Z",
  "total_events": 713,
  "dated_events": 579,
  "undated_events": 134,

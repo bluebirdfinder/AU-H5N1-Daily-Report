@@ -1,8 +1,8 @@
 window.casesEventsEmbedded = {
-  "generated_at_utc": "2026-10-20T01:21:36Z",
+  "generated_at_utc": "2026-10-20T13:10:57Z",
   "total_events": 713,
   "negative_events": 2450,
-  "hotline_reports": 64437,
+  "hotline_reports": 65906,
   "events_by_state": {
     "JBT": 1,
     "WA": 10,
