@@ -1,21 +1,31 @@
 window.alaBirdDataEmbedded = {
-  "fetched_at_utc": "2026-10-19T15:11:13Z",
-  "fetched_at_taipei": "2026-10-19 23:11:13",
+  "fetched_at_utc": "2026-10-20T01:22:35Z",
+  "fetched_at_taipei": "2026-10-20 09:22:35",
   "source": "Atlas of Living Australia (Biocache API)",
   "available": true,
   "unavailable_reason": "",
-  "total_matched_in_ala": 17158622,
+  "total_matched_in_ala": 17158614,
   "sample_records_count": 100,
   "state_counts": {
+    "New South Wales": 34,
     "Australian Capital Territory": 2,
-    "New South Wales": 33,
-    "Victoria": 23,
+    "Victoria": 22,
     "Queensland": 33,
     "Tasmania": 1,
     "South Australia": 6,
     "Western Australia": 2
   },
   "observations": [
+    {
+      "commonName": "Australian Pelican",
+      "scientificName": "Pelecanus conspicillatus",
+      "lat": -32.685627,
+      "lng": 152.040008,
+      "obsDate": "2026-10-17 09:46 UTC",
+      "state": "New South Wales",
+      "dataResource": "Earth Guardians Weekly Feed",
+      "individualCount": 1
+    },
     {
       "commonName": "Australian Wood Duck",
       "scientificName": "Chenonetta jubata",
@@ -417,9 +427,9 @@ window.alaBirdDataEmbedded = {
       "individualCount": 1
     },
     {
-      "commonName": "Little Egret",
-      "scientificName": "Egretta garzetta",
-      "lat": -27.434795,
+      "commonName": "Intermediate Egret",
+      "scientificName": "Ardea intermedia",
+      "lat": -27.434787,
       "lng": 153.147338,
       "obsDate": "2026-10-11 11:57 UTC",
       "state": "Queensland",
@@ -427,9 +437,9 @@ window.alaBirdDataEmbedded = {
       "individualCount": 1
     },
     {
-      "commonName": "Intermediate Egret",
-      "scientificName": "Ardea intermedia",
-      "lat": -27.434787,
+      "commonName": "Little Egret",
+      "scientificName": "Egretta garzetta",
+      "lat": -27.434795,
       "lng": 153.147338,
       "obsDate": "2026-10-11 11:57 UTC",
       "state": "Queensland",
@@ -1003,16 +1013,6 @@ window.alaBirdDataEmbedded = {
       "lng": 153.063715,
       "obsDate": "2026-10-11 07:16 UTC",
       "state": "Queensland",
-      "dataResource": "iNaturalist Australia",
-      "individualCount": 1
-    },
-    {
-      "commonName": "Chestnut Teal",
-      "scientificName": "Anas (Nettion) castanea",
-      "lat": -37.236187,
-      "lng": 142.663812,
-      "obsDate": "2026-10-11 07:13 UTC",
-      "state": "Victoria",
       "dataResource": "iNaturalist Australia",
       "individualCount": 1
     }
