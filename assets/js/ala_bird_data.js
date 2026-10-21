@@ -1,10 +1,10 @@
 window.alaBirdDataEmbedded = {
-  "fetched_at_utc": "2026-10-20T13:11:49Z",
-  "fetched_at_taipei": "2026-10-20 21:11:49",
+  "fetched_at_utc": "2026-10-21T01:07:20Z",
+  "fetched_at_taipei": "2026-10-21 09:07:20",
   "source": "Atlas of Living Australia (Biocache API)",
   "available": true,
   "unavailable_reason": "",
-  "total_matched_in_ala": 17158614,
+  "total_matched_in_ala": 17158622,
   "sample_records_count": 100,
   "state_counts": {
     "New South Wales": 34,
@@ -427,9 +427,9 @@ window.alaBirdDataEmbedded = {
       "individualCount": 1
     },
     {
-      "commonName": "Intermediate Egret",
-      "scientificName": "Ardea intermedia",
-      "lat": -27.434787,
+      "commonName": "Little Egret",
+      "scientificName": "Egretta garzetta",
+      "lat": -27.434795,
       "lng": 153.147338,
       "obsDate": "2026-10-11 11:57 UTC",
       "state": "Queensland",
@@ -437,9 +437,9 @@ window.alaBirdDataEmbedded = {
       "individualCount": 1
     },
     {
-      "commonName": "Little Egret",
-      "scientificName": "Egretta garzetta",
-      "lat": -27.434795,
+      "commonName": "Intermediate Egret",
+      "scientificName": "Ardea intermedia",
+      "lat": -27.434787,
       "lng": 153.147338,
       "obsDate": "2026-10-11 11:57 UTC",
       "state": "Queensland",
