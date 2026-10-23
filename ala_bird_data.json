@@ -1,10 +1,10 @@
 {
-  "fetched_at_utc": "2026-10-22T13:21:47Z",
-  "fetched_at_taipei": "2026-10-22 21:21:47",
+  "fetched_at_utc": "2026-10-23T01:06:51Z",
+  "fetched_at_taipei": "2026-10-23 09:06:51",
   "source": "Atlas of Living Australia (Biocache API)",
   "available": true,
   "unavailable_reason": "",
-  "total_matched_in_ala": 17158621,
+  "total_matched_in_ala": 17158687,
   "sample_records_count": 100,
   "state_counts": {
     "New South Wales": 34,
@@ -427,9 +427,9 @@
       "individualCount": 1
     },
     {
-      "commonName": "Little Egret",
-      "scientificName": "Egretta garzetta",
-      "lat": -27.434795,
+      "commonName": "Intermediate Egret",
+      "scientificName": "Ardea intermedia",
+      "lat": -27.434787,
       "lng": 153.147338,
       "obsDate": "2026-10-11 11:57 UTC",
       "state": "Queensland",
@@ -437,9 +437,9 @@
       "individualCount": 1
     },
     {
-      "commonName": "Intermediate Egret",
-      "scientificName": "Ardea intermedia",
-      "lat": -27.434787,
+      "commonName": "Little Egret",
+      "scientificName": "Egretta garzetta",
+      "lat": -27.434795,
       "lng": 153.147338,
       "obsDate": "2026-10-11 11:57 UTC",
       "state": "Queensland",
