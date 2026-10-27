@@ -1,7 +1,7 @@
 window.daffWeeklyEmbedded = {
- "fetched_at_utc": "2026-10-27T01:41:49Z",
- "total_events": 720,
- "dated_events": 586,
+ "fetched_at_utc": "2026-10-27T13:49:00Z",
+ "total_events": 723,
+ "dated_events": 589,
  "undated_events": 134,
  "weeks": [
   {
@@ -166,9 +166,10 @@ window.daffWeeklyEmbedded = {
   },
   {
    "start": "2026-10-19",
-   "total": 1,
+   "total": 4,
    "by_state": {
-    "NSW": 1
+    "NSW": 3,
+    "SA": 1
    }
   },
   {
@@ -217,12 +218,12 @@ window.daffWeeklyEmbedded = {
    }
   },
   "2026-10": {
-   "total": 31,
+   "total": 34,
    "by_state": {
-    "SA": 10,
+    "SA": 11,
     "TAS": 5,
     "VIC": 11,
-    "NSW": 5
+    "NSW": 7
    }
   }
  },
@@ -231,9 +232,10 @@ window.daffWeeklyEmbedded = {
    "Common Myna": 1,
    "White-bellied Sea-Eagle": 1,
    "Whistling Kite": 1,
-   "Australian Magpie": 1
+   "Australian Magpie": 1,
+   "Australian Raven": 1
   },
-  "nsw_land_birds_total": 4,
+  "nsw_land_birds_total": 5,
   "other_states_land_birds": 37,
   "central_west_lgas": [
    "Blayney",
@@ -248,18 +250,18 @@ window.daffWeeklyEmbedded = {
    "Parkes"
   ],
   "central_west_events": 0,
-  "nsw_events": 73
+  "nsw_events": 75
  },
  "species_birds": {
   "Crested Tern": 455,
-  "Silver Gull": 75,
+  "Silver Gull": 76,
   "Giant Petrel": 18,
   "Pacific Gull": 21,
   "Brown Skua": 3,
-  "Cormorant": 21,
+  "Cormorant": 22,
   "Little Penguin": 16,
-  "Falcon & Other": 90
+  "Falcon & Other": 91
  },
- "bird_events": 699,
+ "bird_events": 702,
  "mammal_events": 21
 };
