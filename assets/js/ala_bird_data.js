@@ -1,10 +1,10 @@
 window.alaBirdDataEmbedded = {
-  "fetched_at_utc": "2026-10-27T13:49:35Z",
-  "fetched_at_taipei": "2026-10-27 21:49:35",
+  "fetched_at_utc": "2026-10-28T01:55:10Z",
+  "fetched_at_taipei": "2026-10-28 09:55:10",
   "source": "Atlas of Living Australia (Biocache API)",
   "available": true,
   "unavailable_reason": "",
-  "total_matched_in_ala": 17160943,
+  "total_matched_in_ala": 17160981,
   "sample_records_count": 100,
   "state_counts": {
     "Victoria": 26,
