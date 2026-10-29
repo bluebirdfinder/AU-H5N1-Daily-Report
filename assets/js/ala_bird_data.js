@@ -1,6 +1,6 @@
 window.alaBirdDataEmbedded = {
-  "fetched_at_utc": "2026-10-29T02:03:07Z",
-  "fetched_at_taipei": "2026-10-29 10:03:07",
+  "fetched_at_utc": "2026-10-29T14:50:52Z",
+  "fetched_at_taipei": "2026-10-29 22:50:52",
   "source": "Atlas of Living Australia (Biocache API)",
   "available": true,
   "unavailable_reason": "",
@@ -836,6 +836,16 @@ window.alaBirdDataEmbedded = {
       "individualCount": 1
     },
     {
+      "commonName": "Bar-tailed Godwit",
+      "scientificName": "Limosa lapponica",
+      "lat": -35.26788,
+      "lng": 150.507556,
+      "obsDate": "2026-10-18 07:31 UTC",
+      "state": "New South Wales",
+      "dataResource": "iNaturalist Australia",
+      "individualCount": 1
+    },
+    {
       "commonName": "Caspian Tern",
       "scientificName": "Hydroprogne caspia",
       "lat": -35.269975,
@@ -850,16 +860,6 @@ window.alaBirdDataEmbedded = {
       "scientificName": "Thalasseus bergii",
       "lat": -35.269978,
       "lng": 150.503551,
-      "obsDate": "2026-10-18 07:31 UTC",
-      "state": "New South Wales",
-      "dataResource": "iNaturalist Australia",
-      "individualCount": 1
-    },
-    {
-      "commonName": "Bar-tailed Godwit",
-      "scientificName": "Limosa lapponica",
-      "lat": -35.26788,
-      "lng": 150.507556,
       "obsDate": "2026-10-18 07:31 UTC",
       "state": "New South Wales",
       "dataResource": "iNaturalist Australia",

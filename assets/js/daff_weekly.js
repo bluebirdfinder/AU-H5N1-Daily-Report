@@ -1,7 +1,7 @@
 window.daffWeeklyEmbedded = {
- "fetched_at_utc": "2026-10-29T02:02:37Z",
- "total_events": 724,
- "dated_events": 590,
+ "fetched_at_utc": "2026-10-29T14:50:05Z",
+ "total_events": 725,
+ "dated_events": 591,
  "undated_events": 134,
  "weeks": [
   {
@@ -166,10 +166,10 @@ window.daffWeeklyEmbedded = {
   },
   {
    "start": "2026-10-19",
-   "total": 5,
+   "total": 6,
    "by_state": {
     "NSW": 3,
-    "SA": 1,
+    "SA": 2,
     "VIC": 1
    }
   },
@@ -219,9 +219,9 @@ window.daffWeeklyEmbedded = {
    }
   },
   "2026-10": {
-   "total": 35,
+   "total": 36,
    "by_state": {
-    "SA": 11,
+    "SA": 12,
     "TAS": 5,
     "VIC": 12,
     "NSW": 7
@@ -254,7 +254,7 @@ window.daffWeeklyEmbedded = {
   "nsw_events": 75
  },
  "species_birds": {
-  "Crested Tern": 455,
+  "Crested Tern": 456,
   "Silver Gull": 76,
   "Giant Petrel": 18,
   "Pacific Gull": 22,
@@ -263,6 +263,6 @@ window.daffWeeklyEmbedded = {
   "Little Penguin": 16,
   "Falcon & Other": 91
  },
- "bird_events": 703,
+ "bird_events": 704,
  "mammal_events": 21
 };

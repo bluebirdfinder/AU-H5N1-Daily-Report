@@ -1,10 +1,10 @@
 {
- "fetched_at_utc": "2026-10-29T02:02:37Z",
+ "fetched_at_utc": "2026-10-29T14:50:05Z",
  "source": "https://www.agriculture.gov.au/sites/default/files/documents/H5_bird_flu_events.xlsx",
- "total_events": 724,
+ "total_events": 725,
  "events_by_state": {
   "WA": 10,
-  "SA": 336,
+  "SA": 337,
   "NSW": 75,
   "QLD": 2,
   "VIC": 247,
@@ -7975,6 +7975,17 @@
    "locality": "Cape Woolamai Beach, Phillip Island",
    "common_name": "Pacific Gull",
    "scientific_name": "Larus pacificus",
+   "is_mammal": false
+  },
+  {
+   "record_id": "SA-WB-328",
+   "date_sampled": "2026-10-22",
+   "jurisdiction": "SA",
+   "state": "SA",
+   "lga": "Elliston",
+   "locality": "Sheringa",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
    "is_mammal": false
   }
  ]
