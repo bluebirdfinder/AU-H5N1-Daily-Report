@@ -1,20 +1,30 @@
 window.alaBirdDataEmbedded = {
-  "fetched_at_utc": "2026-10-29T14:50:52Z",
-  "fetched_at_taipei": "2026-10-29 22:50:52",
+  "fetched_at_utc": "2026-10-30T02:16:16Z",
+  "fetched_at_taipei": "2026-10-30 10:16:16",
   "source": "Atlas of Living Australia (Biocache API)",
   "available": true,
   "unavailable_reason": "",
-  "total_matched_in_ala": 17160981,
+  "total_matched_in_ala": 17160990,
   "sample_records_count": 100,
   "state_counts": {
+    "New South Wales": 17,
     "Victoria": 26,
-    "New South Wales": 16,
     "Queensland": 32,
     "Tasmania": 12,
-    "South Australia": 8,
+    "South Australia": 7,
     "Australian Capital Territory": 6
   },
   "observations": [
+    {
+      "commonName": "Latham's Snipe",
+      "scientificName": "Gallinago (Gallinago) hardwickii",
+      "lat": -28.786414,
+      "lng": 153.543681,
+      "obsDate": "2026-10-20 00:00 UTC",
+      "state": "New South Wales",
+      "dataResource": "NSW BioNet Atlas",
+      "individualCount": 1
+    },
     {
       "commonName": "Black Swan",
       "scientificName": "Cygnus atratus",
@@ -876,20 +886,20 @@ window.alaBirdDataEmbedded = {
       "individualCount": 1
     },
     {
-      "commonName": "Chestnut Teal",
-      "scientificName": "Anas (Nettion) castanea",
-      "lat": -35.267175,
-      "lng": 150.506959,
+      "commonName": "Southern Masked Lapwing",
+      "scientificName": "Vanellus (Lobipluvia) miles novaehollandiae",
+      "lat": -35.266967,
+      "lng": 150.505742,
       "obsDate": "2026-10-18 07:20 UTC",
       "state": "New South Wales",
       "dataResource": "iNaturalist Australia",
       "individualCount": 1
     },
     {
-      "commonName": "Southern Masked Lapwing",
-      "scientificName": "Vanellus (Lobipluvia) miles novaehollandiae",
-      "lat": -35.266967,
-      "lng": 150.505742,
+      "commonName": "Chestnut Teal",
+      "scientificName": "Anas (Nettion) castanea",
+      "lat": -35.267175,
+      "lng": 150.506959,
       "obsDate": "2026-10-18 07:20 UTC",
       "state": "New South Wales",
       "dataResource": "iNaturalist Australia",
@@ -1002,16 +1012,6 @@ window.alaBirdDataEmbedded = {
       "lng": 148.459123,
       "obsDate": "2026-10-18 06:55 UTC",
       "state": "Victoria",
-      "dataResource": "iNaturalist Australia",
-      "individualCount": 1
-    },
-    {
-      "commonName": "Eastern Hooded Dotteral",
-      "scientificName": "Thinornis cucullatus cucullatus",
-      "lat": -35.2,
-      "lng": 136.9,
-      "obsDate": "2026-10-17 21:18 UTC",
-      "state": "South Australia",
       "dataResource": "iNaturalist Australia",
       "individualCount": 1
     }
