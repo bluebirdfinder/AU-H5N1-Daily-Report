@@ -1,6 +1,6 @@
 window.alaBirdDataEmbedded = {
-  "fetched_at_utc": "2026-10-30T14:44:49Z",
-  "fetched_at_taipei": "2026-10-30 22:44:49",
+  "fetched_at_utc": "2026-10-31T01:56:55Z",
+  "fetched_at_taipei": "2026-10-31 09:56:55",
   "source": "Atlas of Living Australia (Biocache API)",
   "available": true,
   "unavailable_reason": "",
@@ -426,9 +426,9 @@ window.alaBirdDataEmbedded = {
       "individualCount": 1
     },
     {
-      "commonName": "Caspian Tern",
-      "scientificName": "Hydroprogne caspia",
-      "lat": -27.049934,
+      "commonName": "Eastern Curlew",
+      "scientificName": "Numenius (Numenius) madagascariensis",
+      "lat": -27.050001,
       "lng": 153.134131,
       "obsDate": "2026-10-18 11:49 UTC",
       "state": "Queensland",
@@ -436,9 +436,9 @@ window.alaBirdDataEmbedded = {
       "individualCount": 1
     },
     {
-      "commonName": "Eastern Curlew",
-      "scientificName": "Numenius (Numenius) madagascariensis",
-      "lat": -27.050001,
+      "commonName": "Caspian Tern",
+      "scientificName": "Hydroprogne caspia",
+      "lat": -27.049934,
       "lng": 153.134131,
       "obsDate": "2026-10-18 11:49 UTC",
       "state": "Queensland",
