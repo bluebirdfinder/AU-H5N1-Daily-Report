@@ -1,10 +1,10 @@
 {
- "fetched_at_utc": "2026-10-31T01:56:32Z",
+ "fetched_at_utc": "2026-10-31T14:06:26Z",
  "source": "https://www.agriculture.gov.au/sites/default/files/documents/H5_bird_flu_events.xlsx",
- "total_events": 726,
+ "total_events": 728,
  "events_by_state": {
   "WA": 10,
-  "SA": 337,
+  "SA": 339,
   "NSW": 76,
   "QLD": 2,
   "VIC": 247,
@@ -7995,6 +7995,28 @@
    "state": "NSW",
    "lga": "Parramatta",
    "locality": "Sydney Olympic Park",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "SA-WB-329",
+   "date_sampled": "2026-10-24",
+   "jurisdiction": "SA",
+   "state": "SA",
+   "lga": "Charles Sturt",
+   "locality": "West Lakes Shore",
+   "common_name": "Silver Gull",
+   "scientific_name": "Chroicocephalus novaehollandiae",
+   "is_mammal": false
+  },
+  {
+   "record_id": "SA-WB-330",
+   "date_sampled": "2026-10-27",
+   "jurisdiction": "SA",
+   "state": "SA",
+   "lga": "Elliston",
+   "locality": "Elliston",
    "common_name": "Greater Crested Tern",
    "scientific_name": "Thalasseus bergii",
    "is_mammal": false
