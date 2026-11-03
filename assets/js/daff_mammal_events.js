@@ -1,9 +1,9 @@
 window.daffMammalEmbedded = {
-  "fetched_at_utc": "2026-11-02T17:36:58Z",
-  "total_events": 728,
-  "mammal_events": 21,
+  "fetched_at_utc": "2026-11-03T03:47:40Z",
+  "total_events": 732,
+  "mammal_events": 22,
   "by_state": {
-    "SA": 10,
+    "SA": 11,
     "VIC": 10,
     "TAS": 1
   },
@@ -11,11 +11,11 @@ window.daffMammalEmbedded = {
     "Long-nosed fur seal": 4,
     "Red Fox": 5,
     "Common Bottlenose Dolphin": 1,
-    "Common Dolphin": 3,
+    "Common Dolphin": 4,
     "Australian sea lion": 3,
     "Dolphins": 2,
     "Australian fur seal": 2,
     "Southern elephant seal": 1
   },
-  "latest_sampled": "2026-09-29"
+  "latest_sampled": "2026-10-27"
 };
