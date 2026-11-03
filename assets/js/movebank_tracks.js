@@ -1,5 +1,5 @@
 window.movebankTracksEmbedded = {
-  "fetched_at_utc": "2026-11-03T03:49:20Z",
+  "fetched_at_utc": "2026-11-03T15:42:03Z",
   "source": "Movebank 研究級備援航線範例資料 (非即時)",
   "authenticated": true,
   "is_live_data": false,
