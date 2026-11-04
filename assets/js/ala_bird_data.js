@@ -1,10 +1,10 @@
 window.alaBirdDataEmbedded = {
-  "fetched_at_utc": "2026-11-03T15:41:01Z",
-  "fetched_at_taipei": "2026-11-03 23:41:01",
+  "fetched_at_utc": "2026-11-04T02:50:46Z",
+  "fetched_at_taipei": "2026-11-04 10:50:46",
   "source": "Atlas of Living Australia (Biocache API)",
   "available": true,
   "unavailable_reason": "",
-  "total_matched_in_ala": 17167954,
+  "total_matched_in_ala": 17167978,
   "sample_records_count": 100,
   "state_counts": {
     "New South Wales": 18,
