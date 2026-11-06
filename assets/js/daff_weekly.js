@@ -1,8 +1,8 @@
 window.daffWeeklyEmbedded = {
- "fetched_at_utc": "2026-11-05T15:58:41Z",
- "total_events": 734,
- "dated_events": 600,
- "undated_events": 134,
+ "fetched_at_utc": "2026-11-06T02:58:16Z",
+ "total_events": 737,
+ "dated_events": 604,
+ "undated_events": 133,
  "weeks": [
   {
    "start": "2026-06-15",
@@ -47,10 +47,10 @@ window.daffWeeklyEmbedded = {
   },
   {
    "start": "2026-07-27",
-   "total": 30,
+   "total": 31,
    "by_state": {
     "VIC": 29,
-    "SA": 1
+    "SA": 2
    }
   },
   {
@@ -184,8 +184,11 @@ window.daffWeeklyEmbedded = {
   },
   {
    "start": "2026-11-02",
-   "total": 0,
-   "by_state": {}
+   "total": 3,
+   "by_state": {
+    "NSW": 2,
+    "SA": 1
+   }
   }
  ],
  "incomplete_from": "2026-10-26",
@@ -198,13 +201,13 @@ window.daffWeeklyEmbedded = {
    }
   },
   "2026-07": {
-   "total": 18,
+   "total": 19,
    "by_state": {
     "WA": 5,
     "NSW": 1,
     "QLD": 1,
     "VIC": 10,
-    "SA": 1
+    "SA": 2
    }
   },
   "2026-08": {
@@ -235,17 +238,25 @@ window.daffWeeklyEmbedded = {
     "VIC": 14,
     "NSW": 10
    }
+  },
+  "2026-11": {
+   "total": 3,
+   "by_state": {
+    "NSW": 2,
+    "SA": 1
+   }
   }
  },
  "nsw_watch": {
   "nsw_land_birds": {
    "Common Myna": 1,
-   "White-bellied Sea-Eagle": 1,
+   "White-bellied Sea-Eagle": 2,
    "Whistling Kite": 1,
    "Australian Magpie": 1,
-   "Australian Raven": 1
+   "Australian Raven": 1,
+   "Peregrine Falcon": 1
   },
-  "nsw_land_birds_total": 5,
+  "nsw_land_birds_total": 7,
   "other_states_land_birds": 37,
   "central_west_lgas": [
    "Blayney",
@@ -260,18 +271,18 @@ window.daffWeeklyEmbedded = {
    "Parkes"
   ],
   "central_west_events": 0,
-  "nsw_events": 78
+  "nsw_events": 80
  },
  "species_birds": {
-  "Crested Tern": 462,
+  "Crested Tern": 463,
   "Silver Gull": 77,
   "Giant Petrel": 18,
   "Pacific Gull": 22,
   "Brown Skua": 3,
   "Cormorant": 22,
   "Little Penguin": 16,
-  "Falcon & Other": 92
+  "Falcon & Other": 94
  },
- "bird_events": 712,
+ "bird_events": 715,
  "mammal_events": 22
 };

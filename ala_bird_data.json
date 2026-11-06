@@ -1,10 +1,10 @@
 {
-  "fetched_at_utc": "2026-11-05T15:59:19Z",
-  "fetched_at_taipei": "2026-11-05 23:59:19",
+  "fetched_at_utc": "2026-11-06T02:58:49Z",
+  "fetched_at_taipei": "2026-11-06 10:58:49",
   "source": "Atlas of Living Australia (Biocache API)",
   "available": true,
   "unavailable_reason": "",
-  "total_matched_in_ala": 17167978,
+  "total_matched_in_ala": 17167990,
   "sample_records_count": 100,
   "state_counts": {
     "New South Wales": 18,
