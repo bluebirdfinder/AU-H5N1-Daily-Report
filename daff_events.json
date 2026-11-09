@@ -1,5 +1,5 @@
 {
- "fetched_at_utc": "2026-11-09T02:12:50Z",
+ "fetched_at_utc": "2026-11-09T18:03:38Z",
  "source": "https://www.agriculture.gov.au/sites/default/files/documents/H5_bird_flu_events.xlsx",
  "total_events": 737,
  "events_by_state": {
@@ -1587,6 +1587,28 @@
    "is_mammal": false
   },
   {
+   "record_id": "NSW-WB-003",
+   "date_sampled": "2026-08-04",
+   "jurisdiction": "NSW",
+   "state": "NSW",
+   "lga": "Eurobodalla",
+   "locality": "Narooma",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "NSW-WB-004",
+   "date_sampled": "2026-08-04",
+   "jurisdiction": "NSW",
+   "state": "NSW",
+   "lga": "Wentworth",
+   "locality": "Coomealla",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
    "record_id": "VIC-WB-038",
    "date_sampled": "2026-08-05",
    "jurisdiction": "VIC",
@@ -1626,28 +1648,6 @@
    "state": "VIC",
    "lga": "Southern Grampians",
    "locality": "Hamilton",
-   "common_name": "Greater Crested Tern",
-   "scientific_name": "Thalasseus bergii",
-   "is_mammal": false
-  },
-  {
-   "record_id": "NSW-WB-003",
-   "date_sampled": "2026-08-04",
-   "jurisdiction": "NSW",
-   "state": "NSW",
-   "lga": "Eurobodalla",
-   "locality": "Narooma",
-   "common_name": "Greater Crested Tern",
-   "scientific_name": "Thalasseus bergii",
-   "is_mammal": false
-  },
-  {
-   "record_id": "NSW-WB-004",
-   "date_sampled": "2026-08-04",
-   "jurisdiction": "NSW",
-   "state": "NSW",
-   "lga": "Wentworth",
-   "locality": "Coomealla",
    "common_name": "Greater Crested Tern",
    "scientific_name": "Thalasseus bergii",
    "is_mammal": false
