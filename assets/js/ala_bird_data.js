@@ -1,10 +1,10 @@
 window.alaBirdDataEmbedded = {
-  "fetched_at_utc": "2026-11-10T15:59:51Z",
-  "fetched_at_taipei": "2026-11-10 23:59:51",
+  "fetched_at_utc": "2026-11-11T02:22:32Z",
+  "fetched_at_taipei": "2026-11-11 10:22:32",
   "source": "Atlas of Living Australia (Biocache API)",
   "available": true,
   "unavailable_reason": "",
-  "total_matched_in_ala": 17171116,
+  "total_matched_in_ala": 17173324,
   "sample_records_count": 100,
   "state_counts": {
     "New South Wales": 33,
@@ -947,20 +947,20 @@ window.alaBirdDataEmbedded = {
       "individualCount": 1
     },
     {
-      "commonName": "Australian Shelduck",
-      "scientificName": "Tadorna (Casarca) tadornoides",
-      "lat": -32.525818,
-      "lng": 117.086574,
+      "commonName": "Australasian Grebe",
+      "scientificName": "Tachybaptus novaehollandiae",
+      "lat": -32.525659,
+      "lng": 117.086833,
       "obsDate": "2026-11-08 08:16 UTC",
       "state": "Western Australia",
       "dataResource": "iNaturalist Australia",
       "individualCount": 1
     },
     {
-      "commonName": "Australasian Grebe",
-      "scientificName": "Tachybaptus novaehollandiae",
-      "lat": -32.525659,
-      "lng": 117.086833,
+      "commonName": "Australian Shelduck",
+      "scientificName": "Tadorna (Casarca) tadornoides",
+      "lat": -32.525818,
+      "lng": 117.086574,
       "obsDate": "2026-11-08 08:16 UTC",
       "state": "Western Australia",
       "dataResource": "iNaturalist Australia",
