@@ -1,11 +1,11 @@
 {
- "fetched_at_utc": "2026-11-13T03:03:26Z",
+ "fetched_at_utc": "2026-11-13T15:49:38Z",
  "source": "https://www.agriculture.gov.au/sites/default/files/documents/H5_bird_flu_events.xlsx",
- "total_events": 738,
+ "total_events": 741,
  "events_by_state": {
   "WA": 10,
   "SA": 342,
-  "NSW": 81,
+  "NSW": 84,
   "QLD": 2,
   "VIC": 249,
   "TAS": 53,
@@ -8127,6 +8127,39 @@
    "state": "NSW",
    "lga": "Canterbury-Bankstown",
    "locality": "Padstow",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "NSW-WB-082",
+   "date_sampled": "2026-11-06",
+   "jurisdiction": "NSW",
+   "state": "NSW",
+   "lga": "Central Coast (NSW)",
+   "locality": "North Avoca",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "NSW-WB-083",
+   "date_sampled": "2026-11-03",
+   "jurisdiction": "NSW",
+   "state": "NSW",
+   "lga": "Eurobodalla",
+   "locality": "Narooma",
+   "common_name": "Brown Skua",
+   "scientific_name": "Stercorarius antarcticus",
+   "is_mammal": false
+  },
+  {
+   "record_id": "NSW-WB-084",
+   "date_sampled": "2026-11-05",
+   "jurisdiction": "NSW",
+   "state": "NSW",
+   "lga": "Northern Beaches",
+   "locality": "Whale Beach",
    "common_name": "Greater Crested Tern",
    "scientific_name": "Thalasseus bergii",
    "is_mammal": false
