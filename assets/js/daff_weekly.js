@@ -1,5 +1,5 @@
 window.daffWeeklyEmbedded = {
- "fetched_at_utc": "2026-11-15T15:09:40Z",
+ "fetched_at_utc": "2026-11-16T02:28:30Z",
  "total_events": 741,
  "dated_events": 608,
  "undated_events": 133,
@@ -194,9 +194,14 @@ window.daffWeeklyEmbedded = {
    "start": "2026-11-09",
    "total": 0,
    "by_state": {}
+  },
+  {
+   "start": "2026-11-16",
+   "total": 0,
+   "by_state": {}
   }
  ],
- "incomplete_from": "2026-11-02",
+ "incomplete_from": "2026-11-09",
  "monthly": {
   "2026-06": {
    "total": 6,
