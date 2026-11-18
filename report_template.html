@@ -22,6 +22,8 @@
     <script src="assets/js/cases_events.js"></script>
     <script src="assets/js/daff_weekly.js"></script>
     <script src="assets/js/daff_weekly_charts.js"></script>
+    <script src="assets/js/shorebird_weekly.js"></script>
+    <script src="assets/js/shorebird_weekly_charts.js"></script>
 
     <style>
         body {
@@ -307,6 +309,30 @@
                 <p class="text-[11px] text-slate-400 mb-4">NSW 境內野生動物確診事件，依 DAFF 官方逐筆檔的採樣日所在週彙整。注意：這是野生動物事件，不是商業家禽；風險評估的紅線仍是「NSW 商業家禽 0 確診」。</p>
                 <div class="h-[240px] w-full relative"><canvas id="nswTrendChart"></canvas></div>
                 <p id="nsw-trend-note" class="text-[11px] text-slate-500 mt-3 leading-relaxed"></p>
+            </div>
+
+            <!-- 遷徙性濱鳥每週觀測紀錄數：資料來自 assets/js/shorebird_weekly.js（GBIF + ALA 計數查詢），無資料時自動隱藏 -->
+            <div id="shorebird-weekly-card" class="hidden bg-slate-800 p-6 rounded-2xl border border-sky-700/40">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                    <h3 class="text-sm font-semibold text-sky-300 uppercase tracking-wider">🦅 遷徙性濱鳥「每週觀測紀錄數」（GBIF／ALA，對照去年同週）</h3>
+                    <span class="text-xs font-mono text-slate-400">資料更新: <span id="shorebird-fetched">-</span></span>
+                </div>
+                <p class="text-[11px] text-slate-400 mb-1 leading-relaxed">
+                    統計 19 種東亞—澳大拉西亞遷飛區濱鳥（斑尾鷸、紅腹濱鷸、大濱鷸、紅頸濱鷸、彎嘴濱鷸、遠東杓鷸等）在澳洲每週被登錄的觀測紀錄數。
+                    <strong class="text-amber-300">這是「被登錄的紀錄數」，不是入境隻數</strong>：會受賞鳥人數、天氣與登錄延遲影響，所以同時畫出去年與前年同週，並算出「佔全鳥類紀錄的比例」來扣除觀察力道。
+                    這是領先指標，不是疫情指標；風險紅線仍是「NSW 商業家禽是否確診」。
+                </p>
+                <p class="text-[11px] text-amber-300/90 mb-4 leading-relaxed">
+                    ⚠️ 登錄延遲：最近 3 週（淡色柱）<strong>假設</strong>尚未登錄完整，通常事後會補增，不可解讀為候鳥減少；此假設未經實測，下方「實測登錄延遲」會在累積 6 天以上的快照後自動顯示。GBIF 內的 eBird 資料以月為單位匯入，比 ALA 更慢。
+                </p>
+                <div id="shorebird-gbif-wrap" class="hidden mb-5">
+                    <div class="h-[220px] w-full relative"><canvas id="shorebird-gbif-chart"></canvas></div>
+                    <p id="shorebird-gbif-summary" class="text-[11px] text-slate-300 mt-2 leading-relaxed font-mono"></p>
+                </div>
+                <div id="shorebird-ala-wrap" class="hidden">
+                    <div class="h-[220px] w-full relative"><canvas id="shorebird-ala-chart"></canvas></div>
+                    <p id="shorebird-ala-summary" class="text-[11px] text-slate-300 mt-2 leading-relaxed font-mono"></p>
+                </div>
             </div>
 
             <!-- ========================================================================= -->

@@ -860,6 +860,19 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
     if m_hot:
         stats["hotline_reports"] = int(m_hot.group(1).replace(",", ""))
 
+    # 2026-11-18：稽核發現這兩個數字在網頁上其實不是即時值——正則沒命中時會靜默沿用上方寫死的備援值
+    # （negative_events=2450 自 9/16 起從未變動；hotline_reports 在 10/30 14:43 之前還在隨官網上升，
+    #  之後固定為備援值 36800）。記下是否真的由官網解析到，並把頁面中相關字樣印進 log 供查明原因。
+    stats["negative_events_live"] = bool(m_neg)
+    stats["hotline_reports_live"] = bool(m_hot)
+    if not (m_neg and m_hot):
+        print(f"[DAFF 陰性/熱線 未解析] 陰性命中={bool(m_neg)} 熱線命中={bool(m_hot)}，網頁上顯示的這兩個數字為寫死備援值，不是官方即時數字")
+        try:
+            for m_dbg in list(re.finditer(r".{0,100}(?:negative|hotline).{0,100}", text, re.IGNORECASE))[:8]:
+                print(f"[DAFF 陰性/熱線 原文診斷] {m_dbg.group(0).strip()}")
+        except Exception as e:
+            print(f"[DAFF 陰性/熱線 原文診斷] 失敗: {e}")
+
     st_patterns = [
         ("WA", r"(\d+)\s+in\s+Western Australia"),
         ("SA", r"(\d+)\s+in\s+South Australia"),
@@ -2117,6 +2130,11 @@ def main():
         print(f"[GBIF API 執行例外] {e}")
 
     try:
+        fetch_shorebird_weekly()
+    except Exception as e:
+        print(f"[濱鳥週觀測數 執行例外] {e}")
+
+    try:
         fetch_movebank_data()
     except Exception as e:
         print(f"[Movebank API 執行例外] {e}")
@@ -3221,6 +3239,225 @@ def fetch_gbif_data():
         print(f"[GBIF API] ✅ 成功寫入 assets/js/gbif_bird_data.js (免 fetch 零阻擋通道)")
     except Exception as e:
         print(f"[GBIF API] 寫入檔案失敗: {e}")
+
+
+# ==================== 遷徙性濱鳥「每週觀測紀錄數」(GBIF + ALA，含去年同週對照) ====================
+# 2026-11-18 新增。目的：eBird/GBIF/ALA 原本只抓「最近 N 筆」點位，沒有時間序列，無法回答
+# 「今年濱鳥入境了沒、比去年多還是少」。這裡改用「計數查詢」（GBIF limit=0 回 count；ALA pageSize=1 回 totalRecords），
+# 對每個週一起算的週區間各查一次，並對照 52 週前、104 週前的同一週。
+# 注意：計數的是「被登錄的觀測紀錄數」，會受賞鳥人數、天氣、登錄延遲影響，不是入境隻數。
+# 為了扣掉觀察力道，同時查「同週全部鳥類紀錄數」，前端據此算濱鳥佔比。
+SHOREBIRD_SPECIES = [
+    "Limosa lapponica",           # 斑尾鷸 Bar-tailed Godwit
+    "Limosa limosa",              # 黑尾鷸 Black-tailed Godwit
+    "Calidris canutus",           # 紅腹濱鷸 Red Knot
+    "Calidris tenuirostris",      # 大濱鷸 Great Knot
+    "Calidris ruficollis",        # 紅頸濱鷸 Red-necked Stint
+    "Calidris ferruginea",        # 彎嘴濱鷸 Curlew Sandpiper
+    "Calidris acuminata",         # 尖尾濱鷸 Sharp-tailed Sandpiper
+    "Calidris alba",              # 三趾濱鷸 Sanderling
+    "Numenius madagascariensis",  # 遠東杓鷸 Far Eastern Curlew
+    "Numenius phaeopus",          # 中杓鷸 Whimbrel
+    "Tringa nebularia",           # 青足鷸 Common Greenshank
+    "Tringa stagnatilis",         # 小青足鷸 Marsh Sandpiper
+    "Tringa glareola",            # 林鷸 Wood Sandpiper
+    "Actitis hypoleucos",         # 磯鷸 Common Sandpiper
+    "Arenaria interpres",         # 翻石鷸 Ruddy Turnstone
+    "Pluvialis fulva",            # 太平洋金斑鴴 Pacific Golden Plover
+    "Xenus cinereus",             # 翹嘴鷸 Terek Sandpiper
+    "Charadrius mongolus",        # 蒙古沙鴴 Lesser Sand Plover
+    "Charadrius leschenaultii",   # 鐵嘴沙鴴 Greater Sand Plover
+]
+
+
+def _shorebird_week_ranges(today=None, season_start_month=7):
+    """回傳今年從 7 月第一個週一起到本週的 [(週一, 週日)] 清單（日期物件）。"""
+    today = today or datetime.now(timezone.utc).date()
+    start = today.replace(month=season_start_month, day=1)
+    start -= timedelta(days=start.weekday())  # 退到週一
+    weeks = []
+    d = start
+    while d <= today:
+        weeks.append((d, d + timedelta(days=6)))
+        d += timedelta(days=7)
+    return weeks
+
+
+def fetch_shorebird_weekly():
+    """
+    產出 shorebird_weekly.json 與 assets/js/shorebird_weekly.js（window.shorebirdWeeklyEmbedded）。
+    失敗時也會寫出 available:false 的空殼，讓前端安全隱藏卡片、不會 404。
+    """
+    import time as _time
+    print("[濱鳥週觀測數] 開始以計數查詢彙整 GBIF / ALA 每週紀錄數 (含去年與前年同週對照)...")
+    today = datetime.now(timezone.utc).date()
+    weeks = _shorebird_week_ranges(today)
+    utc_now = datetime.now(timezone.utc)
+    out_json, out_js = "shorebird_weekly.json", "assets/js/shorebird_weekly.js"
+
+    # 讀取舊檔，沿用其快照（用於日後量測「同一週的數字之後又被補增多少」＝實測登錄延遲）
+    old_snapshots = {}
+    try:
+        with open(out_json, "r", encoding="utf-8") as f:
+            old_snapshots = (json.load(f) or {}).get("snapshots", {}) or {}
+    except Exception:
+        old_snapshots = {}
+
+    def _write(payload):
+        try:
+            with open(out_json, "w", encoding="utf-8") as f:
+                json.dump(payload, f, ensure_ascii=False, indent=1)
+            os.makedirs("assets/js", exist_ok=True)
+            with open(out_js, "w", encoding="utf-8") as f_js:
+                f_js.write("window.shorebirdWeeklyEmbedded = " + json.dumps(payload, ensure_ascii=False) + ";\n")
+        except Exception as e:
+            print(f"[濱鳥週觀測數] 寫檔失敗: {str(e)[:80]}")
+
+    empty = {
+        "fetched_at_utc": utc_now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "available": False, "unavailable_reason": "", "species": SHOREBIRD_SPECIES,
+        "week_starts": [w[0].isoformat() for w in weeks], "sources": {}, "snapshots": old_snapshots,
+    }
+
+    headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36",
+               "Accept": "application/json"}
+
+    # ---------- 來源定義：每個來源提供 count(species_list|None, start, end) ----------
+    def gbif_count(species_list, start, end):
+        params = {"country": "AU", "eventDate": f"{start.isoformat()},{end.isoformat()}",
+                  "occurrenceStatus": "PRESENT", "limit": 0}
+        if species_list is None:
+            params["taxonKey"] = 212  # Aves（鳥綱）
+        else:
+            params["scientificName"] = species_list  # requests 會展成重複參數
+        r = requests.get("https://api.gbif.org/v1/occurrence/search", params=params, headers=headers, timeout=15)
+        if r.status_code != 200:
+            raise RuntimeError(f"GBIF HTTP {r.status_code}: {r.text[:80]}")
+        c = r.json().get("count")
+        if c is None:
+            raise RuntimeError("GBIF 回應缺 count")
+        return int(c)
+
+    ala_field = {"name": "species"}
+
+    def ala_count(species_list, start, end):
+        fq = [f"eventDate:[{start.isoformat()}T00:00:00Z TO {end.isoformat()}T23:59:59Z]"]
+        if species_list is None:
+            fq.append("class:Aves")
+        else:
+            fq.append(ala_field["name"] + ":(" + " OR ".join('"%s"' % s for s in species_list) + ")")
+        params = {"q": "country:Australia", "fq": fq, "pageSize": 1}
+        r = requests.get("https://api.ala.org.au/occurrences/occurrences/search", params=params, headers=headers, timeout=20)
+        if r.status_code != 200:
+            raise RuntimeError(f"ALA HTTP {r.status_code}: {r.text[:80]}")
+        c = r.json().get("totalRecords")
+        if c is None:
+            raise RuntimeError("ALA 回應缺 totalRecords")
+        return int(c)
+
+    def run_source(name, label, count_fn, budget_s=200):
+        """回傳 source dict 或 None（無法使用）。先做「OR 語意自我檢查」，不通過就改逐物種加總。"""
+        t0 = _time.time()
+        probe_start = today - timedelta(days=364 + 30)
+        probe_end = probe_start + timedelta(days=6)
+        try:
+            a = count_fn([SHOREBIRD_SPECIES[0]], probe_start, probe_end)
+            b = count_fn([SHOREBIRD_SPECIES[1]], probe_start, probe_end)
+            ab = count_fn([SHOREBIRD_SPECIES[0], SHOREBIRD_SPECIES[1]], probe_start, probe_end)
+        except Exception as e:
+            print(f"[濱鳥週觀測數 {name}] 自我檢查失敗，略過此來源: {str(e)[:120]}")
+            return None, str(e)[:120]
+        multi_ok = (ab == a + b)
+        # a+b==0 時等式恆成立、無法驗證 OR 語意，換一組物種再檢驗
+        if a + b == 0:
+            try:
+                alt = [SHOREBIRD_SPECIES[4], SHOREBIRD_SPECIES[5]]
+                a2, b2 = count_fn([alt[0]], probe_start, probe_end), count_fn([alt[1]], probe_start, probe_end)
+                ab2 = count_fn(alt, probe_start, probe_end)
+                multi_ok = (ab2 == a2 + b2)
+            except Exception:
+                multi_ok = False
+        mode = "multi" if multi_ok else "per_species"
+        print(f"[濱鳥週觀測數 {name}] OR 自我檢查: A={a} B={b} A+B查詢={ab} → 採用 {mode} 模式")
+
+        def shore_count(start, end):
+            if mode == "multi":
+                return count_fn(SHOREBIRD_SPECIES, start, end)
+            return sum(count_fn([s], start, end) for s in SHOREBIRD_SPECIES)
+
+        years = {}
+        birds = {}
+        failures = 0
+        for off_weeks, key in ((0, str(today.year)), (52, str(today.year - 1)), (104, str(today.year - 2))):
+            ys, yb = [], []
+            for (ws, we) in weeks:
+                s, e = ws - timedelta(weeks=off_weeks), min(we, today) - timedelta(weeks=off_weeks)
+                if off_weeks == 0 and ws > today:
+                    ys.append(None); yb.append(None); continue
+                if _time.time() - t0 > budget_s:
+                    ys.append(None); yb.append(None); failures += 1; continue
+                try:
+                    ys.append(shore_count(s, e))
+                    yb.append(count_fn(None, s, e))
+                except Exception as ex:
+                    failures += 1
+                    ys.append(None); yb.append(None)
+                    if failures <= 3:
+                        print(f"[濱鳥週觀測數 {name}] {s}~{e} 查詢失敗: {str(ex)[:100]}")
+            years[key], birds[key] = ys, yb
+        ok = sum(1 for v in years.get(str(today.year), []) if v is not None)
+        print(f"[濱鳥週觀測數 {name}] 完成：今年 {ok}/{len(weeks)} 週取得，失敗/逾時 {failures} 次，耗時 {_time.time()-t0:.0f}s")
+        if ok == 0:
+            return None, "今年所有週查詢皆失敗"
+        total_shore = sum(v for v in years[str(today.year)] if v)
+        total_birds = sum(v for v in birds[str(today.year)] if v)
+        if total_shore == 0 and total_birds > 0:
+            # 全鳥類有紀錄、濱鳥卻是 0：物種過濾條件（欄位名/學名）沒有命中，這種全 0 不能當真實資料
+            return None, "NO_SPECIES_MATCH"
+        return {"label": label, "mode": mode, "shorebirds": years, "all_birds": birds}, ""
+
+    sources, reasons = {}, {}
+    for name, label, fn in (("gbif", "GBIF（含 eBird 資料集，eBird 資料通常以月為單位匯入，較晚）", gbif_count),
+                            ("ala", "ALA 澳洲生物圖譜（含 iNaturalist、BirdData 等）", ala_count)):
+        try:
+            src, why = run_source(name, label, fn)
+            if name == "ala" and why == "NO_SPECIES_MATCH":
+                print("[濱鳥週觀測數 ala] species 欄位全 0，改用 scientificName 欄位重試一次")
+                ala_field["name"] = "scientificName"
+                src, why = run_source(name, label, fn)
+            if why == "NO_SPECIES_MATCH":
+                why = "物種過濾無命中（全鳥類有紀錄但濱鳥為 0，視為無效，不輸出假的 0）"
+        except Exception as e:
+            src, why = None, str(e)[:120]
+        if src:
+            sources[name] = src
+        else:
+            reasons[name] = why
+
+    if not sources:
+        empty["unavailable_reason"] = "; ".join(f"{k}: {v}" for k, v in reasons.items()) or "無可用來源"
+        print(f"[濱鳥週觀測數] 無任何來源可用，寫出空殼: {empty['unavailable_reason'][:120]}")
+        _write(empty)
+        return
+
+    # 快照：以日期為鍵保存「今年各週計數」，保留 30 天；日後比對同一週數字的增幅即為實測登錄延遲
+    snap = {nm: s["shorebirds"][str(today.year)] for nm, s in sources.items()}
+    snapshots = dict(old_snapshots)
+    snapshots[today.isoformat()] = {"week_starts": [w[0].isoformat() for w in weeks], "counts": snap}
+    cutoff = (today - timedelta(days=30)).isoformat()
+    snapshots = {k: v for k, v in snapshots.items() if k >= cutoff}
+
+    payload = {
+        "fetched_at_utc": utc_now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "available": True, "unavailable_reason": "; ".join(f"{k}: {v}" for k, v in reasons.items()),
+        "species": SHOREBIRD_SPECIES,
+        "week_starts": [w[0].isoformat() for w in weeks],
+        "baseline_offset_weeks": {str(today.year - 1): 52, str(today.year - 2): 104},
+        "incomplete_last_n_weeks": 3,
+        "sources": sources, "snapshots": snapshots,
+    }
+    _write(payload)
+    print(f"[濱鳥週觀測數] ✅ 已寫入 {out_json} 與 {out_js}（來源: {', '.join(sources)}）")
 
 
 # ==================== Movebank 衛星發報器軌跡追蹤整合模組 ====================

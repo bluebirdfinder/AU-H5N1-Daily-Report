@@ -19,6 +19,8 @@
     <script src="assets/js/cases_events.js"></script>
     <script src="assets/js/daff_weekly.js"></script>
     <script src="assets/js/daff_weekly_charts.js"></script>
+    <script src="assets/js/shorebird_weekly.js"></script>
+    <script src="assets/js/shorebird_weekly_charts.js"></script>
 
     <style>
         body {
@@ -271,6 +273,30 @@
                 <p class="text-[11px] text-slate-400 mb-4">Wildlife events in NSW by sampling week from DAFF's official per-event file. These are wildlife events, not commercial poultry; the risk red line remains 'zero confirmed NSW commercial poultry cases'.</p>
                 <div class="h-[240px] w-full relative"><canvas id="nswTrendChart"></canvas></div>
                 <p id="nsw-trend-note" class="text-[11px] text-slate-500 mt-3 leading-relaxed"></p>
+            </div>
+
+            <!-- Migratory shorebird weekly observation records: data from assets/js/shorebird_weekly.js (GBIF + ALA count queries); hidden when unavailable -->
+            <div id="shorebird-weekly-card" class="hidden bg-slate-800 p-6 rounded-2xl border border-sky-700/40">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                    <h3 class="text-sm font-semibold text-sky-300 uppercase tracking-wider">🦅 Migratory Shorebird Weekly Observation Records (GBIF / ALA, vs. same weeks in prior years)</h3>
+                    <span class="text-xs font-mono text-slate-400">Updated: <span id="shorebird-fetched">-</span></span>
+                </div>
+                <p class="text-[11px] text-slate-400 mb-1 leading-relaxed">
+                    Weekly number of observation records logged in Australia for 19 East Asian–Australasian Flyway shorebird species (Bar-tailed Godwit, Red Knot, Great Knot, Red-necked Stint, Curlew Sandpiper, Far Eastern Curlew, etc.).
+                    <strong class="text-amber-300">This counts logged records, not arriving birds</strong>: it depends on observer numbers, weather and registration lag, so last year and the year before are overlaid and the share of all bird records is computed to cancel out observer effort.
+                    It is a leading indicator, not an outbreak indicator; the risk red line remains whether NSW commercial poultry is confirmed.
+                </p>
+                <p class="text-[11px] text-amber-300/90 mb-4 leading-relaxed">
+                    ⚠️ Registration lag: the latest 3 weeks (faded bars) are <strong>assumed</strong> incomplete and are usually revised upward later; do not read them as fewer birds. This assumption is unmeasured; the “measured late registration” figure below appears automatically once snapshots 6+ days old exist. eBird data inside GBIF is imported monthly, so GBIF lags ALA.
+                </p>
+                <div id="shorebird-gbif-wrap" class="hidden mb-5">
+                    <div class="h-[220px] w-full relative"><canvas id="shorebird-gbif-chart"></canvas></div>
+                    <p id="shorebird-gbif-summary" class="text-[11px] text-slate-300 mt-2 leading-relaxed font-mono"></p>
+                </div>
+                <div id="shorebird-ala-wrap" class="hidden">
+                    <div class="h-[220px] w-full relative"><canvas id="shorebird-ala-chart"></canvas></div>
+                    <p id="shorebird-ala-summary" class="text-[11px] text-slate-300 mt-2 leading-relaxed font-mono"></p>
+                </div>
             </div>
 
             <!-- Wild Bird Ecology & Bio-Security Guide -->
