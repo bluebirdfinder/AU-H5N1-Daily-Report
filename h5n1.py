@@ -783,6 +783,9 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
         "total_events": 484,
         "negative_events": 2450,
         "hotline_reports": 36800,
+        # 這兩個值是寫死的備援值；只有官網正則真的命中時才會被改為 True（2026-11-18：避免把備援值當即時數字顯示）
+        "negative_events_live": False,
+        "hotline_reports_live": False,
         "events_by_state": {"WA": 10, "SA": 271, "VIC": 150, "NSW": 22, "QLD": 2, "TAS": 29, "NT": 0, "ACT": 0, "JBT": 0},
         "species_counts": {
             "Crested Tern": 348,
@@ -855,10 +858,12 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
     m_neg = re.search(r"([\d,]+)\s+Negative events", text, re.IGNORECASE)
     if m_neg:
         stats["negative_events"] = int(m_neg.group(1).replace(",", ""))
+        stats["negative_events_live"] = True
 
     m_hot = re.search(r"([\d,]+)\s+Hotline reports", text, re.IGNORECASE)
     if m_hot:
         stats["hotline_reports"] = int(m_hot.group(1).replace(",", ""))
+        stats["hotline_reports_live"] = True
 
     # 2026-11-18：稽核發現這兩個數字在網頁上其實不是即時值——正則沒命中時會靜默沿用上方寫死的備援值
     # （negative_events=2450 自 9/16 起從未變動；hotline_reports 在 10/30 14:43 之前還在隨官網上升，
@@ -1496,6 +1501,20 @@ def generate_dynamic_summary(cases_data, official_stats, lang="zh"):
     total_events = official_stats.get("total_events", 186)
     negative_events = official_stats.get("negative_events", 1273)
     hotline_reports = official_stats.get("hotline_reports", 18869)
+    # 2026-11-18：官網沒解析到時，negative_events／hotline_reports 是寫死備援值，不可當即時數字顯示
+    neg_live = official_stats.get("negative_events_live", False)
+    hot_live = official_stats.get("hotline_reports_live", False)
+    _neg_en = (f'<span class="text-sky-400 font-bold">{negative_events:,} Negative Exclusions</span>' if neg_live
+               else '<span class="text-slate-400 font-bold">Negative Exclusions: not provided by the official site</span>')
+    _hot_en = (f'<span class="text-sky-300 font-semibold">{hotline_reports:,} Hotline Reports</span>' if hot_live
+               else '<span class="text-slate-400 font-semibold">Hotline Reports: not provided by the official site</span>')
+    _neg_short_en = f"{negative_events:,} negative exclusions" if neg_live else "negative exclusions: not provided by the official site"
+    _neg_zh = (f'陰性排除事件達 <span class="text-sky-400 font-bold">{negative_events:,} 起</span>' if neg_live
+               else '陰性排除事件數：<span class="text-slate-400 font-bold">官網未提供</span>')
+    _hot_zh = (f'民眾與專家通報數達 <span class="text-sky-300 font-semibold">{hotline_reports:,} 筆</span>' if hot_live
+               else '通報數：<span class="text-slate-400 font-semibold">官網未提供</span>')
+    _neg_short_zh = (f'陰性排除 <span class="text-sky-400 font-semibold">{negative_events:,} 起</span>' if neg_live
+                     else '陰性排除數：官網未提供')
     evt_by_state = official_stats.get("events_by_state", {})
 
     utc_now = datetime.now(timezone.utc)
@@ -1513,7 +1532,7 @@ def generate_dynamic_summary(cases_data, official_stats, lang="zh"):
         latest_date_str = f"September {taipei_now.day}, {taipei_now.year}"
         
         official_text = (
-            f"According to the {daff_link} and State Agencies <span class=\"text-amber-400 font-bold\">{latest_date_str} Official Telemetry</span>, Australia has recorded a cumulative total of <span class=\"text-red-400 font-extrabold text-base px-1 bg-red-950/40 rounded border border-red-500/30\">{total_events} Confirmed Positive Events</span> in wild animals/birds, with <span class=\"text-sky-400 font-bold\">{negative_events:,} Negative Exclusions</span> and <span class=\"text-sky-300 font-semibold\">{hotline_reports:,} Hotline Reports</span>. "
+            f"According to the {daff_link} and State Agencies <span class=\"text-amber-400 font-bold\">{latest_date_str} Official Telemetry</span>, Australia has recorded a cumulative total of <span class=\"text-red-400 font-extrabold text-base px-1 bg-red-950/40 rounded border border-red-500/30\">{total_events} Confirmed Positive Events</span> in wild animals/birds, with {_neg_en} and {_hot_en}. "
             f"Breakdown by Jurisdiction: <span class=\"text-amber-300 font-semibold\">SA: {sa_evt}</span>, <span class=\"text-amber-300 font-semibold\">VIC: {vic_evt}</span>, <span class=\"text-amber-300 font-semibold\">WA: {wa_evt}</span>, <span class=\"text-amber-300 font-semibold\">NSW: {nsw_evt}</span>, <span class=\"text-amber-300 font-semibold\">TAS: {tas_evt}</span>, <span class=\"text-amber-300 font-semibold\">QLD: {qld_evt}</span>. "
             f"All commercial poultry, egg, and feed manufacturing operations across Australia maintain <span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">100% Area Freedom Status</span> with zero commercial farm infections."
         )
@@ -1521,7 +1540,7 @@ def generate_dynamic_summary(cases_data, official_stats, lang="zh"):
         nsw_dpird_link = '<a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">NSW DPIRD</a>'
         abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">ABC News Australia</a>'
         media_text = (
-            f"According to {abc_link} and {nsw_dpird_link} reports (<span class=\"text-amber-400 font-bold\">{latest_date_str}</span>), Australia officially operates on an international Event-based Reporting framework with <span class=\"text-red-400 font-bold\">{total_events} Positive Events</span> ({negative_events:,} negative exclusions). The Australian Chief Veterinary Officer re-affirms: <span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">All commercial poultry farms in Australia maintain 100% Zero Infection, with extremely low risk to human health</span>."
+            f"According to {abc_link} and {nsw_dpird_link} reports (<span class=\"text-amber-400 font-bold\">{latest_date_str}</span>), Australia officially operates on an international Event-based Reporting framework with <span class=\"text-red-400 font-bold\">{total_events} Positive Events</span> ({_neg_short_en}). The Australian Chief Veterinary Officer re-affirms: <span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">All commercial poultry farms in Australia maintain 100% Zero Infection, with extremely low risk to human health</span>."
         )
         return official_text, media_text
 
@@ -1530,7 +1549,7 @@ def generate_dynamic_summary(cases_data, official_stats, lang="zh"):
     latest_date_str = f"{taipei_now.year} 年 {taipei_now.month} 月 {taipei_now.day} 日"
 
     official_text = (
-        f"依據 {daff_link} 及各州政府 <span class=\"text-amber-400 font-bold\">{latest_date_str} 最新數據</span>，全澳高致病性 H5N1 野生動物確診總數累計為 <span class=\"text-red-400 font-extrabold text-base px-1 bg-red-950/40 rounded border border-red-500/30\">{total_events} 起確診事件 (Positive Events)</span>，陰性排除事件達 <span class=\"text-sky-400 font-bold\">{negative_events:,} 起</span>，民眾與專家通報數達 <span class=\"text-sky-300 font-semibold\">{hotline_reports:,} 筆</span>！"
+        f"依據 {daff_link} 及各州政府 <span class=\"text-amber-400 font-bold\">{latest_date_str} 最新數據</span>，全澳高致病性 H5N1 野生動物確診總數累計為 <span class=\"text-red-400 font-extrabold text-base px-1 bg-red-950/40 rounded border border-red-500/30\">{total_events} 起確診事件 (Positive Events)</span>，{_neg_zh}，{_hot_zh}！"
         f"確診事件分布統計：<span class=\"text-amber-300 font-semibold\">南澳 {sa_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">維州 {vic_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">西澳 {wa_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">新州 {nsw_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">塔州 {tas_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">昆州 {qld_evt} 起</span>。"
         f"全澳商業家禽產業及飼料生產體系 <span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">100% 維持無疫區 (Area Freedom) 狀態</span>，生產鏈安全無虞。"
     )
@@ -1542,7 +1561,7 @@ def generate_dynamic_summary(cases_data, official_stats, lang="zh"):
         nsw_dpird_link = '<a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">新南威爾斯州政府 (NSW DPIRD)</a>'
         abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a>'
         media_text = (
-            f"根據 {abc_link} 與 {nsw_dpird_link} 等媒體 <span class=\"text-amber-400 font-bold\">{latest_date_str} 最新報導</span>，澳洲官方自 8/12 起正式採用國際標準「事件導向 (Event-based Reporting)」統計，全澳累計 <span class=\"text-red-400 font-bold\">{total_events} 起確診事件</span>（陰性排除 <span class=\"text-sky-400 font-semibold\">{negative_events:,} 起</span>）。聯邦首席獸醫官重申：<span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">澳洲所有商業家禽農場維持 100% 零感染，對一般人類健康風險極低</span>。"
+            f"根據 {abc_link} 與 {nsw_dpird_link} 等媒體 <span class=\"text-amber-400 font-bold\">{latest_date_str} 最新報導</span>，澳洲官方自 8/12 起正式採用國際標準「事件導向 (Event-based Reporting)」統計，全澳累計 <span class=\"text-red-400 font-bold\">{total_events} 起確診事件</span>（{_neg_short_zh}）。聯邦首席獸醫官重申：<span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">澳洲所有商業家禽農場維持 100% 零感染，對一般人類健康風險極低</span>。"
         )
 
     official_colored = colorize_summary_text(official_text)
@@ -2594,6 +2613,8 @@ def write_cases_events_js(official_stats):
         "total_events": official_stats.get("total_events", 0),
         "negative_events": official_stats.get("negative_events", 0),
         "hotline_reports": official_stats.get("hotline_reports", 0),
+        "negative_events_live": official_stats.get("negative_events_live", False),
+        "hotline_reports_live": official_stats.get("hotline_reports_live", False),
         "events_by_state": official_stats.get("events_by_state", {}),
         "species_counts": official_stats.get("species_counts", {}),
         "source": official_stats.get("source", "unknown"),

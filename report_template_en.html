@@ -95,18 +95,19 @@
 
             const isLive = stats.source === 'live';
             const total = stats.total_events || '—';
-            const neg = (stats.negative_events || 0).toLocaleString();
-            const hot = (stats.hotline_reports || 0).toLocaleString();
+            // When the official page did not yield these two values they are hard-coded fallbacks, not live numbers
+            const neg = stats.negative_events_live === false ? 'Negative exclusions: not provided by the official site' : (stats.negative_events || 0).toLocaleString() + ' Negative Exclusions';
+            const hot = stats.hotline_reports_live === false ? 'Hotline reports: not provided by the official site' : (stats.hotline_reports || 0).toLocaleString() + ' Hotline Reports';
             const ts = stats.scrape_time || 'Unknown';
 
             if (isLive) {
                 banner.className = banner.className + ' bg-emerald-600/90 border-emerald-500/20';
-                msg.textContent = `✅ Live DAFF Telemetry Synced (${ts}) — Total ${total} Confirmed Positive Events / ${neg} Negative Exclusions / ${hot} Hotline Reports`;
+                msg.textContent = `✅ Live DAFF Telemetry Synced (${ts}) — Total ${total} Confirmed Positive Events / ${neg} / ${hot}`;
             } else {
                 banner.className = banner.className + ' bg-amber-600/90 border-amber-500/30';
                 dot.classList.remove('animate-pulse');
                 dot.style.backgroundColor = '#fbbf24';
-                msg.textContent = `⚠️ Backup Dataset Active — Official DAFF Synced ${total} Positive Events / ${neg} Exclusions`;
+                msg.textContent = `⚠️ Backup Dataset Active — Official DAFF Synced ${total} Positive Events / ${neg}`;
             }
         });
     </script>
@@ -220,7 +221,7 @@
                                         class="text-3xl font-black text-white font-mono">498</span>
                                     <span class="text-xs text-red-400 font-bold">Positive Events</span>
                                 </div>
-                                <span id="kpi-event-hotline-exclusions" class="text-[11px] text-slate-400 block mt-1">2,450 Negative Exclusions / 39,324 Hotline Reports</span>
+                                <span id="kpi-event-hotline-exclusions" class="text-[11px] text-slate-400 block mt-1">Negative exclusions / hotline reports: loading…</span>
                             </div>
 
                             <div class="bg-slate-900/80 p-4 rounded-xl border border-emerald-500/40">
@@ -844,8 +845,8 @@
             const stats = window.OFFICIAL_STATS || {};
             const events = window.H5N1_EVENTS || [];
             const totalEvents = stats.total_events || events.length || 498;
-            const negEvents = (stats.negative_events || 2450).toLocaleString();
-            const hotline = (stats.hotline_reports || 39324).toLocaleString();
+            const negEvents = stats.negative_events_live === false ? 'Negative exclusions: not provided by the official site' : (stats.negative_events || 2450).toLocaleString() + ' Negative Exclusions';
+            const hotline = stats.hotline_reports_live === false ? 'Hotline reports: not provided by the official site' : (stats.hotline_reports || 39324).toLocaleString() + ' Hotline Reports';
             
             let evtByState = stats.events_by_state;
             if (!evtByState && events.length > 0) {
@@ -862,7 +863,7 @@
             if (elPos) elPos.textContent = totalEvents;
 
             const elHot = document.getElementById('kpi-event-hotline-exclusions');
-            if (elHot) elHot.textContent = `${negEvents} Negative Exclusions / ${hotline} Hotline Reports`;
+            if (elHot) elHot.textContent = `${negEvents} / ${hotline}`;
 
             const elGrid = document.getElementById('event-by-state-grid');
             if (elGrid) {

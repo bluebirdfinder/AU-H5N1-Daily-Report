@@ -99,18 +99,19 @@
 
             const isLive = stats.source === 'live';
             const total = stats.total_events || '—';
-            const neg = (stats.negative_events || 0).toLocaleString();
-            const hot = (stats.hotline_reports || 0).toLocaleString();
+            // 官網沒解析到時這兩個值是寫死備援值，不可當即時數字顯示（negative_events_live / hotline_reports_live === false）
+            const neg = stats.negative_events_live === false ? '陰性排除：官網未提供' : (stats.negative_events || 0).toLocaleString() + ' 起陰性排除';
+            const hot = stats.hotline_reports_live === false ? '通報數：官網未提供' : (stats.hotline_reports || 0).toLocaleString() + ' 筆通報';
             const ts = stats.scrape_time || '不明';
 
             if (isLive) {
                 banner.className = banner.className + ' bg-emerald-600/90 border-emerald-500/20';
-                msg.textContent = `✅ 即時官方數據 · 已與 DAFF 官網同步 (${ts}) — 全澳累計 ${total} 起確診事件 / ${neg} 起陰性排除 / ${hot} 筆通報`;
+                msg.textContent = `✅ 即時官方數據 · 已與 DAFF 官網同步 (${ts}) — 全澳累計 ${total} 起確診事件 / ${neg} / ${hot}`;
             } else {
                 banner.className = banner.className + ' bg-amber-600/90 border-amber-500/30';
                 dot.classList.remove('animate-pulse');
                 dot.style.backgroundColor = '#fbbf24';
-                msg.textContent = `⚠️ 備援數據 · DAFF 官網連線異常，目前顯示硬編碼預設值（非即時） — 全澳 ${total} 起確診 / ${neg} 陰性 / ${hot} 通報`;
+                msg.textContent = `⚠️ 備援數據 · DAFF 官網連線異常，目前顯示硬編碼預設值（非即時） — 全澳 ${total} 起確診 / ${neg} / ${hot}`;
             }
         });
     </script>
@@ -248,8 +249,7 @@
                                 <span id="event-confirmed-indicator"
                                     class="text-3xl font-black text-red-500 tracking-tight">236 起確診事件</span>
                                 <span id="event-hotline-indicator"
-                                    class="text-[10px] text-blue-400 block mt-1 font-semibold">（1,273 起陰性排除事件 / 21,041
-                                    筆熱線通報）</span>
+                                    class="text-[10px] text-blue-400 block mt-1 font-semibold">（陰性排除／熱線通報數載入中…）</span>
                             </div>
 
                             <!-- 核心指標 2：受影響家禽 -->
@@ -1186,15 +1186,15 @@
         function renderDynamicIndicators() {
             const stats = window.OFFICIAL_STATS || {};
             const totalEvents = stats.total_events || 236;
-            const negEvents = (stats.negative_events || 1273).toLocaleString();
-            const hotline = (stats.hotline_reports || 21041).toLocaleString();
+            const negEvents = stats.negative_events_live === false ? '陰性排除：官網未提供' : (stats.negative_events || 1273).toLocaleString() + ' 起陰性排除事件';
+            const hotline = stats.hotline_reports_live === false ? '熱線通報：官網未提供' : (stats.hotline_reports || 21041).toLocaleString() + ' 筆熱線通報';
             const evtByState = stats.events_by_state || { 'SA': 166, 'VIC': 53, 'WA': 10, 'NSW': 4, 'TAS': 2, 'QLD': 1 };
 
             const elConf = document.getElementById('event-confirmed-indicator');
             if (elConf) elConf.textContent = `${totalEvents} 起確診事件`;
 
             const elHot = document.getElementById('event-hotline-indicator');
-            if (elHot) elHot.textContent = `（${negEvents} 起陰性排除事件 / ${hotline} 筆熱線通報）`;
+            if (elHot) elHot.textContent = `（${negEvents} / ${hotline}）`;
 
             const elGrid = document.getElementById('event-by-state-grid');
             if (elGrid) {

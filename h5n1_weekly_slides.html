@@ -849,7 +849,7 @@
                             <div class="card-title" style="color: var(--accent-cyan);"><i class="fa-solid fa-clipboard-list"></i> 全澳疫情核心數據摘要</div>
                             <ul class="list-styled" style="margin-top: 10px; gap: 8px;">
                                 <li><b>全澳確診總數：</b><span class="badge-pill badge-red" style="font-size:14px;"><span data-bind="total-events">484</span> 起確診事件</span> (最近完整一週 +<span data-weekly="national-last">-</span> 起)</li>
-                                <li><b>通報與排除：</b><span class="badge-pill badge-cyan"><span data-bind="negative-events">1,273</span> 起</span> 陰性排除 / <span class="badge-pill badge-cyan"><span data-bind="hotline-reports">34,358</span> 筆</span> 熱線通報</li>
+                                <li id="slide-neg-hot-li"><b>通報與排除：</b><span class="badge-pill badge-cyan"><span data-bind="negative-events">1,273</span> 起</span> 陰性排除 / <span class="badge-pill badge-cyan"><span data-bind="hotline-reports">34,358</span> 筆</span> 熱線通報</li>
                                 <li><b>商業產業防線：</b><span class="badge-pill badge-green">100% 完美零確診</span> (家禽、蛋場與乳牛場安全)</li>
                                 <li><b>人類公衛風險：</b><span class="badge-pill badge-green">極低風險等級</span></li>
                             </ul>
@@ -1232,6 +1232,11 @@
             bind('total-events', e.total_events);
             bind('negative-events', e.negative_events);
             bind('hotline-reports', e.hotline_reports);
+            // 官網沒解析到時這兩個是寫死備援值（非即時），整行改為「官網未提供」，不顯示舊數字
+            if (e.negative_events_live === false || e.hotline_reports_live === false) {
+                const li = document.getElementById('slide-neg-hot-li');
+                if (li) li.innerHTML = '<b>通報與排除：</b>陰性排除數與熱線通報數：<span class="badge-pill badge-cyan">官網未提供</span>';
+            }
             if (e.events_by_state) {
                 bind('nsw-events', e.events_by_state.NSW);
                 bind('sa-events', e.events_by_state.SA);
