@@ -6,12 +6,12 @@
     function T(en) {
         return en ? {
             cur: 'Records this year (faded = likely incomplete)', wk: 'Week of ', rec: 'records',
-            sumLabel: 'Last 4 complete weeks', vsLast: 'same weeks last year', share: 'Share of all bird records',
+            sumLabel: 'Last 4 complete weeks', vsLast: 'same weeks last year', share: 'Share of all iNaturalist bird records',
             lateTitle: 'Measured late registration', noLate: 'Not measurable yet: needs a snapshot at least 6 days old (accumulates automatically).',
             flat: 'no baseline', src: { gbif: 'GBIF', ala: 'ALA' }
         } : {
             cur: '今年紀錄數（淡色＝可能尚未登錄完整）', wk: '週起 ', rec: '筆',
-            sumLabel: '最近 4 個完整週', vsLast: '去年同週', share: '佔全鳥類紀錄比例',
+            sumLabel: '最近 4 個完整週', vsLast: '去年同週', share: '佔全鳥類 iNaturalist 紀錄比例',
             lateTitle: '實測登錄延遲', noLate: '尚無法實測：需要至少 6 天前的快照（排程會自動累積）。',
             flat: '無對照', src: { gbif: 'GBIF', ala: 'ALA' }
         };
