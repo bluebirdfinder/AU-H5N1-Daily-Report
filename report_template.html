@@ -318,12 +318,13 @@
                     <span class="text-xs font-mono text-slate-400">資料更新: <span id="shorebird-fetched">-</span></span>
                 </div>
                 <p class="text-[11px] text-slate-400 mb-1 leading-relaxed">
-                    統計 19 種東亞—澳大拉西亞遷飛區濱鳥（斑尾鷸、紅腹濱鷸、大濱鷸、紅頸濱鷸、彎嘴濱鷸、遠東杓鷸等）在澳洲每週被登錄的觀測紀錄數。
-                    <strong class="text-amber-300">這是「被登錄的紀錄數」，不是入境隻數</strong>：會受賞鳥人數、天氣與登錄延遲影響，所以同時畫出去年與前年同週，並算出「佔全鳥類紀錄的比例」來扣除觀察力道。
+                    統計 19 種東亞—澳大拉西亞遷飛區濱鳥（斑尾鷸、紅腹濱鷸、大濱鷸、紅頸濱鷸、彎嘴濱鷸、遠東杓鷸等）在澳洲每週被登錄的 <strong class="text-sky-300">iNaturalist</strong> 觀測紀錄數。
+                    <strong class="text-amber-300">這是「被登錄的紀錄數」，不是入境隻數</strong>：會受賞鳥人數、天氣與登錄延遲影響，所以同時畫出去年與前年同週，並算出「佔全鳥類 iNaturalist 紀錄的比例」來扣除觀察力道。
+                    <strong class="text-amber-300">為什麼只算 iNaturalist：</strong>eBird、BirdData 等大型資料集匯入 GBIF／ALA 要晚很久，去年同週已含它們、今年還沒有，混在一起比較會差約 20 倍，那是登錄延遲不是候鳥減少。iNaturalist 登錄快、各年口徑一致。
                     這是領先指標，不是疫情指標；風險紅線仍是「NSW 商業家禽是否確診」。
                 </p>
                 <p class="text-[11px] text-amber-300/90 mb-4 leading-relaxed">
-                    ⚠️ 登錄延遲：最近 3 週（淡色柱）<strong>假設</strong>尚未登錄完整，通常事後會補增，不可解讀為候鳥減少；此假設未經實測，下方「實測登錄延遲」會在累積 6 天以上的快照後自動顯示。GBIF 內的 eBird 資料以月為單位匯入，比 ALA 更慢。
+                    ⚠️ 登錄延遲：最近 3 週（淡色柱）<strong>假設</strong>尚未登錄完整，通常事後會補增，不可解讀為候鳥減少；此假設未經實測，下方「實測登錄延遲」會在累積 6 天以上的快照後自動顯示。
                 </p>
                 <div id="shorebird-gbif-wrap" class="hidden mb-5">
                     <div class="h-[220px] w-full relative"><canvas id="shorebird-gbif-chart"></canvas></div>

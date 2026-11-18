@@ -3321,6 +3321,8 @@ def fetch_shorebird_weekly():
     try:
         with open(out_json, "r", encoding="utf-8") as f:
             old_snapshots = (json.load(f) or {}).get("snapshots", {}) or {}
+        # 2026-11-18：口徑由「全資料集」改為「僅 iNaturalist」，舊口徑的快照不可與新數字比較，直接丟棄
+        old_snapshots = {k: v for k, v in old_snapshots.items() if isinstance(v, dict) and v.get("series") == "inat"}
     except Exception:
         old_snapshots = {}
 
@@ -3345,8 +3347,10 @@ def fetch_shorebird_weekly():
 
     # ---------- 來源定義：每個來源提供 count(species_list|None, start, end) ----------
     def gbif_count(species_list, start, end):
+        # 2026-11-18：只算 iNaturalist。eBird/BirdData 等大型資料集匯入 GBIF/ALA 要晚很久（去年同週的數字
+        # 已含它們、今年還沒有），全資料集的「今年 vs 去年」會相差約 20 倍，是登錄延遲而非候鳥減少，不可比較。
         params = {"country": "AU", "eventDate": f"{start.isoformat()},{end.isoformat()}",
-                  "occurrenceStatus": "PRESENT", "limit": 0}
+                  "occurrenceStatus": "PRESENT", "institutionCode": "iNaturalist", "limit": 0}
         if species_list is None:
             params["taxonKey"] = 212  # Aves（鳥綱）
         else:
@@ -3359,10 +3363,11 @@ def fetch_shorebird_weekly():
             raise RuntimeError("GBIF 回應缺 count")
         return int(c)
 
-    ala_field = {"name": "species"}
+    ala_field = {"name": "species", "dataset": "dataResourceName"}
 
     def ala_count(species_list, start, end):
-        fq = [f"eventDate:[{start.isoformat()}T00:00:00Z TO {end.isoformat()}T23:59:59Z]"]
+        fq = [f"eventDate:[{start.isoformat()}T00:00:00Z TO {end.isoformat()}T23:59:59Z]",
+              f'{ala_field["dataset"]}:"iNaturalist Australia"']
         if species_list is None:
             fq.append("class:Aves")
         else:
@@ -3432,22 +3437,26 @@ def fetch_shorebird_weekly():
             return None, "今年所有週查詢皆失敗"
         total_shore = sum(v for v in years[str(today.year)] if v)
         total_birds = sum(v for v in birds[str(today.year)] if v)
-        if total_shore == 0 and total_birds > 0:
-            # 全鳥類有紀錄、濱鳥卻是 0：物種過濾條件（欄位名/學名）沒有命中，這種全 0 不能當真實資料
+        if total_shore == 0:
+            # 濱鳥全為 0（含全鳥類也為 0）：物種或資料集過濾條件沒有命中，這種全 0 不能當真實資料
             return None, "NO_SPECIES_MATCH"
         return {"label": label, "mode": mode, "shorebirds": years, "all_birds": birds}, ""
 
     sources, reasons = {}, {}
-    for name, label, fn in (("gbif", "GBIF（含 eBird 資料集，eBird 資料通常以月為單位匯入，較晚）", gbif_count),
-                            ("ala", "ALA 澳洲生物圖譜（含 iNaturalist、BirdData 等）", ala_count)):
+    for name, label, fn in (("gbif", "GBIF（僅 iNaturalist）", gbif_count),
+                            ("ala", "ALA 澳洲生物圖譜（僅 iNaturalist Australia）", ala_count)):
         try:
             src, why = run_source(name, label, fn)
-            if name == "ala" and why == "NO_SPECIES_MATCH":
-                print("[濱鳥週觀測數 ala] species 欄位全 0，改用 scientificName 欄位重試一次")
-                ala_field["name"] = "scientificName"
-                src, why = run_source(name, label, fn)
+            if name == "ala":
+                # ALA 的物種欄位與資料集欄位名無法在沙盒實測，依序嘗試組合，直到有命中
+                for sp_f, ds_f in (("scientificName", "dataResourceName"), ("species", "data_resource"), ("scientificName", "data_resource")):
+                    if why != "NO_SPECIES_MATCH":
+                        break
+                    print(f"[濱鳥週觀測數 ala] 全 0，改試欄位組合 species欄={sp_f} 資料集欄={ds_f}")
+                    ala_field["name"], ala_field["dataset"] = sp_f, ds_f
+                    src, why = run_source(name, label, fn)
             if why == "NO_SPECIES_MATCH":
-                why = "物種過濾無命中（全鳥類有紀錄但濱鳥為 0，視為無效，不輸出假的 0）"
+                why = "物種或資料集過濾無命中（濱鳥週計數全為 0，視為無效，不輸出假的 0）"
         except Exception as e:
             src, why = None, str(e)[:120]
         if src:
@@ -3464,7 +3473,7 @@ def fetch_shorebird_weekly():
     # 快照：以日期為鍵保存「今年各週計數」，保留 30 天；日後比對同一週數字的增幅即為實測登錄延遲
     snap = {nm: s["shorebirds"][str(today.year)] for nm, s in sources.items()}
     snapshots = dict(old_snapshots)
-    snapshots[today.isoformat()] = {"week_starts": [w[0].isoformat() for w in weeks], "counts": snap}
+    snapshots[today.isoformat()] = {"series": "inat", "week_starts": [w[0].isoformat() for w in weeks], "counts": snap}
     cutoff = (today - timedelta(days=30)).isoformat()
     snapshots = {k: v for k, v in snapshots.items() if k >= cutoff}
 
@@ -3474,7 +3483,7 @@ def fetch_shorebird_weekly():
         "species": SHOREBIRD_SPECIES,
         "week_starts": [w[0].isoformat() for w in weeks],
         "baseline_offset_weeks": {str(today.year - 1): 52, str(today.year - 2): 104},
-        "incomplete_last_n_weeks": 3,
+        "incomplete_last_n_weeks": 3, "series": "inat",
         "sources": sources, "snapshots": snapshots,
     }
     _write(payload)
