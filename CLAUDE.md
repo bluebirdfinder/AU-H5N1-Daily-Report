@@ -172,3 +172,12 @@
 - 驗證（run 38667328579）：`available=True`、100 筆（NSW 33、QLD 35、VIC 23、SA 6、WA 2、TAS 1）。座標、日期、州別、來源齊全；樣本全為 iNaturalist 公民科學紀錄，`individualCount` 皆為空（程式預設為 1），因此只適合當點位圖層，**不可當數量指標**。
 - 同日 18:54–19:20 UTC 曾遇 ALA 後端 Solr 叢集故障（`No live SolrServers available`，HTTP 500，連 Worker 也一樣），是 ALA 端暫時性問題，隔日恢復。遇到 500 先判斷是否上游故障，不要以為是我們被擋。
 - **尚未驗證**：前端 `renderAlaOnMap()` 圖層過去從未用 `available:true` 的真實資料畫過，合併後下次排程才會第一次出現，需目視檢查圖層與 tooltip。
+
+## 2026-11-18：濱鳥每週觀測數、抽驗強度稽核
+
+- **新增 `fetch_shorebird_weekly()`**（`h5n1.py`）→ `shorebird_weekly.json`／`assets/js/shorebird_weekly.js`，首頁新卡片（`shorebird-weekly-card`，由 `shorebird_weekly_charts.js` 繪製，中英文同步）。用計數查詢（GBIF `limit=0` 的 `count`、ALA `pageSize=1` 的 `totalRecords`）按週一起算彙整 19 種遷徙濱鳥，並對照 52／104 週前的同一週與「佔全鳥類紀錄比例」（扣觀察力道）。**計的是登錄紀錄數，不是入境隻數**；不參與任何風險分數。
+- **防呆**：每個來源先做「OR 語意自我檢查」（A、B、A+B 三次查詢，不吻合就改逐物種加總）；ALA 物種欄位預設 `species`，全 0 時改 `scientificName` 重試，仍全 0 視為無效、不輸出假的 0；全部失敗寫 `available:false` 空殼，前端卡片保持隱藏。
+- **尚未在真實環境驗證**：沙盒連不到 GBIF／ALA（代理回 403），只用假回應與假 Chart 驗證邏輯與前端。第一次排程後必讀 log 的 `[濱鳥週觀測數 ...]`：確認 OR 檢查結果（multi／per_species）、ALA 用哪個欄位、各週是否取得。ALA 的 `eventDate` 範圍 fq 語法也是未實測的猜測。
+- **登錄延遲**：最近 3 週標淡色是「假設」未實測。`snapshots` 保留 30 天每日快照，累積 6 天後前端自動顯示「實測登錄延遲」（同一週數字之後又被補登多少）。
+- **⚠️ 「陰性排除 2,450」「熱線通報 36,800」不是即時數字**：這兩個是 `parse_daff_official_stats()` 的寫死備援值，正則沒命中時靜默沿用。陰性自 9/16 起從未變動；熱線在 10/30 14:43 前隨官網上升（70,877），之後固定為備援值。已加 `negative_events_live`／`hotline_reports_live` 旗標（預設 False，正則真的命中才改 True；隨 `official_stats`／`cases_events.js` 一起輸出）與 `[DAFF 陰性/熱線 原文診斷]` log，**並且網頁已改**：旗標為 False 時，首頁橫幅／KPI／摘要（中英文）與 `h5n1_weekly_slides.html` 一律顯示「官網未提供」，不再秀備援值；官網解析恢復後自動變回數字。舊版沒有旗標的資料視為即時（`=== false` 才隱藏）。下次排程後讀 log 才知道 DAFF 頁面是否還有這兩個字樣。
+- **抽驗強度稽核結論**（資料來自 git 歷史，需完整歷史：`git fetch --unshallow`）：① 官方逐筆檔 106 個版本中沒有任何紀錄被移除，採樣日被改動僅 8 筆，無事後刪改跡象；② 登錄延遲穩定，中位約 6–7 天（p90 7–11 天），沒有拉長；③ 無採樣日紀錄固定約 133 筆；④ 每週「首次出現的 LGA」由 8 月的 15–25 個降到 10 月後每週 1–2 個，這個指標不受 8/12「已知疫區不再逐隻檢測」影響，但仍無法分離「真的趨緩」與「抽驗減少」。**抽驗強度本身目前沒有任何可靠數據。**

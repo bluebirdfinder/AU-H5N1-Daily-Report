@@ -783,6 +783,9 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
         "total_events": 484,
         "negative_events": 2450,
         "hotline_reports": 36800,
+        # 這兩個值是寫死的備援值；只有官網正則真的命中時才會被改為 True（2026-11-18：避免把備援值當即時數字顯示）
+        "negative_events_live": False,
+        "hotline_reports_live": False,
         "events_by_state": {"WA": 10, "SA": 271, "VIC": 150, "NSW": 22, "QLD": 2, "TAS": 29, "NT": 0, "ACT": 0, "JBT": 0},
         "species_counts": {
             "Crested Tern": 348,
@@ -855,10 +858,25 @@ def parse_daff_official_stats(daff_soup, cases_data=None):
     m_neg = re.search(r"([\d,]+)\s+Negative events", text, re.IGNORECASE)
     if m_neg:
         stats["negative_events"] = int(m_neg.group(1).replace(",", ""))
+        stats["negative_events_live"] = True
 
     m_hot = re.search(r"([\d,]+)\s+Hotline reports", text, re.IGNORECASE)
     if m_hot:
         stats["hotline_reports"] = int(m_hot.group(1).replace(",", ""))
+        stats["hotline_reports_live"] = True
+
+    # 2026-11-18：稽核發現這兩個數字在網頁上其實不是即時值——正則沒命中時會靜默沿用上方寫死的備援值
+    # （negative_events=2450 自 9/16 起從未變動；hotline_reports 在 10/30 14:43 之前還在隨官網上升，
+    #  之後固定為備援值 36800）。記下是否真的由官網解析到，並把頁面中相關字樣印進 log 供查明原因。
+    stats["negative_events_live"] = bool(m_neg)
+    stats["hotline_reports_live"] = bool(m_hot)
+    if not (m_neg and m_hot):
+        print(f"[DAFF 陰性/熱線 未解析] 陰性命中={bool(m_neg)} 熱線命中={bool(m_hot)}，網頁上顯示的這兩個數字為寫死備援值，不是官方即時數字")
+        try:
+            for m_dbg in list(re.finditer(r".{0,100}(?:negative|hotline).{0,100}", text, re.IGNORECASE))[:8]:
+                print(f"[DAFF 陰性/熱線 原文診斷] {m_dbg.group(0).strip()}")
+        except Exception as e:
+            print(f"[DAFF 陰性/熱線 原文診斷] 失敗: {e}")
 
     st_patterns = [
         ("WA", r"(\d+)\s+in\s+Western Australia"),
@@ -1483,6 +1501,20 @@ def generate_dynamic_summary(cases_data, official_stats, lang="zh"):
     total_events = official_stats.get("total_events", 186)
     negative_events = official_stats.get("negative_events", 1273)
     hotline_reports = official_stats.get("hotline_reports", 18869)
+    # 2026-11-18：官網沒解析到時，negative_events／hotline_reports 是寫死備援值，不可當即時數字顯示
+    neg_live = official_stats.get("negative_events_live", False)
+    hot_live = official_stats.get("hotline_reports_live", False)
+    _neg_en = (f'<span class="text-sky-400 font-bold">{negative_events:,} Negative Exclusions</span>' if neg_live
+               else '<span class="text-slate-400 font-bold">Negative Exclusions: not provided by the official site</span>')
+    _hot_en = (f'<span class="text-sky-300 font-semibold">{hotline_reports:,} Hotline Reports</span>' if hot_live
+               else '<span class="text-slate-400 font-semibold">Hotline Reports: not provided by the official site</span>')
+    _neg_short_en = f"{negative_events:,} negative exclusions" if neg_live else "negative exclusions: not provided by the official site"
+    _neg_zh = (f'陰性排除事件達 <span class="text-sky-400 font-bold">{negative_events:,} 起</span>' if neg_live
+               else '陰性排除事件數：<span class="text-slate-400 font-bold">官網未提供</span>')
+    _hot_zh = (f'民眾與專家通報數達 <span class="text-sky-300 font-semibold">{hotline_reports:,} 筆</span>' if hot_live
+               else '通報數：<span class="text-slate-400 font-semibold">官網未提供</span>')
+    _neg_short_zh = (f'陰性排除 <span class="text-sky-400 font-semibold">{negative_events:,} 起</span>' if neg_live
+                     else '陰性排除數：官網未提供')
     evt_by_state = official_stats.get("events_by_state", {})
 
     utc_now = datetime.now(timezone.utc)
@@ -1500,7 +1532,7 @@ def generate_dynamic_summary(cases_data, official_stats, lang="zh"):
         latest_date_str = f"September {taipei_now.day}, {taipei_now.year}"
         
         official_text = (
-            f"According to the {daff_link} and State Agencies <span class=\"text-amber-400 font-bold\">{latest_date_str} Official Telemetry</span>, Australia has recorded a cumulative total of <span class=\"text-red-400 font-extrabold text-base px-1 bg-red-950/40 rounded border border-red-500/30\">{total_events} Confirmed Positive Events</span> in wild animals/birds, with <span class=\"text-sky-400 font-bold\">{negative_events:,} Negative Exclusions</span> and <span class=\"text-sky-300 font-semibold\">{hotline_reports:,} Hotline Reports</span>. "
+            f"According to the {daff_link} and State Agencies <span class=\"text-amber-400 font-bold\">{latest_date_str} Official Telemetry</span>, Australia has recorded a cumulative total of <span class=\"text-red-400 font-extrabold text-base px-1 bg-red-950/40 rounded border border-red-500/30\">{total_events} Confirmed Positive Events</span> in wild animals/birds, with {_neg_en} and {_hot_en}. "
             f"Breakdown by Jurisdiction: <span class=\"text-amber-300 font-semibold\">SA: {sa_evt}</span>, <span class=\"text-amber-300 font-semibold\">VIC: {vic_evt}</span>, <span class=\"text-amber-300 font-semibold\">WA: {wa_evt}</span>, <span class=\"text-amber-300 font-semibold\">NSW: {nsw_evt}</span>, <span class=\"text-amber-300 font-semibold\">TAS: {tas_evt}</span>, <span class=\"text-amber-300 font-semibold\">QLD: {qld_evt}</span>. "
             f"All commercial poultry, egg, and feed manufacturing operations across Australia maintain <span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">100% Area Freedom Status</span> with zero commercial farm infections."
         )
@@ -1508,7 +1540,7 @@ def generate_dynamic_summary(cases_data, official_stats, lang="zh"):
         nsw_dpird_link = '<a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">NSW DPIRD</a>'
         abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">ABC News Australia</a>'
         media_text = (
-            f"According to {abc_link} and {nsw_dpird_link} reports (<span class=\"text-amber-400 font-bold\">{latest_date_str}</span>), Australia officially operates on an international Event-based Reporting framework with <span class=\"text-red-400 font-bold\">{total_events} Positive Events</span> ({negative_events:,} negative exclusions). The Australian Chief Veterinary Officer re-affirms: <span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">All commercial poultry farms in Australia maintain 100% Zero Infection, with extremely low risk to human health</span>."
+            f"According to {abc_link} and {nsw_dpird_link} reports (<span class=\"text-amber-400 font-bold\">{latest_date_str}</span>), Australia officially operates on an international Event-based Reporting framework with <span class=\"text-red-400 font-bold\">{total_events} Positive Events</span> ({_neg_short_en}). The Australian Chief Veterinary Officer re-affirms: <span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">All commercial poultry farms in Australia maintain 100% Zero Infection, with extremely low risk to human health</span>."
         )
         return official_text, media_text
 
@@ -1517,7 +1549,7 @@ def generate_dynamic_summary(cases_data, official_stats, lang="zh"):
     latest_date_str = f"{taipei_now.year} 年 {taipei_now.month} 月 {taipei_now.day} 日"
 
     official_text = (
-        f"依據 {daff_link} 及各州政府 <span class=\"text-amber-400 font-bold\">{latest_date_str} 最新數據</span>，全澳高致病性 H5N1 野生動物確診總數累計為 <span class=\"text-red-400 font-extrabold text-base px-1 bg-red-950/40 rounded border border-red-500/30\">{total_events} 起確診事件 (Positive Events)</span>，陰性排除事件達 <span class=\"text-sky-400 font-bold\">{negative_events:,} 起</span>，民眾與專家通報數達 <span class=\"text-sky-300 font-semibold\">{hotline_reports:,} 筆</span>！"
+        f"依據 {daff_link} 及各州政府 <span class=\"text-amber-400 font-bold\">{latest_date_str} 最新數據</span>，全澳高致病性 H5N1 野生動物確診總數累計為 <span class=\"text-red-400 font-extrabold text-base px-1 bg-red-950/40 rounded border border-red-500/30\">{total_events} 起確診事件 (Positive Events)</span>，{_neg_zh}，{_hot_zh}！"
         f"確診事件分布統計：<span class=\"text-amber-300 font-semibold\">南澳 {sa_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">維州 {vic_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">西澳 {wa_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">新州 {nsw_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">塔州 {tas_evt} 起</span>、<span class=\"text-amber-300 font-semibold\">昆州 {qld_evt} 起</span>。"
         f"全澳商業家禽產業及飼料生產體系 <span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">100% 維持無疫區 (Area Freedom) 狀態</span>，生產鏈安全無虞。"
     )
@@ -1529,7 +1561,7 @@ def generate_dynamic_summary(cases_data, official_stats, lang="zh"):
         nsw_dpird_link = '<a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">新南威爾斯州政府 (NSW DPIRD)</a>'
         abc_link = '<a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲廣播公司 (ABC News)</a>'
         media_text = (
-            f"根據 {abc_link} 與 {nsw_dpird_link} 等媒體 <span class=\"text-amber-400 font-bold\">{latest_date_str} 最新報導</span>，澳洲官方自 8/12 起正式採用國際標準「事件導向 (Event-based Reporting)」統計，全澳累計 <span class=\"text-red-400 font-bold\">{total_events} 起確診事件</span>（陰性排除 <span class=\"text-sky-400 font-semibold\">{negative_events:,} 起</span>）。聯邦首席獸醫官重申：<span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">澳洲所有商業家禽農場維持 100% 零感染，對一般人類健康風險極低</span>。"
+            f"根據 {abc_link} 與 {nsw_dpird_link} 等媒體 <span class=\"text-amber-400 font-bold\">{latest_date_str} 最新報導</span>，澳洲官方自 8/12 起正式採用國際標準「事件導向 (Event-based Reporting)」統計，全澳累計 <span class=\"text-red-400 font-bold\">{total_events} 起確診事件</span>（{_neg_short_zh}）。聯邦首席獸醫官重申：<span class=\"text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40\">澳洲所有商業家禽農場維持 100% 零感染，對一般人類健康風險極低</span>。"
         )
 
     official_colored = colorize_summary_text(official_text)
@@ -2117,6 +2149,11 @@ def main():
         print(f"[GBIF API 執行例外] {e}")
 
     try:
+        fetch_shorebird_weekly()
+    except Exception as e:
+        print(f"[濱鳥週觀測數 執行例外] {e}")
+
+    try:
         fetch_movebank_data()
     except Exception as e:
         print(f"[Movebank API 執行例外] {e}")
@@ -2576,6 +2613,8 @@ def write_cases_events_js(official_stats):
         "total_events": official_stats.get("total_events", 0),
         "negative_events": official_stats.get("negative_events", 0),
         "hotline_reports": official_stats.get("hotline_reports", 0),
+        "negative_events_live": official_stats.get("negative_events_live", False),
+        "hotline_reports_live": official_stats.get("hotline_reports_live", False),
         "events_by_state": official_stats.get("events_by_state", {}),
         "species_counts": official_stats.get("species_counts", {}),
         "source": official_stats.get("source", "unknown"),
@@ -3221,6 +3260,225 @@ def fetch_gbif_data():
         print(f"[GBIF API] ✅ 成功寫入 assets/js/gbif_bird_data.js (免 fetch 零阻擋通道)")
     except Exception as e:
         print(f"[GBIF API] 寫入檔案失敗: {e}")
+
+
+# ==================== 遷徙性濱鳥「每週觀測紀錄數」(GBIF + ALA，含去年同週對照) ====================
+# 2026-11-18 新增。目的：eBird/GBIF/ALA 原本只抓「最近 N 筆」點位，沒有時間序列，無法回答
+# 「今年濱鳥入境了沒、比去年多還是少」。這裡改用「計數查詢」（GBIF limit=0 回 count；ALA pageSize=1 回 totalRecords），
+# 對每個週一起算的週區間各查一次，並對照 52 週前、104 週前的同一週。
+# 注意：計數的是「被登錄的觀測紀錄數」，會受賞鳥人數、天氣、登錄延遲影響，不是入境隻數。
+# 為了扣掉觀察力道，同時查「同週全部鳥類紀錄數」，前端據此算濱鳥佔比。
+SHOREBIRD_SPECIES = [
+    "Limosa lapponica",           # 斑尾鷸 Bar-tailed Godwit
+    "Limosa limosa",              # 黑尾鷸 Black-tailed Godwit
+    "Calidris canutus",           # 紅腹濱鷸 Red Knot
+    "Calidris tenuirostris",      # 大濱鷸 Great Knot
+    "Calidris ruficollis",        # 紅頸濱鷸 Red-necked Stint
+    "Calidris ferruginea",        # 彎嘴濱鷸 Curlew Sandpiper
+    "Calidris acuminata",         # 尖尾濱鷸 Sharp-tailed Sandpiper
+    "Calidris alba",              # 三趾濱鷸 Sanderling
+    "Numenius madagascariensis",  # 遠東杓鷸 Far Eastern Curlew
+    "Numenius phaeopus",          # 中杓鷸 Whimbrel
+    "Tringa nebularia",           # 青足鷸 Common Greenshank
+    "Tringa stagnatilis",         # 小青足鷸 Marsh Sandpiper
+    "Tringa glareola",            # 林鷸 Wood Sandpiper
+    "Actitis hypoleucos",         # 磯鷸 Common Sandpiper
+    "Arenaria interpres",         # 翻石鷸 Ruddy Turnstone
+    "Pluvialis fulva",            # 太平洋金斑鴴 Pacific Golden Plover
+    "Xenus cinereus",             # 翹嘴鷸 Terek Sandpiper
+    "Charadrius mongolus",        # 蒙古沙鴴 Lesser Sand Plover
+    "Charadrius leschenaultii",   # 鐵嘴沙鴴 Greater Sand Plover
+]
+
+
+def _shorebird_week_ranges(today=None, season_start_month=7):
+    """回傳今年從 7 月第一個週一起到本週的 [(週一, 週日)] 清單（日期物件）。"""
+    today = today or datetime.now(timezone.utc).date()
+    start = today.replace(month=season_start_month, day=1)
+    start -= timedelta(days=start.weekday())  # 退到週一
+    weeks = []
+    d = start
+    while d <= today:
+        weeks.append((d, d + timedelta(days=6)))
+        d += timedelta(days=7)
+    return weeks
+
+
+def fetch_shorebird_weekly():
+    """
+    產出 shorebird_weekly.json 與 assets/js/shorebird_weekly.js（window.shorebirdWeeklyEmbedded）。
+    失敗時也會寫出 available:false 的空殼，讓前端安全隱藏卡片、不會 404。
+    """
+    import time as _time
+    print("[濱鳥週觀測數] 開始以計數查詢彙整 GBIF / ALA 每週紀錄數 (含去年與前年同週對照)...")
+    today = datetime.now(timezone.utc).date()
+    weeks = _shorebird_week_ranges(today)
+    utc_now = datetime.now(timezone.utc)
+    out_json, out_js = "shorebird_weekly.json", "assets/js/shorebird_weekly.js"
+
+    # 讀取舊檔，沿用其快照（用於日後量測「同一週的數字之後又被補增多少」＝實測登錄延遲）
+    old_snapshots = {}
+    try:
+        with open(out_json, "r", encoding="utf-8") as f:
+            old_snapshots = (json.load(f) or {}).get("snapshots", {}) or {}
+    except Exception:
+        old_snapshots = {}
+
+    def _write(payload):
+        try:
+            with open(out_json, "w", encoding="utf-8") as f:
+                json.dump(payload, f, ensure_ascii=False, indent=1)
+            os.makedirs("assets/js", exist_ok=True)
+            with open(out_js, "w", encoding="utf-8") as f_js:
+                f_js.write("window.shorebirdWeeklyEmbedded = " + json.dumps(payload, ensure_ascii=False) + ";\n")
+        except Exception as e:
+            print(f"[濱鳥週觀測數] 寫檔失敗: {str(e)[:80]}")
+
+    empty = {
+        "fetched_at_utc": utc_now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "available": False, "unavailable_reason": "", "species": SHOREBIRD_SPECIES,
+        "week_starts": [w[0].isoformat() for w in weeks], "sources": {}, "snapshots": old_snapshots,
+    }
+
+    headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36",
+               "Accept": "application/json"}
+
+    # ---------- 來源定義：每個來源提供 count(species_list|None, start, end) ----------
+    def gbif_count(species_list, start, end):
+        params = {"country": "AU", "eventDate": f"{start.isoformat()},{end.isoformat()}",
+                  "occurrenceStatus": "PRESENT", "limit": 0}
+        if species_list is None:
+            params["taxonKey"] = 212  # Aves（鳥綱）
+        else:
+            params["scientificName"] = species_list  # requests 會展成重複參數
+        r = requests.get("https://api.gbif.org/v1/occurrence/search", params=params, headers=headers, timeout=15)
+        if r.status_code != 200:
+            raise RuntimeError(f"GBIF HTTP {r.status_code}: {r.text[:80]}")
+        c = r.json().get("count")
+        if c is None:
+            raise RuntimeError("GBIF 回應缺 count")
+        return int(c)
+
+    ala_field = {"name": "species"}
+
+    def ala_count(species_list, start, end):
+        fq = [f"eventDate:[{start.isoformat()}T00:00:00Z TO {end.isoformat()}T23:59:59Z]"]
+        if species_list is None:
+            fq.append("class:Aves")
+        else:
+            fq.append(ala_field["name"] + ":(" + " OR ".join('"%s"' % s for s in species_list) + ")")
+        params = {"q": "country:Australia", "fq": fq, "pageSize": 1}
+        r = requests.get("https://api.ala.org.au/occurrences/occurrences/search", params=params, headers=headers, timeout=20)
+        if r.status_code != 200:
+            raise RuntimeError(f"ALA HTTP {r.status_code}: {r.text[:80]}")
+        c = r.json().get("totalRecords")
+        if c is None:
+            raise RuntimeError("ALA 回應缺 totalRecords")
+        return int(c)
+
+    def run_source(name, label, count_fn, budget_s=200):
+        """回傳 source dict 或 None（無法使用）。先做「OR 語意自我檢查」，不通過就改逐物種加總。"""
+        t0 = _time.time()
+        probe_start = today - timedelta(days=364 + 30)
+        probe_end = probe_start + timedelta(days=6)
+        try:
+            a = count_fn([SHOREBIRD_SPECIES[0]], probe_start, probe_end)
+            b = count_fn([SHOREBIRD_SPECIES[1]], probe_start, probe_end)
+            ab = count_fn([SHOREBIRD_SPECIES[0], SHOREBIRD_SPECIES[1]], probe_start, probe_end)
+        except Exception as e:
+            print(f"[濱鳥週觀測數 {name}] 自我檢查失敗，略過此來源: {str(e)[:120]}")
+            return None, str(e)[:120]
+        multi_ok = (ab == a + b)
+        # a+b==0 時等式恆成立、無法驗證 OR 語意，換一組物種再檢驗
+        if a + b == 0:
+            try:
+                alt = [SHOREBIRD_SPECIES[4], SHOREBIRD_SPECIES[5]]
+                a2, b2 = count_fn([alt[0]], probe_start, probe_end), count_fn([alt[1]], probe_start, probe_end)
+                ab2 = count_fn(alt, probe_start, probe_end)
+                multi_ok = (ab2 == a2 + b2)
+            except Exception:
+                multi_ok = False
+        mode = "multi" if multi_ok else "per_species"
+        print(f"[濱鳥週觀測數 {name}] OR 自我檢查: A={a} B={b} A+B查詢={ab} → 採用 {mode} 模式")
+
+        def shore_count(start, end):
+            if mode == "multi":
+                return count_fn(SHOREBIRD_SPECIES, start, end)
+            return sum(count_fn([s], start, end) for s in SHOREBIRD_SPECIES)
+
+        years = {}
+        birds = {}
+        failures = 0
+        for off_weeks, key in ((0, str(today.year)), (52, str(today.year - 1)), (104, str(today.year - 2))):
+            ys, yb = [], []
+            for (ws, we) in weeks:
+                s, e = ws - timedelta(weeks=off_weeks), min(we, today) - timedelta(weeks=off_weeks)
+                if off_weeks == 0 and ws > today:
+                    ys.append(None); yb.append(None); continue
+                if _time.time() - t0 > budget_s:
+                    ys.append(None); yb.append(None); failures += 1; continue
+                try:
+                    ys.append(shore_count(s, e))
+                    yb.append(count_fn(None, s, e))
+                except Exception as ex:
+                    failures += 1
+                    ys.append(None); yb.append(None)
+                    if failures <= 3:
+                        print(f"[濱鳥週觀測數 {name}] {s}~{e} 查詢失敗: {str(ex)[:100]}")
+            years[key], birds[key] = ys, yb
+        ok = sum(1 for v in years.get(str(today.year), []) if v is not None)
+        print(f"[濱鳥週觀測數 {name}] 完成：今年 {ok}/{len(weeks)} 週取得，失敗/逾時 {failures} 次，耗時 {_time.time()-t0:.0f}s")
+        if ok == 0:
+            return None, "今年所有週查詢皆失敗"
+        total_shore = sum(v for v in years[str(today.year)] if v)
+        total_birds = sum(v for v in birds[str(today.year)] if v)
+        if total_shore == 0 and total_birds > 0:
+            # 全鳥類有紀錄、濱鳥卻是 0：物種過濾條件（欄位名/學名）沒有命中，這種全 0 不能當真實資料
+            return None, "NO_SPECIES_MATCH"
+        return {"label": label, "mode": mode, "shorebirds": years, "all_birds": birds}, ""
+
+    sources, reasons = {}, {}
+    for name, label, fn in (("gbif", "GBIF（含 eBird 資料集，eBird 資料通常以月為單位匯入，較晚）", gbif_count),
+                            ("ala", "ALA 澳洲生物圖譜（含 iNaturalist、BirdData 等）", ala_count)):
+        try:
+            src, why = run_source(name, label, fn)
+            if name == "ala" and why == "NO_SPECIES_MATCH":
+                print("[濱鳥週觀測數 ala] species 欄位全 0，改用 scientificName 欄位重試一次")
+                ala_field["name"] = "scientificName"
+                src, why = run_source(name, label, fn)
+            if why == "NO_SPECIES_MATCH":
+                why = "物種過濾無命中（全鳥類有紀錄但濱鳥為 0，視為無效，不輸出假的 0）"
+        except Exception as e:
+            src, why = None, str(e)[:120]
+        if src:
+            sources[name] = src
+        else:
+            reasons[name] = why
+
+    if not sources:
+        empty["unavailable_reason"] = "; ".join(f"{k}: {v}" for k, v in reasons.items()) or "無可用來源"
+        print(f"[濱鳥週觀測數] 無任何來源可用，寫出空殼: {empty['unavailable_reason'][:120]}")
+        _write(empty)
+        return
+
+    # 快照：以日期為鍵保存「今年各週計數」，保留 30 天；日後比對同一週數字的增幅即為實測登錄延遲
+    snap = {nm: s["shorebirds"][str(today.year)] for nm, s in sources.items()}
+    snapshots = dict(old_snapshots)
+    snapshots[today.isoformat()] = {"week_starts": [w[0].isoformat() for w in weeks], "counts": snap}
+    cutoff = (today - timedelta(days=30)).isoformat()
+    snapshots = {k: v for k, v in snapshots.items() if k >= cutoff}
+
+    payload = {
+        "fetched_at_utc": utc_now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "available": True, "unavailable_reason": "; ".join(f"{k}: {v}" for k, v in reasons.items()),
+        "species": SHOREBIRD_SPECIES,
+        "week_starts": [w[0].isoformat() for w in weeks],
+        "baseline_offset_weeks": {str(today.year - 1): 52, str(today.year - 2): 104},
+        "incomplete_last_n_weeks": 3,
+        "sources": sources, "snapshots": snapshots,
+    }
+    _write(payload)
+    print(f"[濱鳥週觀測數] ✅ 已寫入 {out_json} 與 {out_js}（來源: {', '.join(sources)}）")
 
 
 # ==================== Movebank 衛星發報器軌跡追蹤整合模組 ====================
