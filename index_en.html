@@ -283,12 +283,13 @@
                     <span class="text-xs font-mono text-slate-400">Updated: <span id="shorebird-fetched">-</span></span>
                 </div>
                 <p class="text-[11px] text-slate-400 mb-1 leading-relaxed">
-                    Weekly number of observation records logged in Australia for 19 East Asian–Australasian Flyway shorebird species (Bar-tailed Godwit, Red Knot, Great Knot, Red-necked Stint, Curlew Sandpiper, Far Eastern Curlew, etc.).
-                    <strong class="text-amber-300">This counts logged records, not arriving birds</strong>: it depends on observer numbers, weather and registration lag, so last year and the year before are overlaid and the share of all bird records is computed to cancel out observer effort.
+                    Weekly number of <strong class="text-sky-300">iNaturalist</strong> observation records logged in Australia for 19 East Asian–Australasian Flyway shorebird species (Bar-tailed Godwit, Red Knot, Great Knot, Red-necked Stint, Curlew Sandpiper, Far Eastern Curlew, etc.).
+                    <strong class="text-amber-300">This counts logged records, not arriving birds</strong>: it depends on observer numbers, weather and registration lag, so last year and the year before are overlaid and the share of all iNaturalist bird records is computed to cancel out observer effort.
+                    <strong class="text-amber-300">Why iNaturalist only:</strong> large datasets such as eBird and BirdData reach GBIF/ALA much later, so last year's same weeks already include them while this year's do not; mixing them gives a ~20x gap that is registration lag, not fewer birds. iNaturalist registers quickly and is consistent across years.
                     It is a leading indicator, not an outbreak indicator; the risk red line remains whether NSW commercial poultry is confirmed.
                 </p>
                 <p class="text-[11px] text-amber-300/90 mb-4 leading-relaxed">
-                    ⚠️ Registration lag: the latest 3 weeks (faded bars) are <strong>assumed</strong> incomplete and are usually revised upward later; do not read them as fewer birds. This assumption is unmeasured; the “measured late registration” figure below appears automatically once snapshots 6+ days old exist. eBird data inside GBIF is imported monthly, so GBIF lags ALA.
+                    ⚠️ Registration lag: the latest 3 weeks (faded bars) are <strong>assumed</strong> incomplete and are usually revised upward later; do not read them as fewer birds. This assumption is unmeasured; the “measured late registration” figure below appears automatically once snapshots 6+ days old exist.
                 </p>
                 <div id="shorebird-gbif-wrap" class="hidden mb-5">
                     <div class="h-[220px] w-full relative"><canvas id="shorebird-gbif-chart"></canvas></div>
@@ -12202,7 +12203,7 @@
     "Falcon & Other": 5
   },
   "source": "live",
-  "scrape_time": "2026-11-18 08:03 UTC"
+  "scrape_time": "2026-11-18 08:13 UTC"
 };
 
         const factoryLat = -33.521027;
