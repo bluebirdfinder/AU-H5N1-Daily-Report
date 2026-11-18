@@ -22,6 +22,8 @@
     <script src="assets/js/cases_events.js"></script>
     <script src="assets/js/daff_weekly.js"></script>
     <script src="assets/js/daff_weekly_charts.js"></script>
+    <script src="assets/js/shorebird_weekly.js"></script>
+    <script src="assets/js/shorebird_weekly_charts.js"></script>
 
     <style>
         body {
@@ -97,18 +99,19 @@
 
             const isLive = stats.source === 'live';
             const total = stats.total_events || '—';
-            const neg = (stats.negative_events || 0).toLocaleString();
-            const hot = (stats.hotline_reports || 0).toLocaleString();
+            // 官網沒解析到時這兩個值是寫死備援值，不可當即時數字顯示（negative_events_live / hotline_reports_live === false）
+            const neg = stats.negative_events_live === false ? '陰性排除：官網未提供' : (stats.negative_events || 0).toLocaleString() + ' 起陰性排除';
+            const hot = stats.hotline_reports_live === false ? '通報數：官網未提供' : (stats.hotline_reports || 0).toLocaleString() + ' 筆通報';
             const ts = stats.scrape_time || '不明';
 
             if (isLive) {
                 banner.className = banner.className + ' bg-emerald-600/90 border-emerald-500/20';
-                msg.textContent = `✅ 即時官方數據 · 已與 DAFF 官網同步 (${ts}) — 全澳累計 ${total} 起確診事件 / ${neg} 起陰性排除 / ${hot} 筆通報`;
+                msg.textContent = `✅ 即時官方數據 · 已與 DAFF 官網同步 (${ts}) — 全澳累計 ${total} 起確診事件 / ${neg} / ${hot}`;
             } else {
                 banner.className = banner.className + ' bg-amber-600/90 border-amber-500/30';
                 dot.classList.remove('animate-pulse');
                 dot.style.backgroundColor = '#fbbf24';
-                msg.textContent = `⚠️ 備援數據 · DAFF 官網連線異常，目前顯示硬編碼預設值（非即時） — 全澳 ${total} 起確診 / ${neg} 陰性 / ${hot} 通報`;
+                msg.textContent = `⚠️ 備援數據 · DAFF 官網連線異常，目前顯示硬編碼預設值（非即時） — 全澳 ${total} 起確診 / ${neg} / ${hot}`;
             }
         });
     </script>
@@ -174,18 +177,16 @@
                                 <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider mb-1">📢
                                     澳洲官方防線事實 (OFFICIAL STATUS)</span>
                                 <div class="text-slate-200 text-sm leading-relaxed">
-                                    依據 <a href="https://www.agriculture.gov.au/campaigns/birdflu/latest-data#event_data" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲聯邦農業部 (DAFF)</a> 及各州政府 <span class="text-amber-400 font-bold">2026 年 11 月 18 日 最新數據</span>，全澳高致病性 H5N1 野生動物確診總數累計為 <span class="text-red-400 font-extrabold text-base px-1 bg-red-950/40 rounded border border-red-500/30"><span class="text-red-400 font-extrabold text-base">742 起確診事件 (Positive Events)</span></span>，陰性排除事件達 <span class="text-sky-400 font-bold">2,450 起</span>，民眾與專家通報數達 <span class="text-sky-300 font-semibold">36,800 筆</span>！確診事件分布統計：<span class="text-amber-300 font-semibold"><span class="text-amber-300 font-semibold">南澳 343 起</span></span>、<span class="text-amber-300 font-semibold"><span class="text-amber-300 font-semibold">維州 249 起</span></span>、<span class="text-amber-300 font-semibold"><span class="text-amber-300 font-semibold">西澳 10 起</span></span>、<span class="text-amber-300 font-semibold"><span class="text-amber-300 font-semibold">新州 84 起</span></span>、<span class="text-amber-300 font-semibold"><span class="text-amber-300 font-semibold">塔州 53 起</span></span>、<span class="text-amber-300 font-semibold"><span class="text-amber-300 font-semibold">昆州 2 起</span></span>。全澳商業家禽產業及飼料生產體系 <span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40"><span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">100% 維持無疫區 (Area Freedom) 狀態</span></span>，<span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">生產鏈安全無虞</span>。
+                                    依據 <a href="https://www.agriculture.gov.au/campaigns/birdflu/latest-data#event_data" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">澳洲聯邦農業部 (DAFF)</a> 及各州政府 <span class="text-amber-400 font-bold">2026 年 11 月 18 日 最新數據</span>，全澳高致病性 H5N1 野生動物確診總數累計為 <span class="text-red-400 font-extrabold text-base px-1 bg-red-950/40 rounded border border-red-500/30"><span class="text-red-400 font-extrabold text-base">742 起確診事件 (Positive Events)</span></span>，陰性排除事件數：<span class="text-slate-400 font-bold">官網未提供</span>，通報數：<span class="text-slate-400 font-semibold">官網未提供</span>！確診事件分布統計：<span class="text-amber-300 font-semibold"><span class="text-amber-300 font-semibold">南澳 343 起</span></span>、<span class="text-amber-300 font-semibold"><span class="text-amber-300 font-semibold">維州 249 起</span></span>、<span class="text-amber-300 font-semibold"><span class="text-amber-300 font-semibold">西澳 10 起</span></span>、<span class="text-amber-300 font-semibold"><span class="text-amber-300 font-semibold">新州 84 起</span></span>、<span class="text-amber-300 font-semibold"><span class="text-amber-300 font-semibold">塔州 53 起</span></span>、<span class="text-amber-300 font-semibold"><span class="text-amber-300 font-semibold">昆州 2 起</span></span>。全澳商業家禽產業及飼料生產體系 <span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40"><span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">100% 維持無疫區 (Area Freedom) 狀態</span></span>，<span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">生產鏈安全無虞</span>。
                                 </div>
                             </div>
                             <div>
                                 <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider mb-1">📰
                                     媒體與生態監測風向 (MEDIA & ECOLOGY WATCH)</span>
                                 <div class="text-slate-200 text-sm leading-relaxed">
-                                    <p>截至 2026 年 11 月 18 日，澳洲 H5N1 禽流感疫情持續受到密切監測。全國野生動物已累計 742 起 H5 禽流感確診事件。其中，塔斯馬尼亞州於 2026 年 8 月 12 日首次在西北海岸的<span class="text-purple-300 font-extrabold bg-purple-950/60 px-1 py-0.5 rounded border border-purple-700/50">棕賊鷗</span>體內檢測到 H5N1 病毒，成為澳洲第六個出現疫情的州份，截至 11 月 16 日，該州已有 53 起相關事件。南澳與維州仍是疫情熱點，分別錄得 343 起與 249 起事件，並已出現野鳥之間的局部傳播，沿海地區大規模鳥類死亡事件亦持續發生。</p>
-
-<p>⚠️ <strong>哺乳類跨種監測特別提醒：</strong>澳洲已確認 H5N1 禽流感發生跨物種感染<span class="text-fuchsia-300 font-extrabold bg-fuchsia-950/70 px-1.5 py-0.5 rounded border border-fuchsia-500/40">哺乳類動物</span>案例。南澳州於 2026 年 8 月 19 日報告了首例死亡的長鼻毛皮<span class="text-fuchsia-300 font-bold">海獅</span>確診 H5N1。隨後，阿德萊德市區出現<span class="text-fuchsia-300 font-bold">紅狐狸</span>染病案例，是澳洲大陸首次在陸生哺乳動物中檢測到 H5 病毒，維州托基 (Torquay) 也確認了第二例狐狸死亡案例。此外，南澳州於 8 月 28 日首次確診海豚感染 H5N1 案例。儘管如此，目前全澳<span class="text-fuchsia-300 font-extrabold bg-fuchsia-950/70 px-1.5 py-0.5 rounded border border-fuchsia-500/40">哺乳類動物</span>（如<span class="text-fuchsia-300 font-bold">塔斯馬尼亞惡魔</span>、<span class="text-fuchsia-300 font-bold">野貓</span>、狐蝠等）無大規模爆發感染，重點防線維持警覺，並有針對性地為瀕危物種如<span class="text-fuchsia-300 font-bold">塔斯馬尼亞惡魔</span>採取防護措施。</p>
-
-<p>澳洲所有商業家禽農場目前維持 <span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">100% 無疫區</span>狀態，<span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">生產鏈安全無虞</span>，且聯邦政府重申 H5N1 對公眾健康風險極低。</p>
+                                    <p>截至 2026 年 11 月 18 日，澳洲 H5N1 禽流感疫情持續發展，野生鳥類確診案例遍及六個州和一個領地，全國共計 742 起事件。南澳州仍是疫情中心，報告了 343 起事件，其次是維多利亞州 (249 例) 和新南威爾斯州 (84 例)。塔斯馬尼亞州錄得 53 起事件，最近在 10 月 15 日確認了麥夸里島的象<span class="text-fuchsia-300 font-bold">海豹</span>和黑背鷗染疫，以及史蒂格利茨的林渡鴉案例。維州在 11 月 2 日確認了海邊燕鷗和鳳頭燕鷗的新增病例，南澳州則曾發生超過 1,000 隻鳳頭燕鷗大規模死亡事件，且在當地鳥類間出現了局部傳播。西澳州有 10 起事件，皆為遷徙性海鳥，近期未有新增病例。</p>
+<p><strong>⚠️ <span class="text-fuchsia-300 font-bold">哺乳類</span>監測：據報導，澳洲已確診多起<span class="text-fuchsia-300 font-extrabold bg-fuchsia-950/70 px-1.5 py-0.5 rounded border border-fuchsia-500/40">哺乳類動物</span>感染 H5N1 禽流感案例。在南澳州首次發現長鼻毛皮<span class="text-fuchsia-300 font-bold">海豹</span>染疫死亡後，9 月又在袋鼠島發現澳洲<span class="text-fuchsia-300 font-bold">海獅</span>感染案例。此外，在塔斯馬尼亞州的麥夸里島，象<span class="text-fuchsia-300 font-bold">海豹</span>和<span class="text-rose-300 font-extrabold bg-rose-950/60 px-1 py-0.5 rounded border border-rose-700/50">海鷗</span>也於 10 月確診 H5N1，專家預計該島象<span class="text-fuchsia-300 font-bold">海豹</span>族群可能出現大規模死亡。陸生<span class="text-fuchsia-300 font-bold">哺乳類</span>方面，南澳州阿德雷德都會區和維多利亞州托基的<span class="text-fuchsia-300 font-bold">紅狐狸</span>亦被檢測出 H5N1 病毒。目前未有<span class="text-fuchsia-300 font-bold">野貓</span>、<span class="text-fuchsia-300 font-bold">塔斯馬尼亞惡魔</span>或狐蝠大規模感染的最新報導，但當局對所有野生動物的監測保持高度警覺。</strong></p>
+<p>儘管野生動物疫情擴散，但全澳所有商業家禽農場持續維持 <span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">100% 無疫區</span>狀態，<span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-500/40">生產鏈安全無虞</span>。澳洲政府及各州均強調，H5N1 禽流感對公眾健康的風險極低，目前澳洲境內未發現人類感染病例。</p>
                                 </div>
                             </div>
                         </div>
@@ -250,8 +251,7 @@
                                 <span id="event-confirmed-indicator"
                                     class="text-3xl font-black text-red-500 tracking-tight">236 起確診事件</span>
                                 <span id="event-hotline-indicator"
-                                    class="text-[10px] text-blue-400 block mt-1 font-semibold">（1,273 起陰性排除事件 / 21,041
-                                    筆熱線通報）</span>
+                                    class="text-[10px] text-blue-400 block mt-1 font-semibold">（陰性排除／熱線通報數載入中…）</span>
                             </div>
 
                             <!-- 核心指標 2：受影響家禽 -->
@@ -311,6 +311,30 @@
                 <p class="text-[11px] text-slate-400 mb-4">NSW 境內野生動物確診事件，依 DAFF 官方逐筆檔的採樣日所在週彙整。注意：這是野生動物事件，不是商業家禽；風險評估的紅線仍是「NSW 商業家禽 0 確診」。</p>
                 <div class="h-[240px] w-full relative"><canvas id="nswTrendChart"></canvas></div>
                 <p id="nsw-trend-note" class="text-[11px] text-slate-500 mt-3 leading-relaxed"></p>
+            </div>
+
+            <!-- 遷徙性濱鳥每週觀測紀錄數：資料來自 assets/js/shorebird_weekly.js（GBIF + ALA 計數查詢），無資料時自動隱藏 -->
+            <div id="shorebird-weekly-card" class="hidden bg-slate-800 p-6 rounded-2xl border border-sky-700/40">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                    <h3 class="text-sm font-semibold text-sky-300 uppercase tracking-wider">🦅 遷徙性濱鳥「每週觀測紀錄數」（GBIF／ALA，對照去年同週）</h3>
+                    <span class="text-xs font-mono text-slate-400">資料更新: <span id="shorebird-fetched">-</span></span>
+                </div>
+                <p class="text-[11px] text-slate-400 mb-1 leading-relaxed">
+                    統計 19 種東亞—澳大拉西亞遷飛區濱鳥（斑尾鷸、紅腹濱鷸、大濱鷸、紅頸濱鷸、彎嘴濱鷸、遠東杓鷸等）在澳洲每週被登錄的觀測紀錄數。
+                    <strong class="text-amber-300">這是「被登錄的紀錄數」，不是入境隻數</strong>：會受賞鳥人數、天氣與登錄延遲影響，所以同時畫出去年與前年同週，並算出「佔全鳥類紀錄的比例」來扣除觀察力道。
+                    這是領先指標，不是疫情指標；風險紅線仍是「NSW 商業家禽是否確診」。
+                </p>
+                <p class="text-[11px] text-amber-300/90 mb-4 leading-relaxed">
+                    ⚠️ 登錄延遲：最近 3 週（淡色柱）<strong>假設</strong>尚未登錄完整，通常事後會補增，不可解讀為候鳥減少；此假設未經實測，下方「實測登錄延遲」會在累積 6 天以上的快照後自動顯示。GBIF 內的 eBird 資料以月為單位匯入，比 ALA 更慢。
+                </p>
+                <div id="shorebird-gbif-wrap" class="hidden mb-5">
+                    <div class="h-[220px] w-full relative"><canvas id="shorebird-gbif-chart"></canvas></div>
+                    <p id="shorebird-gbif-summary" class="text-[11px] text-slate-300 mt-2 leading-relaxed font-mono"></p>
+                </div>
+                <div id="shorebird-ala-wrap" class="hidden">
+                    <div class="h-[220px] w-full relative"><canvas id="shorebird-ala-chart"></canvas></div>
+                    <p id="shorebird-ala-summary" class="text-[11px] text-slate-300 mt-2 leading-relaxed font-mono"></p>
+                </div>
             </div>
 
             <!-- ========================================================================= -->
@@ -760,12 +784,12 @@
                             </div>
                             <div class="space-y-2 text-slate-200">
                                 <div data-asof="2026-10-08" class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
-                                    <strong class="text-red-400 block mb-0.5 font-bold">維州 (VIC) · 家禽圍養要求再延長</strong>
+                                    <strong class="text-amber-400 block mb-0.5 font-bold">維州 (VIC) · 家禽圍養令狀態待官方確認</strong>
                                     <p class="text-[11px] text-slate-300 leading-relaxed">
-                                        官方「管制令 (Control Order)」要求南部各地方政府區（含大墨爾本都會區）飼養 <strong>50 隻以上</strong>的雞、火雞、珠雞、非原生鴨／鵝／鶉、雉、鷓鴣，須<strong>圍養</strong>以避免接觸野鳥、其糞便及野鳥出入的環境；已再延長 28 天，<strong class="text-amber-300">至少至 2026 年 10 月 16 日</strong>。
+                                        先前公告的「管制令 (Control Order)」圍養要求（南部各地方政府區含大墨爾本、50 隻以上家禽）<strong class="text-amber-300">最後確認的有效期限為 2026 年 10 月 16 日</strong>。2026-11-18 自動抓取時，該管制令專屬頁面已回應「Page not found」，維州主頁的管制令清單也只剩疫苗與野生動物屍體處理兩項。<strong class="text-amber-300">圈養令目前是否仍有效、已解除或已併入他頁，尚無官方原文佐證，請勿視為現行規定。</strong>
                                     </p>
                                     <p class="text-[10px] text-slate-400 leading-relaxed mt-1">
-                                        同頁官方聲明：澳洲目前尚無家禽或牲畜的 H5 檢出，家禽亦無移動限制。（來源：Agriculture Victoria 管制令頁面，2026-10-08 取得原文）
+                                        同頁官方聲明（2026-10-08 取得）：澳洲目前尚無家禽或牲畜的 H5 檢出。（來源：Agriculture Victoria；待官方確認後更新本卡）
                                     </p>
                                 </div>
                                 <div data-asof="2026-09-16" class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
@@ -12475,6 +12499,8 @@
   "total_events": 742,
   "negative_events": 2450,
   "hotline_reports": 36800,
+  "negative_events_live": false,
+  "hotline_reports_live": false,
   "events_by_state": {
     "JBT": 1,
     "WA": 10,
@@ -12497,7 +12523,7 @@
     "Falcon & Other": 5
   },
   "source": "live",
-  "scrape_time": "2026-11-18 03:57 UTC"
+  "scrape_time": "2026-11-18 08:03 UTC"
 };
 
         const factoryLat = -33.521027;
@@ -12607,15 +12633,15 @@
         function renderDynamicIndicators() {
             const stats = window.OFFICIAL_STATS || {};
             const totalEvents = stats.total_events || 236;
-            const negEvents = (stats.negative_events || 1273).toLocaleString();
-            const hotline = (stats.hotline_reports || 21041).toLocaleString();
+            const negEvents = stats.negative_events_live === false ? '陰性排除：官網未提供' : (stats.negative_events || 1273).toLocaleString() + ' 起陰性排除事件';
+            const hotline = stats.hotline_reports_live === false ? '熱線通報：官網未提供' : (stats.hotline_reports || 21041).toLocaleString() + ' 筆熱線通報';
             const evtByState = stats.events_by_state || { 'SA': 166, 'VIC': 53, 'WA': 10, 'NSW': 4, 'TAS': 2, 'QLD': 1 };
 
             const elConf = document.getElementById('event-confirmed-indicator');
             if (elConf) elConf.textContent = `${totalEvents} 起確診事件`;
 
             const elHot = document.getElementById('event-hotline-indicator');
-            if (elHot) elHot.textContent = `（${negEvents} 起陰性排除事件 / ${hotline} 筆熱線通報）`;
+            if (elHot) elHot.textContent = `（${negEvents} / ${hotline}）`;
 
             const elGrid = document.getElementById('event-by-state-grid');
             if (elGrid) {

@@ -19,6 +19,8 @@
     <script src="assets/js/cases_events.js"></script>
     <script src="assets/js/daff_weekly.js"></script>
     <script src="assets/js/daff_weekly_charts.js"></script>
+    <script src="assets/js/shorebird_weekly.js"></script>
+    <script src="assets/js/shorebird_weekly_charts.js"></script>
 
     <style>
         body {
@@ -93,18 +95,19 @@
 
             const isLive = stats.source === 'live';
             const total = stats.total_events || '—';
-            const neg = (stats.negative_events || 0).toLocaleString();
-            const hot = (stats.hotline_reports || 0).toLocaleString();
+            // When the official page did not yield these two values they are hard-coded fallbacks, not live numbers
+            const neg = stats.negative_events_live === false ? 'Negative exclusions: not provided by the official site' : (stats.negative_events || 0).toLocaleString() + ' Negative Exclusions';
+            const hot = stats.hotline_reports_live === false ? 'Hotline reports: not provided by the official site' : (stats.hotline_reports || 0).toLocaleString() + ' Hotline Reports';
             const ts = stats.scrape_time || 'Unknown';
 
             if (isLive) {
                 banner.className = banner.className + ' bg-emerald-600/90 border-emerald-500/20';
-                msg.textContent = `✅ Live DAFF Telemetry Synced (${ts}) — Total ${total} Confirmed Positive Events / ${neg} Negative Exclusions / ${hot} Hotline Reports`;
+                msg.textContent = `✅ Live DAFF Telemetry Synced (${ts}) — Total ${total} Confirmed Positive Events / ${neg} / ${hot}`;
             } else {
                 banner.className = banner.className + ' bg-amber-600/90 border-amber-500/30';
                 dot.classList.remove('animate-pulse');
                 dot.style.backgroundColor = '#fbbf24';
-                msg.textContent = `⚠️ Backup Dataset Active — Official DAFF Synced ${total} Positive Events / ${neg} Exclusions`;
+                msg.textContent = `⚠️ Backup Dataset Active — Official DAFF Synced ${total} Positive Events / ${neg}`;
             }
         });
     </script>
@@ -167,14 +170,14 @@
                                 <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider mb-1">📢
                                     OFFICIAL BIOSECURITY STATUS</span>
                                 <div class="text-slate-200 text-sm leading-relaxed">
-                                    According to the <a href="https://www.agriculture.gov.au/campaigns/birdflu/latest-data#event_data" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">Australian Department of Agriculture, Fisheries and Forestry (DAFF)</a> and State Agencies <span class="text-amber-400 font-bold">September 18, 2026 Official Telemetry</span>, Australia has recorded a cumulative total of <span class="text-red-400 font-extrabold text-base px-1 bg-red-950/40 rounded border border-red-500/30">742 Confirmed Positive Events</span> in wild animals/birds, with <span class="text-sky-400 font-bold">2,450 Negative Exclusions</span> and <span class="text-sky-300 font-semibold">36,800 Hotline Reports</span>. Breakdown by Jurisdiction: <span class="text-amber-300 font-semibold">SA: 343</span>, <span class="text-amber-300 font-semibold">VIC: 249</span>, <span class="text-amber-300 font-semibold">WA: 10</span>, <span class="text-amber-300 font-semibold">NSW: 84</span>, <span class="text-amber-300 font-semibold">TAS: 53</span>, <span class="text-amber-300 font-semibold">QLD: 2</span>. All commercial poultry, egg, and feed manufacturing operations across Australia maintain <span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40">100% Area Freedom Status</span> with zero commercial farm infections.
+                                    According to the <a href="https://www.agriculture.gov.au/campaigns/birdflu/latest-data#event_data" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">Australian Department of Agriculture, Fisheries and Forestry (DAFF)</a> and State Agencies <span class="text-amber-400 font-bold">September 18, 2026 Official Telemetry</span>, Australia has recorded a cumulative total of <span class="text-red-400 font-extrabold text-base px-1 bg-red-950/40 rounded border border-red-500/30">742 Confirmed Positive Events</span> in wild animals/birds, with <span class="text-slate-400 font-bold">Negative Exclusions: not provided by the official site</span> and <span class="text-slate-400 font-semibold">Hotline Reports: not provided by the official site</span>. Breakdown by Jurisdiction: <span class="text-amber-300 font-semibold">SA: 343</span>, <span class="text-amber-300 font-semibold">VIC: 249</span>, <span class="text-amber-300 font-semibold">WA: 10</span>, <span class="text-amber-300 font-semibold">NSW: 84</span>, <span class="text-amber-300 font-semibold">TAS: 53</span>, <span class="text-amber-300 font-semibold">QLD: 2</span>. All commercial poultry, egg, and feed manufacturing operations across Australia maintain <span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40">100% Area Freedom Status</span> with zero commercial farm infections.
                                 </div>
                             </div>
                             <div>
                                 <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider mb-1">📰
                                     MEDIA & ECOLOGY SURVEILLANCE</span>
                                 <div class="text-slate-200 text-sm leading-relaxed">
-                                    According to <a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">ABC News Australia</a> and <a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">NSW DPIRD</a> reports (<span class="text-amber-400 font-bold">September 18, 2026</span>), Australia officially operates on an international Event-based Reporting framework with <span class="text-red-400 font-bold">742 Positive Events</span> (2,450 negative exclusions). The Australian Chief Veterinary Officer re-affirms: <span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40">All commercial poultry farms in Australia maintain 100% Zero Infection, with extremely low risk to human health</span>.
+                                    According to <a href="https://www.abc.net.au/news/" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">ABC News Australia</a> and <a href="https://www.dpird.nsw.gov.au/dpi/biosecurity/animal-biosecurity/avian-influenza" target="_blank" class="text-blue-400 underline hover:text-blue-300 font-semibold">NSW DPIRD</a> reports (<span class="text-amber-400 font-bold">September 18, 2026</span>), Australia officially operates on an international Event-based Reporting framework with <span class="text-red-400 font-bold">742 Positive Events</span> (negative exclusions: not provided by the official site). The Australian Chief Veterinary Officer re-affirms: <span class="text-emerald-400 font-extrabold bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40">All commercial poultry farms in Australia maintain 100% Zero Infection, with extremely low risk to human health</span>.
                                 </div>
                             </div>
                         </div>
@@ -218,7 +221,7 @@
                                         class="text-3xl font-black text-white font-mono">498</span>
                                     <span class="text-xs text-red-400 font-bold">Positive Events</span>
                                 </div>
-                                <span id="kpi-event-hotline-exclusions" class="text-[11px] text-slate-400 block mt-1">2,450 Negative Exclusions / 39,324 Hotline Reports</span>
+                                <span id="kpi-event-hotline-exclusions" class="text-[11px] text-slate-400 block mt-1">Negative exclusions / hotline reports: loading…</span>
                             </div>
 
                             <div class="bg-slate-900/80 p-4 rounded-xl border border-emerald-500/40">
@@ -271,6 +274,30 @@
                 <p class="text-[11px] text-slate-400 mb-4">Wildlife events in NSW by sampling week from DAFF's official per-event file. These are wildlife events, not commercial poultry; the risk red line remains 'zero confirmed NSW commercial poultry cases'.</p>
                 <div class="h-[240px] w-full relative"><canvas id="nswTrendChart"></canvas></div>
                 <p id="nsw-trend-note" class="text-[11px] text-slate-500 mt-3 leading-relaxed"></p>
+            </div>
+
+            <!-- Migratory shorebird weekly observation records: data from assets/js/shorebird_weekly.js (GBIF + ALA count queries); hidden when unavailable -->
+            <div id="shorebird-weekly-card" class="hidden bg-slate-800 p-6 rounded-2xl border border-sky-700/40">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                    <h3 class="text-sm font-semibold text-sky-300 uppercase tracking-wider">🦅 Migratory Shorebird Weekly Observation Records (GBIF / ALA, vs. same weeks in prior years)</h3>
+                    <span class="text-xs font-mono text-slate-400">Updated: <span id="shorebird-fetched">-</span></span>
+                </div>
+                <p class="text-[11px] text-slate-400 mb-1 leading-relaxed">
+                    Weekly number of observation records logged in Australia for 19 East Asian–Australasian Flyway shorebird species (Bar-tailed Godwit, Red Knot, Great Knot, Red-necked Stint, Curlew Sandpiper, Far Eastern Curlew, etc.).
+                    <strong class="text-amber-300">This counts logged records, not arriving birds</strong>: it depends on observer numbers, weather and registration lag, so last year and the year before are overlaid and the share of all bird records is computed to cancel out observer effort.
+                    It is a leading indicator, not an outbreak indicator; the risk red line remains whether NSW commercial poultry is confirmed.
+                </p>
+                <p class="text-[11px] text-amber-300/90 mb-4 leading-relaxed">
+                    ⚠️ Registration lag: the latest 3 weeks (faded bars) are <strong>assumed</strong> incomplete and are usually revised upward later; do not read them as fewer birds. This assumption is unmeasured; the “measured late registration” figure below appears automatically once snapshots 6+ days old exist. eBird data inside GBIF is imported monthly, so GBIF lags ALA.
+                </p>
+                <div id="shorebird-gbif-wrap" class="hidden mb-5">
+                    <div class="h-[220px] w-full relative"><canvas id="shorebird-gbif-chart"></canvas></div>
+                    <p id="shorebird-gbif-summary" class="text-[11px] text-slate-300 mt-2 leading-relaxed font-mono"></p>
+                </div>
+                <div id="shorebird-ala-wrap" class="hidden">
+                    <div class="h-[220px] w-full relative"><canvas id="shorebird-ala-chart"></canvas></div>
+                    <p id="shorebird-ala-summary" class="text-[11px] text-slate-300 mt-2 leading-relaxed font-mono"></p>
+                </div>
             </div>
 
             <!-- Wild Bird Ecology & Bio-Security Guide -->
@@ -693,12 +720,12 @@
                             </div>
                             <div class="space-y-2 text-slate-200">
                                 <div data-asof="2026-10-08" class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
-                                    <strong class="text-red-400 block mb-0.5 font-bold">VIC · Poultry Confinement Requirement Extended</strong>
+                                    <strong class="text-amber-400 block mb-0.5 font-bold">VIC · Poultry Confinement Order: Status Pending Official Confirmation</strong>
                                     <p class="text-[11px] text-slate-300 leading-relaxed">
-                                        The Control Order requires flocks of <strong>50 or more</strong> chickens, turkeys, guinea fowl, non-indigenous ducks/geese/quail, pheasants and partridges in southern local government areas (including metropolitan Melbourne) to be <strong>confined</strong> to prevent contact with wild birds, their droppings and environments they access. Extended another 28 days, <strong class="text-amber-300">until at least 16 October 2026</strong>.
+                                        The previously announced Control Order (confinement of flocks of 50+ poultry in southern local government areas incl. metropolitan Melbourne) was <strong class="text-amber-300">last confirmed valid until 16 October 2026</strong>. On 2026-11-18 the order's dedicated page returned &quot;Page not found&quot;, and the control orders listed on the Victorian main page are now only poultry vaccination and dead wildlife handling. <strong class="text-amber-300">Whether the confinement order is still in force, lifted, or moved elsewhere is not confirmed by any official source; do not treat it as a current rule.</strong>
                                     </p>
                                     <p class="text-[10px] text-slate-400 leading-relaxed mt-1">
-                                        Same page: there have been no H5 bird flu detections in poultry or livestock in Australia, and there are currently no movement restrictions on poultry. (Source: Agriculture Victoria control order page, text obtained 2026-10-08)
+                                        Same page statement (obtained 2026-10-08): no H5 detections in poultry or livestock in Australia. (Source: Agriculture Victoria; this card will be updated once officially confirmed)
                                     </p>
                                 </div>
                                 <div data-asof="2026-09-16" class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
@@ -12151,6 +12178,8 @@
   "total_events": 742,
   "negative_events": 2450,
   "hotline_reports": 36800,
+  "negative_events_live": false,
+  "hotline_reports_live": false,
   "events_by_state": {
     "JBT": 1,
     "WA": 10,
@@ -12173,7 +12202,7 @@
     "Falcon & Other": 5
   },
   "source": "live",
-  "scrape_time": "2026-11-18 03:57 UTC"
+  "scrape_time": "2026-11-18 08:03 UTC"
 };
 
         const factoryLat = -33.521027;
@@ -12261,8 +12290,8 @@
             const stats = window.OFFICIAL_STATS || {};
             const events = window.H5N1_EVENTS || [];
             const totalEvents = stats.total_events || events.length || 498;
-            const negEvents = (stats.negative_events || 2450).toLocaleString();
-            const hotline = (stats.hotline_reports || 39324).toLocaleString();
+            const negEvents = stats.negative_events_live === false ? 'Negative exclusions: not provided by the official site' : (stats.negative_events || 2450).toLocaleString() + ' Negative Exclusions';
+            const hotline = stats.hotline_reports_live === false ? 'Hotline reports: not provided by the official site' : (stats.hotline_reports || 39324).toLocaleString() + ' Hotline Reports';
             
             let evtByState = stats.events_by_state;
             if (!evtByState && events.length > 0) {
@@ -12279,7 +12308,7 @@
             if (elPos) elPos.textContent = totalEvents;
 
             const elHot = document.getElementById('kpi-event-hotline-exclusions');
-            if (elHot) elHot.textContent = `${negEvents} Negative Exclusions / ${hotline} Hotline Reports`;
+            if (elHot) elHot.textContent = `${negEvents} / ${hotline}`;
 
             const elGrid = document.getElementById('event-by-state-grid');
             if (elGrid) {
