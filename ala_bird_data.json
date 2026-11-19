@@ -1,6 +1,6 @@
 {
-  "fetched_at_utc": "2026-11-18T16:51:59Z",
-  "fetched_at_taipei": "2026-11-19 00:51:59",
+  "fetched_at_utc": "2026-11-19T03:56:20Z",
+  "fetched_at_taipei": "2026-11-19 11:56:20",
   "source": "Atlas of Living Australia (Biocache API)",
   "available": true,
   "unavailable_reason": "",
@@ -947,20 +947,20 @@
       "individualCount": 1
     },
     {
-      "commonName": "Australasian Grebe",
-      "scientificName": "Tachybaptus novaehollandiae",
-      "lat": -32.525659,
-      "lng": 117.086833,
+      "commonName": "Australian Shelduck",
+      "scientificName": "Tadorna (Casarca) tadornoides",
+      "lat": -32.525818,
+      "lng": 117.086574,
       "obsDate": "2026-11-08 08:16 UTC",
       "state": "Western Australia",
       "dataResource": "iNaturalist Australia",
       "individualCount": 1
     },
     {
-      "commonName": "Australian Shelduck",
-      "scientificName": "Tadorna (Casarca) tadornoides",
-      "lat": -32.525818,
-      "lng": 117.086574,
+      "commonName": "Australasian Grebe",
+      "scientificName": "Tachybaptus novaehollandiae",
+      "lat": -32.525659,
+      "lng": 117.086833,
       "obsDate": "2026-11-08 08:16 UTC",
       "state": "Western Australia",
       "dataResource": "iNaturalist Australia",
