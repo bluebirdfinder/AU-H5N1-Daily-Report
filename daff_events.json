@@ -1,11 +1,11 @@
 {
- "fetched_at_utc": "2026-11-19T17:17:42Z",
+ "fetched_at_utc": "2026-11-20T03:48:41Z",
  "source": "https://www.agriculture.gov.au/sites/default/files/documents/H5_bird_flu_events.xlsx",
- "total_events": 742,
+ "total_events": 745,
  "events_by_state": {
   "WA": 10,
-  "SA": 343,
-  "NSW": 84,
+  "SA": 344,
+  "NSW": 86,
   "QLD": 2,
   "VIC": 249,
   "TAS": 53,
@@ -8173,6 +8173,39 @@
    "locality": "Hallett Cove",
    "common_name": "Greater Crested Tern",
    "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "NSW-WB-085",
+   "date_sampled": "2026-11-15",
+   "jurisdiction": "NSW",
+   "state": "NSW",
+   "lga": "Georges River",
+   "locality": "Lugarno",
+   "common_name": "Terns",
+   "scientific_name": "Sterninae sp.",
+   "is_mammal": false
+  },
+  {
+   "record_id": "NSW-WB-086",
+   "date_sampled": "2026-11-16",
+   "jurisdiction": "NSW",
+   "state": "NSW",
+   "lga": "Clarence Valley",
+   "locality": "Woody Head",
+   "common_name": "Greater Crested Tern",
+   "scientific_name": "Thalasseus bergii",
+   "is_mammal": false
+  },
+  {
+   "record_id": "SA-WB-334",
+   "date_sampled": "2026-11-16",
+   "jurisdiction": "SA",
+   "state": "SA",
+   "lga": "Port Lincoln",
+   "locality": "Port Lincoln",
+   "common_name": "Black-faced Cormorant",
+   "scientific_name": "Phalacrocorax fuscescens",
    "is_mammal": false
   }
  ]
