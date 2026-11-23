@@ -1,6 +1,6 @@
 window.alaBirdDataEmbedded = {
-  "fetched_at_utc": "2026-11-23T03:21:06Z",
-  "fetched_at_taipei": "2026-11-23 11:21:06",
+  "fetched_at_utc": "2026-11-23T19:42:40Z",
+  "fetched_at_taipei": "2026-11-24 03:42:40",
   "source": "Atlas of Living Australia (Biocache API)",
   "available": true,
   "unavailable_reason": "",
@@ -217,8 +217,8 @@ window.alaBirdDataEmbedded = {
       "individualCount": 1
     },
     {
-      "commonName": "Pink-eared Duck",
-      "scientificName": "Malacorhynchus membranaceus",
+      "commonName": "Nankeen Night-heron",
+      "scientificName": "Nycticorax caledonicus",
       "lat": -37.748115,
       "lng": 145.088929,
       "obsDate": "2026-11-15 13:51 UTC",
@@ -227,8 +227,8 @@ window.alaBirdDataEmbedded = {
       "individualCount": 1
     },
     {
-      "commonName": "Nankeen Night-heron",
-      "scientificName": "Nycticorax caledonicus",
+      "commonName": "Pink-eared Duck",
+      "scientificName": "Malacorhynchus membranaceus",
       "lat": -37.748115,
       "lng": 145.088929,
       "obsDate": "2026-11-15 13:51 UTC",
