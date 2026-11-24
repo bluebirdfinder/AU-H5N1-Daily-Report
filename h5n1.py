@@ -2929,10 +2929,11 @@ def log_nsw_powerbi_reconciliation():
             prev = out
         return rows
 
-    # 2026-11-24：Power BI 報表改版後同一頁會有兩個以 Event.LGA 起頭的查詢（事件數、最新通報日）。
-    # 舊版只認第一欄名稱，後者蓋掉前者，把毫秒時間戳當事件數加總（印出 5e13 之類的荒謬數字）。
-    # 現在依第二欄名稱分辨：CountNonNull(...)＝事件數；Max(...ReportDate)＝各 LGA 最新通報日。
-    lga_counts, lga_last, shapes = None, None, []
+    # 2026-11-24：Power BI 報表的各 LGA 查詢是「Event.LGA ＋ 若干欄」，欄位組合會變動（同日實測：
+    # ['Event.LGA','Min(Event.ReportDate)','CountNonNull(Event.EventIDValue)']）。舊版假設事件數固定在第二欄，
+    # 改版後把毫秒時間戳當事件數加總；上一版只看第二欄名稱，又把 Min（首次通報日）誤標成「最新通報日」。
+    # 現在依每一欄的名稱逐欄對應：CountNonNull＝事件數；Min(…ReportDate)＝首次通報日；Max(…ReportDate)＝最新通報日（頁面目前沒有）。
+    lga_counts, lga_first, lga_last, shapes = None, None, None, []
     for body in bodies:
         try:
             data = json.loads(body)
@@ -2940,13 +2941,18 @@ def log_nsw_powerbi_reconciliation():
                 d = res["result"]["data"]
                 names = [s.get("Name", "") for s in d["descriptor"]["Select"] if s]
                 shapes.append(names)
-                if len(names) >= 2 and names[0] == "Event.LGA":
-                    dm0 = d["dsr"]["DS"][0]["PH"][0]["DM0"]
-                    rows = [(r[0], r[1]) for r in decode_rows(dm0)]
-                    if "CountNonNull" in names[1]:
-                        lga_counts = rows
-                    elif "Max(" in names[1] or "ReportDate" in names[1]:
-                        lga_last = rows
+                if not names or names[0] != "Event.LGA":
+                    continue
+                rows = decode_rows(d["dsr"]["DS"][0]["PH"][0]["DM0"])
+                def col(pred):
+                    i = next((k for k, n in enumerate(names) if pred(n)), None)
+                    return None if i is None else [(r[0], r[i]) for r in rows if len(r) > i]
+                c = col(lambda n: "CountNonNull" in n)
+                f = col(lambda n: n.startswith("Min(") and "ReportDate" in n)
+                x = col(lambda n: n.startswith("Max(") and "ReportDate" in n)
+                lga_counts = c or lga_counts
+                lga_first = f or lga_first
+                lga_last = x or lga_last
         except Exception:
             continue
 
@@ -2960,16 +2966,18 @@ def log_nsw_powerbi_reconciliation():
     else:
         nsw_total = None
         print(f"[NSW PowerBI 對帳] 未攔截到「各 LGA 事件數」查詢（共 {len(bodies)} 個回應）；查詢欄位組合：{shapes[:6]}；頁面文字 {page_total}")
-    if lga_last:
-        today = datetime.now(timezone.utc).date()
+    today = datetime.now(timezone.utc).date()
+    for label, series, asc in (("首次通報日", lga_first, True), ("最新通報日", lga_last, False)):
+        if not series:
+            continue
         stamped = []
-        for lga, ms in lga_last:
+        for lga, ms in series:
             try:
                 stamped.append((lga or "(無 LGA)", datetime.fromtimestamp(ms / 1000, tz=timezone.utc).date()))
             except Exception:
                 continue
-        for lga, day in sorted(stamped, key=lambda x: x[1], reverse=True):
-            print(f"[NSW PowerBI 最新通報日] {lga}: {day.isoformat()}（距今 {(today - day).days} 天）")
+        for lga, day in sorted(stamped, key=lambda x: x[1], reverse=not asc):
+            print(f"[NSW PowerBI {label}] {lga}: {day.isoformat()}（距今 {(today - day).days} 天）")
     try:
         daff = json.load(open("daff_events.json", encoding="utf-8"))
         daff_nsw = (daff.get("events_by_state") or {}).get("NSW")
