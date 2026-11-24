@@ -2776,6 +2776,39 @@ def write_daff_weekly_js(payload):
         "central_west_events": sum(1 for r in recs if r.get("state") == "NSW" and (r.get("lga") or "") in central_west),
         "nsw_events": sum(1 for r in recs if r.get("state") == "NSW"),
     }
+    # 已知地區活動（2026-11-24）：官方 8/12 起不再對已知疫區逐隻檢測，但仍會登記部分重複通報。
+    # 「已知 LGA」＝28 天前就已有紀錄的行政區；比較其近 28 天與前 28 天的新增，並列出 NSW 各 LGA 最近一次採樣日。
+    # 只呈現資料；採樣強度無可靠數據，下降不可解讀為趨緩。
+    try:
+        _today = datetime.now(timezone.utc).date()
+        _cut = _today - timedelta(days=28)
+        _prev = _cut - timedelta(days=28)
+        def _day(r):
+            return datetime.strptime(r["date_sampled"], "%Y-%m-%d").date()
+        def _key(r):
+            return (r.get("state"), r.get("lga") or r.get("locality") or "?")
+        def _known_activity(rows):
+            first = {}
+            for r in sorted(rows, key=_day):
+                first.setdefault(_key(r), _day(r))
+            known = {k for k, v in first.items() if v < _cut}
+            return {"known_lgas": len(known),
+                    "recent": sum(1 for r in rows if _key(r) in known and _day(r) >= _cut),
+                    "prev": sum(1 for r in rows if _key(r) in known and _prev <= _day(r) < _cut)}
+        nsw_dated = [r for r in dated if r.get("state") == "NSW"]
+        out["nsw_watch"]["known_lga_28d"] = {"nsw": _known_activity(nsw_dated), "aus": _known_activity(dated)}
+        last_by, cnt_by = {}, {}
+        for r in nsw_dated:
+            k = r.get("lga") or r.get("locality") or "?"
+            d0 = _day(r)
+            if k not in last_by or d0 > last_by[k]:
+                last_by[k] = d0
+            cnt_by[k] = cnt_by.get(k, 0) + 1
+        out["nsw_watch"]["nsw_lga_last"] = [
+            {"lga": k, "last": v.isoformat(), "n": cnt_by[k]}
+            for k, v in sorted(last_by.items(), key=lambda kv: kv[1], reverse=True)[:10]]
+    except Exception as e:
+        print(f"[DAFF xlsx] 已知地區活動計算失敗（略過，不影響其他欄位）: {str(e)[:80]}")
     out["species_birds"] = sp
     out["bird_events"] = sum(sp.values())
     out["mammal_events"] = sum(1 for r in recs if r.get("is_mammal"))

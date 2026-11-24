@@ -874,6 +874,12 @@
                     <div class="text-[11px] text-slate-300 leading-relaxed">This source (DAFF wildlife events) does not include poultry notifications. Use NSW DPI / the Emergency Animal Disease Hotline; the commercial-farm status on this page is shown in the indicators above.</div>
                 </div>
             </div>
+            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1 text-xs">
+                <div class="text-slate-400">Known-area activity (repeat notifications still being recorded)</div>
+                <div id="nsw-watch-known" class="font-mono text-cyan-300 text-sm"></div>
+                <div id="nsw-watch-lga-last" class="text-[10px] text-slate-400 leading-relaxed"></div>
+                <div class="text-[10px] text-slate-500 leading-relaxed">* "Known LGA" = already had a record 28+ days ago. Since 12 Aug DAFF no longer tests every bird in known infected areas, and the last two weeks are incomplete; sampling intensity has no reliable data, so a decline must <strong>not</strong> be read as easing. For trend watching only.</div>
+            </div>
             <script>
                 (function () {
                     try {
@@ -890,6 +896,15 @@
                         document.getElementById('nsw-watch-land-other').textContent = W.other_states_land_birds + ' ';
                         document.getElementById('nsw-watch-cw').textContent = W.central_west_events + ' ';
                         document.getElementById('nsw-watch-cw-lgas').textContent = W.central_west_lgas.join(', ');
+                        const K = W.known_lga_28d;
+                        if (K && K.nsw && K.aus) {
+                            document.getElementById('nsw-watch-known').textContent = 'NSW: ' + K.nsw.known_lgas + ' known LGAs, ' + K.nsw.recent + ' new events in the last 28 days (' + K.nsw.prev + ' in the 28 days before) | Australia: ' + K.aus.recent + ' (' + K.aus.prev + ')';
+                        }
+                        const LL = W.nsw_lga_last;
+                        if (Array.isArray(LL) && LL.length) {
+                            const ref = new Date(D.fetched_at_utc || Date.now());
+                            document.getElementById('nsw-watch-lga-last').textContent = 'Latest sampling per LGA: ' + LL.map(x => x.lga + ' ' + x.last.slice(5).replace('-', '/') + ' (' + Math.max(0, Math.round((ref - new Date(x.last + 'T00:00:00Z')) / 86400000)) + ' d ago, ' + x.n + ' total)').join('; ');
+                        }
                         document.getElementById('nsw-watch-card').classList.remove('hidden');
                     } catch (e) { console.warn('nsw watch card skipped', e); }
                 })();
