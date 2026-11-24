@@ -1,6 +1,6 @@
 window.ebirdDataEmbedded = {
-  "fetched_at_utc": "2026-11-24T03:22:33Z",
-  "fetched_at_taipei": "2026-11-24 11:22:33",
+  "fetched_at_utc": "2026-11-24T06:35:35Z",
+  "fetched_at_taipei": "2026-11-24 14:35:35",
   "source": "eBird API v2 (Cornell Lab of Ornithology)",
   "query_back_days": 30,
   "state_summary": {
