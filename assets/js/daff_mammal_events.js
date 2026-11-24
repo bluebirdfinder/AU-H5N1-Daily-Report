@@ -1,5 +1,5 @@
 window.daffMammalEmbedded = {
-  "fetched_at_utc": "2026-11-24T06:35:36Z",
+  "fetched_at_utc": "2026-11-24T09:36:46Z",
   "total_events": 748,
   "mammal_events": 22,
   "by_state": {
