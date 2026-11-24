@@ -1,7 +1,7 @@
 window.daffWeeklyEmbedded = {
- "fetched_at_utc": "2026-11-23T19:42:13Z",
- "total_events": 745,
- "dated_events": 612,
+ "fetched_at_utc": "2026-11-24T03:22:34Z",
+ "total_events": 748,
+ "dated_events": 615,
  "undated_events": 133,
  "weeks": [
   {
@@ -200,10 +200,10 @@ window.daffWeeklyEmbedded = {
   },
   {
    "start": "2026-11-16",
-   "total": 2,
+   "total": 5,
    "by_state": {
     "NSW": 1,
-    "SA": 1
+    "SA": 4
    }
   },
   {
@@ -261,10 +261,10 @@ window.daffWeeklyEmbedded = {
    }
   },
   "2026-11": {
-   "total": 11,
+   "total": 14,
    "by_state": {
     "NSW": 8,
-    "SA": 3
+    "SA": 6
    }
   }
  },
@@ -292,18 +292,82 @@ window.daffWeeklyEmbedded = {
    "Parkes"
   ],
   "central_west_events": 0,
-  "nsw_events": 86
+  "nsw_events": 86,
+  "known_lga_28d": {
+   "nsw": {
+    "known_lgas": 23,
+    "recent": 6,
+    "prev": 8
+   },
+   "aus": {
+    "known_lgas": 121,
+    "recent": 16,
+    "prev": 44
+   }
+  },
+  "nsw_lga_last": [
+   {
+    "lga": "Clarence Valley",
+    "last": "2026-11-16",
+    "n": 1
+   },
+   {
+    "lga": "Georges River",
+    "last": "2026-11-15",
+    "n": 1
+   },
+   {
+    "lga": "Central Coast (NSW)",
+    "last": "2026-11-06",
+    "n": 6
+   },
+   {
+    "lga": "Northern Beaches",
+    "last": "2026-11-05",
+    "n": 3
+   },
+   {
+    "lga": "Eurobodalla",
+    "last": "2026-11-03",
+    "n": 16
+   },
+   {
+    "lga": "Bega Valley",
+    "last": "2026-11-03",
+    "n": 16
+   },
+   {
+    "lga": "Canterbury-Bankstown",
+    "last": "2026-11-03",
+    "n": 2
+   },
+   {
+    "lga": "Penrith",
+    "last": "2026-10-28",
+    "n": 1
+   },
+   {
+    "lga": "Newcastle",
+    "last": "2026-10-28",
+    "n": 1
+   },
+   {
+    "lga": "Parramatta",
+    "last": "2026-10-22",
+    "n": 1
+   }
+  ]
  },
  "species_birds": {
   "Crested Tern": 468,
-  "Silver Gull": 77,
+  "Silver Gull": 78,
   "Giant Petrel": 18,
   "Pacific Gull": 22,
   "Brown Skua": 4,
-  "Cormorant": 23,
+  "Cormorant": 25,
   "Little Penguin": 16,
   "Falcon & Other": 95
  },
- "bird_events": 723,
+ "bird_events": 726,
  "mammal_events": 22
 };
