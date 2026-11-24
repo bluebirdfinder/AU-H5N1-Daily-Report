@@ -1,54 +1,59 @@
-"""唯讀探針：確認 iNaturalist API 能否篩出「死亡」鳥類觀測（Alive or Dead 標註），並比較 NSW 近 28 天、前 28 天、去年同期。
-每個查詢只要 per_page 1~5，不寫任何檔案。目的：評估「死亡鳥觀測」能否當已知疫區的間接監測指標。"""
-import datetime, json
+"""唯讀探針（第二輪）：NSW 海岸海鳥／猛禽類群的 iNaturalist「死亡」標註，以 28 天為窗，比較近 5 窗與去年同期。
+只用 per_page=0 取 total_results；不寫任何檔案。第一輪（全鳥類）：死亡占比近28天 0.61%／前28天 0.50%／去年同期 0.57%，
+樣本多為常見陸鳥（撞玻璃、路殺），所以要拆到與 H5N1 相關的類群。"""
+import datetime, time
 import requests
 
 API = "https://api.inaturalist.org/v1"
 UA = {"User-Agent": "au-h5n1-daily-report-probe/1.0 (read-only; contact via repo)"}
 NSW = {"swlat": -37.6, "swlng": 140.9, "nelat": -28.1, "nelng": 153.7}
+TERM, DEAD = 17, 19
+GROUPS = {
+    "海岸海鳥": ["Laridae", "Stercorariidae", "Procellariidae", "Spheniscidae", "Phalacrocoracidae", "Sulidae", "Pelecanidae"],
+    "猛禽": ["Accipitridae", "Falconidae"],
+}
 
 
 def get(path, **params):
+    time.sleep(1.1)  # iNaturalist 建議 <= 60 requests/min
     r = requests.get(f"{API}/{path}", params=params, headers=UA, timeout=40)
-    return r.status_code, r.json() if r.headers.get("content-type", "").startswith("application/json") else r.text[:200]
+    r.raise_for_status()
+    return r.json()
 
 
-print("[iNat probe] --- controlled terms")
-sc, d = get("controlled_terms")
-term_id = value_id = None
-if sc == 200:
-    for t in d.get("results", []):
-        if "alive" in t.get("label", "").lower():
-            print(f"[iNat probe] term id={t['id']} label={t['label']!r} values={[(v['id'], v['label']) for v in t.get('values', [])]}")
-            term_id = t["id"]
-            for v in t.get("values", []):
-                if v["label"].lower().startswith("dead"):
-                    value_id = v["id"]
-else:
-    print(f"[iNat probe] controlled_terms HTTP {sc}: {d}")
-print(f"[iNat probe] 採用 term_id={term_id} term_value_id(dead)={value_id}")
+ids = {}
+for fams in GROUPS.values():
+    for f in fams:
+        res = get("taxa", q=f, rank="family", per_page=5).get("results", [])
+        hit = next((t for t in res if t.get("name") == f), None)
+        ids[f] = hit["id"] if hit else None
+print(f"[iNat probe] 科別 taxon id: {ids}")
 
 today = datetime.date.today()
-def win(days_back_start, days_back_end):
-    return ((today - datetime.timedelta(days=days_back_start)).isoformat(), (today - datetime.timedelta(days=days_back_end)).isoformat())
+for gname, fams in GROUPS.items():
+    tids = ",".join(str(ids[f]) for f in fams if ids.get(f))
+    if not tids:
+        print(f"[iNat probe] {gname}: 無法解析 taxon id，略過")
+        continue
+    print(f"[iNat probe] === {gname}（taxon_id={tids}）每 28 天一窗：起~迄 | 今年 all/dead | 去年同期 all/dead")
+    for i in range(5):
+        end = today - datetime.timedelta(days=28 * i)
+        start = end - datetime.timedelta(days=28)
+        row = []
+        for shift in (0, 364):
+            d1 = (start - datetime.timedelta(days=shift)).isoformat()
+            d2 = (end - datetime.timedelta(days=shift)).isoformat()
+            base = dict(taxon_id=tids, d1=d1, d2=d2, per_page=0, **NSW)
+            a = get("observations", **base)["total_results"]
+            d = get("observations", term_id=TERM, term_value_id=DEAD, **base)["total_results"]
+            row.append((a, d))
+        (a0, d0), (a1, d1_) = row
+        print(f"[iNat probe] {gname} {start}~{end} | 今年 {a0}/{d0} ({(100*d0/a0 if a0 else 0):.2f}%) | 去年 {a1}/{d1_} ({(100*d1_/a1 if a1 else 0):.2f}%)")
 
-windows = {
-    "近28天": win(28, 0),
-    "前28天": win(56, 28),
-    "去年同期(近28天)": win(28 + 365, 365),
-}
-for label, (d1, d2) in windows.items():
-    base = dict(iconic_taxa="Aves", d1=d1, d2=d2, per_page=1, **NSW)
-    sc1, all_ = get("observations", **base)
-    row = {"all": all_.get("total_results") if sc1 == 200 else f"HTTP {sc1}"}
-    if term_id and value_id:
-        sc2, dead = get("observations", term_id=term_id, term_value_id=value_id, **base)
-        row["dead"] = dead.get("total_results") if sc2 == 200 else f"HTTP {sc2}: {str(dead)[:80]}"
-    print(f"[iNat probe] NSW 鳥類 {label} {d1}~{d2}: {row}")
-
-if term_id and value_id:
-    d1, d2 = windows["近28天"]
-    sc, d = get("observations", iconic_taxa="Aves", d1=d1, d2=d2, term_id=term_id, term_value_id=value_id, per_page=8, order_by="observed_on", **NSW)
-    for o in (d.get("results", []) if sc == 200 else []):
-        tx = o.get("taxon") or {}
-        print(f"[iNat probe 樣本] {o.get('observed_on')} {tx.get('preferred_common_name') or tx.get('name')} | {o.get('place_guess')} | grade={o.get('quality_grade')}")
+# 近 28 天海岸海鳥死亡樣本
+tids = ",".join(str(ids[f]) for f in GROUPS["海岸海鳥"] if ids.get(f))
+d2 = today.isoformat(); d1 = (today - datetime.timedelta(days=28)).isoformat()
+res = get("observations", taxon_id=tids, d1=d1, d2=d2, term_id=TERM, term_value_id=DEAD, per_page=15, order_by="observed_on", **NSW).get("results", [])
+for o in res:
+    tx = o.get("taxon") or {}
+    print(f"[iNat probe 樣本] {o.get('observed_on')} {tx.get('preferred_common_name') or tx.get('name')} | {o.get('place_guess')} | grade={o.get('quality_grade')}")
