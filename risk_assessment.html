@@ -873,6 +873,12 @@
                     <div class="text-[11px] text-slate-300 leading-relaxed">此資料源（DAFF 野生動物事件檔）不含家禽通報，請以 NSW DPI／緊急動物疫病熱線通報為準；本頁的商業禽場狀態見上方指標。</div>
                 </div>
             </div>
+            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1 text-xs">
+                <div class="text-slate-400">已知地區活動（官方仍持續登記的重複通報）</div>
+                <div id="nsw-watch-known" class="font-mono text-cyan-300 text-sm"></div>
+                <div id="nsw-watch-lga-last" class="text-[10px] text-slate-400 leading-relaxed"></div>
+                <div class="text-[10px] text-slate-500 leading-relaxed">* 「已知行政區」＝28 天前就已有紀錄者。DAFF 自 8/12 起不再對已知疫區逐隻檢測，且最近兩週登記未完整；抽驗強度沒有可靠數據，數字下降<strong>不能</strong>解讀為趨緩，僅供觀察趨勢。</div>
+            </div>
             <script>
                 (function () {
                     try {
@@ -889,6 +895,15 @@
                         document.getElementById('nsw-watch-land-other').textContent = W.other_states_land_birds + ' 起';
                         document.getElementById('nsw-watch-cw').textContent = W.central_west_events + ' 起';
                         document.getElementById('nsw-watch-cw-lgas').textContent = W.central_west_lgas.join(', ');
+                        const K = W.known_lga_28d;
+                        if (K && K.nsw && K.aus) {
+                            document.getElementById('nsw-watch-known').textContent = 'NSW：已知 ' + K.nsw.known_lgas + ' 個行政區，近 28 天新增 ' + K.nsw.recent + ' 起（前 28 天 ' + K.nsw.prev + ' 起）｜全澳：近 28 天 ' + K.aus.recent + ' 起（前 28 天 ' + K.aus.prev + ' 起）';
+                        }
+                        const LL = W.nsw_lga_last;
+                        if (Array.isArray(LL) && LL.length) {
+                            const ref = new Date(D.fetched_at_utc || Date.now());
+                            document.getElementById('nsw-watch-lga-last').textContent = '各 LGA 最近一次採樣：' + LL.map(x => x.lga + ' ' + x.last.slice(5).replace('-', '/') + '（' + Math.max(0, Math.round((ref - new Date(x.last + 'T00:00:00Z')) / 86400000)) + ' 天前，累計 ' + x.n + ' 起）').join('、');
+                        }
                         document.getElementById('nsw-watch-card').classList.remove('hidden');
                     } catch (e) { console.warn('nsw watch card skipped', e); }
                 })();
