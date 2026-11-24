@@ -2896,33 +2896,55 @@ def log_nsw_powerbi_reconciliation():
             prev = out
         return rows
 
-    lga_counts = None
+    # 2026-11-24：Power BI 報表改版後同一頁會有兩個以 Event.LGA 起頭的查詢（事件數、最新通報日）。
+    # 舊版只認第一欄名稱，後者蓋掉前者，把毫秒時間戳當事件數加總（印出 5e13 之類的荒謬數字）。
+    # 現在依第二欄名稱分辨：CountNonNull(...)＝事件數；Max(...ReportDate)＝各 LGA 最新通報日。
+    lga_counts, lga_last, shapes = None, None, []
     for body in bodies:
         try:
             data = json.loads(body)
             for res in data.get("results", []):
                 d = res["result"]["data"]
                 names = [s.get("Name", "") for s in d["descriptor"]["Select"] if s]
-                if names and names[0] == "Event.LGA":
+                shapes.append(names)
+                if len(names) >= 2 and names[0] == "Event.LGA":
                     dm0 = d["dsr"]["DS"][0]["PH"][0]["DM0"]
-                    lga_counts = [(r[0], r[1]) for r in decode_rows(dm0)]
+                    rows = [(r[0], r[1]) for r in decode_rows(dm0)]
+                    if "CountNonNull" in names[1]:
+                        lga_counts = rows
+                    elif "Max(" in names[1] or "ReportDate" in names[1]:
+                        lga_last = rows
         except Exception:
             continue
 
-    if not lga_counts:
-        print(f"[NSW PowerBI 對帳] 未攔截到 LGA querydata（共 {len(bodies)} 個 querydata 回應）")
-        return
-
-    nsw_total = sum(c for _, c in lga_counts if c)
-    for lga, c in sorted(lga_counts, key=lambda x: -(x[1] or 0)):
-        print(f"[NSW PowerBI 對帳] {lga or '(無 LGA)'}: {c}")
     m = re.search(r"NSW has recorded (\d+) H5 bird flu events", page_text)
-    print(f"[NSW PowerBI 對帳] Power BI LGA 加總 {nsw_total}；頁面文字 {m.group(1) if m else '未找到'}")
+    page_total = int(m.group(1)) if m else None
+    if lga_counts:
+        nsw_total = sum(c for _, c in lga_counts if isinstance(c, (int, float)) and c)
+        for lga, c in sorted(lga_counts, key=lambda x: -(x[1] or 0)):
+            print(f"[NSW PowerBI 對帳] {lga or '(無 LGA)'}: {c}")
+        print(f"[NSW PowerBI 對帳] Power BI LGA 加總 {nsw_total}；頁面文字 {page_total if page_total is not None else '未找到'}")
+    else:
+        nsw_total = None
+        print(f"[NSW PowerBI 對帳] 未攔截到「各 LGA 事件數」查詢（共 {len(bodies)} 個回應）；查詢欄位組合：{shapes[:6]}；頁面文字 {page_total}")
+    if lga_last:
+        today = datetime.now(timezone.utc).date()
+        stamped = []
+        for lga, ms in lga_last:
+            try:
+                stamped.append((lga or "(無 LGA)", datetime.fromtimestamp(ms / 1000, tz=timezone.utc).date()))
+            except Exception:
+                continue
+        for lga, day in sorted(stamped, key=lambda x: x[1], reverse=True):
+            print(f"[NSW PowerBI 最新通報日] {lga}: {day.isoformat()}（距今 {(today - day).days} 天）")
     try:
         daff = json.load(open("daff_events.json", encoding="utf-8"))
         daff_nsw = (daff.get("events_by_state") or {}).get("NSW")
-        print(f"[NSW PowerBI 對帳] DAFF xlsx NSW {daff_nsw}；差距 {nsw_total - daff_nsw:+d}"
-              "（NSW 較新時為正；DAFF 最近兩週會事後補登）")
+        ref = nsw_total if nsw_total is not None else page_total
+        src = "Power BI 加總" if nsw_total is not None else "頁面文字"
+        if ref is not None and daff_nsw is not None:
+            print(f"[NSW PowerBI 對帳] DAFF xlsx NSW {daff_nsw}；與{src}差距 {ref - daff_nsw:+d}"
+                  "（NSW 較新時為正；DAFF 最近兩週會事後補登）")
     except Exception as e:
         print(f"[NSW PowerBI 對帳] 無法讀取 daff_events.json: {str(e)[:80]}")
 
