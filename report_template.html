@@ -21,6 +21,7 @@
     <script src="assets/js/movebank_tracks.js"></script>
     <script src="assets/js/cases_events.js"></script>
     <script src="assets/js/daff_weekly.js"></script>
+    <script src="assets/js/policy_status.js"></script>
     <script src="assets/js/daff_weekly_charts.js"></script>
     <script src="assets/js/shorebird_weekly.js"></script>
     <script src="assets/js/shorebird_weekly_charts.js"></script>
@@ -658,7 +659,7 @@
                                 <span class="bg-blue-500/20 text-blue-300 text-[10px] px-2 py-0.5 rounded font-mono font-bold">雙軌政策</span>
                             </div>
                             <div class="space-y-2 text-slate-200">
-                                <div data-asof="2026-10-08" class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
+                                <div id="policy-vic" data-asof="2026-10-08" class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
                                     <strong class="text-amber-400 block mb-0.5 font-bold">維州 (VIC) · 家禽圍養令狀態待官方確認</strong>
                                     <p class="text-[11px] text-slate-300 leading-relaxed">
                                         先前公告的「管制令 (Control Order)」圍養要求（南部各地方政府區含大墨爾本、50 隻以上家禽）<strong class="text-amber-300">最後確認的有效期限為 2026 年 10 月 16 日</strong>。2026-11-18 自動抓取時，該管制令專屬頁面已回應「Page not found」，維州主頁的管制令清單也只剩疫苗與野生動物屍體處理兩項。<strong class="text-amber-300">圈養令目前是否仍有效、已解除或已併入他頁，尚無官方原文佐證，請勿視為現行規定。</strong>
@@ -667,12 +668,22 @@
                                         同頁官方聲明（2026-10-08 取得）：澳洲目前尚無家禽或牲畜的 H5 檢出。（來源：Agriculture Victoria；待官方確認後更新本卡）
                                     </p>
                                 </div>
-                                <div data-asof="2026-09-16" class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
+                                <div id="policy-nsw" data-asof="2026-09-16" class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
                                     <strong class="text-emerald-400 block mb-0.5 font-bold">新州 (NSW) · 維持自願性質</strong>
                                     <p class="text-[11px] text-slate-300 leading-relaxed">
                                         新州 DPIRD 維持彈性，僅建議自由放養與後院戶「在符合動物福利前提下自願移入室內」，暫無強制立法管制。
                                     </p>
                                 </div>
+                                <script>
+                                    (function () {
+                                        try {
+                                            if (window.PolicyStatus) {
+                                                PolicyStatus.fill(document.getElementById('policy-vic'), 'VIC', 'zh');
+                                                PolicyStatus.fill(document.getElementById('policy-nsw'), 'NSW', 'zh');
+                                            }
+                                        } catch (e) { console.warn('policy status skipped', e); }
+                                    })();
+                                </script>
                             </div>
                         </div>
                     </div>
