@@ -1,10 +1,10 @@
 window.alaBirdDataEmbedded = {
-  "fetched_at_utc": "2026-11-25T05:11:26Z",
-  "fetched_at_taipei": "2026-11-25 13:11:26",
+  "fetched_at_utc": "2026-11-25T08:40:09Z",
+  "fetched_at_taipei": "2026-11-25 16:40:09",
   "source": "Atlas of Living Australia (Biocache API)",
   "available": true,
   "unavailable_reason": "",
-  "total_matched_in_ala": 19070111,
+  "total_matched_in_ala": 19070276,
   "sample_records_count": 100,
   "state_counts": {
     "Tasmania": 15,

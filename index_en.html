@@ -18,6 +18,7 @@
     <script src="assets/js/movebank_tracks.js"></script>
     <script src="assets/js/cases_events.js"></script>
     <script src="assets/js/daff_weekly.js"></script>
+    <script src="assets/js/policy_status.js"></script>
     <script src="assets/js/daff_weekly_charts.js"></script>
     <script src="assets/js/shorebird_weekly.js"></script>
     <script src="assets/js/shorebird_weekly_charts.js"></script>
@@ -588,7 +589,7 @@
                             </div>
                             <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                                 <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">Status: Coastal Nomadic Seabird</span>
-                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF Detections: 579 (77%)</span>
+                                <span class="bg-blue-950/80 text-blue-300 border border-blue-700/50 text-[10px] px-2 py-0.5 rounded font-mono font-bold">DAFF Detections: 583 (78%)</span>
                             </div>
                             <p class="text-xs text-slate-300 leading-relaxed">
                                 <strong class="text-blue-300">Habitats & Ecology: </strong>Piscivorous, nests in dense breeding colonies of thousands on offshore islands and sandbars.
@@ -720,7 +721,7 @@
                                 <span class="bg-blue-500/20 text-blue-300 text-[10px] px-2 py-0.5 rounded font-mono font-bold">Dual Policy</span>
                             </div>
                             <div class="space-y-2 text-slate-200">
-                                <div data-asof="2026-10-08" class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
+                                <div id="policy-vic" data-asof="2026-10-08" class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
                                     <strong class="text-amber-400 block mb-0.5 font-bold">VIC · Poultry Confinement Order: Status Pending Official Confirmation</strong>
                                     <p class="text-[11px] text-slate-300 leading-relaxed">
                                         The previously announced Control Order (confinement of flocks of 50+ poultry in southern local government areas incl. metropolitan Melbourne) was <strong class="text-amber-300">last confirmed valid until 16 October 2026</strong>. On 2026-11-18 the order's dedicated page returned &quot;Page not found&quot;, and the control orders listed on the Victorian main page are now only poultry vaccination and dead wildlife handling. <strong class="text-amber-300">Whether the confinement order is still in force, lifted, or moved elsewhere is not confirmed by any official source; do not treat it as a current rule.</strong>
@@ -729,12 +730,22 @@
                                         Same page statement (obtained 2026-10-08): no H5 detections in poultry or livestock in Australia. (Source: Agriculture Victoria; this card will be updated once officially confirmed)
                                     </p>
                                 </div>
-                                <div data-asof="2026-09-16" class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
+                                <div id="policy-nsw" data-asof="2026-09-16" class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
                                     <strong class="text-emerald-400 block mb-0.5 font-bold">NSW · Voluntary Recommendation</strong>
                                     <p class="text-[11px] text-slate-300 leading-relaxed">
                                         NSW DPIRD maintains flexibility, strongly encouraging voluntary indoor housing without mandatory legislative lockdowns.
                                     </p>
                                 </div>
+                                <script>
+                                    (function () {
+                                        try {
+                                            if (window.PolicyStatus) {
+                                                PolicyStatus.fill(document.getElementById('policy-vic'), 'VIC', 'en');
+                                                PolicyStatus.fill(document.getElementById('policy-nsw'), 'NSW', 'en');
+                                            }
+                                        } catch (e) { console.warn('policy status skipped', e); }
+                                    })();
+                                </script>
                             </div>
                         </div>
                     </div>
@@ -12333,7 +12344,7 @@
     "ACT": 0
   },
   "species_counts": {
-    "Crested Tern": 579,
+    "Crested Tern": 583,
     "Silver Gull": 83,
     "Giant Petrel": 71,
     "Pacific Gull": 4,
@@ -12343,7 +12354,7 @@
     "Falcon & Other": 5
   },
   "source": "live",
-  "scrape_time": "2026-11-25 05:09 UTC"
+  "scrape_time": "2026-11-25 08:39 UTC"
 };
 
         const factoryLat = -33.521027;
