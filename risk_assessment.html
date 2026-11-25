@@ -115,6 +115,7 @@
     <script src="assets/js/movebank_tracks.js"></script>
     <script src="assets/js/cases_events.js"></script>
     <script src="assets/js/daff_weekly.js"></script>
+    <script src="assets/js/policy_status.js"></script>
 </head>
 
 <body class="min-h-screen pb-12">
@@ -425,6 +426,19 @@
                             <option value="60">🟡 僅基本門禁清消、無實質圈養要求 (風險 60分)</option>
                             <option value="100">🔴 完全開放放養、零生物安全防護 (風險 100分)</option>
                         </select>
+                        <div id="policy-status-live" class="hidden mt-2 pt-2 border-t border-slate-800 space-y-1 text-[11px] leading-relaxed"></div>
+                        <script>
+                            (function () {
+                                try {
+                                    if (!window.PolicyStatus) return;
+                                    var h = PolicyStatus.compact('NSW', 'zh') + PolicyStatus.compact('VIC', 'zh');
+                                    if (!h) return;
+                                    var el = document.getElementById('policy-status-live');
+                                    el.innerHTML = '<div class="text-[10px] text-slate-500">官方現況（與首頁共用同一份資料；僅供對照，不會改變上方下拉選單的分數）</div>' + h;
+                                    el.classList.remove('hidden');
+                                } catch (err) { console.warn('policy status skipped', err); }
+                            })();
+                        </script>
                     </div>
 
                     <!-- Control 2: Commercial Farm Outbreak Status -->
