@@ -10,3 +10,6 @@ __pycache__/
 # Ignore OS junk files
 .DS_Store
 Thumbs.db
+
+# Scratch / debug leftovers (do not commit)
+scratch_*
