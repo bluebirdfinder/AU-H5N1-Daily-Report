@@ -116,6 +116,8 @@
     <script src="assets/js/cases_events.js"></script>
     <script src="assets/js/daff_weekly.js"></script>
     <script src="assets/js/policy_status.js"></script>
+    <script src="assets/js/shorebird_weekly.js"></script>
+    <script src="assets/js/shorebird_weekly_charts.js"></script>
 </head>
 
 <body class="min-h-screen pb-12">
@@ -859,6 +861,33 @@
         </div>
 
 
+
+        <!-- Migratory shorebird weekly observation records: shares assets/js/shorebird_weekly.js (data) and shorebird_weekly_charts.js (charts) with the homepage; hidden when there is no data.
+             A leading indicator that supports reading the "migratory season" dimension; it does not feed any score. -->
+        <div id="shorebird-weekly-card" class="hidden glass-card p-6 sm:p-8 space-y-4 border-l-4 border-sky-500">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <h3 class="text-lg font-bold text-white">🦅 Migratory Shorebird Weekly Observation Records (supports the "Migratory Season" dimension)</h3>
+                <span class="text-xs font-mono text-slate-400">Updated: <span id="shorebird-fetched">-</span></span>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+                Weekly number of <strong class="text-sky-300">iNaturalist</strong> observation records logged in Australia for 19 East Asian–Australasian Flyway shorebird species, overlaid with the same weeks of the previous two years.
+                <strong class="text-amber-300">This counts logged records, not arriving birds</strong>: it depends on observer numbers, weather and registration lag, so the earlier years are overlaid and overall observer effort is cancelled out. Only iNaturalist is counted because large datasets such as eBird reach GBIF/ALA much later, which would distort a year-on-year comparison.
+            </p>
+            <p class="text-[11px] text-slate-300 leading-relaxed">
+                A <strong class="text-sky-300">leading indicator for the "Migratory Season" dimension that does not feed any score</strong>; the risk red line remains whether NSW commercial poultry is confirmed. Full method and registration-lag notes are on the <a href="index_en.html" class="text-sky-300 underline">homepage</a>.
+            </p>
+            <p class="text-[11px] text-amber-300/90 leading-relaxed">
+                ⚠️ The latest 3 weeks (faded bars) are <strong>assumed</strong> incomplete and are usually revised upward later; do not read them as fewer birds.
+            </p>
+            <div id="shorebird-gbif-wrap" class="hidden">
+                <div class="h-[220px] w-full relative"><canvas id="shorebird-gbif-chart"></canvas></div>
+                <p id="shorebird-gbif-summary" class="text-[11px] text-slate-300 mt-2 leading-relaxed font-mono"></p>
+            </div>
+            <div id="shorebird-ala-wrap" class="hidden">
+                <div class="h-[220px] w-full relative"><canvas id="shorebird-ala-chart"></canvas></div>
+                <p id="shorebird-ala-summary" class="text-[11px] text-slate-300 mt-2 leading-relaxed font-mono"></p>
+            </div>
+        </div>
 
         <!-- NSW 觀察指標：資料來自 assets/js/daff_weekly.js（DAFF 官方逐筆 xlsx 每日計算）；只顯示指標，門檻由人工決定 -->
         <div id="nsw-watch-card" class="hidden glass-card p-6 sm:p-8 space-y-4 border-l-4 border-cyan-500">

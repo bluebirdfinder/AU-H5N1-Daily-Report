@@ -116,6 +116,8 @@
     <script src="assets/js/cases_events.js"></script>
     <script src="assets/js/daff_weekly.js"></script>
     <script src="assets/js/policy_status.js"></script>
+    <script src="assets/js/shorebird_weekly.js"></script>
+    <script src="assets/js/shorebird_weekly_charts.js"></script>
 </head>
 
 <body class="min-h-screen pb-12">
@@ -858,6 +860,33 @@
         </div>
 
 
+
+        <!-- 遷徙性濱鳥每週觀測紀錄數：與首頁共用 assets/js/shorebird_weekly.js（資料）與 shorebird_weekly_charts.js（繪圖）；無資料時自動隱藏。
+             用途是輔助判讀「候鳥季節」維度的領先指標，不參與任何分數計算。 -->
+        <div id="shorebird-weekly-card" class="hidden glass-card p-6 sm:p-8 space-y-4 border-l-4 border-sky-500">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <h3 class="text-lg font-bold text-white">🦅 遷徙性濱鳥「每週觀測紀錄數」（輔助判讀「候鳥季節」維度）</h3>
+                <span class="text-xs font-mono text-slate-400">資料更新: <span id="shorebird-fetched">-</span></span>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+                統計 19 種東亞—澳大拉西亞遷飛區濱鳥在澳洲每週被登錄的 <strong class="text-sky-300">iNaturalist</strong> 觀測紀錄數，並對照去年與前年同週。
+                <strong class="text-amber-300">這是「被登錄的紀錄數」，不是入境隻數</strong>：會受賞鳥人數、天氣與登錄延遲影響，所以同時畫出前兩年同週並扣除整體觀察力道；只算 iNaturalist 是因為 eBird 等大型資料集匯入 GBIF／ALA 要晚很久，混在一起做跨年比較會失真。
+            </p>
+            <p class="text-[11px] text-slate-300 leading-relaxed">
+                這是「候鳥季節」維度的<strong class="text-sky-300">領先指標，不參與分數計算</strong>；風險紅線仍是「NSW 商業家禽是否確診」。完整方法與登錄延遲說明見<a href="index.html" class="text-sky-300 underline">首頁</a>。
+            </p>
+            <p class="text-[11px] text-amber-300/90 leading-relaxed">
+                ⚠️ 最近 3 週（淡色柱）<strong>假設</strong>尚未登錄完整，事後通常會補增，不可解讀為候鳥減少。
+            </p>
+            <div id="shorebird-gbif-wrap" class="hidden">
+                <div class="h-[220px] w-full relative"><canvas id="shorebird-gbif-chart"></canvas></div>
+                <p id="shorebird-gbif-summary" class="text-[11px] text-slate-300 mt-2 leading-relaxed font-mono"></p>
+            </div>
+            <div id="shorebird-ala-wrap" class="hidden">
+                <div class="h-[220px] w-full relative"><canvas id="shorebird-ala-chart"></canvas></div>
+                <p id="shorebird-ala-summary" class="text-[11px] text-slate-300 mt-2 leading-relaxed font-mono"></p>
+            </div>
+        </div>
 
         <!-- NSW 觀察指標：資料來自 assets/js/daff_weekly.js（DAFF 官方逐筆 xlsx 每日計算）；只顯示指標，門檻由人工決定 -->
         <div id="nsw-watch-card" class="hidden glass-card p-6 sm:p-8 space-y-4 border-l-4 border-cyan-500">
