@@ -1,6 +1,6 @@
 window.alaBirdDataEmbedded = {
-  "fetched_at_utc": "2026-11-26T04:40:47Z",
-  "fetched_at_taipei": "2026-11-26 12:40:47",
+  "fetched_at_utc": "2026-11-26T18:02:05Z",
+  "fetched_at_taipei": "2026-11-27 02:02:05",
   "source": "Atlas of Living Australia (Biocache API)",
   "available": true,
   "unavailable_reason": "",

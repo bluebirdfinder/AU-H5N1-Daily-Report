@@ -1,9 +1,9 @@
 window.gbifBirdDataEmbedded = {
-  "fetched_at_utc": "2026-11-26T04:41:04Z",
-  "fetched_at_taipei": "2026-11-26 12:41:04",
+  "fetched_at_utc": "2026-11-26T18:02:21Z",
+  "fetched_at_taipei": "2026-11-27 02:02:21",
   "source": "GBIF Global Biodiversity Information Facility (Excluding eBird duplicates)",
   "purpose": "Complement citizen science with scientific research, marine survey transects, and museum records",
-  "records_count": 417,
+  "records_count": 428,
   "records": [
     {
       "scientificName": "Thalasseus bergii",
@@ -809,6 +809,17 @@ window.gbifBirdDataEmbedded = {
       "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
     },
     {
+      "scientificName": "Macronectes halli",
+      "commonName": "Macronectes halli",
+      "lat": -38.8259,
+      "lng": 141.2948,
+      "eventDate": "2026-11-08",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
       "scientificName": "Puffinus tenuirostris",
       "commonName": "Short-tailed Shearwater",
       "lat": -33.8668,
@@ -968,6 +979,39 @@ window.gbifBirdDataEmbedded = {
       "lat": -36.4225,
       "lng": 150.075,
       "eventDate": "2026-11-07",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Puffinus tenuirostris",
+      "commonName": "Ardenna tenuirostris",
+      "lat": -38.39,
+      "lng": 142.2496,
+      "eventDate": "2026-11-09",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Puffinus tenuirostris",
+      "commonName": "Ardenna tenuirostris",
+      "lat": -35.6317,
+      "lng": 138.483,
+      "eventDate": "2026-11-10",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Puffinus tenuirostris",
+      "commonName": "Ardenna tenuirostris",
+      "lat": -30.1018,
+      "lng": 153.1989,
+      "eventDate": "2026-11-11",
       "basisOfRecord": "HUMAN_OBSERVATION",
       "institutionCode": "iNaturalist",
       "datasetName": "iNaturalist research-grade observations",
@@ -1361,9 +1405,75 @@ window.gbifBirdDataEmbedded = {
     {
       "scientificName": "Puffinus carneipes",
       "commonName": "Ardenna carneipes",
+      "lat": -32.0373,
+      "lng": 115.6416,
+      "eventDate": "2026-10-14",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Puffinus carneipes",
+      "commonName": "Ardenna carneipes",
       "lat": -35.7378,
       "lng": 136.5768,
       "eventDate": "2026-11-06",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Puffinus carneipes",
+      "commonName": "Ardenna carneipes",
+      "lat": -35.5171,
+      "lng": 138.7439,
+      "eventDate": "2026-11-13",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Puffinus carneipes",
+      "commonName": "Ardenna carneipes",
+      "lat": -38.4578,
+      "lng": 145.189,
+      "eventDate": "2026-11-16",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Puffinus carneipes",
+      "commonName": "Ardenna carneipes",
+      "lat": -31.9774,
+      "lng": 115.2638,
+      "eventDate": "2026-11-15",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Puffinus carneipes",
+      "commonName": "Ardenna carneipes",
+      "lat": -38.9309,
+      "lng": 141.4585,
+      "eventDate": "2026-11-08",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Puffinus carneipes",
+      "commonName": "Ardenna carneipes",
+      "lat": -38.7787,
+      "lng": 141.4268,
+      "eventDate": "2026-11-08",
       "basisOfRecord": "HUMAN_OBSERVATION",
       "institutionCode": "iNaturalist",
       "datasetName": "iNaturalist research-grade observations",
@@ -2195,6 +2305,17 @@ window.gbifBirdDataEmbedded = {
       "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
     },
     {
+      "scientificName": "Calidris canutus",
+      "commonName": "Calidris canutus",
+      "lat": -27.3226,
+      "lng": 153.1233,
+      "eventDate": "2026-11-10",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
       "scientificName": "Calidris tenuirostris",
       "commonName": "Calidris tenuirostris",
       "lat": -16.9124,
@@ -2244,6 +2365,17 @@ window.gbifBirdDataEmbedded = {
       "lat": -12.4065,
       "lng": 130.8169,
       "eventDate": "2026-08-30",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Calidris tenuirostris",
+      "commonName": "Calidris tenuirostris",
+      "lat": -12.4063,
+      "lng": 130.8142,
+      "eventDate": "2026-08-29",
       "basisOfRecord": "HUMAN_OBSERVATION",
       "institutionCode": "iNaturalist",
       "datasetName": "iNaturalist research-grade observations",
@@ -2481,17 +2613,6 @@ window.gbifBirdDataEmbedded = {
       "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
     },
     {
-      "scientificName": "Calidris tenuirostris",
-      "commonName": "Calidris tenuirostris",
-      "lat": -16.8608,
-      "lng": 145.7604,
-      "eventDate": "2026-10-04",
-      "basisOfRecord": "HUMAN_OBSERVATION",
-      "institutionCode": "iNaturalist",
-      "datasetName": "iNaturalist research-grade observations",
-      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
-    },
-    {
       "scientificName": "Calidris ruficollis",
       "commonName": "Calidris ruficollis",
       "lat": -16.91,
@@ -2518,6 +2639,17 @@ window.gbifBirdDataEmbedded = {
       "commonName": "Calidris ruficollis",
       "lat": -12.4065,
       "lng": 130.8169,
+      "eventDate": "2026-08-29",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Calidris ruficollis",
+      "commonName": "Calidris ruficollis",
+      "lat": -12.4065,
+      "lng": 130.8146,
       "eventDate": "2026-08-29",
       "basisOfRecord": "HUMAN_OBSERVATION",
       "institutionCode": "iNaturalist",
@@ -2706,17 +2838,6 @@ window.gbifBirdDataEmbedded = {
       "lat": -38.3486,
       "lng": 142.3692,
       "eventDate": "2026-09-08",
-      "basisOfRecord": "HUMAN_OBSERVATION",
-      "institutionCode": "iNaturalist",
-      "datasetName": "iNaturalist research-grade observations",
-      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
-    },
-    {
-      "scientificName": "Calidris ruficollis",
-      "commonName": "Calidris ruficollis",
-      "lat": -17.4596,
-      "lng": 140.8303,
-      "eventDate": "2026-09-13",
       "basisOfRecord": "HUMAN_OBSERVATION",
       "institutionCode": "iNaturalist",
       "datasetName": "iNaturalist research-grade observations",
@@ -4473,6 +4594,39 @@ window.gbifBirdDataEmbedded = {
     },
     {
       "scientificName": "Anseranas semipalmata",
+      "commonName": "Anseranas semipalmata",
+      "lat": -12.8654,
+      "lng": 132.7982,
+      "eventDate": "2026-08-30",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Anseranas semipalmata",
+      "commonName": "Anseranas semipalmata",
+      "lat": -12.8654,
+      "lng": 132.7963,
+      "eventDate": "2026-08-30",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Anseranas semipalmata",
+      "commonName": "Anseranas semipalmata",
+      "lat": -12.8638,
+      "lng": 132.7967,
+      "eventDate": "2026-08-30",
+      "basisOfRecord": "HUMAN_OBSERVATION",
+      "institutionCode": "iNaturalist",
+      "datasetName": "iNaturalist research-grade observations",
+      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
+    },
+    {
+      "scientificName": "Anseranas semipalmata",
       "commonName": "Magpie Goose",
       "lat": -27.5739,
       "lng": 152.2702,
@@ -4554,39 +4708,6 @@ window.gbifBirdDataEmbedded = {
       "lat": -12.7171,
       "lng": 131.6398,
       "eventDate": "2026-09-04",
-      "basisOfRecord": "HUMAN_OBSERVATION",
-      "institutionCode": "iNaturalist",
-      "datasetName": "iNaturalist research-grade observations",
-      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
-    },
-    {
-      "scientificName": "Anseranas semipalmata",
-      "commonName": "Anseranas semipalmata",
-      "lat": -19.3191,
-      "lng": 146.7927,
-      "eventDate": "2026-09-03",
-      "basisOfRecord": "HUMAN_OBSERVATION",
-      "institutionCode": "iNaturalist",
-      "datasetName": "iNaturalist research-grade observations",
-      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
-    },
-    {
-      "scientificName": "Anseranas semipalmata",
-      "commonName": "Anseranas semipalmata",
-      "lat": -38.006,
-      "lng": 145.1276,
-      "eventDate": "2026-09-05",
-      "basisOfRecord": "HUMAN_OBSERVATION",
-      "institutionCode": "iNaturalist",
-      "datasetName": "iNaturalist research-grade observations",
-      "source": "GBIF Academic/Museum/Marine Survey (Non-eBird)"
-    },
-    {
-      "scientificName": "Anseranas semipalmata",
-      "commonName": "Anseranas semipalmata",
-      "lat": -32.8755,
-      "lng": 151.6963,
-      "eventDate": "2026-09-01",
       "basisOfRecord": "HUMAN_OBSERVATION",
       "institutionCode": "iNaturalist",
       "datasetName": "iNaturalist research-grade observations",
