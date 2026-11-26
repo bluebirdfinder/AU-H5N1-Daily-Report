@@ -210,4 +210,12 @@
 - **未能驗證**（寫進頁面前已排除）：Gemini 說的「8 月 7 日開始」「兩度各延長 28 天」「公報命令名稱 Avian Influenza Control Area Order 2026」。公報 PDF（`GG2026S434.pdf`）下載成功但 runner 沒有 `pdftotext`，未能抽出文字。
 - 已更新 `assets/js/policy_status.js` 的 VIC 項目（中英文、`asof`＝2026-11-26 官方原文讀取日），首頁政策卡與風險站同步；首頁模板備援文字與風險站「政策隔離」旁的靜態敘述一併更新。頁面註明**這是防護放寬、不是疫情緩解**（官方同稿說野生動物檢出持續）。**不改變任何風險分數**；風險站「政策隔離」下拉選單的預設值（NSW 自願性宣導）本來就以 NSW 為準，未動。
 - **日後若維州重新實施**：維州 H5 主頁的「Requirements and authorisations」會出現新的家禽管制令，排程的 `[VIC 政策原文診斷]` log 會印出含 control order 的段落（原本就有，不需改程式），讀 log 即可發現。
-- **NSW 那一項（`asof` 2026-09-16）仍未用官方原文核對。**
+- ~~**NSW 那一項（`asof` 2026-09-16）仍未用官方原文核對。**~~ **（已於 2026-11-26 更新，見下節）**
+
+## 2026-11-26（後續）：NSW 圈養建議核對、維州「50 隻」出處更正（PR #21）
+
+- **NSW 官方現況**：NSW DPIRD 產業通報（2026-10-27，作者 Joanna Blunden，發布於 extensionaus.com.au/smallscalepoultry，使用者貼上原文）寫明「NSW Chief Veterinary Officer is extending voluntary housing recommendations for a further 28 days, until the 28 November 2026, due to the continued detections in wild birds」，會持續檢討、風險改變時可能修訂。這是**自願性建議，不是強制命令**。`policy_status.js` 的 NSW 項目已更新（`asof` 2026-11-26）。
+- **來源層級要寫清楚**：同一天使用者貼的 Gemini 摘要（含 8/7→9/5、10 月底再延 28 天的歷程）**只有 11/28 這個日期被原文證實**，歷程細節未採用。nsw.gov.au 的「家禽業者頁」原文（2026-11-26 貼上）**完全不含**圈養建議或其日期，只有生物安保措施與一份「圈養令準備」PDF 連結（只代表在準備，不代表已發布）；所以頁面註記明寫來源是 DPIRD 通報、不是 nsw.gov.au 主頁。
+- **⚠️ NSW 建議 2026-11-28 到期**：官方可能續延、調整或失效，我們尚無 11/28 之後的公告。`asof` 超過 14 天首頁會自動顯示 ⚠️，但到期當天就可能已過期，需要人工貼新公告更新（NSW 主頁或下一期 DPIRD 產業通報）。
+- **維州「50 隻以上」出處更正**：先前把這個數字寫在 10/16 新聞稿名下，但 10/16 稿只寫 "metropolitan Melbourne and specified coastal and adjacent areas"。使用者貼 8/21 新聞稿後證實數字是真的，但屬於**圈養令生效期間**的門檻：「Poultry owners with 50 or more birds in coastal and southern shires are required to confine their birds」（當時延長至少 28 天，其他地區僅建議，ACCC 放養標示不執法期最長 90 天）。已改為內文不提 50 隻，註記另句標明 8/21 稿。**教訓：同一段文字混用兩份新聞稿的內容時，每個事實都要標對來源與日期。**
+- 這輪仍未目視頁面，只驗證檔案內容與備援文字和 `PolicyStatus.full()` 輸出逐字一致（四個區塊）。
