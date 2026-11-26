@@ -10526,5 +10526,19 @@
     "confirm_date": "2026-11-25",
     "detection_count": 1,
     "notes": "【DAFF 權威數據對齊事件】官方最新通報確診事件，物種：野生燕鷗 (大鳳頭燕鷗 / Crested tern)，確保事件庫與 DAFF 官網總數 (752 起) 100% 對齊。"
+  },
+  {
+    "id": "EVENT-757",
+    "type": "Confirmed",
+    "source_status": "official_updated",
+    "species": "野生燕鷗 (大鳳頭燕鷗 / Crested tern)",
+    "location": "VIC 官方最新通報區域 (個案 1)",
+    "latitude": -38.2636,
+    "longitude": 144.6031,
+    "found_date": "2026-11-26",
+    "notify_date": "2026-11-26",
+    "confirm_date": "2026-11-26",
+    "detection_count": 1,
+    "notes": "【DAFF 權威數據對齊事件】官方最新通報確診事件，物種：野生燕鷗 (大鳳頭燕鷗 / Crested tern)，確保事件庫與 DAFF 官網總數 (753 起) 100% 對齊。"
   }
 ]

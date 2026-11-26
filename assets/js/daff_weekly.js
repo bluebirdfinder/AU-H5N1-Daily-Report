@@ -1,7 +1,7 @@
 window.daffWeeklyEmbedded = {
- "fetched_at_utc": "2026-11-26T02:58:14Z",
- "total_events": 752,
- "dated_events": 619,
+ "fetched_at_utc": "2026-11-26T03:33:13Z",
+ "total_events": 753,
+ "dated_events": 620,
  "undated_events": 133,
  "weeks": [
   {
@@ -200,10 +200,11 @@ window.daffWeeklyEmbedded = {
   },
   {
    "start": "2026-11-16",
-   "total": 9,
+   "total": 10,
    "by_state": {
     "NSW": 1,
-    "SA": 8
+    "SA": 8,
+    "VIC": 1
    }
   },
   {
@@ -261,10 +262,11 @@ window.daffWeeklyEmbedded = {
    }
   },
   "2026-11": {
-   "total": 18,
+   "total": 19,
    "by_state": {
     "NSW": 8,
-    "SA": 10
+    "SA": 10,
+    "VIC": 1
    }
   }
  },
@@ -301,7 +303,7 @@ window.daffWeeklyEmbedded = {
    },
    "aus": {
     "known_lgas": 123,
-    "recent": 18,
+    "recent": 19,
     "prev": 42
    }
   },
@@ -366,8 +368,8 @@ window.daffWeeklyEmbedded = {
   "Brown Skua": 4,
   "Cormorant": 28,
   "Little Penguin": 16,
-  "Falcon & Other": 95
+  "Falcon & Other": 96
  },
- "bird_events": 730,
+ "bird_events": 731,
  "mammal_events": 22
 };
