@@ -203,3 +203,11 @@
 - **濱鳥每週觀測數同步放到風險站（PR #18）**：風險站「候鳥季節」相關區塊（候鳥地圖之後、NSW 看板之前）新增同一張卡片，**直接重用**首頁的 `assets/js/shorebird_weekly.js`（資料）與 `shorebird_weekly_charts.js`（繪圖，依元素 id 自動繪製），風險站只放卡片外殼，中英文同步。卡片明寫「領先指標、**不參與分數計算**」，並連回首頁看完整方法。理由：AGENT.md 把野鳥數據定位為領先指標（預測擴散），屬於風險判讀；先前只放首頁。用真實 `shorebird_weekly.js` 與替身 DOM／Chart 驗證卡片會顯示、建立 2 張圖；**沒有目視過實際圖形**。
 - **根目錄雜物整理（PR #19）**：移除 21 張已被 `.gitignore`（`*.png`）排除卻仍留在版控的截圖，與 3 個 8 月的暫存檔（`scratch_*`），合計約 18 MB；`.gitignore` 補上 `scratch_*`。移除前逐一確認沒有程式、工作流程或文件引用。**刻意保留**：`live_page.html`／`live_page_en.html`／`live_page_utf8.html`（排程 `cp` 與 `h5n1.py` 備援路徑都在用）、`cases.json`（`h5n1.py` 備援）、`species_cache.json`（`h5n1.py` 快取）。
 - **評估後刻意不做的整理**：①「4 大候鳥數據源判讀指引」是兩頁各自的說明彈窗（`#telemetryGuideModal`，各約 7.7 KB），去重得改成跨頁開彈窗，風險大於收益，且兩頁各自完整便於離線開啟；② 風險站 NSW 看板的「每週新增」是 4 週小數字，與首頁完整圖表形式不同，不算有害重複；③ 首頁「歷史凍結區」（236 隻、64 筆舊病歷）想摺疊，但該區含 Leaflet 地圖與 Chart.js 圖，放進預設隱藏的容器會讓尺寸計算出錯，沙盒無法目視驗證，因此未動。
+
+## 2026-11-26：維州家禽圈養令已結束（官方原文證實）
+
+- 使用者貼 Gemini 的說法（圈養令 2026-10-16 解除）後，**不直接採用**，改用 GitHub runner 的唯讀探針讀官方頁面（沙盒連不到 `agriculture.vic.gov.au`）。**官方原文證實**：維州農業局新聞稿 *Biosecurity remains essential as temporary poultry confinement requirement ends*（日期 2026-10-16）寫明大墨爾本及指定沿海與鄰近地區（50 隻以上家禽）的臨時要求「ending on 16 October 2026」；理由是預報夏季氣溫高於平均加上動物福利考量；首席獸醫官仍強烈鼓勵業者持續隔離家禽與野鳥，並保留依《1994 年牲畜疾病控制法》再發布管制令的權限；同稿說澳洲尚無家禽或牲畜 H5 檢出、野生動物仍在全州檢出。9/18 新聞稿證實「extended for another 28 days from 19 September 2026」。維州 H5 主頁（`…/poultry-diseases/H5N1-avian-influenza-H5-bird-flu`）目前列出的管制令只剩野生動物屍體處理兩項，**不含家禽圈養**。
+- **未能驗證**（寫進頁面前已排除）：Gemini 說的「8 月 7 日開始」「兩度各延長 28 天」「公報命令名稱 Avian Influenza Control Area Order 2026」。公報 PDF（`GG2026S434.pdf`）下載成功但 runner 沒有 `pdftotext`，未能抽出文字。
+- 已更新 `assets/js/policy_status.js` 的 VIC 項目（中英文、`asof`＝2026-11-26 官方原文讀取日），首頁政策卡與風險站同步；首頁模板備援文字與風險站「政策隔離」旁的靜態敘述一併更新。頁面註明**這是防護放寬、不是疫情緩解**（官方同稿說野生動物檢出持續）。**不改變任何風險分數**；風險站「政策隔離」下拉選單的預設值（NSW 自願性宣導）本來就以 NSW 為準，未動。
+- **日後若維州重新實施**：維州 H5 主頁的「Requirements and authorisations」會出現新的家禽管制令，排程的 `[VIC 政策原文診斷]` log 會印出含 control order 的段落（原本就有，不需改程式），讀 log 即可發現。
+- **NSW 那一項（`asof` 2026-09-16）仍未用官方原文核對。**

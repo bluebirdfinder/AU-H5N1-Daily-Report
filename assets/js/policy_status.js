@@ -2,24 +2,24 @@
  * 更新政策時只改下面的資料，並同步 asof（官方原文最後取得日）；不要再改各頁面的寫死文字。
  * 這是人工維護的資料檔，h5n1.py 不會覆寫它。 */
 window.policyStatusEmbedded = {
-  "updated": "2026-11-25",
+  "updated": "2026-11-26",
   "note": "各州家禽圈養令現況。首頁政策卡與風險評估頁共用此檔，更新時只改這裡；asof＝官方原文最後取得日（超過 14 天頁面會顯示 ⚠️）。",
   "items": [
     {
       "state": "VIC",
       "tone": "amber",
-      "asof": "2026-10-08",
+      "asof": "2026-11-26",
       "zh": {
-        "title": "維州 (VIC) · 家禽圍養令狀態待官方確認",
-        "short": "狀態待官方確認：最後確認期限 2026-10-16，專屬頁面已無法讀取，請勿視為現行規定。",
-        "body": "先前公告的「管制令 (Control Order)」圍養要求（南部各地方政府區含大墨爾本、50 隻以上家禽）<strong class=\"text-amber-300\">最後確認的有效期限為 2026 年 10 月 16 日</strong>。2026-11-18 自動抓取時，該管制令專屬頁面已回應「Page not found」，維州主頁的管制令清單也只剩疫苗與野生動物屍體處理兩項。<strong class=\"text-amber-300\">圈養令目前是否仍有效、已解除或已併入他頁，尚無官方原文佐證，請勿視為現行規定。</strong>",
-        "note": "同頁官方聲明（2026-10-08 取得）：澳洲目前尚無家禽或牲畜的 H5 檢出。（來源：Agriculture Victoria；待官方確認後更新本卡）"
+        "title": "維州 (VIC) · 家禽臨時圈養令已於 2026 年 10 月 16 日結束",
+        "short": "強制圈養要求已結束（官方新聞稿 2026-10-16）；官方仍強烈鼓勵業者持續隔離家禽與野鳥，並保留日後再發布管制令的權限。",
+        "body": "維州農業局新聞稿（2026-10-16）宣布，大墨爾本及指定沿海與鄰近地區（飼養 50 隻以上家禽者）的<strong class=\"text-amber-300\">臨時圈養要求已於 2026 年 10 月 16 日結束</strong>；官方列出的理由是預報夏季氣溫高於平均，加上動物福利考量。維州首席獸醫官<strong class=\"text-amber-300\">強烈鼓勵所有業者繼續採取一切可行措施</strong>：讓家禽與野鳥保持隔離、保護飼料與飲水不被野鳥接觸、防止野鳥進入禽舍與活動場地，並保留依《1994 年牲畜疾病控制法》於情況改變時再發布管制令的權限。",
+        "note": "本站註：圈養要求結束代表防護放寬，並非疫情緩解——同一份新聞稿指出野生動物的檢出仍在全州持續，澳洲則尚無家禽或牲畜的 H5 檢出。維州 H5 主頁目前列出的管制令只剩野生動物屍體處理相關兩項，不含家禽圈養。（來源：Agriculture Victoria 新聞稿 2026-10-16 與 H5 主頁，2026-11-26 讀取）"
       },
       "en": {
-        "title": "VIC · Poultry Confinement Order: Status Pending Official Confirmation",
-        "short": "Status pending official confirmation: last confirmed valid until 16 Oct 2026; the official page is no longer readable. Do not treat it as a current rule.",
-        "body": "The previously announced Control Order (confinement of flocks of 50+ poultry in southern local government areas incl. metropolitan Melbourne) was <strong class=\"text-amber-300\">last confirmed valid until 16 October 2026</strong>. On 2026-11-18 the order's dedicated page returned &quot;Page not found&quot;, and the control orders listed on the Victorian main page are now only poultry vaccination and dead wildlife handling. <strong class=\"text-amber-300\">Whether the confinement order is still in force, lifted, or moved elsewhere is not confirmed by any official source; do not treat it as a current rule.</strong>",
-        "note": "Same page statement (obtained 2026-10-08): no H5 detections in poultry or livestock in Australia. (Source: Agriculture Victoria; this card will be updated once officially confirmed)"
+        "title": "VIC · Temporary poultry confinement requirement ended on 16 October 2026",
+        "short": "The mandatory confinement requirement ended (official media release, 16 Oct 2026); producers are still strongly encouraged to keep poultry separated from wild birds, and the Chief Veterinary Officer retains the power to issue new Control Orders.",
+        "body": "An Agriculture Victoria media release (16 Oct 2026) announced that the temporary requirements for poultry producers (50 or more poultry) in metropolitan Melbourne and specified coastal and adjacent areas <strong class=\"text-amber-300\">ended on 16 October 2026</strong>; the stated reasons are forecast hotter-than-average summer temperatures together with animal welfare considerations. Victoria's Chief Veterinary Officer <strong class=\"text-amber-300\">strongly encourages all producers to keep using every practical measure</strong>: keep poultry separated from wild birds, protect feed and water from wild bird access, and prevent wild birds entering sheds and yards. The Chief Veterinary Officer retains the authority to issue future Control Orders under the Livestock Disease Control Act 1994 if the situation changes.",
+        "note": "Site note: ending the confinement requirement is a loosening of protection, not an easing of the outbreak: the same release says detections in wildlife continue across the state, while there have been no H5 detections in Australian poultry or livestock. The control orders now listed on the Victorian H5 page are only the two on dead wildlife handling; none concerns poultry confinement. (Source: Agriculture Victoria media release 16 Oct 2026 and H5 page, read 2026-11-26)"
       }
     },
     {
