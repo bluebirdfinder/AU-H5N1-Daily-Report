@@ -219,3 +219,12 @@
 - **⚠️ NSW 建議 2026-11-28 到期**：官方可能續延、調整或失效，我們尚無 11/28 之後的公告。`asof` 超過 14 天首頁會自動顯示 ⚠️，但到期當天就可能已過期，需要人工貼新公告更新（NSW 主頁或下一期 DPIRD 產業通報）。
 - **維州「50 隻以上」出處更正**：先前把這個數字寫在 10/16 新聞稿名下，但 10/16 稿只寫 "metropolitan Melbourne and specified coastal and adjacent areas"。使用者貼 8/21 新聞稿後證實數字是真的，但屬於**圈養令生效期間**的門檻：「Poultry owners with 50 or more birds in coastal and southern shires are required to confine their birds」（當時延長至少 28 天，其他地區僅建議，ACCC 放養標示不執法期最長 90 天）。已改為內文不提 50 隻，註記另句標明 8/21 稿。**教訓：同一段文字混用兩份新聞稿的內容時，每個事實都要標對來源與日期。**
 - 這輪仍未目視頁面，只驗證檔案內容與備援文字和 `PolicyStatus.full()` 輸出逐字一致（四個區塊）。
+
+## 2026-11-26（後續）：沙盒網路白名單實測（哪些讀得到、哪些被擋）
+
+使用者在環境設定把下列網域加入白名單後，用 `curl`（一般 User-Agent）實測：
+
+- **讀得到**：`extensionaus.com.au`（NSW DPIRD 產業通報，如 `/smallscalepoultry/h5-bird-flu-industry-update-27-october/`，內容與使用者貼的一致）；`www.nsw.gov.au` 禽流感主頁（HTTP 200，但公告多為載入後由腳本寫入，靜態內容**不含**圈養建議或 11/28，不能用來核對）。
+- **讀不到（不是白名單問題）**：`www.dpird.nsw.gov.au` 與 `agriculture.vic.gov.au` 回 HTTP 403，內容是 Cloudflare 的「Just a moment...」驗證頁，是網站自己的機器人防護；這兩個站過去只有 GitHub runner（curl_cffi／Playwright）讀得到。**之後看到 403 先看回應內文是不是 Cloudflare 驗證頁，不要先假設是白名單沒設好。**
+- 「允許套件管理工具」未勾選：本專案的抓取與編譯在 GitHub runner 跑，沙盒用不到。
+- **NSW 圈養建議到期檢查**：建議 2026-11-28 到期，已排 11/29 提醒；沙盒可直接讀 extensionaus 的新一期通報，不必等使用者貼。維州與 DPIRD 新聞稿原文仍需使用者貼上或讓 runner 讀取。
