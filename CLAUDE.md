@@ -129,6 +129,7 @@
 
 ## 開發規範
 
+- **溝通偏好（摘自使用者的全域 CLAUDE.md，另有全域設定時以全域為準）**：用白話解釋；多項進度用表格；任何任務回報大約完成百分比；流程與架構優先用 code block 畫文字圖；需要使用者決定時一律用 `AskUserQuestion` 選項卡片（選項 description 要寫清楚後果與建議，建議選項放第一個並標「（建議）」）；每次回覆結尾明講「有沒有需要使用者回答的事」。
 - CDN 白名單只能用 `cdnjs.cloudflare.com`，不可用 `cdn.jsdelivr.net` / `unpkg.com`（企業資安政策，見 AGENT.md）。
 - 中英文四組檔案（`index`/`index_en`、`risk_assessment`/`risk_assessment_en`、`risk_assessment_slides`/`risk_assessment_slides_en`）必須維持同步；改一邊時記得另一邊——這次稽核發現的好幾個 bug 都是「中文版修過、英文版沒同步跟著改」（例如 NSW 事件數中文版寫 22、英文版某幾處寫的是完全不同的 17 或 456）。
 - 改完 `h5n1.py` 或模板後，用 `python h5n1.py` 重新編譯，確認 console 印出「網頁自動編譯成功！」。在沒有 `EBIRD_API_KEY`/`MOVEBANK_USER`/網路權限的沙盒環境跑這支程式是安全的（每個抓取步驟都有 try/except 與離線 fallback），但跑完記得檢查 `git diff`，不要把沙盒才會出現的降級資料（例如網路不通導致 GBIF 寫出 0 筆記錄）誤 commit 回去。
