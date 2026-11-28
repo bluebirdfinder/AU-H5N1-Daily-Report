@@ -1,5 +1,5 @@
 window.daffWeeklyEmbedded = {
- "fetched_at_utc": "2026-11-27T17:46:27Z",
+ "fetched_at_utc": "2026-11-28T04:24:57Z",
  "total_events": 753,
  "dated_events": 620,
  "undated_events": 133,
@@ -304,7 +304,7 @@ window.daffWeeklyEmbedded = {
    "aus": {
     "known_lgas": 123,
     "recent": 16,
-    "prev": 39
+    "prev": 38
    }
   },
   "nsw_lga_last": [
